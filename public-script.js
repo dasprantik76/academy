@@ -457,49 +457,51 @@ class PublicAcademyApp {
     if (!this.authOtpDigits || this.authOtpDigits.length === 0) return;
 
     this.authOtpDigits.forEach((digitInput, index) => {
-      // Auto-select on focus or click for instant overwrite
+      // Auto-select on focus or click
       digitInput.addEventListener('focus', () => {
-        setTimeout(() => digitInput.select(), 10);
+        digitInput.select();
       });
       digitInput.addEventListener('click', () => {
         digitInput.select();
       });
 
-      // Direct Keydown Handler (Handles desktop number keys & numpad instantly)
-      digitInput.addEventListener('keydown', (e) => {
-        // Digits 0-9
-        if (/^[0-9]$/.test(e.key)) {
-          e.preventDefault();
-          digitInput.value = e.key;
-          digitInput.classList.add('filled');
-          digitInput.classList.remove('input-error');
-          this.syncAuthCodeFromOtpDigits();
+      // Primary Input event: works seamlessly across desktop, mobile, numpad, IME
+      digitInput.addEventListener('input', (e) => {
+        const raw = digitInput.value;
+        const cleaned = raw.replace(/\D/g, '');
+        const digit = cleaned.length > 0 ? cleaned.slice(-1) : '';
+        digitInput.value = digit;
 
-          if (index < this.authOtpDigits.length - 1) {
-            this.authOtpDigits[index + 1].focus();
-            this.authOtpDigits[index + 1].select();
+        digitInput.classList.toggle('filled', Boolean(digit));
+        digitInput.classList.remove('input-error');
+
+        this.syncAuthCodeFromOtpDigits();
+
+        // Advance to next box immediately if a digit is entered
+        if (digit && index < this.authOtpDigits.length - 1) {
+          const next = this.authOtpDigits[index + 1];
+          if (next) {
+            next.focus();
+            next.select();
           }
-          return;
         }
+      });
 
-        // Backspace handling
+      // Keydown for Backspace and Arrow navigation
+      digitInput.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace') {
           if (!digitInput.value && index > 0) {
             e.preventDefault();
-            this.authOtpDigits[index - 1].value = '';
-            this.authOtpDigits[index - 1].classList.remove('filled');
-            this.authOtpDigits[index - 1].focus();
-            this.syncAuthCodeFromOtpDigits();
-          } else {
-            digitInput.value = '';
-            digitInput.classList.remove('filled');
-            this.syncAuthCodeFromOtpDigits();
+            const prev = this.authOtpDigits[index - 1];
+            if (prev) {
+              prev.value = '';
+              prev.classList.remove('filled');
+              prev.focus();
+              prev.select();
+              this.syncAuthCodeFromOtpDigits();
+            }
           }
-          return;
-        }
-
-        // Arrow Key Navigation
-        if (e.key === 'ArrowLeft' && index > 0) {
+        } else if (e.key === 'ArrowLeft' && index > 0) {
           e.preventDefault();
           this.authOtpDigits[index - 1].focus();
           this.authOtpDigits[index - 1].select();
@@ -510,27 +512,10 @@ class PublicAcademyApp {
         }
       });
 
-      // Mobile soft keyboards input fallback
-      digitInput.addEventListener('input', (e) => {
-        let val = e.target.value.replace(/\D/g, '');
-        if (val.length > 1) val = val.charAt(val.length - 1);
-        e.target.value = val;
-
-        digitInput.classList.toggle('filled', Boolean(val));
-        digitInput.classList.remove('input-error');
-
-        this.syncAuthCodeFromOtpDigits();
-
-        if (val && index < this.authOtpDigits.length - 1) {
-          this.authOtpDigits[index + 1].focus();
-          this.authOtpDigits[index + 1].select();
-        }
-      });
-
-      // Paste event: automatically distributes 6 digits
+      // Paste event: paste full 6-digit code
       digitInput.addEventListener('paste', (e) => {
         e.preventDefault();
-        const clipboard = (e.clipboardData || window.clipboardData).getData('text');
+        const clipboard = (e.clipboardData || window.clipboardData).getData('text') || '';
         const digits = clipboard.replace(/\D/g, '').slice(0, 6);
         if (!digits) return;
 
