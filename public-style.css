@@ -888,21 +888,25 @@ input[data-capitalize="true"] {
 }
 
 .auth-otp-digit {
-  width: 50px;
-  height: 56px;
-  text-align: center;
-  font-family: 'Plus Jakarta Sans', 'SF Mono', 'Roboto Mono', monospace, sans-serif;
-  font-size: 1.5rem;
-  font-weight: 800;
+  width: 50px !important;
+  height: 56px !important;
+  padding: 0 !important;
+  text-indent: 0 !important;
+  margin: 0 !important;
+  text-align: center !important;
+  font-family: 'Plus Jakarta Sans', 'SF Mono', 'Roboto Mono', monospace, sans-serif !important;
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
   color: #0f172a !important;
   background-color: #ffffff !important;
-  border: 2px solid #6ee7b7;
+  border: 2px solid #6ee7b7 !important;
   border-radius: 8px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
   transition: all var(--transition-fast);
-  outline: none;
-  caret-color: #059669;
-  -webkit-appearance: none;
+  outline: none !important;
+  caret-color: #059669 !important;
+  -webkit-appearance: none !important;
+  box-sizing: border-box !important;
 }
 
 .auth-otp-digit:focus {
@@ -930,9 +934,10 @@ input[data-capitalize="true"] {
     gap: 0.35rem;
   }
   .auth-otp-digit {
-    width: 42px;
-    height: 50px;
-    font-size: 1.25rem;
+    width: 42px !important;
+    height: 50px !important;
+    font-size: 1.3rem !important;
+    padding: 0 !important;
   }
 }
 
