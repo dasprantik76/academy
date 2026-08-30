@@ -1,0 +1,1366 @@
+/**
+ * Academy by PixelSetu - Public Website, Student Registration & Certificate Logic
+ * Custom dropdowns opening directly below dropdown boxes
+ * Real-time Title Case Capitalization & 10-Digit Mobile Number Validation
+ * Student Certificate Verification by Mobile Number & Date of Birth
+ */
+
+const STORAGE_KEYS = {
+  COURSES: 'educore_academy_courses',
+  STUDENTS: 'educore_academy_students',
+  AUTH_TOKEN: 'educore_academy_auth_token',
+  ACADEMY_PROFILE: 'pixelsetu_academy_profile'
+};
+
+const INDIAN_STATES_DISTRICTS = {
+  "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Ananthapuramu", "Annamayya", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema", "East Godavari", "Eluru", "Guntur", "Kakinada", "Krishna", "Kurnool", "Nandyal", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "Sri Potti Sriramulu Nellore", "Sri Sathya Sai", "Srikakulam", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
+  "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang", "Itanagar"],
+  "Assam": ["Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tamulpur", "Tinsukia", "Udalguri", "West Karbi Anglong", "Bajali"],
+  "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran (Motihari)", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur (Bhabua)", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda (Bihar Sharif)", "Nawada", "Patna", "Purnia", "Rohtas (Sasaram)", "Saharsa", "Samastipur", "Saran (Chhapra)", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali (Hajipur)", "West Champaran (Bettiah)"],
+  "Chhattisgarh": ["Balod", "Baloda Bazar", "Balrampur", "Bastar (Jagdalpur)", "Bemetara", "Bijapur", "Bilaspur", "Dantewada (South Bastar)", "Dhamtari", "Durg", "Gariaband", "Gaurela-Pendra-Marwahi", "Janjgir-Champa", "Jashpur", "Kabirdham (Kawardha)", "Kanker (North Bastar)", "Khairagarh-Chhuikhadan-Gandai", "Kondagaon", "Korba", "Koriya", "Mahasamund", "Manendragarh-Chirmiri-Bharatpur", "Mohla-Manpur-Ambagarh Chouki", "Mungeli", "Narayanpur", "Raigarh", "Raipur", "Rajnandgaon", "Sakti", "Sarangarh-Bilaigarh", "Sukma", "Surajpur", "Surguja (Ambikapur)"],
+  "Goa": ["North Goa", "South Goa"],
+  "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha (Palanpur)", "Bharuch", "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda (Nadiad)", "Kutch (Bhuj)", "Mahisagar", "Mehsana", "Morbi", "Narmada (Rajpipla)", "Navsari", "Panchmahal (Godhra)", "Patan", "Porbandar", "Rajkot", "Sabarkantha (Himmatnagar)", "Surat", "Surendranagar", "Tapi (Vyara)", "Vadodara", "Valsad"],
+  "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Yamunanagar"],
+  "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra (Dharamshala)", "Kinnaur", "Kullu", "Lahaul and Spiti", "Mandi", "Shimla", "Sirmaur (Nahan)", "Solan", "Una"],
+  "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "East Singhbhum (Jamshedpur)", "Garhwa", "Giridih", "Godda", "Gumla", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu (Medininagar)", "Ramgarh", "Ranchi", "Sahibganj", "Seraikela Kharsawan", "Simdega", "West Singhbhum (Chaibasa)"],
+  "Karnataka": ["Bagalkote", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapura", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada (Mangaluru)", "Davangere", "Dharwad (Hubballi)", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu (Madikeri)", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada (Karwar)", "Vijayapura", "Yadgir", "Vijayanagara"],
+  "Kerala": ["Alappuzha", "Ernakulam (Kochi)", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
+  "Madhya Pradesh": ["Agar Malwa", "Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Harda", "Indore", "Jabalpur", "Jhabua", "Katni", "Khandwa", "Khargone", "Maihar", "Mandla", "Mandsaur", "Morena", "Mauganj", "Narmadapuram", "Narsinghpur", "Neemuch", "Niwari", "Panna", "Pandhurna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Sidhi", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
+  "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad (Chhatrapati Sambhaji Nagar)", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad (Dharashiv)", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
+  "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Pherzawl", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
+  "Meghalaya": ["Eastern West Khasi Hills", "East Garo Hills", "East Jaintia Hills", "East Khasi Hills (Shillong)", "North Garo Hills", "Ri Bhoi", "South Garo Hills", "South West Garo Hills", "South West Khasi Hills", "West Garo Hills (Tura)", "West Jaintia Hills (Jowai)", "West Khasi Hills"],
+  "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Khawzawl", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Saitual", "Serchhip"],
+  "Nagaland": ["Chumoukedima", "Dimapur", "Kiphire", "Kohima", "Longleng", "Mokokchung", "Mon", "Niuland", "Noklak", "Peren", "Phek", "Shamator", "Tseminyu", "Tuensang", "Wokha", "Zunheboto"],
+  "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Debagarh", "Dhenkanal", "Gajapati", "Ganjam (Berhampur)", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar (Keonjhar)", "Khurda (Bhubaneswar)", "Koraput", "Malkangiri", "Mayurbhanj (Baripada)", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur (Sonepur)", "Sundargarh (Rourkela)"],
+  "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Malerkotla", "Mansa", "Moga", "Muktsar", "Pathankot", "Patiala", "Rupnagar", "Sahibzada Ajit Singh Nagar (Mohali)", "Sangrur", "Shahid Bhagat Singh Nagar (Nawanshahr)", "Tarn Taran"],
+  "Rajasthan": ["Ajmer", "Alwar", "Anupgarh", "Balotra", "Banswara", "Baran", "Barmer", "Beawar", "Bharatpur", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Deeg", "Didwana-Kuchaman", "Dholpur", "Dudu", "Dungarpur", "Ganganagar", "Gangapur City", "Hanumangarh", "Jaipur", "Jaipur Rural", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Jodhpur Rural", "Karauli", "Kekri", "Khairthal-Tijara", "Kota", "Kotputli-Behror", "Nagaur", "Neem Ka Thana", "Pali", "Phalodi", "Pratapgarh", "Rajsamand", "Salumbar", "Sanchore", "Sawai Madhopur", "Shahpura", "Sikar", "Sirohi", "Tonk", "Udaipur"],
+  "Sikkim": ["Gangtok", "Gyalshing", "Pakyong", "Mangan", "Namchi", "Soreng"],
+  "Tamil Nadu": ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari (Nagercoil)", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris (Ooty)", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupattur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"],
+  "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hanumakonda", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Kumuram Bheem Asifabad", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"],
+  "Tripura": ["Dhalai (Ambassa)", "Gomati (Udaipur)", "Khowai", "North Tripura (Dharmanagar)", "Sepahijala (Bishramganj)", "South Tripura (Belonia)", "Unakoti (Kailashahar)", "West Tripura (Agartala)"],
+  "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Ayodhya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar (Noida)", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kushinagar", "Lakhimpur Kheri", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Prayagraj", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
+  "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar (Rudrapur)", "Uttarkashi"],
+  "West Bengal": ["Alipurduar", "Bankura", "Birbhum (Suri)", "Cooch Behar", "Dakshin Dinajpur (Balurghat)", "Darjeeling", "Hooghly (Chinsurah)", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda (English Bazar)", "Murshidabad (Baharampur)", "Nadia (Krishnanagar)", "North 24 Parganas (Barasat)", "Paschim Bardhaman (Asansol)", "Paschim Medinipur (Midnapore)", "Purba Bardhaman (Bardhaman)", "Purba Medinipur (Tamluk)", "Purulia", "South 24 Parganas (Alipore)", "Uttar Dinajpur (Raiganj)"],
+  "Andaman and Nicobar Islands": ["Nicobar", "North and Middle Andaman", "South Andaman"],
+  "Chandigarh": ["Chandigarh"],
+  "Dadra and Nagar Haveli and Daman and Diu": ["Dadra and Nagar Haveli", "Daman", "Diu"],
+  "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
+  "Jammu and Kashmir": ["Anantnag", "Bandipora", "Baramulla", "Budgam", "Doda", "Ganderbal", "Jammu", "Kathua", "Kishtwar", "Kulgam", "Kupwara", "Poonch", "Pulwama", "Rajouri", "Ramban", "Reasi", "Samba", "Shopian", "Srinagar", "Udhampur"],
+  "Ladakh": ["Kargil", "Leh"],
+  "Lakshadweep": ["Lakshadweep (Kavaratti)"],
+  "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam"]
+};
+
+class PublicAcademyApp {
+  constructor() {
+    this.currentView = 'home';
+    this.courses = [];
+    this.academyProfile = null;
+
+    // Resolve tenant from Subdomain (e.g. prantik.pixelsetu.com) or URL Query (?academy=prantik)
+    this.currentAcademySlug = this.resolveTenant();
+    this.currentOwnerEmail = this.currentAcademySlug.includes('poulami') ? 'poulami.13thmay@gmail.com' : 'dasprantik76@gmail.com';
+
+    this.cacheDOMElements();
+    this.initData();
+    this.bindEvents();
+    this.initCustomDropdowns();
+    this.initInputFormatters();
+    this.render();
+    this.updateAdminLoginLinks();
+
+    // Asynchronously synchronize courses and profile for this specific academy from MongoDB
+    this.fetchCloudData();
+
+    // Check initial hash
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'student' || hash === 'registration') {
+      this.switchView('student');
+    } else if (hash === 'certificate') {
+      this.switchView('certificate');
+    } else {
+      this.switchView('home');
+    }
+  }
+
+  resolveTenant() {
+    const hostname = window.location.hostname.toLowerCase();
+
+    // If accessing academy.pixelsetu.com directly on root, route to Admin Gateway
+    if (hostname === 'academy.pixelsetu.com' || hostname === 'academy.localhost') {
+      window.location.href = 'login.html';
+      return 'prantik';
+    }
+
+    // 1. Check Subdomain (e.g. prantik.pixelsetu.com or poulami.pixelsetu.com)
+    const parts = hostname.split('.');
+    if (parts.length >= 3 || (parts.length === 2 && parts[1] === 'localhost')) {
+      const subdomain = parts[0];
+      if (subdomain !== 'www' && subdomain !== 'academy' && subdomain !== 'app') {
+        return subdomain;
+      }
+    }
+
+    // 2. Check Query Parameters (?academy=prantik or ?academy=poulami)
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get('academy') || urlParams.get('owner');
+    if (queryParam) {
+      return queryParam.toLowerCase().trim();
+    }
+
+    return 'prantik'; // Default fallback
+  }
+
+  updateAdminLoginLinks() {
+    const hostname = window.location.hostname.toLowerCase();
+    const adminUrl = hostname.includes('pixelsetu.com') ? 'https://academy.pixelsetu.com/login.html' : 'login.html';
+
+    const btnNav = document.getElementById('btnNavAdminLogin');
+    if (btnNav) btnNav.href = adminUrl;
+    const navMobile = document.getElementById('navMobileAdminLogin');
+    if (navMobile) navMobile.href = adminUrl;
+  }
+
+  getStorageKey(baseKey) {
+    return `${baseKey}_${this.currentOwnerEmail}`;
+  }
+
+  getDefaultProfile() {
+    if (this.currentOwnerEmail.includes('poulami')) {
+      return {
+        academyName: 'Poulami Dance Academy',
+        ownerName: 'Poulami',
+        email: this.currentOwnerEmail,
+        phone: '9876543211',
+        slug: 'poulami'
+      };
+    }
+    return {
+      academyName: 'Prantik Computer Academy',
+      ownerName: 'Prantik Das',
+      email: this.currentOwnerEmail,
+      phone: '9876543210',
+      slug: 'prantik'
+    };
+  }
+
+  cacheDOMElements() {
+    // Brand & Titles
+    this.navAcademyName = document.getElementById('navAcademyName');
+    this.heroAcademyName = document.getElementById('heroAcademyName');
+    this.footerAcademyName = document.getElementById('footerAcademyName');
+
+    // Navigation & Views
+    this.brandHomeLink = document.getElementById('brandHomeLink');
+    this.navHomeLink = document.getElementById('navHomeLink');
+    this.navStudentLink = document.getElementById('navStudentLink');
+    this.navCertificateLink = document.getElementById('navCertificateLink');
+    this.btnHeroGoToRegister = document.getElementById('btnHeroGoToRegister');
+    this.btnMobileNav = document.getElementById('btnMobileNav');
+    this.navMenu = document.getElementById('navMenu');
+
+    this.viewHome = document.getElementById('view-home');
+    this.viewStudent = document.getElementById('view-student');
+    this.viewCertificate = document.getElementById('view-certificate');
+
+    // Home Section
+    this.homeCoursesGrid = document.getElementById('homeCoursesGrid');
+
+    // Registration Form Elements
+    this.studentRegForm = document.getElementById('studentRegForm');
+    this.regFullName = document.getElementById('regFullName');
+    this.regDob = document.getElementById('regDob');
+    this.regFatherName = document.getElementById('regFatherName');
+    this.regMotherName = document.getElementById('regMotherName');
+    this.regAadhar = document.getElementById('regAadhar');
+    this.regAadharError = document.getElementById('regAadharError');
+    this.regPhone = document.getElementById('regPhone');
+    this.regPhoneError = document.getElementById('regPhoneError');
+    this.regEmail = document.getElementById('regEmail');
+    this.regPinCode = document.getElementById('regPinCode');
+    this.regPinCodeError = document.getElementById('regPinCodeError');
+    this.regAddress = document.getElementById('regAddress');
+    this.regAuthCode = document.getElementById('regAuthCode');
+    this.authOtpBoxes = document.getElementById('authOtpBoxes');
+    this.authOtpDigits = document.querySelectorAll('.auth-otp-digit');
+    this.btnSubmitReg = document.getElementById('btnSubmitReg');
+
+    // Dropdown Containers & Inputs
+    this.regGenderDropdown = document.getElementById('regGenderDropdown');
+    this.regGenderDisplay = document.getElementById('regGenderDisplay');
+    this.regGenderInput = document.getElementById('regGenderInput');
+    this.regGenderMenu = document.getElementById('regGenderMenu');
+
+    this.regMaritalStatusDropdown = document.getElementById('regMaritalStatusDropdown');
+    this.regMaritalStatusDisplay = document.getElementById('regMaritalStatusDisplay');
+    this.regMaritalStatusInput = document.getElementById('regMaritalStatusInput');
+    this.regMaritalStatusMenu = document.getElementById('regMaritalStatusMenu');
+
+    this.regCategoryDropdown = document.getElementById('regCategoryDropdown');
+    this.regCategoryDisplay = document.getElementById('regCategoryDisplay');
+    this.regCategoryInput = document.getElementById('regCategoryInput');
+    this.regCategoryMenu = document.getElementById('regCategoryMenu');
+
+    this.regReligionDropdown = document.getElementById('regReligionDropdown');
+    this.regReligionDisplay = document.getElementById('regReligionDisplay');
+    this.regReligionInput = document.getElementById('regReligionInput');
+    this.regReligionMenu = document.getElementById('regReligionMenu');
+
+    this.regStateDropdown = document.getElementById('regStateDropdown');
+    this.regStateDisplay = document.getElementById('regStateDisplay');
+    this.regStateInput = document.getElementById('regStateInput');
+    this.regStateMenu = document.getElementById('regStateMenu');
+
+    this.regDistrictDropdown = document.getElementById('regDistrictDropdown');
+    this.regDistrictDisplay = document.getElementById('regDistrictDisplay');
+    this.regDistrictInput = document.getElementById('regDistrictInput');
+    this.regDistrictMenu = document.getElementById('regDistrictMenu');
+
+    this.regQualificationDropdown = document.getElementById('regQualificationDropdown');
+    this.regQualificationDisplay = document.getElementById('regQualificationDisplay');
+    this.regQualificationInput = document.getElementById('regQualificationInput');
+    this.regQualificationMenu = document.getElementById('regQualificationMenu');
+
+    this.regCourseDropdown = document.getElementById('regCourseDropdown');
+    this.regCourseDisplay = document.getElementById('regCourseDisplay');
+    this.regCourseInput = document.getElementById('regCourseInput');
+    this.regCourseMenu = document.getElementById('regCourseMenu');
+
+    // Certificate Verification Form Elements
+    this.certSearchForm = document.getElementById('certSearchForm');
+    this.certPhone = document.getElementById('certPhone');
+    this.certPhoneError = document.getElementById('certPhoneError');
+    this.certDob = document.getElementById('certDob');
+    this.btnSearchCertificate = document.getElementById('btnSearchCertificate');
+
+    this.certResultContainer = document.getElementById('certResultContainer');
+    this.certNotFoundState = document.getElementById('certNotFoundState');
+    this.certIncompleteState = document.getElementById('certIncompleteState');
+    this.certIncompleteDesc = document.getElementById('certIncompleteDesc');
+    this.btnPrintCertificate = document.getElementById('btnPrintCertificate');
+
+    // Success Modal
+    this.successModal = document.getElementById('registrationSuccessModal');
+    this.modalStudentId = document.getElementById('modalStudentId');
+    this.modalStudentName = document.getElementById('modalStudentName');
+    this.modalCourseName = document.getElementById('modalCourseName');
+    this.modalRegDate = document.getElementById('modalRegDate');
+    this.btnCloseSuccessModal = document.getElementById('btnCloseSuccessModal');
+
+    // Toast Container
+    this.toastContainer = document.getElementById('toastContainer');
+  }
+
+  initData() {
+    // Load Academy Profile for active tenant
+    const rawProfile = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE));
+    if (rawProfile) {
+      try {
+        this.academyProfile = JSON.parse(rawProfile);
+      } catch (e) {
+        this.academyProfile = this.getDefaultProfile();
+      }
+    } else {
+      this.academyProfile = this.getDefaultProfile();
+    }
+
+    // Load Available Courses for active tenant
+    const rawCourses = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.COURSES));
+    if (rawCourses) {
+      try {
+        this.courses = JSON.parse(rawCourses) || [];
+      } catch (e) {
+        this.courses = [];
+      }
+    } else {
+      this.courses = [];
+    }
+  }
+
+  async fetchCloudData() {
+    try {
+      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
+      if (!response.ok) return false;
+      const json = await response.json();
+      if (json && json.success && json.data) {
+        if (json.tenant && json.tenant.ownerEmail) {
+          this.currentOwnerEmail = json.tenant.ownerEmail;
+        }
+
+        const { profile, courses, students, authToken } = json.data;
+
+        if (Array.isArray(courses) && courses.length > 0) {
+          this.courses = courses;
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
+          this.renderCoursesShowcase();
+          this.populateCoursesDropdown();
+        }
+
+        if (profile) {
+          this.academyProfile = profile;
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE), JSON.stringify(profile));
+          this.renderBranding();
+        }
+
+        if (Array.isArray(students) && students.length > 0) {
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(students));
+        }
+
+        if (authToken && authToken.code && authToken.expiresAt) {
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(authToken));
+        }
+        return true;
+      }
+    } catch (e) {
+      console.info('[PublicApp] Operating in local storage caching for', this.currentAcademySlug);
+    }
+    return false;
+  }
+
+  bindEvents() {
+    // Mobile Nav Toggle
+    if (this.btnMobileNav && this.navMenu) {
+      this.btnMobileNav.addEventListener('click', () => {
+        this.navMenu.classList.toggle('active');
+      });
+    }
+
+    // Nav Links (HOME, STUDENT, CERTIFICATE)
+    if (this.navHomeLink) {
+      this.navHomeLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchView('home');
+      });
+    }
+
+    if (this.brandHomeLink) {
+      this.brandHomeLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchView('home');
+      });
+    }
+
+    if (this.navStudentLink) {
+      this.navStudentLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchView('student');
+      });
+    }
+
+    if (this.navCertificateLink) {
+      this.navCertificateLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchView('certificate');
+      });
+    }
+
+    if (this.btnHeroGoToRegister) {
+      this.btnHeroGoToRegister.addEventListener('click', () => {
+        this.switchView('student');
+      });
+    }
+
+    // Hash Change
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'student' || hash === 'registration') {
+        this.switchView('student', false);
+      } else if (hash === 'certificate') {
+        this.switchView('certificate', false);
+      } else if (hash === 'home' || hash === '') {
+        this.switchView('home', false);
+      }
+    });
+
+    // Student Registration Form Submit Handler
+    if (this.studentRegForm) {
+      this.studentRegForm.addEventListener('submit', (e) => this.handleRegistration(e));
+    }
+
+    // Certificate Search Form Submit Handler
+    if (this.certificateSearchForm) {
+      this.certificateSearchForm.addEventListener('submit', (e) => this.handleCertificateSearch(e));
+    }
+
+    // Certificate Reset / Print Buttons
+    if (this.btnResetCertSearch) {
+      this.btnResetCertSearch.addEventListener('click', () => {
+        if (this.certResultContainer) this.certResultContainer.style.display = 'none';
+        if (this.certNotFoundState) this.certNotFoundState.style.display = 'none';
+        if (this.certIncompleteState) this.certIncompleteState.style.display = 'none';
+        if (this.certificateSearchForm) this.certificateSearchForm.reset();
+        if (this.certPhone) {
+          this.certPhone.classList.remove('input-error');
+          this.certPhone.focus();
+        }
+        if (this.certPhoneError) this.certPhoneError.style.display = 'none';
+      });
+    }
+
+    if (this.btnPrintCertificate) {
+      this.btnPrintCertificate.addEventListener('click', () => {
+        window.print();
+      });
+    }
+
+    // Modal Close
+    if (this.btnCloseSuccessModal && this.successModal) {
+      this.btnCloseSuccessModal.addEventListener('click', () => {
+        this.successModal.classList.remove('open');
+      });
+    }
+  }
+
+  // ==========================================================================
+  // Real-time Input Formatters & Validators (Initials Capitalization, 10-Digit Mobile, 12-Digit Aadhar, 6-Digit PIN)
+  // ==========================================================================
+  initInputFormatters() {
+    // Auto capitalize Full Name, Father's Name, Mother's Name initials
+    if (this.regFullName) applyAutoCapitalization(this.regFullName);
+    if (this.regFatherName) applyAutoCapitalization(this.regFatherName);
+    if (this.regMotherName) applyAutoCapitalization(this.regMotherName);
+
+    // Strict 10-digit number only validation for Mobile Numbers
+    if (this.regPhone) {
+      setupPhoneInputValidation(this.regPhone, this.regPhoneError);
+    }
+    if (this.certPhone) {
+      setupPhoneInputValidation(this.certPhone, this.certPhoneError);
+    }
+
+    // Strict 12-digit Aadhar validation
+    if (this.regAadhar) {
+      setupAadharInputValidation(this.regAadhar, this.regAadharError);
+    }
+
+    // 6-digit Pin code validation
+    if (this.regPinCode) {
+      setupPinCodeInputValidation(this.regPinCode, this.regPinCodeError);
+    }
+
+    // Date inputs has-value styling
+    [this.regDob, this.certDob].forEach(dateInput => {
+      if (dateInput) {
+        ['input', 'change'].forEach(evt => {
+          dateInput.addEventListener(evt, () => {
+            dateInput.classList.toggle('has-value', Boolean(dateInput.value));
+          });
+        });
+      }
+    });
+
+    // 6-Digit OTP Box inputs
+    this.initOtpBoxes();
+  }
+
+  initOtpBoxes() {
+    if (!this.authOtpDigits || this.authOtpDigits.length === 0) return;
+
+    this.authOtpDigits.forEach((digitInput, index) => {
+      // Auto-select on focus or click for instant overwrite
+      digitInput.addEventListener('focus', () => {
+        setTimeout(() => digitInput.select(), 10);
+      });
+      digitInput.addEventListener('click', () => {
+        digitInput.select();
+      });
+
+      // Direct Keydown Handler (Handles desktop number keys & numpad instantly)
+      digitInput.addEventListener('keydown', (e) => {
+        // Digits 0-9
+        if (/^[0-9]$/.test(e.key)) {
+          e.preventDefault();
+          digitInput.value = e.key;
+          digitInput.classList.add('filled');
+          digitInput.classList.remove('input-error');
+          this.syncAuthCodeFromOtpDigits();
+
+          if (index < this.authOtpDigits.length - 1) {
+            this.authOtpDigits[index + 1].focus();
+            this.authOtpDigits[index + 1].select();
+          }
+          return;
+        }
+
+        // Backspace handling
+        if (e.key === 'Backspace') {
+          if (!digitInput.value && index > 0) {
+            e.preventDefault();
+            this.authOtpDigits[index - 1].value = '';
+            this.authOtpDigits[index - 1].classList.remove('filled');
+            this.authOtpDigits[index - 1].focus();
+            this.syncAuthCodeFromOtpDigits();
+          } else {
+            digitInput.value = '';
+            digitInput.classList.remove('filled');
+            this.syncAuthCodeFromOtpDigits();
+          }
+          return;
+        }
+
+        // Arrow Key Navigation
+        if (e.key === 'ArrowLeft' && index > 0) {
+          e.preventDefault();
+          this.authOtpDigits[index - 1].focus();
+          this.authOtpDigits[index - 1].select();
+        } else if (e.key === 'ArrowRight' && index < this.authOtpDigits.length - 1) {
+          e.preventDefault();
+          this.authOtpDigits[index + 1].focus();
+          this.authOtpDigits[index + 1].select();
+        }
+      });
+
+      // Mobile soft keyboards input fallback
+      digitInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '');
+        if (val.length > 1) val = val.charAt(val.length - 1);
+        e.target.value = val;
+
+        digitInput.classList.toggle('filled', Boolean(val));
+        digitInput.classList.remove('input-error');
+
+        this.syncAuthCodeFromOtpDigits();
+
+        if (val && index < this.authOtpDigits.length - 1) {
+          this.authOtpDigits[index + 1].focus();
+          this.authOtpDigits[index + 1].select();
+        }
+      });
+
+      // Paste event: automatically distributes 6 digits
+      digitInput.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const clipboard = (e.clipboardData || window.clipboardData).getData('text');
+        const digits = clipboard.replace(/\D/g, '').slice(0, 6);
+        if (!digits) return;
+
+        digits.split('').forEach((d, i) => {
+          if (this.authOtpDigits[i]) {
+            this.authOtpDigits[i].value = d;
+            this.authOtpDigits[i].classList.add('filled');
+            this.authOtpDigits[i].classList.remove('input-error');
+          }
+        });
+
+        const nextFocusIndex = Math.min(digits.length, this.authOtpDigits.length - 1);
+        if (this.authOtpDigits[nextFocusIndex]) {
+          this.authOtpDigits[nextFocusIndex].focus();
+          this.authOtpDigits[nextFocusIndex].select();
+        }
+        this.syncAuthCodeFromOtpDigits();
+      });
+    });
+  }
+
+  syncAuthCodeFromOtpDigits() {
+    if (!this.authOtpDigits || !this.regAuthCode) return;
+    const code = Array.from(this.authOtpDigits).map(input => input.value || '').join('');
+    this.regAuthCode.value = code;
+  }
+
+  // ==========================================================================
+  // Custom Dropdowns (Opens directly below the dropdown box)
+  // ==========================================================================
+  initCustomDropdowns() {
+    // Setup Gender Dropdown
+    this.setupDropdown(this.regGenderDropdown, this.regGenderTrigger, this.regGenderMenu, this.regGenderDisplay, this.regGenderInput);
+
+    // Setup Marital Status Dropdown
+    this.setupDropdown(this.regMaritalStatusDropdown, this.regMaritalStatusTrigger, this.regMaritalStatusMenu, this.regMaritalStatusDisplay, this.regMaritalStatusInput);
+
+    // Setup Category Dropdown
+    this.setupDropdown(this.regCategoryDropdown, this.regCategoryTrigger, this.regCategoryMenu, this.regCategoryDisplay, this.regCategoryInput);
+
+    // Setup Religion Dropdown
+    this.setupDropdown(this.regReligionDropdown, this.regReligionTrigger, this.regReligionMenu, this.regReligionDisplay, this.regReligionInput);
+
+    // Setup State & District Dropdowns
+    this.initStateAndDistrictDropdowns();
+
+    // Setup Qualification Dropdown
+    this.setupDropdown(this.regQualificationDropdown, this.regQualificationTrigger, this.regQualificationMenu, this.regQualificationDisplay, this.regQualificationInput);
+
+    // Setup Course Dropdown
+    this.setupDropdown(this.regCourseDropdown, this.regCourseTrigger, this.regCourseMenu, this.regCourseDisplay, this.regCourseInput);
+
+    const getAllDropdowns = () => [
+      this.regGenderDropdown,
+      this.regMaritalStatusDropdown,
+      this.regCategoryDropdown,
+      this.regReligionDropdown,
+      this.regStateDropdown,
+      this.regDistrictDropdown,
+      this.regQualificationDropdown,
+      this.regCourseDropdown
+    ];
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      getAllDropdowns().forEach(dropdown => {
+        if (dropdown && !dropdown.contains(e.target)) {
+          dropdown.classList.remove('open');
+          const trigger = dropdown.querySelector('.custom-select-trigger');
+          if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        getAllDropdowns().forEach(dropdown => {
+          if (dropdown) {
+            dropdown.classList.remove('open');
+            const trigger = dropdown.querySelector('.custom-select-trigger');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+    });
+  }
+
+  initStateAndDistrictDropdowns() {
+    if (!this.regStateMenu || !this.regDistrictMenu) return;
+
+    const states = Object.keys(INDIAN_STATES_DISTRICTS).sort();
+    this.regStateMenu.innerHTML = states.map(state => `
+      <li class="custom-select-option" data-value="${escapeHtml(state)}" role="option">${escapeHtml(state)}</li>
+    `).join('');
+
+    this.setupDropdown(
+      this.regStateDropdown,
+      this.regStateTrigger,
+      this.regStateMenu,
+      this.regStateDisplay,
+      this.regStateInput,
+      (selectedState) => {
+        this.populateDistricts(selectedState);
+      }
+    );
+
+    this.setupDropdown(
+      this.regDistrictDropdown,
+      this.regDistrictTrigger,
+      this.regDistrictMenu,
+      this.regDistrictDisplay,
+      this.regDistrictInput
+    );
+  }
+
+  populateDistricts(selectedState) {
+    if (!this.regDistrictMenu || !this.regDistrictDisplay || !this.regDistrictInput) return;
+
+    const districts = INDIAN_STATES_DISTRICTS[selectedState] || [];
+    if (districts.length === 0) {
+      this.regDistrictMenu.innerHTML = '<li class="custom-select-option" data-value="" style="color: var(--text-muted); cursor: default;">No districts available</li>';
+    } else {
+      this.regDistrictMenu.innerHTML = districts.map(d => `
+        <li class="custom-select-option" data-value="${escapeHtml(d)}" role="option">${escapeHtml(d)}</li>
+      `).join('');
+    }
+
+    this.regDistrictDisplay.textContent = 'Select District';
+    this.regDistrictInput.value = '';
+    this.regDistrictMenu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('selected'));
+  }
+
+  setupDropdown(container, trigger, menu, display, hiddenInput, onChangeCallback) {
+    if (!container || !trigger || !menu || !hiddenInput) return;
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Close other dropdowns first
+      const allDropdowns = [
+        this.regGenderDropdown, this.regMaritalStatusDropdown, this.regCategoryDropdown,
+        this.regReligionDropdown, this.regStateDropdown, this.regDistrictDropdown,
+        this.regQualificationDropdown, this.regCourseDropdown
+      ];
+      allDropdowns.forEach(d => {
+        if (d && d !== container) {
+          d.classList.remove('open');
+          const t = d.querySelector('.custom-select-trigger');
+          if (t) t.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      const isOpen = container.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    menu.addEventListener('click', (e) => {
+      const option = e.target.closest('.custom-select-option');
+      if (!option) return;
+
+      const value = option.getAttribute('data-value');
+      const label = option.textContent.trim();
+
+      hiddenInput.value = value;
+      if (display) display.textContent = label;
+      container.classList.toggle('has-value', Boolean(value));
+
+      // Update selected state
+      menu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+
+      container.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+
+      if (typeof onChangeCallback === 'function') {
+        onChangeCallback(value);
+      }
+    });
+  }
+
+  switchView(viewName, updateHash = true) {
+    this.currentView = viewName;
+
+    // Update Nav Active State
+    if (this.navHomeLink) {
+      this.navHomeLink.classList.toggle('active', viewName === 'home');
+    }
+    if (this.navStudentLink) {
+      this.navStudentLink.classList.toggle('active', viewName === 'student');
+    }
+    if (this.navCertificateLink) {
+      this.navCertificateLink.classList.toggle('active', viewName === 'certificate');
+    }
+
+    // Toggle View Sections
+    if (this.viewHome) {
+      this.viewHome.classList.toggle('active', viewName === 'home');
+    }
+    if (this.viewStudent) {
+      this.viewStudent.classList.toggle('active', viewName === 'student');
+    }
+    if (this.viewCertificate) {
+      this.viewCertificate.classList.toggle('active', viewName === 'certificate');
+    }
+
+    // Close Mobile Menu if open
+    if (this.navMenu) {
+      this.navMenu.classList.remove('active');
+    }
+
+    if (updateHash) {
+      window.location.hash = viewName;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  render() {
+    // 1. Render Academy Brand Name
+    const name = this.academyProfile?.academyName || 'Academy';
+    if (this.navAcademyName) this.navAcademyName.textContent = name;
+    if (this.heroAcademyName) this.heroAcademyName.textContent = name;
+    if (this.footerAcademyName) this.footerAcademyName.textContent = name;
+    if (this.certDocAcademyName) this.certDocAcademyName.textContent = name;
+
+    // 2. Render Available Courses in Home View
+    this.renderHomeCourses();
+
+    // 3. Populate Course Dropdown in Student Registration Form
+    this.populateCourseDropdown();
+  }
+
+  renderHomeCourses() {
+    if (!this.homeCoursesGrid) return;
+
+    if (this.courses.length === 0) {
+      this.homeCoursesGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem 1.5rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+          <i class="fa-solid fa-desktop" style="font-size: 2rem; color: var(--text-subtle); margin-bottom: 0.75rem; display: block;"></i>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Programs Coming Soon</h3>
+          <p style="font-size: 0.875rem;">Courses are currently being updated by the academy administration.</p>
+        </div>
+      `;
+      return;
+    }
+
+    this.homeCoursesGrid.innerHTML = this.courses.map(course => `
+      <div class="course-card">
+        <div class="course-card-header">
+          <h3 class="course-card-title">${escapeHtml(course.title)}</h3>
+          <span class="course-duration-badge">
+            <i class="fa-regular fa-clock"></i> ${escapeHtml(course.duration)}
+          </span>
+        </div>
+        <p class="course-card-desc">${escapeHtml(course.description || 'Comprehensive curriculum with practical assignments and certification.')}</p>
+        <div class="course-card-footer">
+          <button type="button" class="btn-enroll-link" onclick="window.publicApp.selectCourseAndRegister('${escapeHtml(course.id)}')">
+            <span>Enroll in Course</span> <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  populateCourseDropdown() {
+    if (!this.regCourseMenu) return;
+
+    if (this.courses.length === 0) {
+      this.regCourseMenu.innerHTML = '<li class="custom-select-option" style="color: var(--text-muted); pointer-events: none;">No courses currently available</li>';
+      if (this.regCourseDisplay) this.regCourseDisplay.textContent = 'No courses available';
+      if (this.regCourseInput) this.regCourseInput.value = '';
+    } else {
+      let html = '';
+      this.courses.forEach(c => {
+        html += `<li class="custom-select-option" data-value="${escapeHtml(c.id)}" role="option">${escapeHtml(c.title)} (${escapeHtml(c.duration)})</li>`;
+      });
+      this.regCourseMenu.innerHTML = html;
+    }
+  }
+
+  selectCourseAndRegister(courseId) {
+    this.switchView('student');
+    const course = this.courses.find(c => c.id === courseId);
+    if (course) {
+      if (this.regCourseInput) this.regCourseInput.value = course.id;
+      if (this.regCourseDisplay) this.regCourseDisplay.textContent = `${course.title} (${course.duration})`;
+      if (this.regCourseDropdown) this.regCourseDropdown.classList.add('has-value');
+      if (this.regCourseMenu) {
+        this.regCourseMenu.querySelectorAll('.custom-select-option').forEach(opt => {
+          opt.classList.toggle('selected', opt.getAttribute('data-value') === course.id);
+        });
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Student Registration Handler
+  // ==========================================================================
+  handleRegistration(e) {
+    e.preventDefault();
+
+    const rawFullName = this.regFullName.value.trim();
+    const fullName = toTitleCase(rawFullName);
+    const dob = this.regDob.value;
+    const rawFatherName = this.regFatherName ? this.regFatherName.value.trim() : '';
+    const fatherName = toTitleCase(rawFatherName);
+    const rawMotherName = this.regMotherName ? this.regMotherName.value.trim() : '';
+    const motherName = toTitleCase(rawMotherName);
+    const aadhar = this.regAadhar ? this.regAadhar.value.trim().replace(/\D/g, '') : '';
+    const gender = this.regGenderInput.value.trim();
+    const maritalStatus = this.regMaritalStatusInput.value.trim();
+    const category = this.regCategoryInput.value.trim();
+    const religion = this.regReligionInput.value.trim();
+    const phone = this.regPhone.value.trim().replace(/\D/g, '');
+    const email = this.regEmail.value.trim();
+    const state = this.regStateInput.value.trim();
+    const district = this.regDistrictInput.value.trim();
+    const pinCode = this.regPinCode ? this.regPinCode.value.trim().replace(/\D/g, '') : '';
+    const address = this.regAddress.value.trim();
+    const qualification = this.regQualificationInput.value.trim();
+    const courseId = this.regCourseInput.value.trim();
+    const authCode = this.regAuthCode.value.trim();
+
+    // Required Validations
+    if (
+      !fullName || !dob || !fatherName || !motherName || !aadhar || !gender ||
+      !maritalStatus || !category || !religion || !phone || !email ||
+      !state || !district || !pinCode || !qualification || !address ||
+      !courseId || !authCode
+    ) {
+      this.showToast('Please complete all required fields.', 'error');
+      return;
+    }
+
+    // Strict 12-Digit Aadhar Number Validation
+    if (aadhar.length !== 12 || !/^\d{12}$/.test(aadhar)) {
+      if (this.regAadhar) this.regAadhar.classList.add('input-error');
+      if (this.regAadharError) {
+        this.regAadharError.textContent = 'Please enter a valid 12-digit Aadhar number.';
+        this.regAadharError.style.display = 'block';
+      }
+      if (this.regAadhar) this.regAadhar.focus();
+      this.showToast('Aadhar number must be exactly 12 digits.', 'error');
+      return;
+    }
+
+    // Strict 10-Digit Mobile Number Validation
+    if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+      this.regPhone.classList.add('input-error');
+      if (this.regPhoneError) {
+        this.regPhoneError.textContent = 'Please enter a valid 10-digit mobile number.';
+        this.regPhoneError.style.display = 'block';
+      }
+      this.regPhone.focus();
+      this.showToast('Mobile number must be exactly 10 digits.', 'error');
+      return;
+    }
+
+    // Strict 6-Digit PIN Code Validation
+    if (pinCode.length !== 6 || !/^\d{6}$/.test(pinCode)) {
+      if (this.regPinCode) this.regPinCode.classList.add('input-error');
+      if (this.regPinCodeError) {
+        this.regPinCodeError.textContent = 'Please enter a valid 6-digit pin code.';
+        this.regPinCodeError.style.display = 'block';
+      }
+      if (this.regPinCode) this.regPinCode.focus();
+      this.showToast('Pin code must be exactly 6 digits.', 'error');
+      return;
+    }
+
+    // Validate 6-Digit Authentication Code with Admin Token
+    const authValidation = this.validateAuthenticationCode(authCode);
+    if (!authValidation.valid) {
+      this.showToast(authValidation.message, 'error');
+      if (this.authOtpDigits && this.authOtpDigits.length > 0) {
+        this.authOtpDigits.forEach(d => d.classList.add('input-error'));
+        this.authOtpDigits[0].focus();
+      }
+      return;
+    }
+
+    // Generate Unique Student Identifier
+    const studentId = `STU-${Math.floor(1000 + Math.random() * 9000)}`;
+    const joinDate = new Date().toISOString().split('T')[0];
+
+    const selectedCourse = this.courses.find(c => c.id === courseId);
+    const courseTitle = selectedCourse ? selectedCourse.title : 'Enrolled Program';
+
+    // Structured textual student data model
+    const newStudent = {
+      id: studentId,
+      name: fullName,
+      dob: dob,
+      fatherName: fatherName,
+      motherName: motherName,
+      aadhar: aadhar,
+      gender: gender,
+      maritalStatus: maritalStatus,
+      category: category,
+      religion: religion,
+      phone: phone,
+      email: email,
+      state: state,
+      district: district,
+      pinCode: pinCode,
+      address: address,
+      qualification: qualification,
+      status: 'Active',
+      joinDate: joinDate,
+      enrolledCourseIds: [courseId],
+      ownerEmail: this.currentOwnerEmail,
+      academySlug: this.currentAcademySlug
+    };
+
+    // Save to local storage students registry for this tenant
+    let allStudents = [];
+    const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+    if (rawStudents) {
+      try {
+        allStudents = JSON.parse(rawStudents) || [];
+      } catch (err) {
+        allStudents = [];
+      }
+    }
+
+    allStudents.unshift(newStudent);
+    localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(allStudents));
+
+    // Post to Multi-Tenant MongoDB cloud storage in background
+    fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'add_student',
+        payload: {
+          student: newStudent,
+          ownerEmail: this.currentOwnerEmail,
+          academySlug: this.currentAcademySlug
+        }
+      })
+    }).catch(() => {});
+
+    // Display Success Receipt Dialog
+    if (this.modalStudentId) this.modalStudentId.textContent = studentId;
+    if (this.modalStudentName) this.modalStudentName.textContent = fullName;
+    if (this.modalCourseName) this.modalCourseName.textContent = courseTitle;
+    if (this.modalRegDate) this.modalRegDate.textContent = joinDate;
+
+    if (this.successModal) {
+      this.successModal.classList.add('open');
+    }
+
+    // Reset Form
+    this.studentRegForm.reset();
+    if (this.regAadhar) this.regAadhar.classList.remove('input-error');
+    if (this.regAadharError) this.regAadharError.style.display = 'none';
+    this.regPhone.classList.remove('input-error');
+    if (this.regPhoneError) this.regPhoneError.style.display = 'none';
+    if (this.regPinCode) this.regPinCode.classList.remove('input-error');
+    if (this.regPinCodeError) this.regPinCodeError.style.display = 'none';
+
+    if (this.authOtpDigits) {
+      this.authOtpDigits.forEach(d => {
+        d.value = '';
+        d.classList.remove('filled', 'input-error');
+      });
+    }
+    if (this.regAuthCode) this.regAuthCode.value = '';
+
+    if (this.regGenderDisplay) this.regGenderDisplay.textContent = 'Select Gender';
+    if (this.regGenderInput) this.regGenderInput.value = '';
+    if (this.regMaritalStatusDisplay) this.regMaritalStatusDisplay.textContent = 'Select Marital Status';
+    if (this.regMaritalStatusInput) this.regMaritalStatusInput.value = '';
+    if (this.regCategoryDisplay) this.regCategoryDisplay.textContent = 'Select Category';
+    if (this.regCategoryInput) this.regCategoryInput.value = '';
+    if (this.regReligionDisplay) this.regReligionDisplay.textContent = 'Select Religion';
+    if (this.regReligionInput) this.regReligionInput.value = '';
+    if (this.regStateDisplay) this.regStateDisplay.textContent = 'Select State';
+    if (this.regStateInput) this.regStateInput.value = '';
+    if (this.regDistrictDisplay) this.regDistrictDisplay.textContent = 'Select District';
+    if (this.regDistrictInput) this.regDistrictInput.value = '';
+    if (this.regDistrictMenu) this.regDistrictMenu.innerHTML = '';
+    if (this.regQualificationDisplay) this.regQualificationDisplay.textContent = 'Select Qualification';
+    if (this.regQualificationInput) this.regQualificationInput.value = '';
+    if (this.regCourseDisplay) this.regCourseDisplay.textContent = 'Select Course';
+    if (this.regCourseInput) this.regCourseInput.value = '';
+
+    [
+      this.regGenderDropdown, this.regMaritalStatusDropdown, this.regCategoryDropdown,
+      this.regReligionDropdown, this.regStateDropdown, this.regDistrictDropdown,
+      this.regQualificationDropdown, this.regCourseDropdown
+    ].forEach(d => { if (d) d.classList.remove('has-value'); });
+
+    if (this.regDob) this.regDob.classList.remove('has-value');
+
+    this.showToast('Registration successfully submitted!', 'success');
+  }
+
+  // ==========================================================================
+  // Certificate Verification & Download Handler (Requires Mobile & DOB)
+  // ==========================================================================
+  async handleCertificateSearch(e) {
+    e.preventDefault();
+
+    const phone = this.certPhone.value.trim().replace(/\D/g, '');
+    const dob = this.certDob.value.trim();
+
+    if (!phone || !dob) {
+      this.showToast('Please enter both Mobile Number and Date of Birth.', 'error');
+      return;
+    }
+
+    if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+      this.certPhone.classList.add('input-error');
+      if (this.certPhoneError) {
+        this.certPhoneError.textContent = 'Please enter a valid 10-digit mobile number.';
+        this.certPhoneError.style.display = 'block';
+      }
+      this.certPhone.focus();
+      this.showToast('Mobile number must be exactly 10 digits.', 'error');
+      return;
+    }
+
+    // Try to fetch latest students for this specific academy tenant from cloud
+    let allStudents = [];
+    try {
+      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
+      if (response.ok) {
+        const json = await response.json();
+        if (json?.success && Array.isArray(json.data?.students)) {
+          allStudents = json.data.students;
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(allStudents));
+        }
+      }
+    } catch (err) {}
+
+    // Fallback to tenant local storage if needed
+    if (allStudents.length === 0) {
+      const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+      if (rawStudents) {
+        try {
+          allStudents = JSON.parse(rawStudents) || [];
+        } catch (err) {
+          allStudents = [];
+        }
+      }
+    }
+
+    // Match student by Mobile Number AND Date of Birth
+    const student = allStudents.find(s => {
+      const sPhone = String(s.phone || '').replace(/\D/g, '');
+      const sDob = String(s.dob || '').trim();
+      return sPhone === phone && sDob === dob;
+    });
+
+    if (!student) {
+      if (this.certResultContainer) this.certResultContainer.style.display = 'none';
+      if (this.certIncompleteState) this.certIncompleteState.style.display = 'none';
+      if (this.certNotFoundState) {
+        this.certNotFoundState.style.display = 'flex';
+        this.certNotFoundState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    // Check if student's course status is Completed
+    if (student.status !== 'Completed') {
+      if (this.certResultContainer) this.certResultContainer.style.display = 'none';
+      if (this.certNotFoundState) this.certNotFoundState.style.display = 'none';
+      if (this.certIncompleteState) {
+        if (this.certIncompleteDesc) {
+          this.certIncompleteDesc.textContent = `Hello, ${toTitleCase(student.name)}, your certificate is not available at this moment.`;
+        }
+        this.certIncompleteState.style.display = 'flex';
+        this.certIncompleteState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    // Student found & Completed! Hide alerts and populate Certificate Document
+    if (this.certNotFoundState) this.certNotFoundState.style.display = 'none';
+    if (this.certIncompleteState) this.certIncompleteState.style.display = 'none';
+
+    const academyName = this.academyProfile?.academyName || 'Academy';
+    const ownerName = this.academyProfile?.ownerName || 'Academy Director';
+
+    // Find course title
+    const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || '';
+    const course = this.courses.find(c => c.id === courseId);
+    const courseTitle = course ? course.title : 'Professional Academic Program';
+    const courseDuration = course ? `(${course.duration})` : '';
+
+    if (this.certDocAcademyName) this.certDocAcademyName.textContent = academyName;
+    if (this.certDocStudentName) this.certDocStudentName.textContent = toTitleCase(student.name);
+    if (this.certDocCourseTitle) {
+      this.certDocCourseTitle.innerHTML = `${escapeHtml(courseTitle)} <span id="certDocCourseDuration">${escapeHtml(courseDuration)}</span>`;
+    }
+    if (this.certDocStudentId) this.certDocStudentId.textContent = student.id || 'STU-0000';
+    if (this.certDocIssueDate) this.certDocIssueDate.textContent = formatCertificateDate(student.joinDate);
+    if (this.certDocSignatory) this.certDocSignatory.textContent = toTitleCase(ownerName);
+
+    if (this.certResultContainer) {
+      this.certResultContainer.style.display = 'block';
+      this.certResultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    this.showToast(`Certificate verified for ${toTitleCase(student.name)}!`, 'success');
+  }
+
+  validateAuthenticationCode(inputCode) {
+    const rawToken = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    if (!rawToken) {
+      return {
+        valid: false,
+        message: 'No active authentication code found. Please request the code from your academy administrator.'
+      };
+    }
+
+    try {
+      const token = JSON.parse(rawToken);
+      if (!token.code || !token.expiresAt) {
+        return { valid: false, message: 'Invalid authentication token configuration.' };
+      }
+
+      if (Date.now() > token.expiresAt) {
+        return {
+          valid: false,
+          message: 'The 6-digit authentication code has expired. Please request a fresh code from your administrator.'
+        };
+      }
+
+      if (String(token.code).trim() !== String(inputCode).trim()) {
+        return {
+          valid: false,
+          message: 'Invalid authentication code. Please enter the valid 6-digit code provided by your academy.'
+        };
+      }
+
+      return { valid: true };
+    } catch (e) {
+      return { valid: false, message: 'Error verifying authentication token.' };
+    }
+  }
+
+  showToast(message, type = 'error') {
+    if (!this.toastContainer) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icon = type === 'success' ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-exclamation';
+
+    toast.innerHTML = `
+      <i class="${icon}" style="color: ${type === 'success' ? 'var(--emerald)' : 'var(--rose)'}; font-size: 1.15rem;"></i>
+      <span style="font-size: 0.875rem; font-weight: 500; color: var(--text-main);">${escapeHtml(message)}</span>
+    `;
+
+    this.toastContainer.appendChild(toast);
+    setTimeout(() => {
+      if (toast.parentElement) {
+        toast.parentElement.removeChild(toast);
+      }
+    }, 4500);
+  }
+}
+
+// ==========================================================================
+// Global Formatters & Helpers
+// ==========================================================================
+function toTitleCase(str) {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word ? word.charAt(0).toUpperCase() + word.slice(1) : '')
+    .join(' ');
+}
+
+function formatCertificateDate(dateStr) {
+  if (!dateStr) {
+    return new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  try {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+function applyAutoCapitalization(inputElement) {
+  if (!inputElement) return;
+
+  inputElement.addEventListener('input', (e) => {
+    const start = e.target.selectionStart;
+    const end = e.target.selectionEnd;
+    const original = e.target.value;
+
+    // Capitalize first letter of every word
+    const capitalized = original.replace(/\b[a-z]/g, char => char.toUpperCase());
+    if (capitalized !== original) {
+      e.target.value = capitalized;
+      if (start !== null && end !== null) {
+        e.target.setSelectionRange(start, end);
+      }
+    }
+  });
+
+  inputElement.addEventListener('blur', (e) => {
+    if (e.target.value) {
+      e.target.value = toTitleCase(e.target.value);
+    }
+  });
+}
+
+function setupPhoneInputValidation(phoneInput, errorElement) {
+  if (!phoneInput) return;
+
+  phoneInput.addEventListener('input', (e) => {
+    // Filter non-digits and cap at exactly 10 digits
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length > 10) val = val.slice(0, 10);
+    e.target.value = val;
+
+    if (val.length > 0 && val.length < 10) {
+      phoneInput.classList.add('input-error');
+      if (errorElement) {
+        errorElement.textContent = `Mobile number must be exactly 10 digits (${val.length}/10 entered).`;
+        errorElement.style.display = 'block';
+      }
+    } else {
+      phoneInput.classList.remove('input-error');
+      if (errorElement) errorElement.style.display = 'none';
+    }
+  });
+
+  phoneInput.addEventListener('blur', (e) => {
+    const val = e.target.value.replace(/\D/g, '');
+    if (val.length > 0 && val.length !== 10) {
+      phoneInput.classList.add('input-error');
+      if (errorElement) {
+        errorElement.textContent = 'Please enter a valid 10-digit mobile number.';
+        errorElement.style.display = 'block';
+      }
+    } else if (val.length === 10) {
+      phoneInput.classList.remove('input-error');
+      if (errorElement) errorElement.style.display = 'none';
+    }
+  });
+}
+
+function setupPinCodeInputValidation(pinInput, errorElement) {
+  if (!pinInput) return;
+
+  pinInput.addEventListener('input', (e) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length > 6) val = val.slice(0, 6);
+    pinInput.value = val;
+
+    if (val.length > 0 && val.length < 6) {
+      pinInput.classList.add('input-error');
+      if (errorElement) {
+        errorElement.textContent = `Pin code must be exactly 6 digits (${val.length}/6 entered).`;
+        errorElement.style.display = 'block';
+      }
+    } else {
+      pinInput.classList.remove('input-error');
+      if (errorElement) errorElement.style.display = 'none';
+    }
+  });
+
+  pinInput.addEventListener('blur', (e) => {
+    const val = pinInput.value.replace(/\D/g, '');
+    if (val.length > 0 && val.length !== 6) {
+      pinInput.classList.add('input-error');
+      if (errorElement) {
+        errorElement.textContent = 'Please enter a valid 6-digit pin code.';
+        errorElement.style.display = 'block';
+      }
+    } else if (val.length === 6) {
+      pinInput.classList.remove('input-error');
+      if (errorElement) errorElement.style.display = 'none';
+    }
+  });
+}
+
+function setupAadharInputValidation(aadharInput, errorElement) {
+  if (!aadharInput) return;
+
+  aadharInput.addEventListener('input', (e) => {
+    let val = e.target.value.replace(/\D/g, '');
+    if (val.length > 12) val = val.slice(0, 12);
+    aadharInput.value = val;
+
+    if (val.length > 0 && val.length < 12) {
+      aadharInput.classList.add('input-error');
+      if (errorElement) {
+        errorElement.textContent = `Aadhar number must be exactly 12 digits (${val.length}/12 entered).`;
+        errorElement.style.display = 'block';
+      }
+    } else {
+      aadharInput.classList.remove('input-error');
+      if (errorElement) errorElement.style.display = 'none';
+    }
+  });
+
+  aadharInput.addEventListener('blur', (e) => {
+    const val = aadharInput.value.replace(/\D/g, '');
+    if (val.length > 0 && val.length !== 12) {
+      aadharInput.classList.add('input-error');
+      if (errorElement) {
+        errorElement.textContent = 'Please enter a valid 12-digit Aadhar number.';
+        errorElement.style.display = 'block';
+      }
+    } else if (val.length === 12) {
+      aadharInput.classList.remove('input-error');
+      if (errorElement) errorElement.style.display = 'none';
+    }
+  });
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.publicApp = new PublicAcademyApp();
+});
