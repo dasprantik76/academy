@@ -56,17 +56,29 @@ class PublicAcademyApp {
     this.currentView = 'home';
     this.courses = [];
     this.academyProfile = null;
+    this.isNotFound = false;
 
-    // Resolve tenant from Subdomain (e.g. prantik.pixelsetu.com) or URL Query (?academy=prantik)
+    // Resolve tenant from Subdomain (e.g. prantik.prantikphotography.com) or URL Query (?academy=prantik)
     this.currentAcademySlug = this.resolveTenant();
-    this.currentOwnerEmail = this.currentAcademySlug.includes('poulami') ? 'poulami.13thmay@gmail.com' : 'dasprantik76@gmail.com';
+    const isKnownDefault = this.currentAcademySlug === 'prantik' || this.currentAcademySlug === 'poulami';
+    this.currentOwnerEmail = this.currentAcademySlug === 'poulami' ? 'poulami.13thmay@gmail.com' : (this.currentAcademySlug === 'prantik' ? 'dasprantik76@gmail.com' : '');
 
     this.cacheDOMElements();
-    this.initData();
+
+    // If an unknown custom slug is requested and not in local cache, hide views until cloud verification completes
+    const hasLocalCache = Boolean(this.currentOwnerEmail && localStorage.getItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE)));
+    if (!isKnownDefault && !hasLocalCache) {
+      if (this.viewHome) this.viewHome.style.display = 'none';
+      if (this.viewStudent) this.viewStudent.style.display = 'none';
+      if (this.viewCertificate) this.viewCertificate.style.display = 'none';
+    } else {
+      this.initData();
+      this.render();
+    }
+
     this.bindEvents();
     this.initCustomDropdowns();
     this.initInputFormatters();
-    this.render();
     this.updateAdminLoginLinks();
 
     // Asynchronously synchronize courses and profile for this specific academy from MongoDB
@@ -800,6 +812,12 @@ class PublicAcademyApp {
   }
 
   render() {
+    if (this.isNotFound) return;
+
+    if (this.viewHome && this.currentView === 'home') this.viewHome.style.display = '';
+    if (this.viewStudent && this.currentView === 'student') this.viewStudent.style.display = '';
+    if (this.viewCertificate && this.currentView === 'certificate') this.viewCertificate.style.display = '';
+
     // 1. Render Academy Brand Name
     const name = this.academyProfile?.academyName || 'Academy';
     if (this.navAcademyName) this.navAcademyName.textContent = name;
