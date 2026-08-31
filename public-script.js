@@ -356,6 +356,10 @@ class PublicAcademyApp {
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(authToken));
         }
 
+        // Remove tenantGuard if it was an unverified custom subdomain
+        const guard = document.getElementById('tenantGuard');
+        if (guard) guard.remove();
+
         this.render();
         this.switchView(this.currentView, false);
         return true;

@@ -28,9 +28,15 @@
           if (q) slug = q.toLowerCase();
         }
 
+        let isKnown = false;
         let resolvedName = '';
-        if (slug === 'poulami') resolvedName = 'Poulami Dance Academy';
-        else if (slug === 'prantik' || slug === 'ppxt') resolvedName = 'Prantik Computer Academy';
+        if (slug === 'poulami') {
+          resolvedName = 'Poulami Dance Academy';
+          isKnown = true;
+        } else if (slug === 'prantik' || slug === 'ppxt') {
+          resolvedName = 'Prantik Computer Academy';
+          isKnown = true;
+        }
 
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
@@ -38,16 +44,23 @@
             const raw = localStorage.getItem(k);
             if (raw) {
               const p = JSON.parse(raw);
-              if (p && (p.slug === slug || (slug === 'prantik' && p.slug === 'ppxt') || (slug === 'ppxt' && p.slug === 'ppxt'))) {
+              if (p && (p.slug === slug || (slug === 'ppxt' && p.slug === 'ppxt'))) {
                 if (p.academyName) resolvedName = p.academyName;
+                isKnown = true;
                 break;
               }
             }
           }
         }
         window.__INITIAL_ACADEMY_NAME__ = resolvedName || '';
+        window.__IS_KNOWN_TENANT__ = isKnown;
         if (window.__INITIAL_ACADEMY_NAME__) {
           document.title = window.__INITIAL_ACADEMY_NAME__ + ' | Public Admissions Portal';
+        }
+
+        // If this is an unverified subdomain, hide body immediately to prevent ANY flash of default content
+        if (!isKnown && slug !== 'prantik' && slug !== 'ppxt' && slug !== 'poulami') {
+          document.write('<style id="tenantGuard">body { display: none !important; }</style>');
         }
       } catch (e) {
         window.__INITIAL_ACADEMY_NAME__ = '';
