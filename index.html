@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Academy | Public Portal</title>
+  <title>Public Admissions Portal</title>
   <meta name="description" content="Academy Public Portal - Explore courses and register directly online">
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +13,36 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="public-style.css?v=5.8">
+  <script>
+    // Fast synchronous pre-hydration to eliminate any flash of text
+    (function() {
+      try {
+        const host = window.location.hostname.toLowerCase();
+        let slug = 'prantik';
+        const parts = host.split('.');
+        if (parts.length >= 3 && parts[0] !== 'www' && parts[0] !== 'academy' && parts[0] !== 'app') {
+          slug = parts[0];
+        } else {
+          const params = new URLSearchParams(window.location.search);
+          const q = params.get('academy') || params.get('owner');
+          if (q) slug = q.toLowerCase();
+        }
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('educore_academy_profile_')) {
+            const raw = localStorage.getItem(k);
+            if (raw) {
+              const p = JSON.parse(raw);
+              if (p && (p.slug === slug || (slug === 'prantik' && p.slug === 'ppxt'))) {
+                document.title = p.academyName + ' | Public Portal';
+                break;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 
@@ -24,7 +54,7 @@
         <div class="brand-icon">
           <i class="fa-solid fa-graduation-cap"></i>
         </div>
-        <span class="brand-title" id="navAcademyName">Academy</span>
+        <span class="brand-title" id="navAcademyName"></span>
       </a>
 
       <!-- Desktop & Mobile Navigation Links -->
@@ -77,7 +107,7 @@
           <span>Admissions & Registrations Open</span>
         </div>
         <h1 class="hero-title">
-          Welcome to <span id="heroAcademyName">Academy</span>
+          Welcome to <span id="heroAcademyName"></span>
         </h1>
         <p class="hero-desc">
           Empowering learners with industry-standard courses and certified training. Explore our programs and register online through our student admissions portal.
