@@ -448,19 +448,40 @@ class UIController {
     });
   }
 
+  getRootDomain() {
+    const hostname = window.location.hostname.toLowerCase();
+    const parts = hostname.split('.');
+    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
+      return parts.slice(-2).join('.');
+    }
+    return 'prantikphotography.com';
+  }
+
+  getPublicUrlForSlug(slug) {
+    const hostname = window.location.hostname.toLowerCase();
+    const parts = hostname.split('.');
+    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
+      const rootDomain = parts.slice(-2).join('.');
+      return `https://${slug}.${rootDomain}`;
+    }
+    return `${window.location.origin}/?academy=${encodeURIComponent(slug)}`;
+  }
+
   updatePublicSiteLink() {
     const profile = store.getAcademyProfile();
     const slug = profile?.slug || (this.session?.email?.includes('poulami') ? 'poulami' : 'prantik');
+    const publicUrl = this.getPublicUrlForSlug(slug);
+
     const btnViewPublicSite = document.getElementById('btnViewPublicSite');
     if (btnViewPublicSite) {
-      const hostname = window.location.hostname.toLowerCase();
-      const parts = hostname.split('.');
-      if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
-        const rootDomain = parts.slice(-2).join('.');
-        btnViewPublicSite.href = `https://${slug}.${rootDomain}`;
-      } else {
-        btnViewPublicSite.href = `index.html?academy=${encodeURIComponent(slug)}`;
-      }
+      btnViewPublicSite.href = publicUrl;
+    }
+
+    if (this.dashboardFullUrlText) {
+      this.dashboardFullUrlText.textContent = publicUrl;
+    }
+    if (this.dashboardPublicLinkDisplay) {
+      this.dashboardPublicLinkDisplay.href = publicUrl;
     }
   }
 
@@ -642,12 +663,20 @@ class UIController {
     this.btnCancelConfirm = document.getElementById('btnCancelConfirm');
     this.btnCloseConfirmModal = document.getElementById('btnCloseConfirmModal');
 
+    // Dashboard Public Portal Widgets
+    this.dashboardFullUrlText = document.getElementById('dashboardFullUrlText');
+    this.dashboardPublicLinkDisplay = document.getElementById('dashboardPublicLinkDisplay');
+    this.btnCopyPublicUrl = document.getElementById('btnCopyPublicUrl');
+    this.btnOpenSubdomainSettings = document.getElementById('btnOpenSubdomainSettings');
+
     // Modals - Academy Settings
     this.btnEditAcademySettings = document.getElementById('btnEditAcademySettings');
     this.academySettingsModal = document.getElementById('academySettingsModal');
     this.academySettingsForm = document.getElementById('academySettingsForm');
     this.settingsAcademyName = document.getElementById('settingsAcademyName');
     this.settingsOwnerName = document.getElementById('settingsOwnerName');
+    this.settingsSubdomainSlug = document.getElementById('settingsSubdomainSlug');
+    this.settingsSubdomainSuffix = document.getElementById('settingsSubdomainSuffix');
     this.btnCloseAcademySettingsModal = document.getElementById('btnCloseAcademySettingsModal');
     this.btnCancelAcademySettings = document.getElementById('btnCancelAcademySettings');
 
@@ -656,12 +685,49 @@ class UIController {
     this.onboardingForm = document.getElementById('onboardingForm');
     this.onboardingAcademyName = document.getElementById('onboardingAcademyName');
     this.onboardingOwnerName = document.getElementById('onboardingOwnerName');
+    this.onboardingSubdomainSlug = document.getElementById('onboardingSubdomainSlug');
+    this.onboardingSubdomainSuffix = document.getElementById('onboardingSubdomainSuffix');
     this.btnSaveOnboarding = document.getElementById('btnSaveOnboarding');
 
     this.toastContainer = document.getElementById('toastContainer');
   }
 
   bindEvents() {
+    // Copy Public Link Button
+    if (this.btnCopyPublicUrl) {
+      this.btnCopyPublicUrl.addEventListener('click', () => {
+        const profile = store.getAcademyProfile();
+        const slug = profile?.slug || (this.session?.email?.includes('poulami') ? 'poulami' : 'prantik');
+        const url = this.getPublicUrlForSlug(slug);
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(() => {
+            this.showToast('Link Copied!', 'Your public admissions link has been copied to your clipboard.', 'success');
+          }).catch(() => {
+            prompt('Copy your public website link:', url);
+          });
+        } else {
+          prompt('Copy your public website link:', url);
+        }
+      });
+    }
+
+    if (this.btnOpenSubdomainSettings) {
+      this.btnOpenSubdomainSettings.addEventListener('click', () => this.openAcademySettingsModal());
+    }
+
+    // Subdomain Slug Cleaners (lowercase, alphanumeric, hyphens only)
+    if (this.settingsSubdomainSlug) {
+      this.settingsSubdomainSlug.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+      });
+    }
+    if (this.onboardingSubdomainSlug) {
+      this.onboardingSubdomainSlug.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+      });
+    }
+
     // Academy Settings Handlers
     if (this.btnEditAcademySettings) {
       this.btnEditAcademySettings.addEventListener('click', () => this.openAcademySettingsModal());
@@ -677,6 +743,7 @@ class UIController {
         e.preventDefault();
         const academyName = this.settingsAcademyName.value.trim();
         const ownerName = this.settingsOwnerName.value.trim();
+        let slug = (this.settingsSubdomainSlug?.value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
 
         if (!academyName || !ownerName) {
           this.showToast('Required Fields', 'Please enter both Academy Name and Owner Name.', 'error');
@@ -684,10 +751,15 @@ class UIController {
         }
 
         const currentProfile = store.getAcademyProfile() || {};
+        if (!slug) {
+          slug = currentProfile.slug || (this.session?.email?.includes('poulami') ? 'poulami' : 'prantik');
+        }
+
         const updatedProfile = {
           ...currentProfile,
           academyName,
           ownerName,
+          slug,
           updatedAt: Date.now()
         };
         store.saveAcademyProfile(updatedProfile);
@@ -699,7 +771,8 @@ class UIController {
 
         this.closeAcademySettingsModal();
         this.render();
-        this.showToast('Settings Saved', `Academy name updated to "${academyName}".`, 'success');
+        this.updatePublicSiteLink();
+        this.showToast('Settings Saved', `Academy details & subdomain (${slug}) updated successfully!`, 'success');
       });
     }
 
@@ -709,15 +782,21 @@ class UIController {
         e.preventDefault();
         const academyName = this.onboardingAcademyName.value.trim();
         const ownerName = this.onboardingOwnerName.value.trim();
+        let slug = (this.onboardingSubdomainSlug?.value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
 
         if (!academyName || !ownerName) {
           this.showToast('Required Fields', 'Please fill in both Academy Name and Owner Name.', 'error');
           return;
         }
 
+        if (!slug) {
+          slug = academyName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'academy';
+        }
+
         const profile = {
           academyName,
           ownerName,
+          slug,
           configuredAt: Date.now()
         };
         store.saveAcademyProfile(profile);
@@ -729,7 +808,8 @@ class UIController {
 
         this.closeOnboardingModal();
         this.render();
-        this.showToast('Setup Complete', `Welcome to ${academyName}! Your portal is ready.`, 'success');
+        this.updatePublicSiteLink();
+        this.showToast('Setup Complete', `Welcome to ${academyName}! Your subdomain (${slug}) is live.`, 'success');
       });
     }
 
@@ -2144,12 +2224,22 @@ class UIController {
   openAcademySettingsModal() {
     if (!this.academySettingsModal) return;
     const profile = store.getAcademyProfile();
+    const currentSlug = profile?.slug || (this.session?.email?.includes('poulami') ? 'poulami' : 'prantik');
+    const rootDomain = this.getRootDomain();
+
     if (this.settingsAcademyName) {
       this.settingsAcademyName.value = profile?.academyName || '';
     }
     if (this.settingsOwnerName) {
       this.settingsOwnerName.value = profile?.ownerName || this.session?.name || '';
     }
+    if (this.settingsSubdomainSlug) {
+      this.settingsSubdomainSlug.value = currentSlug;
+    }
+    if (this.settingsSubdomainSuffix) {
+      this.settingsSubdomainSuffix.textContent = `.${rootDomain}`;
+    }
+
     this.openModal(this.academySettingsModal);
     setTimeout(() => {
       if (this.settingsAcademyName) this.settingsAcademyName.focus();
@@ -2173,9 +2263,19 @@ class UIController {
 
   openOnboardingModal() {
     if (!this.onboardingModal) return;
+    const rootDomain = this.getRootDomain();
+    const defaultSlug = this.session?.email?.includes('poulami') ? 'poulami' : 'prantik';
+
     if (this.onboardingOwnerName && this.session && this.session.name && this.session.name !== 'Super Administrator') {
       this.onboardingOwnerName.value = this.session.name;
     }
+    if (this.onboardingSubdomainSlug) {
+      this.onboardingSubdomainSlug.value = defaultSlug;
+    }
+    if (this.onboardingSubdomainSuffix) {
+      this.onboardingSubdomainSuffix.textContent = `.${rootDomain}`;
+    }
+
     this.openModal(this.onboardingModal);
     setTimeout(() => {
       if (this.onboardingAcademyName) this.onboardingAcademyName.focus();

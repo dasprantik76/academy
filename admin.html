@@ -104,6 +104,30 @@
 
         <!-- ================= DASHBOARD VIEW ================= -->
         <section class="view-section active" id="view-dashboard">
+          <!-- Live Public Subdomain Showcase Card -->
+          <div class="public-portal-card" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #ffffff; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(49, 46, 129, 0.25);">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 46px; height: 46px; border-radius: 10px; background: rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: #38bdf8; flex-shrink: 0;">
+                <i class="fa-solid fa-globe"></i>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: #93c5fd; display: block; margin-bottom: 0.2rem;">Your Public Admissions Website</span>
+                <a id="dashboardPublicLinkDisplay" href="#" target="_blank" style="color: #ffffff; font-weight: 700; font-size: 1.05rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <span id="dashboardFullUrlText">https://prantik.prantikphotography.com</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem; color: #38bdf8;"></i>
+                </a>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm" id="btnCopyPublicUrl" style="background: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); font-weight: 600; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: background 0.15s ease;">
+                <i class="fa-solid fa-copy"></i> Copy Link
+              </button>
+              <button type="button" class="btn btn-sm" id="btnOpenSubdomainSettings" style="background: #38bdf8; color: #0f172a; border: none; font-weight: 700; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: background 0.15s ease;">
+                <i class="fa-solid fa-pen-to-square"></i> Change Subdomain
+              </button>
+            </div>
+          </div>
+
           <!-- Stats Summary Grid -->
           <div class="stats-grid">
             <div class="stat-card">
@@ -775,6 +799,18 @@
               <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true" required>
             </div>
           </div>
+
+          <div class="form-group">
+            <label for="settingsSubdomainSlug">Public Subdomain <span class="required-star">*</span></label>
+            <div class="subdomain-input-wrap" style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+              <span style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1;">https://</span>
+              <input type="text" id="settingsSubdomainSlug" placeholder="your-subdomain" style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;" required>
+              <span id="settingsSubdomainSuffix" style="padding: 0 0.85rem; color: #475569; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-left: 1px solid #cbd5e1;">.prantikphotography.com</span>
+            </div>
+            <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
+              Letters, numbers, and hyphens only (e.g. <code>dance-academy</code>).
+            </p>
+          </div>
         </div>
 
         <div class="modal-footer">
@@ -817,6 +853,18 @@
               <i class="fa-solid fa-user-tie"></i>
               <input type="text" id="onboardingOwnerName" class="name-input-capitalized" data-capitalize="true" required>
             </div>
+          </div>
+
+          <div class="form-group">
+            <label for="onboardingSubdomainSlug">Choose Your Public Subdomain <span class="required-star">*</span></label>
+            <div class="subdomain-input-wrap" style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+              <span style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1;">https://</span>
+              <input type="text" id="onboardingSubdomainSlug" placeholder="your-subdomain" style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;" required>
+              <span id="onboardingSubdomainSuffix" style="padding: 0 0.85rem; color: #475569; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-left: 1px solid #cbd5e1;">.prantikphotography.com</span>
+            </div>
+            <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
+              This will be your dedicated website link for student admissions.
+            </p>
           </div>
         </div>
 
