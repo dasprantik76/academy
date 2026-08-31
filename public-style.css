@@ -156,6 +156,47 @@ body {
 }
 
 /* ==========================================================================
+   Top Narrow White Badge Banner (Below Yellow Notice Bar)
+   ========================================================================== */
+.top-badge-banner {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.badge-banner-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.badge-banner-left {
+  display: flex;
+  align-items: center;
+}
+
+.badge-banner-img {
+  height: 52px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .top-badge-banner {
+    padding: 0.35rem 0;
+  }
+  .badge-banner-img {
+    height: 42px;
+  }
+}
+
+/* ==========================================================================
    Public Navigation Bar (HOME & STUDENT only)
    ========================================================================== */
 .public-navbar {
