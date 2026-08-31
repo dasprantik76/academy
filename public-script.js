@@ -313,12 +313,18 @@ class PublicAcademyApp {
   async fetchCloudData() {
     try {
       const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
+      
+      if (response.status === 404) {
+        this.showBrowserDefaultNotFound();
+        return false;
+      }
+      
       if (!response.ok) return false;
       const json = await response.json();
 
       // If requested subdomain is not registered/found
       if (json && json.notFound) {
-        this.showAcademyNotFound(this.currentAcademySlug);
+        this.showBrowserDefaultNotFound();
         return false;
       }
 
@@ -360,42 +366,57 @@ class PublicAcademyApp {
     return false;
   }
 
-  showAcademyNotFound(slug) {
+  showBrowserDefaultNotFound() {
     this.isNotFound = true;
-
-    if (this.viewHome) {
-      this.viewHome.classList.remove('active');
-      this.viewHome.style.display = 'none';
+    document.open();
+    document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>404: NOT_FOUND</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      color: #ffffff;
     }
-    if (this.viewStudent) {
-      this.viewStudent.classList.remove('active');
-      this.viewStudent.style.display = 'none';
+    .error-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: left;
     }
-    if (this.viewCertificate) {
-      this.viewCertificate.classList.remove('active');
-      this.viewCertificate.style.display = 'none';
+    .error-code {
+      font-size: 24px;
+      font-weight: 600;
+      padding-right: 20px;
+      margin-right: 20px;
+      border-right: 1px solid rgba(255, 255, 255, 0.3);
+      line-height: 48px;
     }
-    if (this.viewNotFound) {
-      this.viewNotFound.classList.add('active');
-      this.viewNotFound.style.display = 'flex';
+    .error-msg {
+      font-size: 14px;
+      color: #cccccc;
+      line-height: 48px;
+      margin: 0;
     }
-
-    const hostname = window.location.hostname.toLowerCase();
-    const parts = hostname.split('.');
-    let rootDomain = 'prantikphotography.com';
-    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
-      rootDomain = parts.slice(-2).join('.');
-    }
-
-    if (this.notFoundSubdomainDisplay) {
-      this.notFoundSubdomainDisplay.textContent = `https://${slug}.${rootDomain}`;
-    }
-    if (this.btnNotFoundClaim) {
-      this.btnNotFoundClaim.href = `https://academy.${rootDomain}/login.html`;
-    }
-    if (this.btnNotFoundDemo) {
-      this.btnNotFoundDemo.href = `https://prantik.${rootDomain}/`;
-    }
+  </style>
+</head>
+<body>
+  <div class="error-wrap">
+    <div class="error-code">404</div>
+    <div class="error-msg">This page could not be found.</div>
+  </div>
+</body>
+</html>`);
+    document.close();
   }
 
   bindEvents() {

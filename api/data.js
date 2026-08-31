@@ -167,11 +167,11 @@ export default async function handler(req, res) {
       const ownerEmail = await resolveOwnerEmail(req.query.ownerEmail, req.query.academy, req.headers.host);
 
       if (!ownerEmail) {
-        return res.status(200).json({
+        return res.status(404).json({
           success: false,
           notFound: true,
           slug: requestedSlug,
-          message: `The academy "${requestedSlug}" has not been registered or claimed yet.`
+          message: `404 Not Found: The academy "${requestedSlug}" has not been registered or claimed yet.`
         });
       }
 
