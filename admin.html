@@ -49,6 +49,10 @@
           <span>Courses</span>
           <span class="nav-badge" id="courseCountBadge">0</span>
         </a>
+        <a href="#personalisation" class="nav-item" data-view="personalisation" id="nav-personalisation">
+          <i class="fa-solid fa-palette"></i>
+          <span>Personalisation</span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -104,30 +108,6 @@
 
         <!-- ================= DASHBOARD VIEW ================= -->
         <section class="view-section active" id="view-dashboard">
-          <!-- Live Public Subdomain Showcase Card -->
-          <div class="public-portal-card" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #ffffff; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; box-shadow: 0 4px 14px rgba(49, 46, 129, 0.25);">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <div style="width: 46px; height: 46px; border-radius: 10px; background: rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: #38bdf8; flex-shrink: 0;">
-                <i class="fa-solid fa-globe"></i>
-              </div>
-              <div>
-                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: #93c5fd; display: block; margin-bottom: 0.2rem;">Your Public Admissions Website</span>
-                <a id="dashboardPublicLinkDisplay" href="#" target="_blank" style="color: #ffffff; font-weight: 700; font-size: 1.05rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
-                  <span id="dashboardFullUrlText">https://prantik.prantikphotography.com</span>
-                  <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem; color: #38bdf8;"></i>
-                </a>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-              <button type="button" class="btn btn-sm" id="btnCopyPublicUrl" style="background: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); font-weight: 600; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: background 0.15s ease;">
-                <i class="fa-solid fa-copy"></i> Copy Link
-              </button>
-              <button type="button" class="btn btn-sm" id="btnOpenSubdomainSettings" style="background: #38bdf8; color: #0f172a; border: none; font-weight: 700; padding: 0.5rem 0.85rem; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: background 0.15s ease;">
-                <i class="fa-solid fa-pen-to-square"></i> Change Subdomain
-              </button>
-            </div>
-          </div>
-
           <!-- Stats Summary Grid -->
           <div class="stats-grid">
             <div class="stat-card">
@@ -357,6 +337,219 @@
             <button class="btn btn-secondary btn-sm" id="btnResetCourseFilters">
               <i class="fa-solid fa-rotate-left"></i> Reset Search
             </button>
+          </div>
+        <!-- ================= PERSONALISATION VIEW ================= -->
+        <section class="view-section" id="view-personalisation">
+          <div class="personalisation-container" style="max-width: 1050px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Header Card -->
+            <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 1.75rem; border-radius: 12px; border: 1px solid #334155;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.4rem;">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                      <i class="fa-solid fa-palette"></i>
+                    </div>
+                    <h2 style="font-size: 1.4rem; font-weight: 700; color: #f8fafc; margin: 0;">Website Personalisation</h2>
+                  </div>
+                  <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Customize your public portal subdomain, branding, contact information, and academy story in real time.</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <a id="btnPersonalisationPreviewLive" href="#" target="_blank" class="btn btn-outline btn-sm" style="color: #38bdf8; border-color: #38bdf8; text-decoration: none;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Live Site
+                  </a>
+                  <button type="button" class="btn btn-primary btn-sm" id="btnSavePersonalisationTop" style="background: #2563eb; color: #fff; font-weight: 600;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Form Wrapper -->
+            <form id="personalisationForm">
+              
+              <!-- 1. Subdomain & Custom URL Card -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-globe" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">1. Public Subdomain & Portal Address</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-row" style="align-items: flex-start;">
+                    <div class="form-group flex-1">
+                      <label for="persSubdomainSlug">Subdomain Slug <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-link"></i>
+                        <input type="text" id="persSubdomainSlug" placeholder="e.g. prantik, dance-academy" required>
+                      </div>
+                      <small style="color: var(--text-muted); font-size: 0.78rem; margin-top: 0.35rem; display: block;">
+                        Lowercase letters, numbers, and hyphens only (e.g. <code>myacademy</code>).
+                      </small>
+                    </div>
+
+                    <div class="form-group flex-1">
+                      <label>Live Public Website Address</label>
+                      <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 0.65rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                        <span id="persFullUrlPreview" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; color: #0f172a; word-break: break-all;">https://slug.domain.com</span>
+                        <button type="button" class="btn btn-outline btn-sm" id="btnPersCopyLink" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; white-space: nowrap;">
+                          <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Hero Banner & Visual Branding Card -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-wand-magic-sparkles" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">2. Hero Banner & Brand Identity</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persAcademyName">Academy Brand Name <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-school"></i>
+                        <input type="text" id="persAcademyName" placeholder="e.g. Prantik Computer Academy" required>
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persCategory">Primary Category / Field <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <input type="text" id="persCategory" placeholder="e.g. Computer Science & IT, Dance & Arts" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persHeroTagline">Hero Badge / Tagline</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-tag"></i>
+                        <input type="text" id="persHeroTagline" placeholder="e.g. Admissions & Registrations Open 2026">
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persOwnerName">Authorized Director / Head Name <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <input type="text" id="persOwnerName" placeholder="Director / Principal Name" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="persHeroDesc">Hero Subtitle / Description</label>
+                    <textarea id="persHeroDesc" rows="3" class="form-textarea" placeholder="Brief introduction displayed prominently in the hero header..."></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Contact & Location Information Card -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-phone-volume" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">3. Contact Numbers & Physical Address</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persPhone">Primary Mobile / Helpline <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="tel" id="persPhone" maxlength="10" placeholder="10-digit primary phone" required>
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persSecondaryPhone">Secondary Phone / WhatsApp</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <input type="tel" id="persSecondaryPhone" maxlength="10" placeholder="Alternative contact / WhatsApp">
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persEmail">Public Inquiry Email <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="persEmail" placeholder="admissions@academy.com" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-2">
+                      <label for="persAddress">Street Address / Campus Location</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-map-pin"></i>
+                        <input type="text" id="persAddress" placeholder="Building, Street, Landmark, Area">
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persPinCode">PIN Code</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <input type="text" id="persPinCode" maxlength="6" placeholder="6-digit PIN code">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. About Us Page & Academy Story Card -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-book-open-reader" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">4. Academy Story & About Us Page</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-group">
+                    <label for="persAboutHeadline">About Page Title / Mission Statement</label>
+                    <div class="input-icon-wrap">
+                      <i class="fa-solid fa-heading"></i>
+                      <input type="text" id="persAboutHeadline" placeholder="e.g. Dedicated to Excellence in Practical IT & Software Education">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="persAboutStory">Academy Story / About Description <span class="required">*</span></label>
+                    <textarea id="persAboutStory" rows="5" class="form-textarea" placeholder="Detail your academy's history, mission, vision, and teaching methodology..." required></textarea>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persHighlight1">Key Highlight 1</label>
+                      <input type="text" id="persHighlight1" placeholder="e.g. Certified Expert Faculty">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persHighlight2">Key Highlight 2</label>
+                      <input type="text" id="persHighlight2" placeholder="e.g. 100% Practical Hands-on Labs">
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persHighlight3">Key Highlight 3</label>
+                      <input type="text" id="persHighlight3" placeholder="e.g. Recognized Government & Industry Certifications">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persHighlight4">Key Highlight 4</label>
+                      <input type="text" id="persHighlight4" placeholder="e.g. Career Guidance & Placement Support">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom Save Button Bar -->
+              <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-bottom: 2.5rem;">
+                <button type="submit" class="btn btn-primary" id="btnSavePersonalisation" style="padding: 0.75rem 2rem; font-size: 1rem; font-weight: 700;">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish Changes
+                </button>
+              </div>
+
+            </form>
           </div>
         </section>
 

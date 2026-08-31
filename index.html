@@ -90,6 +90,11 @@
             </a>
           </li>
           <li>
+            <a href="#about" class="nav-link" data-view="about" id="navAboutLink">
+              <i class="fa-solid fa-circle-info"></i> ABOUT
+            </a>
+          </li>
+          <li>
             <a href="#student" class="nav-link" data-view="student" id="navStudentLink">
               <i class="fa-solid fa-user-graduate"></i> STUDENT
             </a>
@@ -126,14 +131,14 @@
     <!-- Hero Banner -->
     <section class="hero-section">
       <div class="hero-container">
-        <div class="hero-badge">
+        <div class="hero-badge" id="heroBadgeWrapper">
           <i class="fa-solid fa-circle-check"></i>
-          <span>Admissions & Registrations Open</span>
+          <span id="heroTaglineText">Admissions & Registrations Open</span>
         </div>
         <h1 class="hero-title">
           Welcome to <span id="heroAcademyName"><script>document.write(window.__INITIAL_ACADEMY_NAME__ || '');</script></span>
         </h1>
-        <p class="hero-desc">
+        <p class="hero-desc" id="heroDescText">
           Empowering learners with industry-standard courses and certified training. Explore our programs and register online through our student admissions portal.
         </p>
         <div class="hero-actions">
@@ -594,6 +599,102 @@
             </div>
           </div>
 
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= VIEW 4: ABOUT US ================= -->
+  <div class="view-section" id="view-about">
+    <!-- About Hero Header -->
+    <section class="hero-section" style="padding: 4rem 1.5rem 3rem;">
+      <div class="hero-container">
+        <div class="hero-badge" id="aboutBadgeWrapper">
+          <i class="fa-solid fa-award"></i>
+          <span id="aboutCategoryBadge">Certified Professional Training Institute</span>
+        </div>
+        <h1 class="hero-title" id="aboutHeadlineDisplay" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+          About Our Academy
+        </h1>
+        <p class="hero-desc" id="aboutSubHeadlineDisplay" style="max-width: 680px; margin-left: auto; margin-right: auto;">
+          Empowering learners with industry-standard skills, certified curriculum, and personalized career mentoring.
+        </p>
+      </div>
+    </section>
+
+    <!-- Main About Content Container -->
+    <div style="max-width: 1080px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; display: flex; flex-direction: column; gap: 3rem;">
+
+      <!-- Academy Story & Mission Card -->
+      <div style="background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 16px; padding: 2.5rem 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color);">
+          <div style="width: 52px; height: 52px; border-radius: 12px; background: rgba(37, 99, 235, 0.1); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem;">Our Story & Mission</h2>
+            <span id="aboutStoryDirector" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Authorized Academy Direction</span>
+          </div>
+        </div>
+
+        <div style="font-size: 1.05rem; line-height: 1.8; color: #334155; white-space: pre-line;" id="aboutStoryTextDisplay">
+          Loading academy story...
+        </div>
+      </div>
+
+      <!-- Key Pillars / Why Choose Us -->
+      <div>
+        <div class="section-header" style="text-align: center; margin-bottom: 2rem;">
+          <span class="section-tag">Key Highlights</span>
+          <h2 class="section-title">Why Learn With Us</h2>
+          <p class="section-subtitle">Core advantages delivered across our certified training programs.</p>
+        </div>
+
+        <div class="about-highlights-grid" id="aboutHighlightsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem;">
+          <!-- Dynamically populated from profile -->
+        </div>
+      </div>
+
+      <!-- Campus Contact & Location Info Card -->
+      <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-radius: 16px; padding: 2.5rem 2rem; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);">
+        <div style="margin-bottom: 2rem; text-align: center;">
+          <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 0.35rem;">Admissions & Support</span>
+          <h3 style="font-size: 1.6rem; font-weight: 800; color: #f8fafc; margin-bottom: 0.5rem;">Get in Touch With Our Campus</h3>
+          <p style="font-size: 0.95rem; color: #94a3b8; max-width: 540px; margin: 0 auto;">Have questions about admission dates, course fees, or batch timings? Reach out directly.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+          <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.25rem;">
+            <i class="fa-solid fa-phone" style="font-size: 1.25rem; color: #38bdf8; margin-bottom: 0.75rem; display: block;"></i>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; display: block; font-weight: 700;">Helpline Phone</span>
+            <a href="#" id="aboutPhoneLink" style="color: #ffffff; font-weight: 700; font-size: 1rem; text-decoration: none;">--</a>
+          </div>
+
+          <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.25rem;" id="aboutSecondaryPhoneWrapper">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.25rem; color: #25d366; margin-bottom: 0.75rem; display: block;"></i>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; display: block; font-weight: 700;">WhatsApp / Helpline 2</span>
+            <a href="#" id="aboutSecondaryPhoneLink" style="color: #ffffff; font-weight: 700; font-size: 1rem; text-decoration: none;">--</a>
+          </div>
+
+          <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.25rem;">
+            <i class="fa-solid fa-envelope" style="font-size: 1.25rem; color: #38bdf8; margin-bottom: 0.75rem; display: block;"></i>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; display: block; font-weight: 700;">Email Address</span>
+            <a href="#" id="aboutEmailLink" style="color: #ffffff; font-weight: 700; font-size: 1rem; text-decoration: none; word-break: break-all;">--</a>
+          </div>
+
+          <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.25rem;">
+            <i class="fa-solid fa-map-pin" style="font-size: 1.25rem; color: #38bdf8; margin-bottom: 0.75rem; display: block;"></i>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; display: block; font-weight: 700;">Campus Address</span>
+            <span id="aboutAddressDisplay" style="color: #ffffff; font-weight: 700; font-size: 0.95rem; line-height: 1.4; display: block;">--</span>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center;">
+          <button type="button" class="btn btn-hero-primary" id="btnAboutGoToRegister" style="padding: 0.75rem 2rem; font-weight: 700;">
+            <i class="fa-solid fa-pen-nib"></i> Proceed to Student Registration
+          </button>
         </div>
       </div>
 

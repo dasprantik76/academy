@@ -687,7 +687,32 @@ class UIController {
     this.onboardingOwnerName = document.getElementById('onboardingOwnerName');
     this.onboardingSubdomainSlug = document.getElementById('onboardingSubdomainSlug');
     this.onboardingSubdomainSuffix = document.getElementById('onboardingSubdomainSuffix');
-    this.btnSaveOnboarding = document.getElementById('btnSaveOnboarding');
+    // Personalisation View Elements
+    this.navPersonalisation = document.getElementById('nav-personalisation');
+    this.viewPersonalisation = document.getElementById('view-personalisation');
+    this.btnPersonalisationPreviewLive = document.getElementById('btnPersonalisationPreviewLive');
+    this.btnSavePersonalisationTop = document.getElementById('btnSavePersonalisationTop');
+    this.personalisationForm = document.getElementById('personalisationForm');
+    this.persSubdomainSlug = document.getElementById('persSubdomainSlug');
+    this.persFullUrlPreview = document.getElementById('persFullUrlPreview');
+    this.btnPersCopyLink = document.getElementById('btnPersCopyLink');
+    this.persAcademyName = document.getElementById('persAcademyName');
+    this.persCategory = document.getElementById('persCategory');
+    this.persHeroTagline = document.getElementById('persHeroTagline');
+    this.persOwnerName = document.getElementById('persOwnerName');
+    this.persHeroDesc = document.getElementById('persHeroDesc');
+    this.persPhone = document.getElementById('persPhone');
+    this.persSecondaryPhone = document.getElementById('persSecondaryPhone');
+    this.persEmail = document.getElementById('persEmail');
+    this.persAddress = document.getElementById('persAddress');
+    this.persPinCode = document.getElementById('persPinCode');
+    this.persAboutHeadline = document.getElementById('persAboutHeadline');
+    this.persAboutStory = document.getElementById('persAboutStory');
+    this.persHighlight1 = document.getElementById('persHighlight1');
+    this.persHighlight2 = document.getElementById('persHighlight2');
+    this.persHighlight3 = document.getElementById('persHighlight3');
+    this.persHighlight4 = document.getElementById('persHighlight4');
+    this.btnSavePersonalisation = document.getElementById('btnSavePersonalisation');
 
     this.toastContainer = document.getElementById('toastContainer');
   }
@@ -709,6 +734,46 @@ class UIController {
         } else {
           prompt('Copy your public website link:', url);
         }
+      });
+    }
+
+    // Personalisation Subdomain Slug Auto-Cleaner & Live URL Update
+    if (this.persSubdomainSlug) {
+      this.persSubdomainSlug.addEventListener('input', (e) => {
+        const clean = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+        e.target.value = clean;
+        if (this.persFullUrlPreview) {
+          this.persFullUrlPreview.textContent = this.getPublicUrlForSlug(clean || 'slug');
+        }
+        if (this.btnPersonalisationPreviewLive) {
+          this.btnPersonalisationPreviewLive.href = this.getPublicUrlForSlug(clean || 'slug');
+        }
+      });
+    }
+
+    if (this.btnPersCopyLink) {
+      this.btnPersCopyLink.addEventListener('click', () => {
+        const rawSlug = (this.persSubdomainSlug?.value || '').trim() || 'slug';
+        const url = this.getPublicUrlForSlug(rawSlug);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(() => {
+            this.showToast('Link Copied!', 'Your public admissions link has been copied to clipboard.', 'success');
+          }).catch(() => {
+            prompt('Copy your public website link:', url);
+          });
+        } else {
+          prompt('Copy your public website link:', url);
+        }
+      });
+    }
+
+    if (this.personalisationForm) {
+      this.personalisationForm.addEventListener('submit', (e) => this.handleSavePersonalisation(e));
+    }
+
+    if (this.btnSavePersonalisationTop) {
+      this.btnSavePersonalisationTop.addEventListener('click', () => {
+        if (this.personalisationForm) this.personalisationForm.requestSubmit();
       });
     }
 
@@ -826,7 +891,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses'].includes(hash)) {
+      if (['dashboard', 'students', 'courses', 'personalisation'].includes(hash)) {
         this.switchView(hash, false);
       }
     });
@@ -1166,9 +1231,95 @@ class UIController {
     } else if (viewName === 'courses') {
       this.pageTitle.textContent = 'Course Management';
       this.pageSubtitle.textContent = 'Curate academy courses, durations, and syllabus details';
+    } else if (viewName === 'personalisation') {
+      this.pageTitle.textContent = 'Website Personalisation';
+      this.pageSubtitle.textContent = 'Manage public subdomain, branding, contact details, and academy story';
+      this.populatePersonalisationForm();
     }
 
     this.render();
+  }
+
+  populatePersonalisationForm() {
+    const profile = store.getAcademyProfile() || {};
+    const defaultSlug = this.session?.email?.includes('poulami') ? 'poulami' : 'prantik';
+    const slug = profile.slug || defaultSlug;
+
+    if (this.persSubdomainSlug) this.persSubdomainSlug.value = slug;
+    if (this.persFullUrlPreview) this.persFullUrlPreview.textContent = this.getPublicUrlForSlug(slug);
+    if (this.btnPersonalisationPreviewLive) this.btnPersonalisationPreviewLive.href = this.getPublicUrlForSlug(slug);
+
+    if (this.persAcademyName) this.persAcademyName.value = profile.academyName || '';
+    if (this.persCategory) this.persCategory.value = profile.category || '';
+    if (this.persHeroTagline) this.persHeroTagline.value = profile.tagline || 'Admissions & Registrations Open 2026';
+    if (this.persOwnerName) this.persOwnerName.value = profile.ownerName || this.session?.name || '';
+    if (this.persHeroDesc) this.persHeroDesc.value = profile.heroDesc || profile.about || 'Empowering learners with industry-standard courses and certified training. Explore our programs and register online through our student admissions portal.';
+    if (this.persPhone) this.persPhone.value = profile.phone || '';
+    if (this.persSecondaryPhone) this.persSecondaryPhone.value = profile.secondaryPhone || profile.whatsapp || '';
+    if (this.persEmail) this.persEmail.value = profile.email || this.session?.email || '';
+    if (this.persAddress) this.persAddress.value = profile.address || '';
+    if (this.persPinCode) this.persPinCode.value = profile.pincode || '';
+    if (this.persAboutHeadline) this.persAboutHeadline.value = profile.aboutHeadline || `Welcome to ${profile.academyName || 'Our Academy'}`;
+    if (this.persAboutStory) this.persAboutStory.value = profile.aboutStory || profile.about || 'Premier professional training academy offering certified courses with modern practical laboratory sessions.';
+
+    // Highlights
+    const highlights = Array.isArray(profile.aboutHighlights) ? profile.aboutHighlights : [];
+    if (this.persHighlight1) this.persHighlight1.value = highlights[0] || 'Certified Expert & Industry-Experienced Faculty';
+    if (this.persHighlight2) this.persHighlight2.value = highlights[1] || '100% Practical Hands-on Lab Sessions';
+    if (this.persHighlight3) this.persHighlight3.value = highlights[2] || 'Recognized Government & Industry Certifications';
+    if (this.persHighlight4) this.persHighlight4.value = highlights[3] || 'Comprehensive Career Guidance & Placement Assistance';
+  }
+
+  async handleSavePersonalisation(e) {
+    if (e) e.preventDefault();
+
+    const rawSlug = (this.persSubdomainSlug?.value || '').trim();
+    const sanitizedSlug = rawSlug.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '');
+    if (!sanitizedSlug) {
+      this.showToast('Invalid Subdomain', 'Please provide a valid subdomain (e.g. prantik, my-academy).', 'error');
+      return;
+    }
+
+    const academyName = this.persAcademyName?.value.trim();
+    if (!academyName) {
+      this.showToast('Required Field', 'Please enter your Academy Brand Name.', 'error');
+      return;
+    }
+
+    const highlights = [
+      this.persHighlight1?.value.trim(),
+      this.persHighlight2?.value.trim(),
+      this.persHighlight3?.value.trim(),
+      this.persHighlight4?.value.trim()
+    ].filter(Boolean);
+
+    const updatedProfile = {
+      ...store.getAcademyProfile(),
+      slug: sanitizedSlug,
+      academyName: academyName,
+      category: this.persCategory?.value.trim() || '',
+      tagline: this.persHeroTagline?.value.trim() || '',
+      ownerName: this.persOwnerName?.value.trim() || '',
+      heroDesc: this.persHeroDesc?.value.trim() || '',
+      phone: this.persPhone?.value.trim() || '',
+      secondaryPhone: this.persSecondaryPhone?.value.trim() || '',
+      whatsapp: this.persSecondaryPhone?.value.trim() || '',
+      email: this.persEmail?.value.trim() || '',
+      address: this.persAddress?.value.trim() || '',
+      pincode: this.persPinCode?.value.trim() || '',
+      aboutHeadline: this.persAboutHeadline?.value.trim() || '',
+      aboutStory: this.persAboutStory?.value.trim() || '',
+      about: this.persHeroDesc?.value.trim() || this.persAboutStory?.value.trim() || '',
+      aboutHighlights: highlights,
+      updatedAt: Date.now()
+    };
+
+    store.saveAcademyProfile(updatedProfile);
+    this.updatePublicSiteLink();
+    this.populatePersonalisationForm();
+    this.render();
+
+    this.showToast('Personalisation Published!', `Your updates and live subdomain (${sanitizedSlug}) are now synced live to the public portal.`, 'success');
   }
 
   render() {

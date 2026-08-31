@@ -78,6 +78,8 @@ class PublicAcademyApp {
       this.switchView('student');
     } else if (hash === 'certificate') {
       this.switchView('certificate');
+    } else if (hash === 'about') {
+      this.switchView('about');
     } else {
       this.switchView('home');
     }
@@ -155,10 +157,13 @@ class PublicAcademyApp {
     this.navAcademyName = document.getElementById('navAcademyName');
     this.heroAcademyName = document.getElementById('heroAcademyName');
     this.footerAcademyName = document.getElementById('footerAcademyName');
+    this.heroTaglineText = document.getElementById('heroTaglineText');
+    this.heroDescText = document.getElementById('heroDescText');
 
     // Navigation & Views
     this.brandHomeLink = document.getElementById('brandHomeLink');
     this.navHomeLink = document.getElementById('navHomeLink');
+    this.navAboutLink = document.getElementById('navAboutLink');
     this.navStudentLink = document.getElementById('navStudentLink');
     this.navCertificateLink = document.getElementById('navCertificateLink');
     this.btnHeroGoToRegister = document.getElementById('btnHeroGoToRegister');
@@ -166,12 +171,27 @@ class PublicAcademyApp {
     this.navMenu = document.getElementById('navMenu');
 
     this.viewHome = document.getElementById('view-home');
+    this.viewAbout = document.getElementById('view-about');
     this.viewStudent = document.getElementById('view-student');
     this.viewCertificate = document.getElementById('view-certificate');
     this.viewNotFound = document.getElementById('view-not-found');
     this.notFoundSubdomainDisplay = document.getElementById('notFoundSubdomainDisplay');
     this.btnNotFoundClaim = document.getElementById('btnNotFoundClaim');
     this.btnNotFoundDemo = document.getElementById('btnNotFoundDemo');
+
+    // About Us View Elements
+    this.aboutCategoryBadge = document.getElementById('aboutCategoryBadge');
+    this.aboutHeadlineDisplay = document.getElementById('aboutHeadlineDisplay');
+    this.aboutSubHeadlineDisplay = document.getElementById('aboutSubHeadlineDisplay');
+    this.aboutStoryDirector = document.getElementById('aboutStoryDirector');
+    this.aboutStoryTextDisplay = document.getElementById('aboutStoryTextDisplay');
+    this.aboutHighlightsGrid = document.getElementById('aboutHighlightsGrid');
+    this.aboutPhoneLink = document.getElementById('aboutPhoneLink');
+    this.aboutSecondaryPhoneLink = document.getElementById('aboutSecondaryPhoneLink');
+    this.aboutSecondaryPhoneWrapper = document.getElementById('aboutSecondaryPhoneWrapper');
+    this.aboutEmailLink = document.getElementById('aboutEmailLink');
+    this.aboutAddressDisplay = document.getElementById('aboutAddressDisplay');
+    this.btnAboutGoToRegister = document.getElementById('btnAboutGoToRegister');
 
     // Home Section
     this.homeCoursesGrid = document.getElementById('homeCoursesGrid');
@@ -431,7 +451,7 @@ class PublicAcademyApp {
       });
     }
 
-    // Nav Links (HOME, STUDENT, CERTIFICATE)
+    // Nav Links (HOME, ABOUT, STUDENT, CERTIFICATE)
     if (this.navHomeLink) {
       this.navHomeLink.addEventListener('click', (e) => {
         e.preventDefault();
@@ -443,6 +463,13 @@ class PublicAcademyApp {
       this.brandHomeLink.addEventListener('click', (e) => {
         e.preventDefault();
         this.switchView('home');
+      });
+    }
+
+    if (this.navAboutLink) {
+      this.navAboutLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchView('about');
       });
     }
 
@@ -466,6 +493,12 @@ class PublicAcademyApp {
       });
     }
 
+    if (this.btnAboutGoToRegister) {
+      this.btnAboutGoToRegister.addEventListener('click', () => {
+        this.switchView('student');
+      });
+    }
+
     // Hash Change
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
@@ -473,6 +506,8 @@ class PublicAcademyApp {
         this.switchView('student', false);
       } else if (hash === 'certificate') {
         this.switchView('certificate', false);
+      } else if (hash === 'about') {
+        this.switchView('about', false);
       } else if (hash === 'home' || hash === '') {
         this.switchView('home', false);
       }
@@ -810,6 +845,9 @@ class PublicAcademyApp {
     if (this.navHomeLink) {
       this.navHomeLink.classList.toggle('active', viewName === 'home');
     }
+    if (this.navAboutLink) {
+      this.navAboutLink.classList.toggle('active', viewName === 'about');
+    }
     if (this.navStudentLink) {
       this.navStudentLink.classList.toggle('active', viewName === 'student');
     }
@@ -821,6 +859,10 @@ class PublicAcademyApp {
     if (this.viewHome) {
       this.viewHome.style.display = viewName === 'home' ? 'block' : 'none';
       this.viewHome.classList.toggle('active', viewName === 'home');
+    }
+    if (this.viewAbout) {
+      this.viewAbout.style.display = viewName === 'about' ? 'block' : 'none';
+      this.viewAbout.classList.toggle('active', viewName === 'about');
     }
     if (this.viewStudent) {
       this.viewStudent.style.display = viewName === 'student' ? 'block' : 'none';
@@ -848,18 +890,108 @@ class PublicAcademyApp {
   }
 
   renderBranding() {
-    const name = this.academyProfile?.academyName || 'Academy';
+    const profile = this.academyProfile || {};
+    const name = profile.academyName || 'Academy';
+    
+    // 1. Navbar & Brand Headings
     if (this.navAcademyName) this.navAcademyName.textContent = name;
     if (this.heroAcademyName) this.heroAcademyName.textContent = name;
     if (this.footerAcademyName) this.footerAcademyName.textContent = name;
     if (this.certDocAcademyName) this.certDocAcademyName.textContent = name;
     document.title = `${name} | Public Admissions Portal`;
+
+    // 2. Hero Tagline & Subtitle
+    if (this.heroTaglineText) {
+      this.heroTaglineText.textContent = profile.tagline || 'Admissions & Registrations Open';
+    }
+    if (this.heroDescText) {
+      this.heroDescText.textContent = profile.heroDesc || profile.about || 'Empowering learners with industry-standard courses and certified training. Explore our programs and register online through our student admissions portal.';
+    }
+
+    // 3. About Us View Personalisation
+    if (this.aboutCategoryBadge) {
+      this.aboutCategoryBadge.textContent = profile.category ? `Certified in ${profile.category}` : 'Certified Professional Training Institute';
+    }
+    if (this.aboutHeadlineDisplay) {
+      this.aboutHeadlineDisplay.textContent = profile.aboutHeadline || `About ${name}`;
+    }
+    if (this.aboutSubHeadlineDisplay) {
+      this.aboutSubHeadlineDisplay.textContent = profile.category ? `Premier Institute for ${profile.category} Education & Certification` : 'Dedicated to career-transforming training and industry skills.';
+    }
+    if (this.aboutStoryDirector) {
+      this.aboutStoryDirector.textContent = profile.ownerName ? `Supervised & Directed by ${profile.ownerName}` : 'Authorized Academy Administration';
+    }
+    if (this.aboutStoryTextDisplay) {
+      this.aboutStoryTextDisplay.textContent = profile.aboutStory || profile.about || `${name} is a premier training academy offering comprehensive hands-on certification programs designed to build high-demand industry skills.`;
+    }
+
+    // 4. Highlights Grid
+    if (this.aboutHighlightsGrid) {
+      const defaultHighlights = [
+        { icon: 'fa-user-tie', title: 'Certified Expert Faculty', desc: 'Personalized mentoring from seasoned industry instructors.' },
+        { icon: 'fa-laptop-code', title: '100% Practical Labs', desc: 'Modern lab infrastructure and real-world project assignments.' },
+        { icon: 'fa-certificate', title: 'Verifiable Certification', desc: 'Instantly verifiable QR-enabled academic completion credentials.' },
+        { icon: 'fa-briefcase', title: 'Career Guidance', desc: 'Placement assistance, portfolio reviews, and interview prep.' }
+      ];
+
+      const customHighlights = Array.isArray(profile.aboutHighlights) && profile.aboutHighlights.length > 0
+        ? profile.aboutHighlights
+        : defaultHighlights.map(d => d.title);
+
+      this.aboutHighlightsGrid.innerHTML = customHighlights.map((hlText, idx) => {
+        const icon = defaultHighlights[idx % defaultHighlights.length].icon;
+        const sub = defaultHighlights[idx % defaultHighlights.length].desc;
+        return `
+          <div style="background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; gap: 1rem; align-items: flex-start; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+            <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(37,99,235,0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+              <i class="fa-solid ${icon}"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">${escapeHtml(hlText)}</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4;">${sub}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 5. Contact & Location Information
+    const primaryPhone = profile.phone || '9876543210';
+    if (this.aboutPhoneLink) {
+      this.aboutPhoneLink.textContent = `+91 ${primaryPhone}`;
+      this.aboutPhoneLink.href = `tel:${primaryPhone}`;
+    }
+
+    const secondaryPhone = profile.secondaryPhone || profile.whatsapp;
+    if (this.aboutSecondaryPhoneWrapper) {
+      if (secondaryPhone) {
+        this.aboutSecondaryPhoneWrapper.style.display = 'block';
+        if (this.aboutSecondaryPhoneLink) {
+          this.aboutSecondaryPhoneLink.textContent = `+91 ${secondaryPhone}`;
+          this.aboutSecondaryPhoneLink.href = `https://wa.me/91${secondaryPhone.replace(/\D/g, '')}`;
+        }
+      } else {
+        this.aboutSecondaryPhoneWrapper.style.display = 'none';
+      }
+    }
+
+    const email = profile.email || 'admissions@academy.com';
+    if (this.aboutEmailLink) {
+      this.aboutEmailLink.textContent = email;
+      this.aboutEmailLink.href = `mailto:${email}`;
+    }
+
+    const addressParts = [profile.address, profile.pincode ? `PIN: ${profile.pincode}` : ''].filter(Boolean);
+    if (this.aboutAddressDisplay) {
+      this.aboutAddressDisplay.textContent = addressParts.length > 0 ? addressParts.join(', ') : 'Main Campus Admissions Center';
+    }
   }
 
   render() {
     if (this.isNotFound) return;
 
     if (this.viewHome && this.currentView === 'home') this.viewHome.style.display = 'block';
+    if (this.viewAbout && this.currentView === 'about') this.viewAbout.style.display = 'block';
     if (this.viewStudent && this.currentView === 'student') this.viewStudent.style.display = 'block';
     if (this.viewCertificate && this.currentView === 'certificate') this.viewCertificate.style.display = 'block';
 
