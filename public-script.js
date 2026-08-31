@@ -193,43 +193,51 @@ class PublicAcademyApp {
 
     // Dropdown Containers & Inputs
     this.regGenderDropdown = document.getElementById('regGenderDropdown');
+    this.regGenderTrigger = this.regGenderDropdown?.querySelector('.custom-select-trigger');
     this.regGenderDisplay = document.getElementById('regGenderDisplay');
     this.regGenderInput = document.getElementById('regGenderInput');
     this.regGenderMenu = document.getElementById('regGenderMenu');
 
     this.regMaritalStatusDropdown = document.getElementById('regMaritalStatusDropdown');
+    this.regMaritalStatusTrigger = this.regMaritalStatusDropdown?.querySelector('.custom-select-trigger');
     this.regMaritalStatusDisplay = document.getElementById('regMaritalStatusDisplay');
     this.regMaritalStatusInput = document.getElementById('regMaritalStatusInput');
     this.regMaritalStatusMenu = document.getElementById('regMaritalStatusMenu');
 
     this.regCategoryDropdown = document.getElementById('regCategoryDropdown');
+    this.regCategoryTrigger = this.regCategoryDropdown?.querySelector('.custom-select-trigger');
     this.regCategoryDisplay = document.getElementById('regCategoryDisplay');
     this.regCategoryInput = document.getElementById('regCategoryInput');
     this.regCategoryMenu = document.getElementById('regCategoryMenu');
 
     this.regReligionDropdown = document.getElementById('regReligionDropdown');
+    this.regReligionTrigger = this.regReligionDropdown?.querySelector('.custom-select-trigger');
     this.regReligionDisplay = document.getElementById('regReligionDisplay');
     this.regReligionInput = document.getElementById('regReligionInput');
     this.regReligionMenu = document.getElementById('regReligionMenu');
 
     this.regStateDropdown = document.getElementById('regStateDropdown');
+    this.regStateTrigger = this.regStateDropdown?.querySelector('.custom-select-trigger');
     this.regStateDisplay = document.getElementById('regStateDisplay');
     this.regStateInput = document.getElementById('regStateInput');
     this.regStateMenu = document.getElementById('regStateMenu');
 
     this.regDistrictDropdown = document.getElementById('regDistrictDropdown');
+    this.regDistrictTrigger = this.regDistrictDropdown?.querySelector('.custom-select-trigger');
     this.regDistrictDisplay = document.getElementById('regDistrictDisplay');
     this.regDistrictInput = document.getElementById('regDistrictInput');
     this.regDistrictMenu = document.getElementById('regDistrictMenu');
 
     this.regQualificationDropdown = document.getElementById('regQualificationDropdown');
+    this.regQualificationTrigger = this.regQualificationDropdown?.querySelector('.custom-select-trigger');
     this.regQualificationDisplay = document.getElementById('regQualificationDisplay');
     this.regQualificationInput = document.getElementById('regQualificationInput');
     this.regQualificationMenu = document.getElementById('regQualificationMenu');
 
     this.regCourseDropdown = document.getElementById('regCourseDropdown');
+    this.regCourseTrigger = document.getElementById('regCourseTrigger') || this.regCourseDropdown?.querySelector('.custom-select-trigger');
     this.regCourseDisplay = document.getElementById('regCourseDisplay');
-    this.regCourseInput = document.getElementById('regCourseInput');
+    this.regCourseInput = document.getElementById('regCourse') || document.getElementById('regCourseInput');
     this.regCourseMenu = document.getElementById('regCourseMenu');
 
     // Certificate Verification Form Elements
