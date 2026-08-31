@@ -56,29 +56,17 @@ class PublicAcademyApp {
     this.currentView = 'home';
     this.courses = [];
     this.academyProfile = null;
-    this.isNotFound = false;
 
     // Resolve tenant from Subdomain (e.g. prantik.prantikphotography.com) or URL Query (?academy=prantik)
     this.currentAcademySlug = this.resolveTenant();
-    const isKnownDefault = this.currentAcademySlug === 'prantik' || this.currentAcademySlug === 'poulami';
-    this.currentOwnerEmail = this.currentAcademySlug === 'poulami' ? 'poulami.13thmay@gmail.com' : (this.currentAcademySlug === 'prantik' ? 'dasprantik76@gmail.com' : '');
+    this.currentOwnerEmail = this.currentAcademySlug.includes('poulami') ? 'poulami.13thmay@gmail.com' : 'dasprantik76@gmail.com';
 
     this.cacheDOMElements();
-
-    // If an unknown custom slug is requested and not in local cache, hide views until cloud verification completes
-    const hasLocalCache = Boolean(this.currentOwnerEmail && localStorage.getItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE)));
-    if (!isKnownDefault && !hasLocalCache) {
-      if (this.viewHome) this.viewHome.style.display = 'none';
-      if (this.viewStudent) this.viewStudent.style.display = 'none';
-      if (this.viewCertificate) this.viewCertificate.style.display = 'none';
-    } else {
-      this.initData();
-      this.render();
-    }
-
+    this.initData();
     this.bindEvents();
     this.initCustomDropdowns();
     this.initInputFormatters();
+    this.render();
     this.updateAdminLoginLinks();
 
     // Asynchronously synchronize courses and profile for this specific academy from MongoDB
@@ -282,17 +270,32 @@ class PublicAcademyApp {
   }
 
   initData() {
-    // Load Academy Profile for active tenant
+    // 1. Load Academy Profile for active tenant
+    let loadedProfile = null;
     const rawProfile = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE));
     if (rawProfile) {
       try {
-        this.academyProfile = JSON.parse(rawProfile);
-      } catch (e) {
-        this.academyProfile = this.getDefaultProfile();
-      }
-    } else {
-      this.academyProfile = this.getDefaultProfile();
+        loadedProfile = JSON.parse(rawProfile);
+      } catch (e) {}
     }
+
+    // Check fallback for custom slug in localStorage
+    if (!loadedProfile) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('educore_academy_profile_')) {
+          try {
+            const p = JSON.parse(localStorage.getItem(k));
+            if (p && (p.slug === this.currentAcademySlug || (this.currentAcademySlug === 'ppxt' && p.slug === 'ppxt'))) {
+              loadedProfile = p;
+              break;
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    this.academyProfile = loadedProfile || this.getDefaultProfile();
 
     // Load Available Courses for active tenant
     const rawCourses = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.COURSES));
