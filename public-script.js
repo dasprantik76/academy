@@ -160,6 +160,15 @@ class PublicAcademyApp {
     this.heroTaglineText = document.getElementById('heroTaglineText');
     this.heroDescText = document.getElementById('heroDescText');
 
+    // Top Notice Bar
+    this.topNoticeBar = document.getElementById('topNoticeBar');
+    this.noticeLink1 = document.getElementById('noticeLink1');
+    this.noticeLink1B = document.getElementById('noticeLink1B');
+    this.noticeLink2 = document.getElementById('noticeLink2');
+    this.noticeLink2B = document.getElementById('noticeLink2B');
+    this.noticeLink3 = document.getElementById('noticeLink3');
+    this.noticeLink3B = document.getElementById('noticeLink3B');
+
     // Navigation & Views
     this.brandHomeLink = document.getElementById('brandHomeLink');
     this.navHomeLink = document.getElementById('navHomeLink');
@@ -900,6 +909,19 @@ class PublicAcademyApp {
     const profile = this.academyProfile || {};
     const name = profile.academyName || 'Academy';
     
+    // 0. Top Notice Ticker
+    const notice1Text = `Notice: Admissions Open for ${name} 2026 Academic Batches`;
+    const notice2Text = `Fast-Track Student Verification & Official Certification Active`;
+    const primaryPhone = profile.phone || '9876543210';
+    const notice3Text = `Contact Admissions Helpline: +91 ${primaryPhone}`;
+
+    if (this.noticeLink1) this.noticeLink1.textContent = notice1Text;
+    if (this.noticeLink1B) this.noticeLink1B.textContent = notice1Text;
+    if (this.noticeLink2) this.noticeLink2.textContent = notice2Text;
+    if (this.noticeLink2B) this.noticeLink2B.textContent = notice2Text;
+    if (this.noticeLink3) this.noticeLink3.textContent = notice3Text;
+    if (this.noticeLink3B) this.noticeLink3B.textContent = notice3Text;
+
     // 1. Navbar & Brand Headings
     if (this.navAcademyName) this.navAcademyName.textContent = name;
     if (this.heroAcademyName) this.heroAcademyName.textContent = name;
@@ -963,7 +985,6 @@ class PublicAcademyApp {
     }
 
     // 5. Contact & Location Information
-    const primaryPhone = profile.phone || '9876543210';
     if (this.aboutPhoneLink) {
       this.aboutPhoneLink.textContent = `+91 ${primaryPhone}`;
       this.aboutPhoneLink.href = `tel:${primaryPhone}`;

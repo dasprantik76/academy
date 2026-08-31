@@ -62,6 +62,100 @@ body {
 }
 
 /* ==========================================================================
+   Top Notice Banner (Thin Yellowish Line / Marquee)
+   ========================================================================== */
+.top-notice-bar {
+  background: #fff3bf; /* Thin pleasant yellowish bar matching screenshot */
+  background: linear-gradient(90deg, #fef08a 0%, #fff3bf 50%, #fef08a 100%);
+  border-bottom: 1px solid #fde047;
+  padding: 0.35rem 1rem;
+  font-size: 0.82rem;
+  color: #854d0e;
+  position: relative;
+  z-index: 501;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(234, 179, 8, 0.15);
+}
+
+.notice-bar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notice-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 800;
+  color: #dc2626; /* Crimson / Red matching screenshot */
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 0.83rem;
+}
+
+.notice-bell-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.notice-content-marquee {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  white-space: nowrap;
+  mask-image: linear-gradient(to right, transparent, black 1.5%, black 98.5%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 1.5%, black 98.5%, transparent);
+}
+
+.marquee-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: noticeMarqueeScroll 35s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.marquee-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-right: 0.75rem;
+  white-space: nowrap;
+}
+
+@keyframes noticeMarqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.notice-link {
+  color: #dc2626; /* Red matching screenshot */
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.notice-link:hover {
+  color: #991b1b;
+  opacity: 0.85;
+}
+
+.notice-separator {
+  color: #ca8a04;
+  opacity: 0.75;
+  font-weight: 700;
+  margin: 0 0.15rem;
+}
+
+/* ==========================================================================
    Public Navigation Bar (HOME & STUDENT only)
    ========================================================================== */
 .public-navbar {
