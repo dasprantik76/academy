@@ -819,19 +819,24 @@ class PublicAcademyApp {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  render() {
-    if (this.isNotFound) return;
-
-    if (this.viewHome && this.currentView === 'home') this.viewHome.style.display = '';
-    if (this.viewStudent && this.currentView === 'student') this.viewStudent.style.display = '';
-    if (this.viewCertificate && this.currentView === 'certificate') this.viewCertificate.style.display = '';
-
-    // 1. Render Academy Brand Name
+  renderBranding() {
     const name = this.academyProfile?.academyName || 'Academy';
     if (this.navAcademyName) this.navAcademyName.textContent = name;
     if (this.heroAcademyName) this.heroAcademyName.textContent = name;
     if (this.footerAcademyName) this.footerAcademyName.textContent = name;
     if (this.certDocAcademyName) this.certDocAcademyName.textContent = name;
+    document.title = `${name} | Public Admissions Portal`;
+  }
+
+  render() {
+    if (this.isNotFound) return;
+
+    if (this.viewHome && this.currentView === 'home') this.viewHome.style.display = 'block';
+    if (this.viewStudent && this.currentView === 'student') this.viewStudent.style.display = 'block';
+    if (this.viewCertificate && this.currentView === 'certificate') this.viewCertificate.style.display = 'block';
+
+    // 1. Render Academy Brand Name
+    this.renderBranding();
 
     // 2. Render Available Courses in Home View
     this.renderHomeCourses();
