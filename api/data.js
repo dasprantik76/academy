@@ -124,7 +124,7 @@ export default async function handler(req, res) {
     let email = (queryEmail || '').toLowerCase().trim();
     let slug = (querySlug || '').toLowerCase().trim();
 
-    // Check host header for custom subdomains (e.g. prantik.pixelsetu.com)
+    // Check host header for custom subdomains (e.g. prantik.prantikphotography.com)
     if (!slug && reqHost) {
       const parts = reqHost.toLowerCase().split('.');
       if (parts.length >= 3) {
@@ -144,12 +144,15 @@ export default async function handler(req, res) {
         const profileDoc = await db.collection(COLLECTIONS.PROFILE).findOne({ slug }, { projection: { _id: 0 } });
         if (profileDoc && profileDoc.ownerEmail) {
           email = profileDoc.ownerEmail;
+        } else {
+          // Explicit unknown slug requested that is not registered
+          return null;
         }
       }
     }
 
-    // Default tenant fallback if none matched
-    if (!email) {
+    // Default tenant fallback only when bare domain accessed with no specific subdomain/slug
+    if (!email && !slug) {
       email = 'dasprantik76@gmail.com';
     }
     return email;
@@ -160,7 +163,17 @@ export default async function handler(req, res) {
   // --------------------------------------------------------------------------
   if (req.method === 'GET') {
     try {
+      const requestedSlug = req.query.academy || req.headers.host?.split('.')[0] || '';
       const ownerEmail = await resolveOwnerEmail(req.query.ownerEmail, req.query.academy, req.headers.host);
+
+      if (!ownerEmail) {
+        return res.status(200).json({
+          success: false,
+          notFound: true,
+          slug: requestedSlug,
+          message: `The academy "${requestedSlug}" has not been registered or claimed yet.`
+        });
+      }
 
       let [profileDoc, coursesList, studentsList, authTokenDoc] = await Promise.all([
         db.collection(COLLECTIONS.PROFILE).findOne({ ownerEmail }, { projection: { _id: 0 } }),

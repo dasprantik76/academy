@@ -168,6 +168,10 @@ class PublicAcademyApp {
     this.viewHome = document.getElementById('view-home');
     this.viewStudent = document.getElementById('view-student');
     this.viewCertificate = document.getElementById('view-certificate');
+    this.viewNotFound = document.getElementById('view-not-found');
+    this.notFoundSubdomainDisplay = document.getElementById('notFoundSubdomainDisplay');
+    this.btnNotFoundClaim = document.getElementById('btnNotFoundClaim');
+    this.btnNotFoundDemo = document.getElementById('btnNotFoundDemo');
 
     // Home Section
     this.homeCoursesGrid = document.getElementById('homeCoursesGrid');
@@ -296,6 +300,13 @@ class PublicAcademyApp {
       const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
       if (!response.ok) return false;
       const json = await response.json();
+
+      // If requested subdomain is not registered/found
+      if (json && json.notFound) {
+        this.showAcademyNotFound(this.currentAcademySlug);
+        return false;
+      }
+
       if (json && json.success && json.data) {
         if (json.tenant && json.tenant.ownerEmail) {
           this.currentOwnerEmail = json.tenant.ownerEmail;
@@ -331,6 +342,44 @@ class PublicAcademyApp {
       console.error('[PublicApp] fetchCloudData error:', e);
     }
     return false;
+  }
+
+  showAcademyNotFound(slug) {
+    this.isNotFound = true;
+
+    if (this.viewHome) {
+      this.viewHome.classList.remove('active');
+      this.viewHome.style.display = 'none';
+    }
+    if (this.viewStudent) {
+      this.viewStudent.classList.remove('active');
+      this.viewStudent.style.display = 'none';
+    }
+    if (this.viewCertificate) {
+      this.viewCertificate.classList.remove('active');
+      this.viewCertificate.style.display = 'none';
+    }
+    if (this.viewNotFound) {
+      this.viewNotFound.classList.add('active');
+      this.viewNotFound.style.display = 'flex';
+    }
+
+    const hostname = window.location.hostname.toLowerCase();
+    const parts = hostname.split('.');
+    let rootDomain = 'prantikphotography.com';
+    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
+      rootDomain = parts.slice(-2).join('.');
+    }
+
+    if (this.notFoundSubdomainDisplay) {
+      this.notFoundSubdomainDisplay.textContent = `https://${slug}.${rootDomain}`;
+    }
+    if (this.btnNotFoundClaim) {
+      this.btnNotFoundClaim.href = `https://academy.${rootDomain}/login.html`;
+    }
+    if (this.btnNotFoundDemo) {
+      this.btnNotFoundDemo.href = `https://prantik.${rootDomain}/`;
+    }
   }
 
   bindEvents() {
@@ -713,6 +762,7 @@ class PublicAcademyApp {
   }
 
   switchView(viewName, updateHash = true) {
+    if (this.isNotFound) return;
     this.currentView = viewName;
 
     // Update Nav Active State
