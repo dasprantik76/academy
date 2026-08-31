@@ -217,51 +217,51 @@ class PublicAcademyApp {
 
     // Dropdown Containers & Inputs
     this.regGenderDropdown = document.getElementById('regGenderDropdown');
-    this.regGenderTrigger = this.regGenderDropdown?.querySelector('.custom-select-trigger');
-    this.regGenderDisplay = document.getElementById('regGenderDisplay');
-    this.regGenderInput = document.getElementById('regGenderInput');
+    this.regGenderTrigger = document.getElementById('regGenderTrigger') || this.regGenderDropdown?.querySelector('.custom-select-trigger');
+    this.regGenderDisplay = document.getElementById('regGenderDisplay') || this.regGenderTrigger?.querySelector('.select-label');
+    this.regGenderInput = document.getElementById('regGender') || document.getElementById('regGenderInput') || this.regGenderDropdown?.querySelector('input[type="hidden"]');
     this.regGenderMenu = document.getElementById('regGenderMenu');
 
     this.regMaritalStatusDropdown = document.getElementById('regMaritalStatusDropdown');
-    this.regMaritalStatusTrigger = this.regMaritalStatusDropdown?.querySelector('.custom-select-trigger');
-    this.regMaritalStatusDisplay = document.getElementById('regMaritalStatusDisplay');
-    this.regMaritalStatusInput = document.getElementById('regMaritalStatusInput');
+    this.regMaritalStatusTrigger = document.getElementById('regMaritalStatusTrigger') || this.regMaritalStatusDropdown?.querySelector('.custom-select-trigger');
+    this.regMaritalStatusDisplay = document.getElementById('regMaritalStatusDisplay') || this.regMaritalStatusTrigger?.querySelector('.select-label');
+    this.regMaritalStatusInput = document.getElementById('regMaritalStatus') || document.getElementById('regMaritalStatusInput') || this.regMaritalStatusDropdown?.querySelector('input[type="hidden"]');
     this.regMaritalStatusMenu = document.getElementById('regMaritalStatusMenu');
 
     this.regCategoryDropdown = document.getElementById('regCategoryDropdown');
-    this.regCategoryTrigger = this.regCategoryDropdown?.querySelector('.custom-select-trigger');
-    this.regCategoryDisplay = document.getElementById('regCategoryDisplay');
-    this.regCategoryInput = document.getElementById('regCategoryInput');
+    this.regCategoryTrigger = document.getElementById('regCategoryTrigger') || this.regCategoryDropdown?.querySelector('.custom-select-trigger');
+    this.regCategoryDisplay = document.getElementById('regCategoryDisplay') || this.regCategoryTrigger?.querySelector('.select-label');
+    this.regCategoryInput = document.getElementById('regCategory') || document.getElementById('regCategoryInput') || this.regCategoryDropdown?.querySelector('input[type="hidden"]');
     this.regCategoryMenu = document.getElementById('regCategoryMenu');
 
     this.regReligionDropdown = document.getElementById('regReligionDropdown');
-    this.regReligionTrigger = this.regReligionDropdown?.querySelector('.custom-select-trigger');
-    this.regReligionDisplay = document.getElementById('regReligionDisplay');
-    this.regReligionInput = document.getElementById('regReligionInput');
+    this.regReligionTrigger = document.getElementById('regReligionTrigger') || this.regReligionDropdown?.querySelector('.custom-select-trigger');
+    this.regReligionDisplay = document.getElementById('regReligionDisplay') || this.regReligionTrigger?.querySelector('.select-label');
+    this.regReligionInput = document.getElementById('regReligion') || document.getElementById('regReligionInput') || this.regReligionDropdown?.querySelector('input[type="hidden"]');
     this.regReligionMenu = document.getElementById('regReligionMenu');
 
     this.regStateDropdown = document.getElementById('regStateDropdown');
-    this.regStateTrigger = this.regStateDropdown?.querySelector('.custom-select-trigger');
-    this.regStateDisplay = document.getElementById('regStateDisplay');
-    this.regStateInput = document.getElementById('regStateInput');
+    this.regStateTrigger = document.getElementById('regStateTrigger') || this.regStateDropdown?.querySelector('.custom-select-trigger');
+    this.regStateDisplay = document.getElementById('regStateDisplay') || this.regStateTrigger?.querySelector('.select-label');
+    this.regStateInput = document.getElementById('regState') || document.getElementById('regStateInput') || this.regStateDropdown?.querySelector('input[type="hidden"]');
     this.regStateMenu = document.getElementById('regStateMenu');
 
     this.regDistrictDropdown = document.getElementById('regDistrictDropdown');
-    this.regDistrictTrigger = this.regDistrictDropdown?.querySelector('.custom-select-trigger');
-    this.regDistrictDisplay = document.getElementById('regDistrictDisplay');
-    this.regDistrictInput = document.getElementById('regDistrictInput');
+    this.regDistrictTrigger = document.getElementById('regDistrictTrigger') || this.regDistrictDropdown?.querySelector('.custom-select-trigger');
+    this.regDistrictDisplay = document.getElementById('regDistrictDisplay') || this.regDistrictTrigger?.querySelector('.select-label');
+    this.regDistrictInput = document.getElementById('regDistrict') || document.getElementById('regDistrictInput') || this.regDistrictDropdown?.querySelector('input[type="hidden"]');
     this.regDistrictMenu = document.getElementById('regDistrictMenu');
 
     this.regQualificationDropdown = document.getElementById('regQualificationDropdown');
-    this.regQualificationTrigger = this.regQualificationDropdown?.querySelector('.custom-select-trigger');
-    this.regQualificationDisplay = document.getElementById('regQualificationDisplay');
-    this.regQualificationInput = document.getElementById('regQualificationInput');
+    this.regQualificationTrigger = document.getElementById('regQualificationTrigger') || this.regQualificationDropdown?.querySelector('.custom-select-trigger');
+    this.regQualificationDisplay = document.getElementById('regQualificationDisplay') || this.regQualificationTrigger?.querySelector('.select-label');
+    this.regQualificationInput = document.getElementById('regQualification') || document.getElementById('regQualificationInput') || this.regQualificationDropdown?.querySelector('input[type="hidden"]');
     this.regQualificationMenu = document.getElementById('regQualificationMenu');
 
     this.regCourseDropdown = document.getElementById('regCourseDropdown');
     this.regCourseTrigger = document.getElementById('regCourseTrigger') || this.regCourseDropdown?.querySelector('.custom-select-trigger');
-    this.regCourseDisplay = document.getElementById('regCourseDisplay');
-    this.regCourseInput = document.getElementById('regCourse') || document.getElementById('regCourseInput');
+    this.regCourseDisplay = document.getElementById('regCourseDisplay') || this.regCourseTrigger?.querySelector('.select-label');
+    this.regCourseInput = document.getElementById('regCourse') || document.getElementById('regCourseInput') || this.regCourseDropdown?.querySelector('input[type="hidden"]');
     this.regCourseMenu = document.getElementById('regCourseMenu');
 
     // Certificate Verification Form Elements
@@ -791,45 +791,52 @@ class PublicAcademyApp {
   }
 
   setupDropdown(container, trigger, menu, display, hiddenInput, onChangeCallback) {
-    if (!container || !trigger || !menu || !hiddenInput) return;
+    const cont = container;
+    const trig = trigger || cont?.querySelector('.custom-select-trigger');
+    const m = menu || cont?.querySelector('.custom-select-menu');
+    const d = display || trig?.querySelector('.select-label') || cont?.querySelector('.select-label');
+    const input = hiddenInput || cont?.querySelector('input[type="hidden"]');
 
-    trigger.addEventListener('click', (e) => {
+    if (!cont || !trig || !m || !input) return;
+
+    trig.addEventListener('click', (e) => {
       e.stopPropagation();
+      e.preventDefault();
       // Close other dropdowns first
       const allDropdowns = [
         this.regGenderDropdown, this.regMaritalStatusDropdown, this.regCategoryDropdown,
         this.regReligionDropdown, this.regStateDropdown, this.regDistrictDropdown,
         this.regQualificationDropdown, this.regCourseDropdown
       ];
-      allDropdowns.forEach(d => {
-        if (d && d !== container) {
-          d.classList.remove('open');
-          const t = d.querySelector('.custom-select-trigger');
+      allDropdowns.forEach(otherDropdown => {
+        if (otherDropdown && otherDropdown !== cont) {
+          otherDropdown.classList.remove('open');
+          const t = otherDropdown.querySelector('.custom-select-trigger');
           if (t) t.setAttribute('aria-expanded', 'false');
         }
       });
 
-      const isOpen = container.classList.toggle('open');
-      trigger.setAttribute('aria-expanded', String(isOpen));
+      const isOpen = cont.classList.toggle('open');
+      trig.setAttribute('aria-expanded', String(isOpen));
     });
 
-    menu.addEventListener('click', (e) => {
+    m.addEventListener('click', (e) => {
       const option = e.target.closest('.custom-select-option');
       if (!option) return;
 
       const value = option.getAttribute('data-value');
       const label = option.textContent.trim();
 
-      hiddenInput.value = value;
-      if (display) display.textContent = label;
-      container.classList.toggle('has-value', Boolean(value));
+      input.value = value;
+      if (d) d.textContent = label;
+      cont.classList.toggle('has-value', Boolean(value));
 
       // Update selected state
-      menu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('selected'));
+      m.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
 
-      container.classList.remove('open');
-      trigger.setAttribute('aria-expanded', 'false');
+      cont.classList.remove('open');
+      trig.setAttribute('aria-expanded', 'false');
 
       if (typeof onChangeCallback === 'function') {
         onChangeCallback(value);
