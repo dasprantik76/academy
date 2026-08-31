@@ -295,11 +295,11 @@ class PublicAcademyApp {
 
         const { profile, courses, students, authToken } = json.data;
 
-        if (Array.isArray(courses) && courses.length > 0) {
+        if (Array.isArray(courses)) {
           this.courses = courses;
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
-          this.renderCoursesShowcase();
-          this.populateCoursesDropdown();
+          this.renderHomeCourses();
+          this.populateCourseDropdown();
         }
 
         if (profile) {
@@ -308,17 +308,19 @@ class PublicAcademyApp {
           this.renderBranding();
         }
 
-        if (Array.isArray(students) && students.length > 0) {
+        if (Array.isArray(students)) {
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(students));
         }
 
         if (authToken && authToken.code && authToken.expiresAt) {
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(authToken));
         }
+
+        this.render();
         return true;
       }
     } catch (e) {
-      console.info('[PublicApp] Operating in local storage caching for', this.currentAcademySlug);
+      console.error('[PublicApp] fetchCloudData error:', e);
     }
     return false;
   }
