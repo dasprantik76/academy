@@ -86,13 +86,13 @@ class PublicAcademyApp {
   resolveTenant() {
     const hostname = window.location.hostname.toLowerCase();
 
-    // If accessing academy.pixelsetu.com directly on root, route to Admin Gateway
-    if (hostname === 'academy.pixelsetu.com' || hostname === 'academy.localhost') {
+    // If accessing academy.XXXX directly on root, route to Admin Gateway
+    if (hostname.startsWith('academy.')) {
       window.location.href = 'login.html';
       return 'prantik';
     }
 
-    // 1. Check Subdomain (e.g. prantik.pixelsetu.com or poulami.pixelsetu.com)
+    // 1. Check Subdomain (e.g. prantik.prantikphotography.com or poulami.prantikphotography.com)
     const parts = hostname.split('.');
     if (parts.length >= 3 || (parts.length === 2 && parts[1] === 'localhost')) {
       const subdomain = parts[0];
@@ -113,7 +113,13 @@ class PublicAcademyApp {
 
   updateAdminLoginLinks() {
     const hostname = window.location.hostname.toLowerCase();
-    const adminUrl = hostname.includes('pixelsetu.com') ? 'https://academy.pixelsetu.com/login.html' : 'login.html';
+    const parts = hostname.split('.');
+    let adminUrl = 'login.html';
+
+    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
+      const rootDomain = parts.slice(-2).join('.');
+      adminUrl = `https://academy.${rootDomain}/login.html`;
+    }
 
     const btnNav = document.getElementById('btnNavAdminLogin');
     if (btnNav) btnNav.href = adminUrl;

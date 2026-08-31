@@ -454,8 +454,10 @@ class UIController {
     const btnViewPublicSite = document.getElementById('btnViewPublicSite');
     if (btnViewPublicSite) {
       const hostname = window.location.hostname.toLowerCase();
-      if (hostname.includes('pixelsetu.com')) {
-        btnViewPublicSite.href = `https://${slug}.pixelsetu.com`;
+      const parts = hostname.split('.');
+      if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
+        const rootDomain = parts.slice(-2).join('.');
+        btnViewPublicSite.href = `https://${slug}.${rootDomain}`;
       } else {
         btnViewPublicSite.href = `index.html?academy=${encodeURIComponent(slug)}`;
       }
