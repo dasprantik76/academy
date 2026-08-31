@@ -348,6 +348,7 @@ class PublicAcademyApp {
         }
 
         this.render();
+        this.switchView(this.currentView, false);
         return true;
       }
     } catch (e) {
@@ -790,13 +791,20 @@ class PublicAcademyApp {
 
     // Toggle View Sections
     if (this.viewHome) {
+      this.viewHome.style.display = viewName === 'home' ? 'block' : 'none';
       this.viewHome.classList.toggle('active', viewName === 'home');
     }
     if (this.viewStudent) {
+      this.viewStudent.style.display = viewName === 'student' ? 'block' : 'none';
       this.viewStudent.classList.toggle('active', viewName === 'student');
     }
     if (this.viewCertificate) {
+      this.viewCertificate.style.display = viewName === 'certificate' ? 'block' : 'none';
       this.viewCertificate.classList.toggle('active', viewName === 'certificate');
+    }
+    if (this.viewNotFound) {
+      this.viewNotFound.classList.remove('active');
+      this.viewNotFound.style.display = 'none';
     }
 
     // Close Mobile Menu if open
