@@ -68,6 +68,7 @@ class PublicAcademyApp {
     this.initInputFormatters();
     this.render();
     this.updateAdminLoginLinks();
+    this.initHeroCarousel();
 
     // Asynchronously synchronize courses and profile for this specific academy from MongoDB
     this.fetchCloudData();
@@ -83,6 +84,22 @@ class PublicAcademyApp {
     } else {
       this.switchView('home');
     }
+  }
+
+  initHeroCarousel() {
+    const slides = document.querySelectorAll('.hero-chevron-slide, .hero-svg-slide, .hero-carousel-slide');
+    if (!slides || slides.length < 2) return;
+
+    if (this._heroCarouselTimer) {
+      clearInterval(this._heroCarouselTimer);
+    }
+
+    let currentIndex = 0;
+    this._heroCarouselTimer = setInterval(() => {
+      slides[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add('active');
+    }, 4000);
   }
 
   resolveTenant() {
@@ -144,7 +161,7 @@ class PublicAcademyApp {
       };
     }
     return {
-      academyName: 'Prantik Computer Academy',
+      academyName: 'Diganta Computer Centre',
       ownerName: 'Prantik Das',
       email: this.currentOwnerEmail,
       phone: '9876543210',
@@ -340,11 +357,15 @@ class PublicAcademyApp {
   }
 
   async fetchCloudData() {
+    const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+
     try {
       const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
       
       if (response.status === 404) {
-        this.showBrowserDefaultNotFound();
+        if (!isLocalDev) {
+          this.showBrowserDefaultNotFound();
+        }
         return false;
       }
       
@@ -353,7 +374,9 @@ class PublicAcademyApp {
 
       // If requested subdomain is not registered/found
       if (json && json.notFound) {
-        this.showBrowserDefaultNotFound();
+        if (!isLocalDev) {
+          this.showBrowserDefaultNotFound();
+        }
         return false;
       }
 
@@ -383,6 +406,7 @@ class PublicAcademyApp {
 
         if (authToken && authToken.code && authToken.expiresAt) {
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(authToken));
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(authToken));
         }
 
         // Remove tenantGuard if it was an unverified custom subdomain
@@ -400,6 +424,9 @@ class PublicAcademyApp {
   }
 
   showBrowserDefaultNotFound() {
+    const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+    if (isLocalDev) return;
+
     this.isNotFound = true;
     document.open();
     document.write(`<!DOCTYPE html>
@@ -924,17 +951,32 @@ class PublicAcademyApp {
 
     // 1. Navbar & Brand Headings
     if (this.navAcademyName) this.navAcademyName.textContent = name;
-    if (this.heroAcademyName) this.heroAcademyName.textContent = name;
     if (this.footerAcademyName) this.footerAcademyName.textContent = name;
     if (this.certDocAcademyName) this.certDocAcademyName.textContent = name;
     document.title = `${name} | Public Admissions Portal`;
+
+    // Hero 2-Liner Title without "Welcome to"
+    const heroLine1El = document.getElementById('heroTitleLine1');
+    const heroLine2El = document.getElementById('heroTitleLine2');
+    if (heroLine1El && heroLine2El) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length > 1) {
+        heroLine1El.textContent = parts[0].toUpperCase();
+        heroLine2El.textContent = parts.slice(1).join(' ');
+      } else {
+        heroLine1El.textContent = name.toUpperCase();
+        heroLine2El.textContent = 'Computer Centre';
+      }
+    } else if (this.heroAcademyName) {
+      this.heroAcademyName.textContent = name;
+    }
 
     // 2. Hero Tagline & Subtitle
     if (this.heroTaglineText) {
       this.heroTaglineText.textContent = profile.tagline || 'Admissions & Registrations Open';
     }
     if (this.heroDescText) {
-      this.heroDescText.textContent = profile.heroDesc || profile.about || 'Empowering learners with industry-standard courses and certified training. Explore our programs and register online through our student admissions portal.';
+      this.heroDescText.textContent = profile.heroDesc || profile.about || 'Empowering learners with industry-standard courses and certified training.';
     }
 
     // 3. About Us View Personalisation
@@ -1411,38 +1453,72 @@ class PublicAcademyApp {
   }
 
   validateAuthenticationCode(inputCode) {
-    const rawToken = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-    if (!rawToken) {
+    if (!inputCode) {
       return {
         valid: false,
-        message: 'No active authentication code found. Please request the code from your academy administrator.'
+        message: 'Please enter the 6-digit authentication code.'
       };
     }
 
-    try {
-      const token = JSON.parse(rawToken);
-      if (!token.code || !token.expiresAt) {
-        return { valid: false, message: 'Invalid authentication token configuration.' };
-      }
+    // Try tenant-specific key, default key, and scan all storage keys
+    const candidateKeys = [
+      this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN),
+      STORAGE_KEYS.AUTH_TOKEN,
+      'educore_academy_auth_token'
+    ];
 
-      if (Date.now() > token.expiresAt) {
-        return {
-          valid: false,
-          message: 'The 6-digit authentication code has expired. Please request a fresh code from your administrator.'
-        };
+    let foundToken = null;
+    for (const key of candidateKeys) {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.code) {
+            foundToken = parsed;
+            break;
+          }
+        } catch (e) {}
       }
-
-      if (String(token.code).trim() !== String(inputCode).trim()) {
-        return {
-          valid: false,
-          message: 'Invalid authentication code. Please enter the valid 6-digit code provided by your academy.'
-        };
-      }
-
-      return { valid: true };
-    } catch (e) {
-      return { valid: false, message: 'Error verifying authentication token.' };
     }
+
+    // If still not found, check any key in localStorage starting with educore_academy_auth_token
+    if (!foundToken) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('educore_academy_auth_token')) {
+          try {
+            const parsed = JSON.parse(localStorage.getItem(k));
+            if (parsed && parsed.code) {
+              foundToken = parsed;
+              break;
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    if (!foundToken) {
+      return {
+        valid: false,
+        message: 'No active authentication code found. Please generate or check the 6-digit code in the Admin Portal.'
+      };
+    }
+
+    if (foundToken.expiresAt && Date.now() > foundToken.expiresAt) {
+      return {
+        valid: false,
+        message: 'The 6-digit authentication code has expired. Please request a fresh code from your administrator.'
+      };
+    }
+
+    if (String(foundToken.code).trim() !== String(inputCode).trim()) {
+      return {
+        valid: false,
+        message: 'Invalid authentication code. Please enter the valid 6-digit code provided by your academy administrator.'
+      };
+    }
+
+    return { valid: true };
   }
 
   showToast(message, type = 'error') {

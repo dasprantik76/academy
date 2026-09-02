@@ -154,6 +154,7 @@ class AcademyStore {
 
         if (authToken && authToken.code && authToken.expiresAt && Date.now() < authToken.expiresAt) {
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(authToken));
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(authToken));
         }
 
         if (typeof onLoadedCallback === 'function') {
@@ -212,7 +213,7 @@ class AcademyStore {
         };
       }
       return {
-        academyName: 'Prantik Computer Academy',
+        academyName: 'Diganta Computer Centre',
         ownerName: 'Prantik Das',
         email: this.ownerEmail,
         phone: '9876543210',
@@ -255,6 +256,7 @@ class AcademyStore {
       ownerEmail: this.ownerEmail
     };
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(token));
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(token));
     this.syncToCloud('save_auth_token', { token });
     return token;
   }
@@ -1253,7 +1255,7 @@ class UIController {
     if (this.persCategory) this.persCategory.value = profile.category || '';
     if (this.persHeroTagline) this.persHeroTagline.value = profile.tagline || 'Admissions & Registrations Open 2026';
     if (this.persOwnerName) this.persOwnerName.value = profile.ownerName || this.session?.name || '';
-    if (this.persHeroDesc) this.persHeroDesc.value = profile.heroDesc || profile.about || 'Empowering learners with industry-standard courses and certified training. Explore our programs and register online through our student admissions portal.';
+    if (this.persHeroDesc) this.persHeroDesc.value = profile.heroDesc || profile.about || 'Empowering learners with industry-standard courses and certified training.';
     if (this.persPhone) this.persPhone.value = profile.phone || '';
     if (this.persSecondaryPhone) this.persSecondaryPhone.value = profile.secondaryPhone || profile.whatsapp || '';
     if (this.persEmail) this.persEmail.value = profile.email || this.session?.email || '';
