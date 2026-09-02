@@ -1254,6 +1254,7 @@ class PublicAcademyApp {
     const newStudent = {
       id: studentId,
       name: fullName,
+      fullName: fullName,
       dob: dob,
       fatherName: fatherName,
       motherName: motherName,
@@ -1278,7 +1279,7 @@ class PublicAcademyApp {
 
     // Save to local storage students registry for this tenant
     let allStudents = [];
-    const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+    const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS)) || localStorage.getItem(STORAGE_KEYS.STUDENTS);
     if (rawStudents) {
       try {
         allStudents = JSON.parse(rawStudents) || [];
@@ -1289,6 +1290,7 @@ class PublicAcademyApp {
 
     allStudents.unshift(newStudent);
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(allStudents));
+    localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(allStudents));
 
     // Post to Multi-Tenant MongoDB cloud storage in background
     fetch('/api/data', {

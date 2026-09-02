@@ -302,12 +302,18 @@ export default async function handler(req, res) {
         // 6. Add New Student Registration (From Public Site)
         case 'add_student': {
           const student = payload?.student;
-          if (!student || !student.fullName || !student.phone) {
+          const studentName = student?.name || student?.fullName;
+          if (!student || !studentName || !student?.phone) {
             return res.status(400).json({ success: false, error: 'Invalid student registration payload' });
           }
-          const taggedStudent = { ...student, ownerEmail };
-          await db.collection(COLLECTIONS.STUDENTS).insertOne(taggedStudent);
-          return res.status(200).json({ success: true, student: taggedStudent });
+          const normalizedStudent = {
+            ...student,
+            name: studentName,
+            fullName: studentName,
+            ownerEmail
+          };
+          await db.collection(COLLECTIONS.STUDENTS).insertOne(normalizedStudent);
+          return res.status(200).json({ success: true, student: normalizedStudent });
         }
 
         // 7. Update Single Student (From Admin Portal)

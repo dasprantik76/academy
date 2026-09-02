@@ -138,9 +138,10 @@ class AcademyStore {
           this.syncToCloud('save_courses', { courses: this.courses });
         }
 
-        if (Array.isArray(students) && students.length > 0) {
+        if (Array.isArray(students)) {
           this.students = students;
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(this.students));
+          localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this.students));
         } else if (this.students.length > 0) {
           this.syncToCloud('save_students', { students: this.students });
         }
@@ -447,6 +448,13 @@ class UIController {
       this.populateCourseDropdownInStudentModal();
       this.render();
       this.updatePublicSiteLink();
+    });
+
+    // Auto-refresh data when switching back to this browser tab
+    window.addEventListener('focus', () => {
+      store.fetchCloudData(() => {
+        this.render();
+      });
     });
   }
 
@@ -1240,6 +1248,9 @@ class UIController {
     }
 
     this.render();
+    store.fetchCloudData(() => {
+      this.render();
+    });
   }
 
   populatePersonalisationForm() {
