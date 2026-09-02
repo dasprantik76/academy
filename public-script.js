@@ -1141,8 +1141,11 @@ class PublicAcademyApp {
   // ==========================================================================
   // Student Registration Handler
   // ==========================================================================
-  handleRegistration(e) {
+  async handleRegistration(e) {
     e.preventDefault();
+
+    // Ensure OTP input boxes are synchronized immediately
+    this.syncAuthCodeFromOtpDigits();
 
     const rawFullName = this.regFullName.value.trim();
     const fullName = toTitleCase(rawFullName);
@@ -1164,7 +1167,7 @@ class PublicAcademyApp {
     const address = this.regAddress.value.trim();
     const qualification = this.regQualificationInput.value.trim();
     const courseId = this.regCourseInput.value.trim();
-    const authCode = this.regAuthCode.value.trim();
+    const authCode = (this.regAuthCode?.value || Array.from(this.authOtpDigits || []).map(i => i.value).join('')).trim();
 
     // Required Validations
     if (
@@ -1214,7 +1217,23 @@ class PublicAcademyApp {
     }
 
     // Validate 6-Digit Authentication Code with Admin Token
-    const authValidation = this.validateAuthenticationCode(authCode);
+    let authValidation = this.validateAuthenticationCode(authCode);
+    if (!authValidation.valid) {
+      // Real-time check: If local validation failed, query cloud immediately to fetch the latest generated token
+      try {
+        const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
+        if (response.ok) {
+          const json = await response.json();
+          const cloudToken = json?.data?.authToken;
+          if (cloudToken && cloudToken.code) {
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(cloudToken));
+            localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(cloudToken));
+            authValidation = this.validateAuthenticationCode(authCode);
+          }
+        }
+      } catch (err) {}
+    }
+
     if (!authValidation.valid) {
       this.showToast(authValidation.message, 'error');
       if (this.authOtpDigits && this.authOtpDigits.length > 0) {
