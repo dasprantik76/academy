@@ -1216,26 +1216,49 @@ class PublicAcademyApp {
       return;
     }
 
-    // Validate 6-Digit Authentication Code with Admin Token
-    let authValidation = this.validateAuthenticationCode(authCode);
-    if (!authValidation.valid) {
-      // Real-time check: If local validation failed, query cloud immediately to fetch the latest generated token
-      try {
-        const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
-        if (response.ok) {
-          const json = await response.json();
-          const cloudToken = json?.data?.authToken;
-          if (cloudToken && cloudToken.code) {
-            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(cloudToken));
-            localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(cloudToken));
-            authValidation = this.validateAuthenticationCode(authCode);
-          }
+    // Strictly fetch and validate against the current active Authentication Token
+    let activeToken = null;
+    try {
+      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
+      if (response.ok) {
+        const json = await response.json();
+        const cloudToken = json?.data?.authToken;
+        if (cloudToken && cloudToken.code) {
+          activeToken = cloudToken;
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(cloudToken));
         }
-      } catch (err) {}
+      }
+    } catch (err) {}
+
+    if (!activeToken) {
+      const raw = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN)) || localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+      if (raw) {
+        try {
+          activeToken = JSON.parse(raw);
+        } catch (e) {}
+      }
     }
 
-    if (!authValidation.valid) {
-      this.showToast(authValidation.message, 'error');
+    if (!activeToken || !activeToken.code) {
+      this.showToast('No active authentication code found. Please request the current code from your administrator.', 'error');
+      if (this.authOtpDigits && this.authOtpDigits.length > 0) {
+        this.authOtpDigits.forEach(d => d.classList.add('input-error'));
+        this.authOtpDigits[0].focus();
+      }
+      return;
+    }
+
+    if (activeToken.expiresAt && Date.now() > activeToken.expiresAt) {
+      this.showToast('The authentication code has expired. Please request a new code from your administrator.', 'error');
+      if (this.authOtpDigits && this.authOtpDigits.length > 0) {
+        this.authOtpDigits.forEach(d => d.classList.add('input-error'));
+        this.authOtpDigits[0].focus();
+      }
+      return;
+    }
+
+    if (String(activeToken.code).trim() !== String(authCode).trim()) {
+      this.showToast('Invalid authentication code. Please enter the current 6-digit code shown in the Admin Portal.', 'error');
       if (this.authOtpDigits && this.authOtpDigits.length > 0) {
         this.authOtpDigits.forEach(d => d.classList.add('input-error'));
         this.authOtpDigits[0].focus();
@@ -1481,65 +1504,38 @@ class PublicAcademyApp {
       };
     }
 
-    // Try tenant-specific key, default key, and scan all storage keys
-    const candidateKeys = [
-      this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN),
-      STORAGE_KEYS.AUTH_TOKEN,
-      'educore_academy_auth_token'
-    ];
+    const rawToken = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN)) || localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    if (!rawToken) {
+      return {
+        valid: false,
+        message: 'No active authentication code found. Please generate or check the current 6-digit code in the Admin Portal.'
+      };
+    }
 
-    let foundToken = null;
-    for (const key of candidateKeys) {
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.code) {
-            foundToken = parsed;
-            break;
-          }
-        } catch (e) {}
+    try {
+      const token = JSON.parse(rawToken);
+      if (!token || !token.code) {
+        return { valid: false, message: 'Invalid authentication token configuration.' };
       }
-    }
 
-    // If still not found, check any key in localStorage starting with educore_academy_auth_token
-    if (!foundToken) {
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('educore_academy_auth_token')) {
-          try {
-            const parsed = JSON.parse(localStorage.getItem(k));
-            if (parsed && parsed.code) {
-              foundToken = parsed;
-              break;
-            }
-          } catch (e) {}
-        }
+      if (token.expiresAt && Date.now() > token.expiresAt) {
+        return {
+          valid: false,
+          message: 'The 6-digit authentication code has expired. Please request a fresh code from your administrator.'
+        };
       }
-    }
 
-    if (!foundToken) {
-      return {
-        valid: false,
-        message: 'No active authentication code found. Please generate or check the 6-digit code in the Admin Portal.'
-      };
-    }
+      if (String(token.code).trim() !== String(inputCode).trim()) {
+        return {
+          valid: false,
+          message: 'Invalid authentication code. Please enter the current 6-digit code shown in the Admin Portal.'
+        };
+      }
 
-    if (foundToken.expiresAt && Date.now() > foundToken.expiresAt) {
-      return {
-        valid: false,
-        message: 'The 6-digit authentication code has expired. Please request a fresh code from your administrator.'
-      };
+      return { valid: true };
+    } catch (e) {
+      return { valid: false, message: 'Error verifying authentication token.' };
     }
-
-    if (String(foundToken.code).trim() !== String(inputCode).trim()) {
-      return {
-        valid: false,
-        message: 'Invalid authentication code. Please enter the valid 6-digit code provided by your academy administrator.'
-      };
-    }
-
-    return { valid: true };
   }
 
   showToast(message, type = 'error') {
