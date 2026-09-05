@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academy by PixelSetu | Admin Panel</title>
+  <meta name="description" content="Comprehensive Academy Management Portal by PixelSetu">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="admin-style.css?v=6.0">
+  <script src="admin-config.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="brand-text">
+          <h2 id="sidebarAcademyName">Academy</h2>
+        </div>
+        <button class="btn-brand-settings" id="btnEditAcademySettings" title="Edit Academy Settings">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+        <button class="btn-close-sidebar" id="btnCloseSidebar" aria-label="Close sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">MAIN MENU</div>
+        <a href="#dashboard" class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#students" class="nav-item" data-view="students" id="nav-students">
+          <i class="fa-solid fa-user-graduate"></i>
+          <span>Students</span>
+          <span class="nav-badge" id="studentCountBadge">0</span>
+        </a>
+        <a href="#courses" class="nav-item" data-view="courses" id="nav-courses">
+          <i class="fa-solid fa-desktop"></i>
+          <span>Courses</span>
+          <span class="nav-badge" id="courseCountBadge">0</span>
+        </a>
+        <a href="#personalisation" class="nav-item" data-view="personalisation" id="nav-personalisation">
+          <i class="fa-solid fa-palette"></i>
+          <span>Personalisation</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-card">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span>
+            <span>Live Data Sync</span>
+          </div>
+          <button class="btn-reset-demo" id="btnClearAllData" title="Clear all student and course records">
+            <i class="fa-regular fa-trash-can"></i> Clear All Data
+          </button>
+        </div>
+        <div class="user-profile-compact">
+          <div class="avatar-circle" id="sidebarUserAvatar">AD</div>
+          <div class="user-info">
+            <strong id="sidebarUserName">Admin Portal</strong>
+            <span id="sidebarUserEmail">admin@educore.edu</span>
+          </div>
+          <button class="btn-logout" id="btnLogout" title="Sign Out">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Bar -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" id="btnSidebarToggle" aria-label="Toggle sidebar">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-box">
+            <h1 id="pageTitle">Dashboard Overview</h1>
+            <p id="pageSubtitle">Welcome to EduCore Academy Administration Portal</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <a href="#" class="btn btn-outline btn-sm" target="_blank" rel="noopener noreferrer" title="View Public Academy Website" id="btnViewPublicSite">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>View Public Site</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Views Container -->
+      <main class="content-container">
+
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <section class="view-section active" id="view-dashboard">
+          <!-- Stats Summary Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon icon-primary">
+                <i class="fa-solid fa-user-graduate"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Students</span>
+                <h3 class="stat-value" id="statTotalStudents">0</h3>
+                <span class="stat-trend positive" id="statActiveStudentsText">
+                  <i class="fa-solid fa-circle-check"></i> <span id="statActiveStudentsCount">0</span> Active
+                </span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon icon-accent">
+                <i class="fa-solid fa-desktop"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Courses</span>
+                <h3 class="stat-value" id="statTotalCourses">0</h3>
+                <span class="stat-trend positive">
+                  <i class="fa-solid fa-bolt"></i> <span id="statActiveCoursesCount">0</span> Available
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dashboard Highlights Section -->
+          <div class="dashboard-grid">
+            <!-- Recent Students Table -->
+            <div class="dashboard-card span-2">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">Recent Student Enrollments</h3>
+                  <p class="card-subtitle">Latest learners enrolled in academy programs</p>
+                </div>
+                <button class="btn btn-sm btn-outline" id="btnViewAllStudents">
+                  View All Students <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Student</th>
+                        <th>Email</th>
+                        <th>Enrolled Courses</th>
+                        <th>Join Date</th>
+                        <th>Course Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentStudentsTableBody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Authentication Code Card (OTP Generator & 5-Hour Countdown) -->
+            <div class="dashboard-card auth-code-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--primary); margin-right: 0.35rem;"></i>
+                    Authentication Code
+                  </h3>
+                  <p class="card-subtitle">Dynamic 6-digit access OTP token</p>
+                </div>
+                <button class="btn btn-sm btn-outline" id="btnGenerateNewAuthCode" title="Generate a fresh authentication code">
+                  <i class="fa-solid fa-rotate"></i> Generate New
+                </button>
+              </div>
+              <div class="card-body auth-code-body">
+                <div class="auth-code-box">
+                  <div class="auth-digits" id="authCodeDigits">
+                    <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                  </div>
+                  <button class="btn-copy-code" id="btnCopyAuthCode" title="Copy authentication code">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+
+                <div class="auth-countdown-container">
+                  <div class="auth-countdown-meta">
+                    <span class="countdown-label">
+                      <i class="fa-regular fa-clock"></i> Expires in:
+                    </span>
+                    <strong class="countdown-timer" id="authCountdownTimer">05:00:00</strong>
+                  </div>
+                  <div class="auth-progress-bar">
+                    <div class="auth-progress-fill" id="authProgressFill" style="width: 100%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= STUDENTS MANAGEMENT VIEW ================= -->
+        <section class="view-section" id="view-students">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="studentSearchInput" placeholder="Search students...">
+                <button class="btn-clear-search" id="btnClearStudentSearch" title="Clear search">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- Course Filter (Custom Dropdown opens right below) -->
+              <div class="custom-select-container toolbar-filter-dropdown" id="adminStudentCourseFilterDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentCourseFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-filter select-icon"></i>
+                  <span id="adminStudentCourseFilterDisplay">All Courses</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentCourseFilterMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="all" role="option">All Courses</li>
+                </ul>
+                <input type="hidden" id="studentCourseFilter" value="all">
+              </div>
+
+              <!-- Status Filter (Custom Dropdown opens right below) -->
+              <div class="custom-select-container toolbar-filter-dropdown" id="adminStudentStatusFilterDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentStatusFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-circle-notch select-icon"></i>
+                  <span id="adminStudentStatusFilterDisplay">All Statuses</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentStatusFilterMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
+                  <li class="custom-select-option" data-value="Active" role="option">Active</li>
+                  <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                </ul>
+                <input type="hidden" id="studentStatusFilter" value="all">
+              </div>
+            </div>
+
+            <div class="view-actions">
+              <button class="btn btn-success" id="btnBulkMarkCompleted" disabled title="Mark selected students as Course Completed">
+                <i class="fa-solid fa-certificate"></i>
+                <span id="bulkMarkCompletedLabel">Mark as Completed</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Students List Table Card -->
+          <div class="dashboard-card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table" id="studentsTable">
+                  <thead>
+                    <tr>
+                      <th style="width: 44px; text-align: center;">
+                        <input type="checkbox" id="selectAllStudentsCheckbox" aria-label="Select All Students" class="custom-table-checkbox">
+                      </th>
+                      <th>Student</th>
+                      <th>Contact Info</th>
+                      <th>Enrolled Courses</th>
+                      <th>Enrollment Date</th>
+                      <th>Course Status</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="studentsTableBody">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Empty State -->
+              <div class="empty-state" id="studentsEmptyState" style="display: none;">
+                <div class="empty-icon">
+                  <i class="fa-solid fa-user-slash"></i>
+                </div>
+                <h4>No Students Found</h4>
+                <p>No student records match your current search or filter criteria.</p>
+                <button class="btn btn-secondary btn-sm" id="btnResetStudentFilters">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= COURSES MANAGEMENT VIEW ================= -->
+        <section class="view-section" id="view-courses">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="courseSearchInput" placeholder="Search courses...">
+                <button class="btn-clear-search" id="btnClearCourseSearch" title="Clear search">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="view-actions">
+              <button class="btn btn-primary" id="btnAddCourse">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Course</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Courses Grid -->
+          <div class="courses-grid" id="coursesGrid">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Courses Empty State -->
+          <div class="empty-state" id="coursesEmptyState" style="display: none;">
+            <div class="empty-icon">
+              <i class="fa-solid fa-desktop"></i>
+            </div>
+            <h4>No Courses Found</h4>
+            <p>No courses match your search keywords.</p>
+            <button class="btn btn-secondary btn-sm" id="btnResetCourseFilters">
+              <i class="fa-solid fa-rotate-left"></i> Reset Search
+            </button>
+          </div>
+        </section>
+
+        <!-- ================= PERSONALISATION VIEW ================= -->
+        <section class="view-section" id="view-personalisation">
+          <div class="personalisation-container" style="width: 100%; display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Header Card -->
+            <div class="card" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 1.75rem; border-radius: 12px; border: 1px solid #334155;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.4rem;">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                      <i class="fa-solid fa-palette"></i>
+                    </div>
+                    <h2 style="font-size: 1.4rem; font-weight: 700; color: #f8fafc; margin: 0;">Website Personalisation</h2>
+                  </div>
+                  <p style="font-size: 0.9rem; color: #94a3b8; margin: 0;">Customize your public portal subdomain, branding, contact information, and academy story in real time.</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <a id="btnPersonalisationPreviewLive" href="#" target="_blank" class="btn btn-outline btn-sm" style="color: #38bdf8; border-color: #38bdf8; text-decoration: none;">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Live Site
+                  </a>
+                  <button type="button" class="btn btn-primary btn-sm" id="btnSavePersonalisationTop" style="background: #2563eb; color: #fff; font-weight: 600;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Form Wrapper -->
+            <form id="personalisationForm">
+              
+              <!-- Subdomain & Custom URL Card -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; justify-content: flex-start; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-globe" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Public Subdomain & Portal Address</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-row" style="align-items: flex-start;">
+                    <div class="form-group flex-1">
+                      <label for="persSubdomainSlug">Subdomain Slug <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-link"></i>
+                        <input type="text" id="persSubdomainSlug" placeholder="e.g. prantik, dance-academy" required>
+                      </div>
+                      <small style="color: var(--text-muted); font-size: 0.78rem; margin-top: 0.35rem; display: block;">
+                        Lowercase letters, numbers, and hyphens only (e.g. <code>myacademy</code>).
+                      </small>
+                    </div>
+
+                    <div class="form-group flex-1">
+                      <label>Live Public Website Address</label>
+                      <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 0.65rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                        <span id="persFullUrlPreview" style="font-family: monospace; font-size: 0.95rem; font-weight: 700; color: #0f172a; word-break: break-all;">https://slug.domain.com</span>
+                        <button type="button" class="btn btn-outline btn-sm" id="btnPersCopyLink" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; white-space: nowrap;">
+                          <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hero Banner & Visual Branding Card -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; justify-content: flex-start; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-wand-magic-sparkles" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Hero Banner & Brand Identity</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persAcademyName">Academy Brand Name <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-school"></i>
+                        <input type="text" id="persAcademyName" placeholder="e.g. Prantik Computer Academy" required>
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persCategory">Primary Category / Field <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <input type="text" id="persCategory" placeholder="e.g. Computer Science & IT, Dance & Arts" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persHeroTagline">Hero Badge / Tagline</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-tag"></i>
+                        <input type="text" id="persHeroTagline" placeholder="e.g. Admissions & Registrations Open 2026">
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persOwnerName">Authorized Director / Head Name <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <input type="text" id="persOwnerName" placeholder="Director / Principal Name" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="persHeroDesc">Hero Subtitle / Description</label>
+                    <textarea id="persHeroDesc" rows="3" class="form-textarea" placeholder="Brief introduction displayed prominently in the hero header..."></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contact & Location Information Card -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; justify-content: flex-start; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-phone-volume" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Contact Numbers & Physical Address</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persPhone">Primary Mobile / Helpline <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="tel" id="persPhone" maxlength="10" placeholder="10-digit primary phone" required>
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persSecondaryPhone">Secondary Phone / WhatsApp</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <input type="tel" id="persSecondaryPhone" maxlength="10" placeholder="Alternative contact / WhatsApp">
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persEmail">Public Inquiry Email <span class="required">*</span></label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="persEmail" placeholder="admissions@academy.com" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-2">
+                      <label for="persAddress">Street Address / Campus Location</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-map-pin"></i>
+                        <input type="text" id="persAddress" placeholder="Building, Street, Landmark, Area">
+                      </div>
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persPinCode">PIN Code</label>
+                      <div class="input-icon-wrap">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <input type="text" id="persPinCode" maxlength="6" placeholder="6-digit PIN code">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Academy Story & About Us Page -->
+              <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header" style="display: flex; align-items: center; justify-content: flex-start; gap: 0.65rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+                  <i class="fa-solid fa-book-open-reader" style="color: #2563eb; font-size: 1.15rem;"></i>
+                  <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Academy Story & About Us Page</h3>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                  <div class="form-group">
+                    <label for="persAboutHeadline">About Page Title / Mission Statement</label>
+                    <div class="input-icon-wrap">
+                      <i class="fa-solid fa-heading"></i>
+                      <input type="text" id="persAboutHeadline" placeholder="e.g. Dedicated to Excellence in Practical IT & Software Education">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="persAboutStory">Academy Story / About Description <span class="required">*</span></label>
+                    <textarea id="persAboutStory" rows="5" class="form-textarea" placeholder="Detail your academy's history, mission, vision, and teaching methodology..." required></textarea>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persHighlight1">Key Highlight 1</label>
+                      <input type="text" id="persHighlight1" placeholder="e.g. Certified Expert Faculty">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persHighlight2">Key Highlight 2</label>
+                      <input type="text" id="persHighlight2" placeholder="e.g. 100% Practical Hands-on Labs">
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group flex-1">
+                      <label for="persHighlight3">Key Highlight 3</label>
+                      <input type="text" id="persHighlight3" placeholder="e.g. Recognized Government & Industry Certifications">
+                    </div>
+                    <div class="form-group flex-1">
+                      <label for="persHighlight4">Key Highlight 4</label>
+                      <input type="text" id="persHighlight4" placeholder="e.g. Career Guidance & Placement Support">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom Save Button Bar -->
+              <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-bottom: 2.5rem;">
+                <button type="submit" class="btn btn-primary" id="btnSavePersonalisation" style="padding: 0.75rem 2rem; font-size: 1rem; font-weight: 700;">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish Changes
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Student Form Modal (Add / Edit) -->
+  <div class="modal-backdrop" id="studentModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-user-graduate modal-icon"></i>
+          <h3 id="studentModalTitle">Add New Student</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseStudentModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="studentForm">
+        <input type="hidden" id="studentId">
+        <div class="modal-body">
+          <div class="form-row">
+            <!-- 1. Full Name (Auto Capitalize Initials) -->
+            <div class="form-group flex-1">
+              <label for="studentName">Full Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="studentName" class="name-input-capitalized" data-capitalize="true" placeholder="Full name" required>
+              </div>
+            </div>
+
+            <!-- 2. Date of Birth (Beside Full Name) -->
+            <div class="form-group flex-1">
+              <label for="studentDob">Date of Birth <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="studentDob" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 3. Father's Name (Auto Capitalize Initials) -->
+            <div class="form-group flex-1">
+              <label for="studentFatherName">Father's Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user-tie"></i>
+                <input type="text" id="studentFatherName" class="name-input-capitalized" data-capitalize="true" placeholder="Father's name" required>
+              </div>
+            </div>
+
+            <!-- 4. Mother's Name (Auto Capitalize Initials) -->
+            <div class="form-group flex-1">
+              <label for="studentMotherName">Mother's Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="studentMotherName" class="name-input-capitalized" data-capitalize="true" placeholder="Mother's name" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 5. Aadhar Number (12 Digits normal slot) -->
+            <div class="form-group flex-1">
+              <label for="studentAadhar">Aadhar Number <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-id-card"></i>
+                <input type="text" id="studentAadhar" maxlength="12" pattern="[0-9]{12}" inputmode="numeric" placeholder="12-digit Aadhar" required>
+              </div>
+              <span class="input-error-msg" id="studentAadharError">Please enter a valid 12-digit Aadhar number.</span>
+            </div>
+
+            <!-- 6. Gender (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Gender <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentGenderDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentGenderTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-venus-mars select-icon"></i>
+                  <span id="adminStudentGenderDisplay">Select Gender</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentGenderMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Male" role="option">Male</li>
+                  <li class="custom-select-option" data-value="Female" role="option">Female</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentGender" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 7. Marital Status (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Marital Status <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentMaritalStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentMaritalStatusTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-ring select-icon"></i>
+                  <span id="adminStudentMaritalStatusDisplay">Select Marital Status</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentMaritalStatusMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Single / Unmarried" role="option">Single / Unmarried</li>
+                  <li class="custom-select-option" data-value="Married" role="option">Married</li>
+                  <li class="custom-select-option" data-value="Divorced" role="option">Divorced</li>
+                  <li class="custom-select-option" data-value="Widowed" role="option">Widowed</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentMaritalStatus" required>
+              </div>
+            </div>
+
+            <!-- 8. Category (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Category <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentCategoryDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentCategoryTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-layer-group select-icon"></i>
+                  <span id="adminStudentCategoryDisplay">Select Category</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentCategoryMenu" role="listbox">
+                  <li class="custom-select-option" data-value="General" role="option">General</li>
+                  <li class="custom-select-option" data-value="SC" role="option">SC</li>
+                  <li class="custom-select-option" data-value="ST" role="option">ST</li>
+                  <li class="custom-select-option" data-value="OBC" role="option">OBC</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentCategory" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 9. Religion (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Religion <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentReligionDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentReligionTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-hands-praying select-icon"></i>
+                  <span id="adminStudentReligionDisplay">Select Religion</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentReligionMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Hinduism" role="option">Hinduism</li>
+                  <li class="custom-select-option" data-value="Islam" role="option">Islam</li>
+                  <li class="custom-select-option" data-value="Christianity" role="option">Christianity</li>
+                  <li class="custom-select-option" data-value="Sikhism" role="option">Sikhism</li>
+                  <li class="custom-select-option" data-value="Buddhism" role="option">Buddhism</li>
+                  <li class="custom-select-option" data-value="Jainism" role="option">Jainism</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentReligion" required>
+              </div>
+            </div>
+
+            <!-- 10. Mobile Number (10 Digits strictly) -->
+            <div class="form-group flex-1">
+              <label for="studentPhone">Mobile Number <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="studentPhone" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" placeholder="10-digit mobile" required>
+              </div>
+              <span class="input-error-msg" id="studentPhoneError">Please enter a valid 10-digit mobile number.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 11. Email Address -->
+            <div class="form-group flex-1">
+              <label for="studentEmail">Email Address <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="studentEmail" placeholder="student@example.com" required>
+              </div>
+            </div>
+
+            <!-- 12. State (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>State <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentStateDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentStateTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-map-location-dot select-icon"></i>
+                  <span id="adminStudentStateDisplay">Select State</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentStateMenu" role="listbox">
+                  <!-- Populated dynamically with Indian States & UTs -->
+                </ul>
+                <input type="hidden" id="studentState" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 13. District (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>District <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentDistrictDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentDistrictTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-city select-icon"></i>
+                  <span id="adminStudentDistrictDisplay">Select District</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentDistrictMenu" role="listbox">
+                  <!-- Populated dynamically based on selected state -->
+                </ul>
+                <input type="hidden" id="studentDistrict" required>
+              </div>
+            </div>
+
+            <!-- 14. Pin Code (6 Digits) -->
+            <div class="form-group flex-1">
+              <label for="studentPinCode">Pin Code <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-location-dot"></i>
+                <input type="text" id="studentPinCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" placeholder="6-digit pin code" required>
+              </div>
+              <span class="input-error-msg" id="studentPinCodeError">Please enter a valid 6-digit pin code.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 15. Highest Qualification (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Highest Qualification <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentQualificationDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentQualificationTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-award select-icon"></i>
+                  <span id="adminStudentQualificationDisplay">Select Qualification</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentQualificationMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Below Madhyamik" role="option">Below Madhyamik</li>
+                  <li class="custom-select-option" data-value="Madhyamik / 10th" role="option">Madhyamik / 10th</li>
+                  <li class="custom-select-option" data-value="Higher Secondary / 12th" role="option">Higher Secondary / 12th</li>
+                  <li class="custom-select-option" data-value="Diploma" role="option">Diploma</li>
+                  <li class="custom-select-option" data-value="Bachelor's Degree" role="option">Bachelor's Degree</li>
+                  <li class="custom-select-option" data-value="Master's Degree" role="option">Master's Degree</li>
+                  <li class="custom-select-option" data-value="Doctorate / PhD" role="option">Doctorate / PhD</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentQualification" required>
+              </div>
+            </div>
+
+            <!-- 16. Course (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Enrolled Course <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentCourseDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentCourseTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-desktop select-icon"></i>
+                  <span id="adminStudentCourseDisplay">Select Course</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentCourseMenu" role="listbox">
+                  <!-- Dynamically populated from active courses -->
+                </ul>
+                <input type="hidden" id="studentCourse" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 17. Course Status (Custom Dropdown - Small 50% width like others) -->
+            <div class="form-group flex-1" style="max-width: calc(50% - 0.5rem);">
+              <label for="studentStatus">Course Status <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentStatusTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-circle-check select-icon"></i>
+                  <span id="adminStudentStatusDisplay">Active</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentStatusMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="Active" role="option">Active</li>
+                  <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                </ul>
+                <input type="hidden" id="studentStatus" value="Active" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- 18. Full Address -->
+          <div class="form-group">
+            <label for="studentAddress">Full Address <span class="required">*</span></label>
+            <textarea id="studentAddress" rows="2" placeholder="House/Flat No., Street, Landmark, Area..." required></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelStudentModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveStudent">
+            <i class="fa-solid fa-check"></i> Save Student
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Course Form Modal (Add / Edit) - Only Course Name, Duration, and Description -->
+  <div class="modal-backdrop" id="courseModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-desktop modal-icon"></i>
+          <h3 id="courseModalTitle">Add New Course</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseCourseModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="courseForm">
+        <input type="hidden" id="courseId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="courseTitle">Course Name <span class="required">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-desktop"></i>
+              <input type="text" id="courseTitle" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="courseDurationValue">Duration <span class="required">*</span></label>
+            <div class="duration-input-group">
+              <div class="input-icon-wrap flex-1">
+                <i class="fa-regular fa-clock"></i>
+                <input type="number" id="courseDurationValue" min="1" step="1" required>
+              </div>
+              <div class="custom-select-container" id="durationUnitDropdown">
+                <button type="button" class="custom-select-trigger" id="durationUnitTrigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="durationUnitDisplay">Months</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="durationUnitMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="Months" role="option" aria-selected="true">Months</li>
+                  <li class="custom-select-option" data-value="Years" role="option" aria-selected="false">Years</li>
+                </ul>
+                <input type="hidden" id="courseDurationUnit" value="Months" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="courseDescription">Description <span class="required">*</span></label>
+            <textarea id="courseDescription" rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelCourseModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveCourse">
+            <i class="fa-solid fa-check"></i> Save Course
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Student Details & Profile Modal -->
+  <div class="modal-backdrop" id="studentDetailsModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-id-card modal-icon"></i>
+          <h3>Student Profile & Enrollments</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseDetailsModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="studentDetailsContent">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCloseDetailsBtn">Close</button>
+        <button type="button" class="btn btn-primary" id="btnEditFromDetails">
+          <i class="fa-regular fa-pen-to-square"></i> Edit Student
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Confirmation Dialog Modal -->
+  <div class="modal-backdrop" id="confirmModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-triangle-exclamation modal-icon text-danger" id="confirmIcon"></i>
+          <h3 id="confirmTitle">Confirm Action</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseConfirmModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage">Are you sure you want to proceed with this action?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelConfirm">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btnExecuteConfirm">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Academy & Client Profile Settings Modal -->
+  <div class="modal-backdrop" id="academySettingsModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-gear modal-icon"></i>
+          <h3>Academy Settings</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseAcademySettingsModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="academySettingsForm" autocomplete="off">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="settingsAcademyName">Academy Name <span class="required-star">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-school"></i>
+              <input type="text" id="settingsAcademyName" class="name-input-capitalized" data-capitalize="true" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="settingsOwnerName">Owner Name <span class="required-star">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-user-tie"></i>
+              <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="settingsSubdomainSlug">Public Subdomain <span class="required-star">*</span></label>
+            <div class="subdomain-input-wrap" style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+              <span style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1;">https://</span>
+              <input type="text" id="settingsSubdomainSlug" placeholder="your-subdomain" style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;" required>
+              <span id="settingsSubdomainSuffix" style="padding: 0 0.85rem; color: #475569; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-left: 1px solid #cbd5e1;">.prantikphotography.com</span>
+            </div>
+            <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
+              Letters, numbers, and hyphens only (e.g. <code>dance-academy</code>).
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelAcademySettings">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveAcademySettings">
+            <i class="fa-solid fa-check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- One-Time Academy & Owner Setup Modal -->
+  <div class="modal-backdrop" id="onboardingModal">
+    <div class="modal-window modal-sm onboarding-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-graduation-cap modal-icon"></i>
+          <h3>Welcome to Academy by PixelSetu</h3>
+        </div>
+      </div>
+      <form id="onboardingForm" autocomplete="off">
+        <div class="modal-body">
+          <p class="onboarding-intro" style="margin-bottom: 1.25rem; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+            Please complete your one-time academy setup to personalize your administration workspace.
+          </p>
+
+          <div class="form-group">
+            <label for="onboardingAcademyName">Academy Name <span class="required-star">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-school"></i>
+              <input type="text" id="onboardingAcademyName" class="name-input-capitalized" data-capitalize="true" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="onboardingOwnerName">Owner Name <span class="required-star">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-user-tie"></i>
+              <input type="text" id="onboardingOwnerName" class="name-input-capitalized" data-capitalize="true" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="onboardingSubdomainSlug">Choose Your Public Subdomain <span class="required-star">*</span></label>
+            <div class="subdomain-input-wrap" style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+              <span style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1;">https://</span>
+              <input type="text" id="onboardingSubdomainSlug" placeholder="your-subdomain" style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;" required>
+              <span id="onboardingSubdomainSuffix" style="padding: 0 0.85rem; color: #475569; font-weight: 600; font-size: 0.875rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-left: 1px solid #cbd5e1;">.prantikphotography.com</span>
+            </div>
+            <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
+              This will be your dedicated website link for student admissions.
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: flex-end;">
+          <button type="submit" class="btn btn-primary" id="btnSaveOnboarding" style="width: 100%; justify-content: center; height: 44px; font-weight: 600;">
+            <i class="fa-solid fa-check"></i> Complete Setup & Launch Portal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- JavaScript -->
+  <script src="admin-script.js?v=5.8"></script>
+</body>
+</html>
