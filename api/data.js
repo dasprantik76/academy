@@ -10,13 +10,13 @@ const COLLECTIONS = {
   AUTH_TOKEN: 'auth_token'
 };
 
-const COURSE_SEED_VERSION = 1;
+const COURSE_SEED_VERSION = 2;
 
 // Default seed profiles for multi-tenant academies
 const DEFAULT_TENANTS = {
   'dasprantik76@gmail.com': {
     ownerEmail: 'dasprantik76@gmail.com',
-    academyName: 'Prantik Computer Academy',
+    academyName: 'Diganta Computer Centre',
     ownerName: 'Prantik Das',
     email: 'swarupkhan1@gmail.com',
     phone: '9733894742',
@@ -236,6 +236,24 @@ export default async function handler(req, res) {
           { $set: profileDoc },
           { upsert: true }
         );
+      }
+
+      // This deployment is dedicated to Diganta Computer Centre. Keep the
+      // public-facing identity canonical even when an older personalised
+      // profile is already present in MongoDB.
+      if (ownerEmail === 'dasprantik76@gmail.com') {
+        const canonicalProfile = DEFAULT_TENANTS[ownerEmail];
+        const needsCanonicalProfile = Object.entries(canonicalProfile)
+          .some(([key, value]) => profileDoc?.[key] !== value);
+
+        if (needsCanonicalProfile) {
+          profileDoc = { ...(profileDoc || {}), ...canonicalProfile };
+          await db.collection(COLLECTIONS.PROFILE).updateOne(
+            { ownerEmail },
+            { $set: canonicalProfile },
+            { upsert: true }
+          );
+        }
       }
 
       // Seed the six starter courses once. The profile marker prevents courses

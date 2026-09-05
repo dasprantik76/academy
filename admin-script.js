@@ -432,7 +432,7 @@ class UIController {
     try {
       this.session = JSON.parse(rawSession);
       const userEmail = (this.session?.email || '').toLowerCase().trim();
-      const ALLOWED_ADMINS = ['poulami.13thmay@gmail.com', 'dasprantik76@gmail.com'];
+      const ALLOWED_ADMINS = window.ADMIN_PORTAL_CONFIG?.authorizedAdminEmails || [];
       if (!this.session || this.session.provider !== 'google' || !ALLOWED_ADMINS.includes(userEmail)) {
         localStorage.removeItem(STORAGE_KEYS.SESSION);
         window.location.href = 'index.html';
@@ -462,7 +462,6 @@ class UIController {
     this.bindEvents();
     this.render();
     this.startAuthCountdownTimer();
-    this.checkOnboarding();
     this.updatePublicSiteLink();
 
     // Synchronize with Multi-Tenant MongoDB cloud storage in background
@@ -927,7 +926,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses', 'personalisation'].includes(hash)) {
+      if (['dashboard', 'students', 'courses'].includes(hash)) {
         this.switchView(hash, false);
       }
     });
@@ -1267,10 +1266,6 @@ class UIController {
     } else if (viewName === 'courses') {
       this.pageTitle.textContent = 'Course Management';
       this.pageSubtitle.textContent = 'Curate academy courses, durations, and syllabus details';
-    } else if (viewName === 'personalisation') {
-      this.pageTitle.textContent = 'Website Personalisation';
-      this.pageSubtitle.textContent = 'Manage public subdomain, branding, contact details, and academy story';
-      this.populatePersonalisationForm();
     }
 
     this.render();
