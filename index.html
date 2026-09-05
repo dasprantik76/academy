@@ -187,7 +187,7 @@
       const isAuthorized = AUTHORIZED_ADMIN_EMAILS.some(email => email.toLowerCase().trim() === userEmail);
 
       if (!isAuthorized) {
-        showLoginAlert(`Access Denied: Account (${userEmail}) is not authorized. Only poulami.13thmay@gmail.com can log in.`, 'error');
+        showLoginAlert('Access Denied', 'error');
         return;
       }
 
