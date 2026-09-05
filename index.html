@@ -15,7 +15,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="admin-style.css?v=2.2">
-  <script src="admin-config.js"></script>
+  <script src="admin-config.js?v=3.0"></script>
   <style>
     .btn-google-action {
       display: flex;
@@ -90,7 +90,7 @@
           <span>Authorized Access Only</span>
         </div>
         <div style="margin-top: 0.85rem; text-align: center;">
-          <a href="#" id="backToPublicSite" style="color: #94a3b8; font-size: 0.8125rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; transition: color 0.15s ease;">
+          <a href="https://digantacomputer.vercel.app" id="backToPublicSite" style="color: #94a3b8; font-size: 0.8125rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; transition: color 0.15s ease;">
             <i class="fa-solid fa-arrow-left"></i> Back to Public Website
           </a>
         </div>
@@ -239,7 +239,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const publicSiteLink = document.getElementById('backToPublicSite');
       const configuredPublicUrl = window.ADMIN_PORTAL_CONFIG?.defaultPublicSiteUrl;
-      if (publicSiteLink) publicSiteLink.href = configuredPublicUrl || '#';
+      if (publicSiteLink) publicSiteLink.href = configuredPublicUrl || 'https://digantacomputer.vercel.app';
       const btn = document.getElementById('btnCustomGoogleSignIn');
       if (btn) {
         btn.addEventListener('click', handleGoogleLoginClick);
