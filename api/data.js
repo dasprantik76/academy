@@ -289,7 +289,9 @@ export default async function handler(req, res) {
           profile: profileDoc || null,
           courses: Array.isArray(coursesList) ? coursesList : [],
           students: Array.isArray(studentsList) ? studentsList : [],
-          authToken: authTokenDoc || null
+          // Authentication codes are never included in academy-slug responses
+          // consumed by public websites.
+          authToken: req.query.ownerEmail ? (authTokenDoc || null) : null
         }
       });
     } catch (error) {
@@ -316,6 +318,71 @@ export default async function handler(req, res) {
       const ownerEmail = await resolveOwnerEmail(payload?.ownerEmail, payload?.academySlug);
 
       switch (action) {
+        // Public registration: resolve the academy exclusively from its slug,
+        // validate that academy's active code on the server, then save.
+        case 'register_student': {
+          const academySlug = String(payload?.academySlug || '').toLowerCase().trim();
+          const submittedCode = String(payload?.authCode || '').trim();
+          const student = payload?.student;
+          const studentName = student?.name || student?.fullName;
+
+          if (!academySlug) {
+            return res.status(400).json({ success: false, code: 'ACADEMY_REQUIRED', error: 'Academy identifier is required.' });
+          }
+
+          const registrationOwnerEmail = await resolveOwnerEmail('', academySlug);
+          if (!registrationOwnerEmail) {
+            return res.status(404).json({ success: false, code: 'ACADEMY_NOT_FOUND', error: 'Academy not found.' });
+          }
+
+          if (!/^\d{6}$/.test(submittedCode)) {
+            return res.status(400).json({ success: false, code: 'INVALID_CODE', error: 'Authentication code must be exactly 6 digits.' });
+          }
+
+          if (!student || !studentName || !student?.phone) {
+            return res.status(400).json({ success: false, code: 'INVALID_STUDENT', error: 'Invalid student registration details.' });
+          }
+
+          const activeToken = await db.collection(COLLECTIONS.AUTH_TOKEN).findOne(
+            { ownerEmail: registrationOwnerEmail },
+            { projection: { _id: 0 } }
+          );
+
+          if (!activeToken?.code) {
+            return res.status(403).json({ success: false, code: 'NO_ACTIVE_CODE', error: 'No active authentication code is available for this academy.' });
+          }
+
+          if (!activeToken.expiresAt || Date.now() > Number(activeToken.expiresAt)) {
+            return res.status(403).json({ success: false, code: 'EXPIRED_CODE', error: 'The authentication code has expired. Please request a new code.' });
+          }
+
+          if (String(activeToken.code).trim() !== submittedCode) {
+            return res.status(403).json({ success: false, code: 'WRONG_CODE', error: 'The authentication code is incorrect.' });
+          }
+
+          const requestedCourseId = student?.enrolledCourseIds?.[0];
+          const courseExists = requestedCourseId && await db.collection(COLLECTIONS.COURSES).findOne(
+            { id: requestedCourseId, ownerEmail: registrationOwnerEmail },
+            { projection: { _id: 1 } }
+          );
+          if (!courseExists) {
+            return res.status(400).json({ success: false, code: 'INVALID_COURSE', error: 'The selected course is not available for this academy.' });
+          }
+
+          const normalizedStudent = {
+            ...student,
+            name: studentName,
+            fullName: studentName,
+            ownerEmail: registrationOwnerEmail,
+            academySlug
+          };
+          delete normalizedStudent.authCode;
+
+          await db.collection(COLLECTIONS.STUDENTS).insertOne(normalizedStudent);
+          delete normalizedStudent._id;
+          return res.status(201).json({ success: true, student: normalizedStudent });
+        }
+
         // 1. Save Academy Profile
         case 'save_profile': {
           if (!payload?.profile) {
