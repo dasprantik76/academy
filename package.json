@@ -4,6 +4,7 @@
   "description": "Universal Academy Management and Student Registration Portal with MongoDB Database",
   "main": "api/data.js",
   "scripts": {
+    "build": "node build.mjs",
     "start": "node -v"
   },
   "dependencies": {

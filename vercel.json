@@ -1,15 +1,11 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/data.js", "use": "@vercel/node" },
-    { "src": "*.html", "use": "@vercel/static" },
-    { "src": "*.css", "use": "@vercel/static" },
-    { "src": "*.js", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/data", "dest": "/api/data.js" },
-    { "src": "/login.html", "status": 308, "headers": { "Location": "/" } },
-    { "src": "/", "dest": "/index.html" },
-    { "src": "/(.*)", "dest": "/$1" }
+  "buildCommand": "npm run build",
+  "outputDirectory": "public",
+  "redirects": [
+    {
+      "source": "/login.html",
+      "destination": "/",
+      "permanent": true
+    }
   ]
 }
