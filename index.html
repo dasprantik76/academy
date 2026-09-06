@@ -120,6 +120,12 @@
 
     let tokenClient = null;
 
+    function startGoogleRedirectLogin() {
+      const redirectUri = `${window.location.origin}/`;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(GOOGLE_CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=email%20profile%20openid&prompt=select_account&include_granted_scopes=true`;
+      window.location.assign(authUrl);
+    }
+
     // Initialize Google OAuth2 Token Client (Forces Account Selector)
     function initGoogleAuth() {
       if (window.google && window.google.accounts && window.google.accounts.oauth2) {
@@ -142,6 +148,17 @@
               } else if (tokenResponse && tokenResponse.error) {
                 showLoginAlert('Google Sign-In Error: ' + tokenResponse.error, 'error');
               }
+            },
+            error_callback: (error) => {
+              const errorType = error?.type || '';
+              if (errorType === 'popup_failed_to_open' || errorType === 'unknown') {
+                showLoginAlert('Popup blocked. Continuing to Google Sign-In in this tab...', 'success');
+                window.setTimeout(startGoogleRedirectLogin, 250);
+                return;
+              }
+              if (errorType !== 'popup_closed') {
+                showLoginAlert('Google Sign-In could not open. Please try again.', 'error');
+              }
             }
           });
         } catch (e) {
@@ -160,19 +177,19 @@
         return;
       }
 
-      if (tokenClient) {
-        // Force account chooser prompt
-        tokenClient.requestAccessToken({ prompt: 'select_account' });
-      } else if (window.google && window.google.accounts && window.google.accounts.oauth2) {
-        initGoogleAuth();
+      try {
+        // Re-initialize on every click so a stale Chrome profile does not keep
+        // a failed token-client instance from an earlier deployment.
+        if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+          initGoogleAuth();
+        }
         if (tokenClient) {
           tokenClient.requestAccessToken({ prompt: 'select_account' });
+        } else {
+          startGoogleRedirectLogin();
         }
-      } else {
-        // Fallback to direct OAuth redirect if SDK is blocked or delayed
-        const redirectUri = window.location.origin + window.location.pathname;
-        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(GOOGLE_CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=email%20profile%20openid&prompt=select_account`;
-        window.location.href = authUrl;
+      } catch (error) {
+        startGoogleRedirectLogin();
       }
     }
 
@@ -187,7 +204,7 @@
       }
 
       const session = {
-        name: user.name || 'Poulami',
+        name: user.name || 'Administrator',
         email: userEmail,
         avatar: user.picture || '',
         provider: 'google',
