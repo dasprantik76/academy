@@ -976,6 +976,9 @@ class UIController {
           message: 'Are you sure you want to sign out of the administrator portal?',
           action: () => {
             localStorage.removeItem(STORAGE_KEYS.SESSION);
+            if (window.google?.accounts?.id) {
+              window.google.accounts.id.disableAutoSelect();
+            }
             window.location.href = 'index.html';
           }
         });
