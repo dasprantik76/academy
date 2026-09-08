@@ -8,3 +8,6 @@ This repository is split into two independent Vercel projects:
 In Vercel, import this repository twice and select the appropriate **Root Directory** for each project.
 
 See the README inside each folder for configuration and deployment steps.
+
+The repository root also preserves the existing central Admin Portal deployment.
+Its files match `admin-portal/` so the current root-based deployment continues to work.
