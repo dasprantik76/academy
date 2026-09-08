@@ -5,12 +5,26 @@
  * Student Certificate Verification by Mobile Number & Date of Birth
  */
 
+const PUBLIC_SITE_CONFIG = window.PUBLIC_SITE_CONFIG || {};
+const PUBLIC_API_BASE_URL = String(PUBLIC_SITE_CONFIG.apiBaseUrl || '').replace(/\/$/, '');
+const getPublicApiUrl = (query = '') => `${PUBLIC_API_BASE_URL}/api/data${query}`;
+
 const STORAGE_KEYS = {
   COURSES: 'educore_academy_courses',
   STUDENTS: 'educore_academy_students',
   AUTH_TOKEN: 'educore_academy_auth_token',
   ACADEMY_PROFILE: 'pixelsetu_academy_profile'
 };
+
+const DEFAULT_PUBLIC_COURSES = [
+  { id: 'CRS-101', title: 'Diploma in Computer Applications (DCA)', duration: '6 Months', description: 'Comprehensive fundamentals of computer operations, MS Office suite, Internet basics, and database concepts.' },
+  { id: 'CRS-102', title: 'Full Stack Web Development', duration: '1 Year', description: 'Modern front-end and back-end web development with HTML5, CSS3, JavaScript, Node.js, and databases.' },
+  { id: 'CRS-103', title: 'Post Graduate Diploma in Computer Applications (PGDCA)', duration: '1 Year', description: 'Advanced programming concepts, system architecture, database administration, and project implementation.' },
+  { id: 'CRS-104', title: 'Certificate in Office Automation', duration: '3 Months', description: 'Practical training in Word, Excel, PowerPoint, email, document formatting, and everyday office productivity.' },
+  { id: 'CRS-105', title: 'Tally Prime with GST', duration: '4 Months', description: 'Learn computerized accounting, inventory management, GST invoicing, taxation reports, and payroll using Tally Prime.' },
+  { id: 'CRS-106', title: 'Graphic Design Fundamentals', duration: '6 Months', description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.' }
+];
+const PUBLIC_COURSE_SEED_VERSION = '2';
 
 const INDIAN_STATES_DISTRICTS = {
   "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Ananthapuramu", "Annamayya", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema", "East Godavari", "Eluru", "Guntur", "Kakinada", "Krishna", "Kurnool", "Nandyal", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "Sri Potti Sriramulu Nellore", "Sri Sathya Sai", "Srikakulam", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
@@ -75,7 +89,9 @@ class PublicAcademyApp {
 
     // Check initial hash
     const hash = window.location.hash.replace('#', '');
-    if (hash === 'student' || hash === 'registration') {
+    if (hash === 'courses') {
+      this.switchView('courses');
+    } else if (hash === 'student' || hash === 'registration') {
       this.switchView('student');
     } else if (hash === 'certificate') {
       this.switchView('certificate');
@@ -103,11 +119,15 @@ class PublicAcademyApp {
   }
 
   resolveTenant() {
+    if (PUBLIC_SITE_CONFIG.academySlug) {
+      return String(PUBLIC_SITE_CONFIG.academySlug).toLowerCase().trim();
+    }
+
     const hostname = window.location.hostname.toLowerCase();
 
     // If accessing academy.XXXX directly on root, route to Admin Gateway
     if (hostname.startsWith('academy.')) {
-      window.location.href = 'login.html';
+      window.location.href = PUBLIC_SITE_CONFIG.adminPortalUrl || '#';
       return 'prantik';
     }
 
@@ -133,11 +153,11 @@ class PublicAcademyApp {
   updateAdminLoginLinks() {
     const hostname = window.location.hostname.toLowerCase();
     const parts = hostname.split('.');
-    let adminUrl = 'login.html';
+    let adminUrl = PUBLIC_SITE_CONFIG.adminPortalUrl || '#';
 
-    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
+    if (!PUBLIC_SITE_CONFIG.adminPortalUrl && parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
       const rootDomain = parts.slice(-2).join('.');
-      adminUrl = `https://academy.${rootDomain}/login.html`;
+      adminUrl = `https://academy.${rootDomain}`;
     }
 
     const btnNav = document.getElementById('btnNavAdminLogin');
@@ -163,8 +183,10 @@ class PublicAcademyApp {
     return {
       academyName: 'Diganta Computer Centre',
       ownerName: 'Prantik Das',
-      email: this.currentOwnerEmail,
-      phone: '9876543210',
+      email: 'swarupkhan1@gmail.com',
+      phone: '9733894742',
+      secondaryPhone: '9733894742',
+      whatsapp: '9733894742',
       slug: 'prantik'
     };
   }
@@ -174,6 +196,10 @@ class PublicAcademyApp {
     this.navAcademyName = document.getElementById('navAcademyName');
     this.heroAcademyName = document.getElementById('heroAcademyName');
     this.footerAcademyName = document.getElementById('footerAcademyName');
+    this.footerCopyrightName = document.getElementById('footerCopyrightName');
+    this.footerPhoneLink = document.getElementById('footerPhoneLink');
+    this.footerEmailLink = document.getElementById('footerEmailLink');
+    this.footerAddress = document.getElementById('footerAddress');
     this.heroTaglineText = document.getElementById('heroTaglineText');
     this.heroDescText = document.getElementById('heroDescText');
 
@@ -189,6 +215,7 @@ class PublicAcademyApp {
     // Navigation & Views
     this.brandHomeLink = document.getElementById('brandHomeLink');
     this.navHomeLink = document.getElementById('navHomeLink');
+    this.navCoursesLink = document.getElementById('navCoursesLink');
     this.navAboutLink = document.getElementById('navAboutLink');
     this.navStudentLink = document.getElementById('navStudentLink');
     this.navCertificateLink = document.getElementById('navCertificateLink');
@@ -197,6 +224,7 @@ class PublicAcademyApp {
     this.navMenu = document.getElementById('navMenu');
 
     this.viewHome = document.getElementById('view-home');
+    this.viewCourses = document.getElementById('view-courses');
     this.viewAbout = document.getElementById('view-about');
     this.viewStudent = document.getElementById('view-student');
     this.viewCertificate = document.getElementById('view-certificate');
@@ -221,6 +249,8 @@ class PublicAcademyApp {
 
     // Home Section
     this.homeCoursesGrid = document.getElementById('homeCoursesGrid');
+    this.coursesPageGrid = document.getElementById('coursesPageGrid');
+    this.homeContactForm = document.getElementById('homeContactForm');
 
     // Registration Form Elements
     this.studentRegForm = document.getElementById('studentRegForm');
@@ -291,17 +321,24 @@ class PublicAcademyApp {
     this.regCourseMenu = document.getElementById('regCourseMenu');
 
     // Certificate Verification Form Elements
-    this.certSearchForm = document.getElementById('certSearchForm');
+    this.certSearchForm = document.getElementById('certificateSearchForm');
     this.certPhone = document.getElementById('certPhone');
     this.certPhoneError = document.getElementById('certPhoneError');
     this.certDob = document.getElementById('certDob');
-    this.btnSearchCertificate = document.getElementById('btnSearchCertificate');
+    this.btnSearchCertificate = document.getElementById('btnSearchCert');
 
     this.certResultContainer = document.getElementById('certResultContainer');
     this.certNotFoundState = document.getElementById('certNotFoundState');
     this.certIncompleteState = document.getElementById('certIncompleteState');
     this.certIncompleteDesc = document.getElementById('certIncompleteDesc');
+    this.btnResetCertSearch = document.getElementById('btnResetCertSearch');
     this.btnPrintCertificate = document.getElementById('btnPrintCertificate');
+    this.certDocAcademyName = document.getElementById('certDocAcademyName');
+    this.certDocStudentName = document.getElementById('certDocStudentName');
+    this.certDocCourseTitle = document.getElementById('certDocCourseTitle');
+    this.certDocStudentId = document.getElementById('certDocStudentId');
+    this.certDocIssueDate = document.getElementById('certDocIssueDate');
+    this.certDocSignatory = document.getElementById('certDocSignatory');
 
     // Success Modal
     this.successModal = document.getElementById('registrationSuccessModal');
@@ -352,7 +389,20 @@ class PublicAcademyApp {
         this.courses = [];
       }
     } else {
-      this.courses = [];
+      this.courses = this.currentOwnerEmail.includes('poulami') ? [] : DEFAULT_PUBLIC_COURSES.map(course => ({ ...course }));
+      if (this.courses.length > 0) {
+        localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
+      }
+    }
+
+    const seedVersionKey = this.getStorageKey('educore_course_seed_version');
+    if (!this.currentOwnerEmail.includes('poulami') && localStorage.getItem(seedVersionKey) !== PUBLIC_COURSE_SEED_VERSION) {
+      const existingIds = new Set(this.courses.map(course => course.id));
+      DEFAULT_PUBLIC_COURSES.forEach(course => {
+        if (!existingIds.has(course.id)) this.courses.push({ ...course });
+      });
+      localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
+      localStorage.setItem(seedVersionKey, PUBLIC_COURSE_SEED_VERSION);
     }
   }
 
@@ -360,7 +410,7 @@ class PublicAcademyApp {
     const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
 
     try {
-      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
+      const response = await fetch(getPublicApiUrl(`?academy=${encodeURIComponent(this.currentAcademySlug)}`), { cache: 'no-store' });
       
       if (response.status === 404) {
         if (!isLocalDev) {
@@ -385,10 +435,18 @@ class PublicAcademyApp {
           this.currentOwnerEmail = json.tenant.ownerEmail;
         }
 
-        const { profile, courses, students, authToken } = json.data;
+        const { profile, courses, students } = json.data;
 
         if (Array.isArray(courses)) {
           this.courses = courses;
+          // The Diganta site always includes its six established courses.
+          // This also repairs browsers that cached the older three-course set.
+          if (!this.currentOwnerEmail.includes('poulami')) {
+            const cloudCourseIds = new Set(this.courses.map(course => course.id));
+            DEFAULT_PUBLIC_COURSES.forEach(course => {
+              if (!cloudCourseIds.has(course.id)) this.courses.push({ ...course });
+            });
+          }
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
           this.renderHomeCourses();
           this.populateCourseDropdown();
@@ -402,11 +460,6 @@ class PublicAcademyApp {
 
         if (Array.isArray(students)) {
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(students));
-        }
-
-        if (authToken && authToken.code && authToken.expiresAt) {
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(authToken));
-          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(authToken));
         }
 
         // Remove tenantGuard if it was an unverified custom subdomain
@@ -480,6 +533,18 @@ class PublicAcademyApp {
   }
 
   bindEvents() {
+    // Keep an already-open public tab in sync with course changes made in Admin.
+    window.addEventListener('storage', (event) => {
+      if (event.key !== this.getStorageKey(STORAGE_KEYS.COURSES) || event.newValue === null) return;
+      try {
+        this.courses = JSON.parse(event.newValue) || [];
+        this.renderHomeCourses();
+        this.populateCourseDropdown();
+      } catch (e) {
+        console.warn('[PublicApp] Ignored invalid course data from storage sync.');
+      }
+    });
+
     // Mobile Nav Toggle
     if (this.btnMobileNav && this.navMenu) {
       this.btnMobileNav.addEventListener('click', () => {
@@ -499,6 +564,13 @@ class PublicAcademyApp {
       this.brandHomeLink.addEventListener('click', (e) => {
         e.preventDefault();
         this.switchView('home');
+      });
+    }
+
+    if (this.navCoursesLink) {
+      this.navCoursesLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.switchView('courses');
       });
     }
 
@@ -538,7 +610,9 @@ class PublicAcademyApp {
     // Hash Change
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (hash === 'student' || hash === 'registration') {
+      if (hash === 'courses') {
+        this.switchView('courses', false);
+      } else if (hash === 'student' || hash === 'registration') {
         this.switchView('student', false);
       } else if (hash === 'certificate') {
         this.switchView('certificate', false);
@@ -552,11 +626,18 @@ class PublicAcademyApp {
     // Student Registration Form Submit Handler
     if (this.studentRegForm) {
       this.studentRegForm.addEventListener('submit', (e) => this.handleRegistration(e));
+      this.studentRegForm.addEventListener('input', (e) => {
+        e.target?.classList.remove('input-error');
+      });
     }
 
     // Certificate Search Form Submit Handler
-    if (this.certificateSearchForm) {
-      this.certificateSearchForm.addEventListener('submit', (e) => this.handleCertificateSearch(e));
+    if (this.certSearchForm) {
+      this.certSearchForm.addEventListener('submit', (e) => this.handleCertificateSearch(e));
+    }
+
+    if (this.homeContactForm) {
+      this.homeContactForm.addEventListener('submit', (e) => this.handleContactMessage(e));
     }
 
     // Certificate Reset / Print Buttons
@@ -565,7 +646,8 @@ class PublicAcademyApp {
         if (this.certResultContainer) this.certResultContainer.style.display = 'none';
         if (this.certNotFoundState) this.certNotFoundState.style.display = 'none';
         if (this.certIncompleteState) this.certIncompleteState.style.display = 'none';
-        if (this.certificateSearchForm) this.certificateSearchForm.reset();
+        window.CertificateCanvas.clear();
+        if (this.certSearchForm) this.certSearchForm.reset();
         if (this.certPhone) {
           this.certPhone.classList.remove('input-error');
           this.certPhone.focus();
@@ -628,6 +710,12 @@ class PublicAcademyApp {
 
     // 6-Digit OTP Box inputs
     this.initOtpBoxes();
+    if (this.regAuthCode) {
+      this.regAuthCode.addEventListener('input', () => {
+        this.regAuthCode.value = this.regAuthCode.value.replace(/\D/g, '').slice(0, 6);
+        this.regAuthCode.classList.remove('input-error');
+      });
+    }
   }
 
   initOtpBoxes() {
@@ -715,7 +803,9 @@ class PublicAcademyApp {
   }
 
   syncAuthCodeFromOtpDigits() {
-    if (!this.authOtpDigits || !this.regAuthCode) return;
+    // The current form uses one regular six-digit input. Only synchronize
+    // when the legacy individual OTP boxes are actually present.
+    if (!this.authOtpDigits || this.authOtpDigits.length === 0 || !this.regAuthCode) return;
     const code = Array.from(this.authOtpDigits).map(input => input.value || '').join('');
     this.regAuthCode.value = code;
   }
@@ -864,6 +954,7 @@ class PublicAcademyApp {
       const label = option.textContent.trim();
 
       input.value = value;
+      trig.classList.remove('input-error');
       if (d) d.textContent = label;
       cont.classList.toggle('has-value', Boolean(value));
 
@@ -888,6 +979,9 @@ class PublicAcademyApp {
     if (this.navHomeLink) {
       this.navHomeLink.classList.toggle('active', viewName === 'home');
     }
+    if (this.navCoursesLink) {
+      this.navCoursesLink.classList.toggle('active', viewName === 'courses');
+    }
     if (this.navAboutLink) {
       this.navAboutLink.classList.toggle('active', viewName === 'about');
     }
@@ -902,6 +996,10 @@ class PublicAcademyApp {
     if (this.viewHome) {
       this.viewHome.style.display = viewName === 'home' ? 'block' : 'none';
       this.viewHome.classList.toggle('active', viewName === 'home');
+    }
+    if (this.viewCourses) {
+      this.viewCourses.style.display = viewName === 'courses' ? 'block' : 'none';
+      this.viewCourses.classList.toggle('active', viewName === 'courses');
     }
     if (this.viewAbout) {
       this.viewAbout.style.display = viewName === 'about' ? 'block' : 'none';
@@ -939,7 +1037,7 @@ class PublicAcademyApp {
     // 0. Top Notice Ticker
     const notice1Text = `Notice: Admissions Open for ${name} 2026 Academic Batches`;
     const notice2Text = `Fast-Track Student Verification & Official Certification Active`;
-    const primaryPhone = profile.phone || '9876543210';
+    const primaryPhone = profile.phone || '9733894742';
     const notice3Text = `Contact Admissions Helpline: +91 ${primaryPhone}`;
 
     if (this.noticeLink1) this.noticeLink1.textContent = notice1Text;
@@ -952,6 +1050,7 @@ class PublicAcademyApp {
     // 1. Navbar & Brand Headings
     if (this.navAcademyName) this.navAcademyName.textContent = name;
     if (this.footerAcademyName) this.footerAcademyName.textContent = name;
+    if (this.footerCopyrightName) this.footerCopyrightName.textContent = name;
     if (this.certDocAcademyName) this.certDocAcademyName.textContent = name;
     document.title = `${name} | Public Admissions Portal`;
 
@@ -1050,10 +1149,21 @@ class PublicAcademyApp {
       this.aboutEmailLink.textContent = email;
       this.aboutEmailLink.href = `mailto:${email}`;
     }
+    if (this.footerPhoneLink) {
+      this.footerPhoneLink.href = `tel:${primaryPhone}`;
+      this.footerPhoneLink.querySelector('span').textContent = `+91 ${primaryPhone}`;
+    }
+    if (this.footerEmailLink) {
+      this.footerEmailLink.href = `mailto:${email}`;
+      this.footerEmailLink.querySelector('span').textContent = email;
+    }
 
     const addressParts = [profile.address, profile.pincode ? `PIN: ${profile.pincode}` : ''].filter(Boolean);
     if (this.aboutAddressDisplay) {
-      this.aboutAddressDisplay.textContent = addressParts.length > 0 ? addressParts.join(', ') : 'Main Campus Admissions Center';
+           this.aboutAddressDisplay.textContent = addressParts.length > 0 ? addressParts.join(', ') : 'Main Campus Admissions Center';
+    }
+    if (this.footerAddress) {
+      this.footerAddress.textContent = addressParts.length > 0 ? addressParts.join(', ') : 'West Bengal, India';
     }
   }
 
@@ -1061,6 +1171,7 @@ class PublicAcademyApp {
     if (this.isNotFound) return;
 
     if (this.viewHome && this.currentView === 'home') this.viewHome.style.display = 'block';
+    if (this.viewCourses && this.currentView === 'courses') this.viewCourses.style.display = 'block';
     if (this.viewAbout && this.currentView === 'about') this.viewAbout.style.display = 'block';
     if (this.viewStudent && this.currentView === 'student') this.viewStudent.style.display = 'block';
     if (this.viewCertificate && this.currentView === 'certificate') this.viewCertificate.style.display = 'block';
@@ -1076,35 +1187,40 @@ class PublicAcademyApp {
   }
 
   renderHomeCourses() {
-    if (!this.homeCoursesGrid) return;
+    const courseGrids = [this.homeCoursesGrid, this.coursesPageGrid].filter(Boolean);
+    if (courseGrids.length === 0) return;
 
     if (this.courses.length === 0) {
-      this.homeCoursesGrid.innerHTML = `
+      const emptyState = `
         <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem 1.5rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
           <i class="fa-solid fa-desktop" style="font-size: 2rem; color: var(--text-subtle); margin-bottom: 0.75rem; display: block;"></i>
           <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Programs Coming Soon</h3>
           <p style="font-size: 0.875rem;">Courses are currently being updated by the academy administration.</p>
         </div>
       `;
+      courseGrids.forEach(grid => { grid.innerHTML = emptyState; });
       return;
     }
 
-    this.homeCoursesGrid.innerHTML = this.courses.map(course => `
+    const courseIcons = ['fa-laptop-code', 'fa-code', 'fa-graduation-cap', 'fa-file-word', 'fa-calculator', 'fa-pen-nib'];
+    const courseCards = this.courses.map((course, index) => `
       <div class="course-card">
         <div class="course-card-header">
+          <span class="course-card-icon" aria-hidden="true"><i class="fa-solid ${courseIcons[index % courseIcons.length]}"></i></span>
           <h3 class="course-card-title">${escapeHtml(course.title)}</h3>
-          <span class="course-duration-badge">
-            <i class="fa-regular fa-clock"></i> ${escapeHtml(course.duration)}
-          </span>
         </div>
         <p class="course-card-desc">${escapeHtml(course.description || 'Comprehensive curriculum with practical assignments and certification.')}</p>
         <div class="course-card-footer">
+          <span class="course-duration-badge">
+            <i class="fa-regular fa-clock"></i> ${escapeHtml(course.duration)}
+          </span>
           <button type="button" class="btn-enroll-link" onclick="window.publicApp.selectCourseAndRegister('${escapeHtml(course.id)}')">
-            <span>Enroll in Course</span> <i class="fa-solid fa-arrow-right"></i>
+            <span>Enroll now</span> <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
       </div>
     `).join('');
+    courseGrids.forEach(grid => { grid.innerHTML = courseCards; });
   }
 
   populateCourseDropdown() {
@@ -1169,14 +1285,41 @@ class PublicAcademyApp {
     const courseId = this.regCourseInput.value.trim();
     const authCode = (this.regAuthCode?.value || Array.from(this.authOtpDigits || []).map(i => i.value).join('')).trim();
 
-    // Required Validations
-    if (
-      !fullName || !dob || !fatherName || !motherName || !aadhar || !gender ||
-      !maritalStatus || !category || !religion || !phone || !email ||
-      !state || !district || !pinCode || !qualification || !address ||
-      !courseId || !authCode
-    ) {
-      this.showToast('Please complete all required fields.', 'error');
+    // Required validation with a precise message and focus target. Custom
+    // dropdowns store their values in hidden inputs, so native browser
+    // validation cannot reliably identify them for the student.
+    const requiredFields = [
+      { value: fullName, label: 'Full Name', element: this.regFullName },
+      { value: dob, label: 'Date of Birth', element: this.regDob },
+      { value: fatherName, label: 'Father\'s Name', element: this.regFatherName },
+      { value: motherName, label: 'Mother\'s Name', element: this.regMotherName },
+      { value: aadhar, label: 'Aadhar Number', element: this.regAadhar },
+      { value: gender, label: 'Gender', element: this.regGenderTrigger },
+      { value: maritalStatus, label: 'Marital Status', element: this.regMaritalStatusTrigger },
+      { value: category, label: 'Category', element: this.regCategoryTrigger },
+      { value: religion, label: 'Religion', element: this.regReligionTrigger },
+      { value: qualification, label: 'Highest Qualification', element: this.regQualificationTrigger },
+      { value: phone, label: 'Mobile Number', element: this.regPhone },
+      { value: email, label: 'Email Address', element: this.regEmail },
+      { value: state, label: 'State', element: this.regStateTrigger },
+      { value: district, label: 'District', element: this.regDistrictTrigger },
+      { value: pinCode, label: 'Pin Code', element: this.regPinCode },
+      { value: address, label: 'Full Address', element: this.regAddress },
+      { value: courseId, label: 'Course', element: this.regCourseTrigger },
+      { value: authCode, label: 'Authentication Code', element: this.regAuthCode }
+    ];
+    requiredFields.forEach(field => field.element?.classList.remove('input-error'));
+    const missingFields = requiredFields.filter(field => !field.value);
+    if (missingFields.length > 0) {
+      missingFields.forEach(field => field.element?.classList.add('input-error'));
+      const firstMissingField = missingFields[0];
+      firstMissingField.element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      window.setTimeout(() => firstMissingField.element?.focus(), 350);
+      const remainingCount = missingFields.length - 1;
+      const message = remainingCount > 0
+        ? `Please complete ${firstMissingField.label} and ${remainingCount} other highlighted field${remainingCount === 1 ? '' : 's'}.`
+        : `Please complete the ${firstMissingField.label} field.`;
+      this.showToast(message, 'error');
       return;
     }
 
@@ -1216,53 +1359,10 @@ class PublicAcademyApp {
       return;
     }
 
-    // Strictly fetch and validate against the current active Authentication Token
-    let activeToken = null;
-    try {
-      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
-      if (response.ok) {
-        const json = await response.json();
-        const cloudToken = json?.data?.authToken;
-        if (cloudToken && cloudToken.code) {
-          activeToken = cloudToken;
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(cloudToken));
-        }
-      }
-    } catch (err) {}
-
-    if (!activeToken) {
-      const raw = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN)) || localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-      if (raw) {
-        try {
-          activeToken = JSON.parse(raw);
-        } catch (e) {}
-      }
-    }
-
-    if (!activeToken || !activeToken.code) {
-      this.showToast('No active authentication code found. Please request the current code from your administrator.', 'error');
-      if (this.authOtpDigits && this.authOtpDigits.length > 0) {
-        this.authOtpDigits.forEach(d => d.classList.add('input-error'));
-        this.authOtpDigits[0].focus();
-      }
-      return;
-    }
-
-    if (activeToken.expiresAt && Date.now() > activeToken.expiresAt) {
-      this.showToast('The authentication code has expired. Please request a new code from your administrator.', 'error');
-      if (this.authOtpDigits && this.authOtpDigits.length > 0) {
-        this.authOtpDigits.forEach(d => d.classList.add('input-error'));
-        this.authOtpDigits[0].focus();
-      }
-      return;
-    }
-
-    if (String(activeToken.code).trim() !== String(authCode).trim()) {
-      this.showToast('Invalid authentication code. Please enter the current 6-digit code shown in the Admin Portal.', 'error');
-      if (this.authOtpDigits && this.authOtpDigits.length > 0) {
-        this.authOtpDigits.forEach(d => d.classList.add('input-error'));
-        this.authOtpDigits[0].focus();
-      }
+    if (!/^\d{6}$/.test(authCode)) {
+      this.regAuthCode?.classList.add('input-error');
+      this.regAuthCode?.focus();
+      this.showToast('Authentication code must be exactly 6 digits.', 'error');
       return;
     }
 
@@ -1300,7 +1400,49 @@ class PublicAcademyApp {
       academySlug: this.currentAcademySlug
     };
 
-    // Save to local storage students registry for this tenant
+    // The server resolves the academy exclusively from this deployment's slug,
+    // validates that academy's code and expiry, and saves only after success.
+    let registrationResult;
+    if (this.btnSubmitReg) this.btnSubmitReg.disabled = true;
+    try {
+      const response = await fetch(getPublicApiUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'register_student',
+          payload: {
+            student: newStudent,
+            academySlug: this.currentAcademySlug,
+            authCode
+          }
+        })
+      });
+      registrationResult = await response.json().catch(() => null);
+
+      if (!response.ok || !registrationResult?.success) {
+        const errorMessages = {
+          WRONG_CODE: 'Incorrect authentication code. Please check the current code from the academy.',
+          EXPIRED_CODE: 'The authentication code has expired. Please request a new code from the academy.',
+          NO_ACTIVE_CODE: 'No active authentication code is available. Please contact the academy.',
+          ACADEMY_NOT_FOUND: 'This public site is not connected to a registered academy.',
+          INVALID_COURSE: 'The selected course is no longer available. Please select another course.'
+        };
+        const message = errorMessages[registrationResult?.code] || registrationResult?.error || 'Registration could not be completed. Please try again.';
+        this.regAuthCode?.classList.add('input-error');
+        this.regAuthCode?.focus();
+        this.showToast(message, 'error');
+        return;
+      }
+    } catch (error) {
+      this.showToast('Unable to contact the academy registration server. Please try again.', 'error');
+      return;
+    } finally {
+      if (this.btnSubmitReg) this.btnSubmitReg.disabled = false;
+    }
+
+    const savedStudent = registrationResult.student || newStudent;
+
+    // Cache the server-confirmed registration locally for this tenant.
     let allStudents = [];
     const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS)) || localStorage.getItem(STORAGE_KEYS.STUDENTS);
     if (rawStudents) {
@@ -1311,23 +1453,9 @@ class PublicAcademyApp {
       }
     }
 
-    allStudents.unshift(newStudent);
+    allStudents.unshift(savedStudent);
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(allStudents));
     localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(allStudents));
-
-    // Post to Multi-Tenant MongoDB cloud storage in background
-    fetch('/api/data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'add_student',
-        payload: {
-          student: newStudent,
-          ownerEmail: this.currentOwnerEmail,
-          academySlug: this.currentAcademySlug
-        }
-      })
-    }).catch(() => {});
 
     // Display Success Receipt Dialog
     if (this.modalStudentId) this.modalStudentId.textContent = studentId;
@@ -1354,7 +1482,10 @@ class PublicAcademyApp {
         d.classList.remove('filled', 'input-error');
       });
     }
-    if (this.regAuthCode) this.regAuthCode.value = '';
+    if (this.regAuthCode) {
+      this.regAuthCode.value = '';
+      this.regAuthCode.classList.remove('input-error');
+    }
 
     if (this.regGenderDisplay) this.regGenderDisplay.textContent = 'Select Gender';
     if (this.regGenderInput) this.regGenderInput.value = '';
@@ -1410,10 +1541,13 @@ class PublicAcademyApp {
       return;
     }
 
+    window.CertificateCanvas.clear();
+    if (this.certResultContainer) this.certResultContainer.style.display = 'none';
+
     // Try to fetch latest students for this specific academy tenant from cloud
     let allStudents = [];
     try {
-      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.currentAcademySlug)}`, { cache: 'no-store' });
+      const response = await fetch(getPublicApiUrl(`?academy=${encodeURIComponent(this.currentAcademySlug)}`), { cache: 'no-store' });
       if (response.ok) {
         const json = await response.json();
         if (json?.success && Array.isArray(json.data?.students)) {
@@ -1470,23 +1604,9 @@ class PublicAcademyApp {
     if (this.certNotFoundState) this.certNotFoundState.style.display = 'none';
     if (this.certIncompleteState) this.certIncompleteState.style.display = 'none';
 
-    const academyName = this.academyProfile?.academyName || 'Academy';
-    const ownerName = this.academyProfile?.ownerName || 'Academy Director';
-
-    // Find course title
     const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || '';
     const course = this.courses.find(c => c.id === courseId);
-    const courseTitle = course ? course.title : 'Professional Academic Program';
-    const courseDuration = course ? `(${course.duration})` : '';
-
-    if (this.certDocAcademyName) this.certDocAcademyName.textContent = academyName;
-    if (this.certDocStudentName) this.certDocStudentName.textContent = toTitleCase(student.name);
-    if (this.certDocCourseTitle) {
-      this.certDocCourseTitle.innerHTML = `${escapeHtml(courseTitle)} <span id="certDocCourseDuration">${escapeHtml(courseDuration)}</span>`;
-    }
-    if (this.certDocStudentId) this.certDocStudentId.textContent = student.id || 'STU-0000';
-    if (this.certDocIssueDate) this.certDocIssueDate.textContent = formatCertificateDate(student.joinDate);
-    if (this.certDocSignatory) this.certDocSignatory.textContent = toTitleCase(ownerName);
+    await window.CertificateCanvas.render(student, course);
 
     if (this.certResultContainer) {
       this.certResultContainer.style.display = 'block';
@@ -1536,6 +1656,33 @@ class PublicAcademyApp {
     } catch (e) {
       return { valid: false, message: 'Error verifying authentication token.' };
     }
+  }
+
+  handleContactMessage(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const name = form.elements.name.value.trim();
+    const phone = form.elements.phone.value.replace(/\D/g, '');
+    const course = form.elements.course.value.trim();
+    const message = form.elements.message.value.trim();
+
+    if (phone.length !== 10) {
+      this.showToast('Please enter a valid 10-digit mobile number.', 'error');
+      return;
+    }
+
+    const whatsappMessage = [
+      'Hello Diganta Computer Centre,',
+      '',
+      `Name: ${name}`,
+      `Mobile: ${phone}`,
+      course ? `Interested in: ${course}` : '',
+      `Message: ${message}`
+    ].filter(Boolean).join('\n');
+
+    window.open(`https://wa.me/919733894742?text=${encodeURIComponent(whatsappMessage)}`, '_blank', 'noopener,noreferrer');
+    this.showToast('Your message is ready to send on WhatsApp.', 'success');
   }
 
   showToast(message, type = 'error') {
@@ -1724,6 +1871,58 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function setupGalleryLightbox() {
+  const lightbox = document.getElementById('galleryLightbox');
+  const previewImage = document.getElementById('galleryLightboxImage');
+  const closeButton = lightbox?.querySelector('.gallery-lightbox-close');
+  const galleryItems = document.querySelectorAll('.gallery-item, .about-certificate-card');
+  if (!lightbox || !previewImage || !closeButton || !galleryItems.length) return;
+
+  let activeItem = null;
+
+  const openLightbox = (item) => {
+    const image = item.querySelector('img');
+    if (!image) return;
+    activeItem = item;
+    previewImage.src = image.currentSrc || image.src;
+    previewImage.alt = image.alt;
+    lightbox.hidden = false;
+    document.body.style.overflow = 'hidden';
+    closeButton.focus();
+  };
+
+  const closeLightbox = () => {
+    lightbox.hidden = true;
+    previewImage.src = '';
+    previewImage.alt = '';
+    document.body.style.overflow = '';
+    activeItem?.focus();
+    activeItem = null;
+  };
+
+  galleryItems.forEach((item) => {
+    item.tabIndex = 0;
+    item.setAttribute('role', 'button');
+    item.setAttribute('aria-label', `Open ${item.querySelector('img')?.alt || 'gallery image'} in large view`);
+    item.addEventListener('click', () => openLightbox(item));
+    item.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openLightbox(item);
+      }
+    });
+  });
+
+  closeButton.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (event) => {
+    if (event.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !lightbox.hidden) closeLightbox();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   window.publicApp = new PublicAcademyApp();
+  setupGalleryLightbox();
 });

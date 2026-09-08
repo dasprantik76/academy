@@ -10,14 +10,18 @@ const COLLECTIONS = {
   AUTH_TOKEN: 'auth_token'
 };
 
+const COURSE_SEED_VERSION = 2;
+
 // Default seed profiles for multi-tenant academies
 const DEFAULT_TENANTS = {
   'dasprantik76@gmail.com': {
     ownerEmail: 'dasprantik76@gmail.com',
-    academyName: 'Prantik Computer Academy',
+    academyName: 'Diganta Computer Centre',
     ownerName: 'Prantik Das',
-    email: 'dasprantik76@gmail.com',
-    phone: '9876543210',
+    email: 'swarupkhan1@gmail.com',
+    phone: '9733894742',
+    secondaryPhone: '9733894742',
+    whatsapp: '9733894742',
     slug: 'prantik',
     category: 'Computer Science & Information Technology',
     about: 'Premier professional computer and software training academy offering certified courses.'
@@ -57,6 +61,27 @@ const DEFAULT_COURSES_BY_TENANT = {
       duration: '1 Year',
       description: 'Advanced programming concepts, system architecture, database administration, and project implementation.',
       ownerEmail: 'dasprantik76@gmail.com'
+    },
+    {
+      id: 'CRS-104',
+      title: 'Certificate in Office Automation',
+      duration: '3 Months',
+      description: 'Practical training in Word, Excel, PowerPoint, email, document formatting, and everyday office productivity.',
+      ownerEmail: 'dasprantik76@gmail.com'
+    },
+    {
+      id: 'CRS-105',
+      title: 'Tally Prime with GST',
+      duration: '4 Months',
+      description: 'Learn computerized accounting, inventory management, GST invoicing, taxation reports, and payroll using Tally Prime.',
+      ownerEmail: 'dasprantik76@gmail.com'
+    },
+    {
+      id: 'CRS-106',
+      title: 'Graphic Design Fundamentals',
+      duration: '6 Months',
+      description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.',
+      ownerEmail: 'dasprantik76@gmail.com'
     }
   ],
   'poulami.13thmay@gmail.com': [
@@ -79,6 +104,27 @@ const DEFAULT_COURSES_BY_TENANT = {
       title: 'Contemporary & Creative Movement',
       duration: '6 Months',
       description: 'Fluid choreography, body alignment, contemporary expression, and stage performance techniques.',
+      ownerEmail: 'poulami.13thmay@gmail.com'
+    },
+    {
+      id: 'CRS-204',
+      title: 'Rabindra Nritya',
+      duration: '6 Months',
+      description: 'Learn expressive movement, musical interpretation, and choreography based on the works of Rabindranath Tagore.',
+      ownerEmail: 'poulami.13thmay@gmail.com'
+    },
+    {
+      id: 'CRS-205',
+      title: 'Creative Dance for Children',
+      duration: '6 Months',
+      description: 'An engaging foundation program that develops rhythm, coordination, expression, confidence, and stage presence.',
+      ownerEmail: 'poulami.13thmay@gmail.com'
+    },
+    {
+      id: 'CRS-206',
+      title: 'Dance Performance Workshop',
+      duration: '3 Months',
+      description: 'Focused training in choreography, musicality, stagecraft, group coordination, and live performance preparation.',
       ownerEmail: 'poulami.13thmay@gmail.com'
     }
   ]
@@ -192,10 +238,44 @@ export default async function handler(req, res) {
         );
       }
 
-      // Auto-seed sample courses if empty for default tenants
-      if ((!coursesList || coursesList.length === 0) && DEFAULT_COURSES_BY_TENANT[ownerEmail]) {
-        coursesList = DEFAULT_COURSES_BY_TENANT[ownerEmail];
-        await db.collection(COLLECTIONS.COURSES).insertMany(coursesList);
+      // This deployment is dedicated to Diganta Computer Centre. Keep the
+      // public-facing identity canonical even when an older personalised
+      // profile is already present in MongoDB.
+      if (ownerEmail === 'dasprantik76@gmail.com') {
+        const canonicalProfile = DEFAULT_TENANTS[ownerEmail];
+        const needsCanonicalProfile = Object.entries(canonicalProfile)
+          .some(([key, value]) => profileDoc?.[key] !== value);
+
+        if (needsCanonicalProfile) {
+          profileDoc = { ...(profileDoc || {}), ...canonicalProfile };
+          await db.collection(COLLECTIONS.PROFILE).updateOne(
+            { ownerEmail },
+            { $set: canonicalProfile },
+            { upsert: true }
+          );
+        }
+      }
+
+      // Seed the six starter courses once. The profile marker prevents courses
+      // intentionally deleted in the Admin Portal from being recreated later.
+      if (DEFAULT_COURSES_BY_TENANT[ownerEmail] && profileDoc?.courseSeedVersion !== COURSE_SEED_VERSION) {
+        const starterCourses = DEFAULT_COURSES_BY_TENANT[ownerEmail];
+        const existingIds = new Set((coursesList || []).map(course => course.id));
+        const missingCourses = starterCourses.filter(course => !existingIds.has(course.id));
+
+        if (missingCourses.length > 0) {
+          await db.collection(COLLECTIONS.COURSES).insertMany(missingCourses);
+          coursesList = await db.collection(COLLECTIONS.COURSES)
+            .find({ ownerEmail }, { projection: { _id: 0 } })
+            .toArray();
+        }
+
+        await db.collection(COLLECTIONS.PROFILE).updateOne(
+          { ownerEmail },
+          { $set: { courseSeedVersion: COURSE_SEED_VERSION } },
+          { upsert: true }
+        );
+        profileDoc = { ...(profileDoc || {}), courseSeedVersion: COURSE_SEED_VERSION };
       }
 
       return res.status(200).json({
@@ -209,7 +289,9 @@ export default async function handler(req, res) {
           profile: profileDoc || null,
           courses: Array.isArray(coursesList) ? coursesList : [],
           students: Array.isArray(studentsList) ? studentsList : [],
-          authToken: authTokenDoc || null
+          // Authentication codes are never included in academy-slug responses
+          // consumed by public websites.
+          authToken: req.query.ownerEmail ? (authTokenDoc || null) : null
         }
       });
     } catch (error) {
@@ -236,6 +318,71 @@ export default async function handler(req, res) {
       const ownerEmail = await resolveOwnerEmail(payload?.ownerEmail, payload?.academySlug);
 
       switch (action) {
+        // Public registration: resolve the academy exclusively from its slug,
+        // validate that academy's active code on the server, then save.
+        case 'register_student': {
+          const academySlug = String(payload?.academySlug || '').toLowerCase().trim();
+          const submittedCode = String(payload?.authCode || '').trim();
+          const student = payload?.student;
+          const studentName = student?.name || student?.fullName;
+
+          if (!academySlug) {
+            return res.status(400).json({ success: false, code: 'ACADEMY_REQUIRED', error: 'Academy identifier is required.' });
+          }
+
+          const registrationOwnerEmail = await resolveOwnerEmail('', academySlug);
+          if (!registrationOwnerEmail) {
+            return res.status(404).json({ success: false, code: 'ACADEMY_NOT_FOUND', error: 'Academy not found.' });
+          }
+
+          if (!/^\d{6}$/.test(submittedCode)) {
+            return res.status(400).json({ success: false, code: 'INVALID_CODE', error: 'Authentication code must be exactly 6 digits.' });
+          }
+
+          if (!student || !studentName || !student?.phone) {
+            return res.status(400).json({ success: false, code: 'INVALID_STUDENT', error: 'Invalid student registration details.' });
+          }
+
+          const activeToken = await db.collection(COLLECTIONS.AUTH_TOKEN).findOne(
+            { ownerEmail: registrationOwnerEmail },
+            { projection: { _id: 0 } }
+          );
+
+          if (!activeToken?.code) {
+            return res.status(403).json({ success: false, code: 'NO_ACTIVE_CODE', error: 'No active authentication code is available for this academy.' });
+          }
+
+          if (!activeToken.expiresAt || Date.now() > Number(activeToken.expiresAt)) {
+            return res.status(403).json({ success: false, code: 'EXPIRED_CODE', error: 'The authentication code has expired. Please request a new code.' });
+          }
+
+          if (String(activeToken.code).trim() !== submittedCode) {
+            return res.status(403).json({ success: false, code: 'WRONG_CODE', error: 'The authentication code is incorrect.' });
+          }
+
+          const requestedCourseId = student?.enrolledCourseIds?.[0];
+          const courseExists = requestedCourseId && await db.collection(COLLECTIONS.COURSES).findOne(
+            { id: requestedCourseId, ownerEmail: registrationOwnerEmail },
+            { projection: { _id: 1 } }
+          );
+          if (!courseExists) {
+            return res.status(400).json({ success: false, code: 'INVALID_COURSE', error: 'The selected course is not available for this academy.' });
+          }
+
+          const normalizedStudent = {
+            ...student,
+            name: studentName,
+            fullName: studentName,
+            ownerEmail: registrationOwnerEmail,
+            academySlug
+          };
+          delete normalizedStudent.authCode;
+
+          await db.collection(COLLECTIONS.STUDENTS).insertOne(normalizedStudent);
+          delete normalizedStudent._id;
+          return res.status(201).json({ success: true, student: normalizedStudent });
+        }
+
         // 1. Save Academy Profile
         case 'save_profile': {
           if (!payload?.profile) {

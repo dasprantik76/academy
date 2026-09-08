@@ -12,7 +12,8 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=5.8">
+  <link rel="stylesheet" href="admin-style.css?v=6.0">
+  <script src="admin-config.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -25,9 +26,6 @@
         <div class="brand-text">
           <h2 id="sidebarAcademyName">Academy</h2>
         </div>
-        <button class="btn-brand-settings" id="btnEditAcademySettings" title="Edit Academy Settings">
-          <i class="fa-solid fa-gear"></i>
-        </button>
         <button class="btn-close-sidebar" id="btnCloseSidebar" aria-label="Close sidebar">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -48,10 +46,6 @@
           <i class="fa-solid fa-desktop"></i>
           <span>Courses</span>
           <span class="nav-badge" id="courseCountBadge">0</span>
-        </a>
-        <a href="#personalisation" class="nav-item" data-view="personalisation" id="nav-personalisation">
-          <i class="fa-solid fa-palette"></i>
-          <span>Personalisation</span>
         </a>
       </nav>
 
@@ -96,7 +90,7 @@
         </div>
 
         <div class="header-right">
-          <a href="index.html" class="btn btn-outline btn-sm" target="_blank" rel="noopener noreferrer" title="View Public Academy Website" id="btnViewPublicSite">
+          <a href="#" class="btn btn-outline btn-sm" target="_blank" rel="noopener noreferrer" title="View Public Academy Website" id="btnViewPublicSite">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
             <span>View Public Site</span>
           </a>
@@ -414,7 +408,7 @@
                       <label for="persAcademyName">Academy Brand Name <span class="required">*</span></label>
                       <div class="input-icon-wrap">
                         <i class="fa-solid fa-school"></i>
-                        <input type="text" id="persAcademyName" placeholder="e.g. Prantik Computer Academy" required>
+                        <input type="text" id="persAcademyName" placeholder="e.g. Diganta Computer Centre" required>
                       </div>
                     </div>
                     <div class="form-group flex-1">
@@ -1077,6 +1071,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=5.7"></script>
+  <script src="admin-script.js?v=5.8"></script>
 </body>
 </html>

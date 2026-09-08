@@ -15,6 +15,16 @@ const STORAGE_KEYS = {
   ACADEMY_PROFILE: 'pixelsetu_academy_profile'
 };
 
+const DEFAULT_COMPUTER_COURSES = [
+  { id: 'CRS-101', title: 'Diploma in Computer Applications (DCA)', duration: '6 Months', description: 'Comprehensive fundamentals of computer operations, MS Office suite, Internet basics, and database concepts.' },
+  { id: 'CRS-102', title: 'Full Stack Web Development', duration: '1 Year', description: 'Modern front-end and back-end web development with HTML5, CSS3, JavaScript, Node.js, and databases.' },
+  { id: 'CRS-103', title: 'Post Graduate Diploma in Computer Applications (PGDCA)', duration: '1 Year', description: 'Advanced programming concepts, system architecture, database administration, and project implementation.' },
+  { id: 'CRS-104', title: 'Certificate in Office Automation', duration: '3 Months', description: 'Practical training in Word, Excel, PowerPoint, email, document formatting, and everyday office productivity.' },
+  { id: 'CRS-105', title: 'Tally Prime with GST', duration: '4 Months', description: 'Learn computerized accounting, inventory management, GST invoicing, taxation reports, and payroll using Tally Prime.' },
+  { id: 'CRS-106', title: 'Graphic Design Fundamentals', duration: '6 Months', description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.' }
+];
+const COURSE_SEED_VERSION = '1';
+
 const INDIAN_STATES_DISTRICTS = {
   "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Ananthapuramu", "Annamayya", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema", "East Godavari", "Eluru", "Guntur", "Kakinada", "Krishna", "Kurnool", "Nandyal", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "Sri Potti Sriramulu Nellore", "Sri Sathya Sai", "Srikakulam", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
   "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang", "Itanagar"],
@@ -108,7 +118,20 @@ class AcademyStore {
         this.courses = [];
       }
     } else {
-      this.courses = [];
+      this.courses = this.ownerEmail.includes('poulami') ? [] : DEFAULT_COMPUTER_COURSES.map(course => ({ ...course }));
+      if (this.courses.length > 0) {
+        localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
+      }
+    }
+
+    const seedVersionKey = this.getStorageKey('educore_course_seed_version');
+    if (!this.ownerEmail.includes('poulami') && localStorage.getItem(seedVersionKey) !== COURSE_SEED_VERSION) {
+      const existingIds = new Set(this.courses.map(course => course.id));
+      DEFAULT_COMPUTER_COURSES.forEach(course => {
+        if (!existingIds.has(course.id)) this.courses.push({ ...course });
+      });
+      localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
+      localStorage.setItem(seedVersionKey, COURSE_SEED_VERSION);
     }
 
     if (rawStudents) {
@@ -131,11 +154,9 @@ class AcademyStore {
       if (json && json.success && json.data) {
         const { profile, courses, students, authToken } = json.data;
 
-        if (Array.isArray(courses) && courses.length > 0) {
+        if (Array.isArray(courses)) {
           this.courses = courses;
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
-        } else if (this.courses.length > 0) {
-          this.syncToCloud('save_courses', { courses: this.courses });
         }
 
         if (Array.isArray(students)) {
@@ -216,8 +237,10 @@ class AcademyStore {
       return {
         academyName: 'Diganta Computer Centre',
         ownerName: 'Prantik Das',
-        email: this.ownerEmail,
-        phone: '9876543210',
+        email: 'swarupkhan1@gmail.com',
+        phone: '9733894742',
+        secondaryPhone: '9733894742',
+        whatsapp: '9733894742',
         slug: 'prantik'
       };
     }
@@ -402,22 +425,22 @@ class UIController {
     // Check Authentication Session Gate
     const rawSession = localStorage.getItem(STORAGE_KEYS.SESSION);
     if (!rawSession) {
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
       return;
     }
 
     try {
       this.session = JSON.parse(rawSession);
       const userEmail = (this.session?.email || '').toLowerCase().trim();
-      const ALLOWED_ADMINS = ['poulami.13thmay@gmail.com', 'dasprantik76@gmail.com'];
+      const ALLOWED_ADMINS = window.ADMIN_PORTAL_CONFIG?.authorizedAdminEmails || [];
       if (!this.session || this.session.provider !== 'google' || !ALLOWED_ADMINS.includes(userEmail)) {
         localStorage.removeItem(STORAGE_KEYS.SESSION);
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
       }
     } catch (e) {
       localStorage.removeItem(STORAGE_KEYS.SESSION);
-      window.location.href = 'login.html';
+      window.location.href = 'index.html';
       return;
     }
 
@@ -439,7 +462,6 @@ class UIController {
     this.bindEvents();
     this.render();
     this.startAuthCountdownTimer();
-    this.checkOnboarding();
     this.updatePublicSiteLink();
 
     // Synchronize with Multi-Tenant MongoDB cloud storage in background
@@ -468,6 +490,9 @@ class UIController {
   }
 
   getPublicUrlForSlug(slug) {
+    const configuredSites = window.ADMIN_PORTAL_CONFIG?.publicSites || {};
+    if (configuredSites[slug]) return configuredSites[slug];
+
     const hostname = window.location.hostname.toLowerCase();
     const parts = hostname.split('.');
     if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
@@ -901,7 +926,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses', 'personalisation'].includes(hash)) {
+      if (['dashboard', 'students', 'courses'].includes(hash)) {
         this.switchView(hash, false);
       }
     });
@@ -951,7 +976,10 @@ class UIController {
           message: 'Are you sure you want to sign out of the administrator portal?',
           action: () => {
             localStorage.removeItem(STORAGE_KEYS.SESSION);
-            window.location.href = 'login.html';
+            if (window.google?.accounts?.id) {
+              window.google.accounts.id.disableAutoSelect();
+            }
+            window.location.href = 'index.html';
           }
         });
       });
@@ -1241,10 +1269,6 @@ class UIController {
     } else if (viewName === 'courses') {
       this.pageTitle.textContent = 'Course Management';
       this.pageSubtitle.textContent = 'Curate academy courses, durations, and syllabus details';
-    } else if (viewName === 'personalisation') {
-      this.pageTitle.textContent = 'Website Personalisation';
-      this.pageSubtitle.textContent = 'Manage public subdomain, branding, contact details, and academy story';
-      this.populatePersonalisationForm();
     }
 
     this.render();
