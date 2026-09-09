@@ -10,6 +10,18 @@ Add this environment variable in Vercel:
 MONGODB_URI=your MongoDB Atlas connection string
 ```
 
+Student passport-photo uploads also require these server-side Vercel environment variables:
+
+```text
+IMAGEKIT_PRIVATE_KEY=your ImageKit private key
+IMAGEKIT_PUBLIC_KEY=your ImageKit public key
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/d3ycnoiwd
+```
+
+Keep `IMAGEKIT_PRIVATE_KEY` server-side. Never add it to public-site files, browser code,
+GitHub, or a variable exposed to the browser. The `/api/imagekit-auth` function uses it
+to create a short-lived, one-time signature after validating the academy registration code.
+
 ## Configure owners and public websites
 
 Edit `admin-config.js`:
