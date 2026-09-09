@@ -11,31 +11,22 @@ const COLLECTIONS = {
 };
 
 const COURSE_SEED_VERSION = 2;
-const MAX_STUDENT_PHOTO_BYTES = 2 * 1024 * 1024;
-
-async function verifyImageKitStudentPhoto(student) {
-  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+function verifyImageKitStudentPhoto(student) {
   const urlEndpoint = String(process.env.IMAGEKIT_URL_ENDPOINT || '').replace(/\/$/, '');
   const photoUrl = String(student?.photoUrl || '').trim();
   const fileId = String(student?.imageKitFileId || '').trim();
   const filePath = String(student?.imageKitFilePath || '').trim();
-  if (!privateKey || !urlEndpoint || !photoUrl.startsWith(`${urlEndpoint}/`)
-    || !fileId || !filePath.startsWith('/academy/student-photos/')) return false;
+  if (!urlEndpoint || !fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)
+    || !filePath.startsWith('/academy/student-photos/')) return false;
 
-  const response = await fetch(`https://api.imagekit.io/v1/files/${encodeURIComponent(fileId)}/details`, {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`
-    }
-  });
-  if (!response.ok) return false;
-  const file = await response.json();
-  return file?.fileId === fileId
-    && file?.filePath === filePath
-    && file?.url === photoUrl
-    && file?.fileType === 'image'
-    && Number(file?.size) > 0
-    && Number(file?.size) <= MAX_STUDENT_PHOTO_BYTES;
+  try {
+    const endpoint = new URL(urlEndpoint);
+    const uploaded = new URL(photoUrl);
+    const expectedPath = `${endpoint.pathname.replace(/\/$/, '')}${filePath}`;
+    return uploaded.origin === endpoint.origin && uploaded.pathname === expectedPath;
+  } catch {
+    return false;
+  }
 }
 
 // Default seed profiles for multi-tenant academies
@@ -395,7 +386,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, code: 'INVALID_COURSE', error: 'The selected course is not available for this academy.' });
           }
 
-          if (!await verifyImageKitStudentPhoto(student)) {
+          if (!verifyImageKitStudentPhoto(student)) {
             return res.status(400).json({
               success: false,
               code: 'PHOTO_REQUIRED',
