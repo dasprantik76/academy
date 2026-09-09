@@ -1995,8 +1995,9 @@ class UIController {
 
     this.studentDetailsContent.innerHTML = `
       <div class="profile-detail-header">
-        <div class="profile-avatar-large" style="background: ${gradient}">
-          ${initials}
+        <div class="profile-avatar-large${student.photoUrl ? ' has-photo' : ''}" style="background: ${gradient}">
+          ${student.photoUrl ? `<img src="${escapeHtml(student.photoUrl)}" alt="Passport photo of ${escapeHtml(student.name)}" onerror="this.hidden=true; this.nextElementSibling.hidden=false; this.parentElement.classList.remove('has-photo')">` : ''}
+          <span${student.photoUrl ? ' hidden' : ''}>${initials}</span>
         </div>
         <div class="profile-info">
           <h3>${escapeHtml(student.name)}</h3>
