@@ -33,10 +33,14 @@ export default async function handler(req, res) {
     if (areas.length === 0) {
       return res.status(404).json({ success: false, error: 'No area was found for this PIN code.' });
     }
+    const primaryOffice = postOffices.find(item => /Head Post Office/i.test(item?.BranchType || ''))
+      || postOffices.find(item => /Sub Post Office/i.test(item?.BranchType || ''))
+      || postOffices[0];
 
     return res.status(200).json({
       success: true,
       pinCode,
+      area: String(primaryOffice?.Name || areas[0]).trim(),
       areas,
       district: String(postOffices[0]?.District || '').trim(),
       state: String(postOffices[0]?.State || '').trim()
