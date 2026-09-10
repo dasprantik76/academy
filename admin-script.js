@@ -738,6 +738,20 @@ class UIController {
     this.currentViewingStudentId = null;
     this.completingBatchId = null;
 
+    // Modals - Batch Management
+    this.batchModal = document.getElementById('batchModal');
+    this.batchForm = document.getElementById('batchForm');
+    this.batchModalTitle = document.getElementById('batchModalTitle');
+    this.batchStudentCount = document.getElementById('batchStudentCount');
+    this.batchNameGroup = document.getElementById('batchNameGroup');
+    this.batchNameInput = document.getElementById('batchNameInput');
+    this.existingBatchGroup = document.getElementById('existingBatchGroup');
+    this.existingBatchSelect = document.getElementById('existingBatchSelect');
+    this.saveBatchLabel = document.getElementById('saveBatchLabel');
+    this.btnCloseBatchModal = document.getElementById('btnCloseBatchModal');
+    this.btnCancelBatchModal = document.getElementById('btnCancelBatchModal');
+    this.batchModalMode = 'create';
+
     // Modals - Course Completion
     this.completionModal = document.getElementById('completionModal');
     this.completionForm = document.getElementById('completionForm');
@@ -1307,6 +1321,9 @@ class UIController {
     this.completionForm.addEventListener('submit', (e) => this.handleCompletionSubmit(e));
     this.btnCloseCompletionModal.addEventListener('click', () => this.closeModal(this.completionModal));
     this.btnCancelCompletion.addEventListener('click', () => this.closeModal(this.completionModal));
+    this.btnCloseBatchModal?.addEventListener('click', () => this.closeModal(this.batchModal));
+    this.btnCancelBatchModal?.addEventListener('click', () => this.closeModal(this.batchModal));
+    this.batchForm?.addEventListener('submit', (e) => this.handleBatchFormSubmit(e));
 
     this.btnCloseConfirmModal.addEventListener('click', () => this.closeModal(this.confirmModal));
     this.btnCancelConfirm.addEventListener('click', () => this.closeModal(this.confirmModal));
@@ -1782,42 +1799,63 @@ class UIController {
     }).join('');
   }
 
-  async handleCreateNewBatch() {
+  handleCreateNewBatch() {
     const studentIds = Array.from(this.selectedStudentIds);
     if (!studentIds.length) {
       this.showToast('Select Students', 'Select one or more students before creating a batch.', 'error');
       return;
     }
-    const name = prompt('Enter a name for the new batch:')?.trim();
-    if (!name) return;
-    try {
-      await store.saveBatch({ name, studentIds, status: 'Active' });
-      this.selectedStudentIds.clear();
-      this.render();
-      this.switchView('batches');
-      this.showToast('Batch Created', `${name} was created successfully.`, 'success');
-    } catch (error) {
-      this.showToast('Batch Not Created', error.message, 'error');
-    }
+    this.batchModalMode = 'create';
+    this.batchForm.reset();
+    this.batchModalTitle.textContent = 'Create New Batch';
+    this.batchStudentCount.textContent = `${studentIds.length} selected student${studentIds.length === 1 ? '' : 's'} will be added.`;
+    this.batchNameGroup.hidden = false;
+    this.existingBatchGroup.hidden = true;
+    this.batchNameInput.required = true;
+    this.existingBatchSelect.required = false;
+    this.saveBatchLabel.textContent = 'Create Batch';
+    this.openModal(this.batchModal);
+    setTimeout(() => this.batchNameInput.focus(), 100);
   }
 
-  async handleAddToExistingBatch() {
+  handleAddToExistingBatch() {
     const studentIds = Array.from(this.selectedStudentIds);
     const batches = store.getAllBatches().filter(batch => batch.status !== 'Completed');
     if (!studentIds.length) return this.showToast('Select Students', 'Select one or more students to add.', 'error');
     if (!batches.length) return this.showToast('No Active Batch', 'Create a new batch first.', 'error');
-    const choices = batches.map((batch, index) => `${index + 1}. ${batch.name}`).join('\n');
-    const selected = Number(prompt(`Choose a batch number:\n${choices}`));
-    const batch = batches[selected - 1];
-    if (!batch) return;
+    this.batchModalMode = 'existing';
+    this.batchForm.reset();
+    this.batchModalTitle.textContent = 'Add to Existing Batch';
+    this.batchStudentCount.textContent = `${studentIds.length} selected student${studentIds.length === 1 ? '' : 's'} will be added.`;
+    this.batchNameGroup.hidden = true;
+    this.existingBatchGroup.hidden = false;
+    this.batchNameInput.required = false;
+    this.existingBatchSelect.required = true;
+    this.existingBatchSelect.innerHTML = '<option value="">Choose an active batch</option>' + batches.map(batch => `<option value="${escapeHtml(batch.id)}">${escapeHtml(batch.name)} (${(batch.studentIds || []).length} students)</option>`).join('');
+    this.saveBatchLabel.textContent = 'Add Students';
+    this.openModal(this.batchModal);
+    setTimeout(() => this.existingBatchSelect.focus(), 100);
+  }
+
+  async handleBatchFormSubmit(e) {
+    e.preventDefault();
+    const studentIds = Array.from(this.selectedStudentIds);
+    if (!studentIds.length) return this.closeModal(this.batchModal);
+    const existing = this.batchModalMode === 'existing';
+    const batch = existing ? store.getAllBatches().find(item => item.id === this.existingBatchSelect.value) : null;
+    const name = this.batchNameInput.value.trim();
+    if ((existing && !batch) || (!existing && !name)) return this.batchForm.reportValidity();
     try {
-      await store.saveBatch({ ...batch, studentIds: [...new Set([...(batch.studentIds || []), ...studentIds])] });
+      const saved = await store.saveBatch(existing
+        ? { ...batch, studentIds: [...new Set([...(batch.studentIds || []), ...studentIds])] }
+        : { name, studentIds, status: 'Active' });
+      this.closeModal(this.batchModal);
       this.selectedStudentIds.clear();
       this.render();
       this.switchView('batches');
-      this.showToast('Students Added', `Students were added to ${batch.name}.`, 'success');
+      this.showToast(existing ? 'Students Added' : 'Batch Created', existing ? `Students were added to ${saved.name}.` : `${saved.name} was created successfully.`, 'success');
     } catch (error) {
-      this.showToast('Students Not Added', error.message, 'error');
+      this.showToast(existing ? 'Students Not Added' : 'Batch Not Created', error.message, 'error');
     }
   }
 
