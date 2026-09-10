@@ -713,6 +713,109 @@ html, body {
   gap: 0.75rem;
 }
 
+.batch-action-menu {
+  position: relative;
+}
+
+.batch-action-chevron {
+  margin-left: 0.15rem;
+  font-size: 0.7rem;
+  transition: transform var(--transition-fast);
+}
+
+.batch-action-menu.open .batch-action-chevron {
+  transform: rotate(180deg);
+}
+
+.batch-action-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 600;
+  display: none;
+  width: max-content;
+  min-width: 190px;
+  padding: 0.4rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.batch-action-menu.open .batch-action-dropdown {
+  display: grid;
+  gap: 0.2rem;
+  animation: dropdownPop 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.batch-action-option {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  color: var(--text-main);
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 3px);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.batch-action-option i {
+  width: 1rem;
+  color: var(--primary);
+  text-align: center;
+}
+
+.batch-action-option:hover,
+.batch-action-option:focus-visible {
+  color: var(--primary);
+  background: var(--primary-light);
+  outline: none;
+}
+
+.batches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1rem;
+}
+
+.batch-card {
+  overflow: hidden;
+  background: var(--surface-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.batch-card-header,
+.batch-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+}
+
+.batch-card-header { border-bottom: 1px solid var(--border-color); }
+.batch-card-header h3 { margin: 0 0 0.45rem; font-size: 1.05rem; }
+.batch-card-header > strong { color: var(--text-muted); font-size: 0.85rem; }
+.batch-members { display: grid; gap: 0.55rem; padding: 1rem 1.15rem; }
+.batch-member { display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem; background: var(--surface-muted); border-radius: var(--radius-md); }
+.batch-member > span:last-child { display: grid; gap: 0.15rem; }
+.batch-member small { color: var(--text-muted); }
+.batch-card-footer { border-top: 1px solid var(--border-color); background: var(--surface-muted); }
+.batch-card-footer > span { color: var(--text-muted); font-size: 0.78rem; }
+
+@media (max-width: 560px) {
+  .batches-grid { grid-template-columns: 1fr; }
+  .batch-card-footer { align-items: stretch; flex-direction: column; }
+}
+
 /* ==========================================================================
    Buttons & Badges
    ========================================================================== */

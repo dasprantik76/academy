@@ -12,7 +12,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=6.3">
+  <link rel="stylesheet" href="admin-style.css?v=6.4">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -46,6 +46,11 @@
           <i class="fa-solid fa-desktop"></i>
           <span>Courses</span>
           <span class="nav-badge" id="courseCountBadge">0</span>
+        </a>
+        <a href="#batches" class="nav-item" data-view="batches" id="nav-batches">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Batches</span>
+          <span class="nav-badge" id="batchCountBadge">0</span>
         </a>
         <a href="#inbox" class="nav-item" data-view="inbox" id="nav-inbox">
           <i class="fa-solid fa-inbox"></i>
@@ -253,6 +258,23 @@
             </div>
 
             <div class="view-actions">
+              <div class="batch-action-menu" id="batchActionMenu">
+                <button class="btn btn-primary" type="button" id="btnCreateBatch" aria-haspopup="menu" aria-expanded="false">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>Create Batch</span>
+                  <i class="fa-solid fa-chevron-down batch-action-chevron"></i>
+                </button>
+                <div class="batch-action-dropdown" id="batchActionDropdown" role="menu">
+                  <button type="button" class="batch-action-option" id="btnCreateNewBatch" role="menuitem">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create New</span>
+                  </button>
+                  <button type="button" class="batch-action-option" id="btnAddToExistingBatch" role="menuitem">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Add to Existing</span>
+                  </button>
+                </div>
+              </div>
               <button class="btn btn-success" id="btnBulkMarkCompleted" disabled title="Mark selected students as Course Completed">
                 <i class="fa-solid fa-certificate"></i>
                 <span id="bulkMarkCompletedLabel">Mark as Completed</span>
@@ -295,6 +317,24 @@
                   <i class="fa-solid fa-rotate-left"></i> Reset Filters
                 </button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= BATCHES VIEW ================= -->
+        <section class="view-section" id="view-batches">
+          <div class="view-header-bar">
+            <div>
+              <h2 class="inbox-heading">Student Batches</h2>
+              <p class="inbox-subtitle">Review batch members and complete a batch to generate student certificates.</p>
+            </div>
+          </div>
+          <div class="batches-grid" id="batchesGrid"></div>
+          <div class="dashboard-card" id="batchesEmptyState" style="display:none">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fa-solid fa-layer-group"></i></div>
+              <h4>No Batches Yet</h4>
+              <p>Select students, then use Create Batch to organize them.</p>
             </div>
           </div>
         </section>
@@ -1155,6 +1195,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=6.8"></script>
+  <script src="admin-script.js?v=6.9"></script>
 </body>
 </html>

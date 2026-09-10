@@ -10,7 +10,8 @@ const COLLECTIONS = {
   STUDENTS: 'students',
   AUTH_TOKEN: 'auth_token',
   COUNTERS: 'counters',
-  MESSAGES: 'messages'
+  MESSAGES: 'messages',
+  BATCHES: 'batches'
 };
 
 async function getNextStudentId(db, ownerEmail) {
@@ -257,13 +258,16 @@ export default async function handler(req, res) {
       }
 
       const includeAdminData = Boolean(req.query.ownerEmail || req.query.admin === '1');
-      let [profileDoc, coursesList, studentsList, authTokenDoc, messagesList] = await Promise.all([
+      let [profileDoc, coursesList, studentsList, authTokenDoc, messagesList, batchesList] = await Promise.all([
         db.collection(COLLECTIONS.PROFILE).findOne({ ownerEmail }, { projection: { _id: 0 } }),
         db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).toArray(),
         db.collection(COLLECTIONS.STUDENTS).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ _id: -1 }).toArray(),
         db.collection(COLLECTIONS.AUTH_TOKEN).findOne({ ownerEmail }, { projection: { _id: 0 } }),
         includeAdminData
           ? db.collection(COLLECTIONS.MESSAGES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray()
+          : Promise.resolve([]),
+        includeAdminData
+          ? db.collection(COLLECTIONS.BATCHES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray()
           : Promise.resolve([])
       ]);
 
@@ -329,6 +333,7 @@ export default async function handler(req, res) {
           courses: Array.isArray(coursesList) ? coursesList : [],
           students: Array.isArray(studentsList) ? studentsList : [],
           messages: includeAdminData && Array.isArray(messagesList) ? messagesList : [],
+          batches: includeAdminData && Array.isArray(batchesList) ? batchesList : [],
           // Authentication codes are never included in academy-slug responses
           // consumed by public websites.
           authToken: includeAdminData ? (authTokenDoc || null) : null
@@ -577,6 +582,18 @@ export default async function handler(req, res) {
           return res.status(200).json({ success: true, modifiedCount: result.modifiedCount });
         }
 
+        case 'save_batch': {
+          const batch = payload?.batch || {};
+          const name = String(batch.name || '').trim().slice(0, 100);
+          const studentIds = [...new Set(Array.isArray(batch.studentIds) ? batch.studentIds.map(String) : [])];
+          if (!name || !studentIds.length) return res.status(400).json({ success: false, error: 'A batch name and students are required.' });
+          const validStudents = await db.collection(COLLECTIONS.STUDENTS).countDocuments({ ownerEmail, id: { $in: studentIds } });
+          if (validStudents !== studentIds.length) return res.status(400).json({ success: false, error: 'One or more students are invalid.' });
+          const savedBatch = { ...batch, id: String(batch.id || randomUUID()), name, studentIds, ownerEmail, status: batch.status === 'Completed' ? 'Completed' : 'Active', createdAt: batch.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+          await db.collection(COLLECTIONS.BATCHES).updateOne({ id: savedBatch.id, ownerEmail }, { $set: savedBatch }, { upsert: true });
+          return res.status(200).json({ success: true, batch: savedBatch });
+        }
+
         case 'mark_message_read': {
           const messageId = String(payload?.messageId || '').trim();
           if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
@@ -623,7 +640,8 @@ export default async function handler(req, res) {
         case 'clear_all': {
           await Promise.all([
             db.collection(COLLECTIONS.COURSES).deleteMany({ ownerEmail }),
-            db.collection(COLLECTIONS.STUDENTS).deleteMany({ ownerEmail })
+            db.collection(COLLECTIONS.STUDENTS).deleteMany({ ownerEmail }),
+            db.collection(COLLECTIONS.BATCHES).deleteMany({ ownerEmail })
           ]);
           return res.status(200).json({ success: true, message: `All student and course records cleared for ${ownerEmail}` });
         }

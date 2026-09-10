@@ -10,6 +10,7 @@
 const STORAGE_KEYS = {
   COURSES: 'educore_academy_courses',
   STUDENTS: 'educore_academy_students',
+  BATCHES: 'educore_academy_batches',
   MESSAGES: 'educore_academy_messages',
   AUTH_TOKEN: 'educore_academy_auth_token',
   SESSION: 'educore_admin_session',
@@ -102,6 +103,7 @@ class AcademyStore {
     this.courses = [];
     this.students = [];
     this.messages = [];
+    this.batches = [];
     this.init();
   }
 
@@ -113,6 +115,7 @@ class AcademyStore {
     const rawCourses = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.COURSES));
     const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
     const rawMessages = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.MESSAGES));
+    const rawBatches = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.BATCHES));
 
     if (rawCourses) {
       try {
@@ -154,6 +157,7 @@ class AcademyStore {
         this.messages = [];
       }
     }
+    try { this.batches = JSON.parse(rawBatches || '[]') || []; } catch { this.batches = []; }
   }
 
   // Asynchronously synchronize with MongoDB Multi-Tenant Cloud Storage (/api/data)
@@ -163,7 +167,7 @@ class AcademyStore {
       if (!response.ok) return false;
       const json = await response.json();
       if (json && json.success && json.data) {
-        const { profile, courses, students, messages, authToken } = json.data;
+        const { profile, courses, students, messages, batches, authToken } = json.data;
 
         if (Array.isArray(courses)) {
           this.courses = courses;
@@ -181,6 +185,10 @@ class AcademyStore {
         if (Array.isArray(messages)) {
           this.messages = messages;
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
+        }
+        if (Array.isArray(batches)) {
+          this.batches = batches;
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
         }
 
         if (profile) {
@@ -233,6 +241,18 @@ class AcademyStore {
 
   getAllMessages() {
     return this.messages;
+  }
+
+  getAllBatches() { return this.batches; }
+
+  async saveBatch(batch) {
+    const result = await this.syncToCloud('save_batch', { batch });
+    if (!result?.success || !result.batch) throw new Error('Batch could not be saved.');
+    const index = this.batches.findIndex(item => item.id === result.batch.id);
+    if (index >= 0) this.batches[index] = result.batch;
+    else this.batches.unshift(result.batch);
+    localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
+    return result.batch;
   }
 
   markMessageRead(messageId) {
@@ -585,6 +605,11 @@ class UIController {
     this.adminStudentStatusFilterMenu = document.getElementById('adminStudentStatusFilterMenu');
     this.studentStatusFilter = document.getElementById('studentStatusFilter');
 
+    this.batchActionMenu = document.getElementById('batchActionMenu');
+    this.btnCreateBatch = document.getElementById('btnCreateBatch');
+    this.batchActionDropdown = document.getElementById('batchActionDropdown');
+    this.btnCreateNewBatch = document.getElementById('btnCreateNewBatch');
+    this.btnAddToExistingBatch = document.getElementById('btnAddToExistingBatch');
     this.btnBulkMarkCompleted = document.getElementById('btnBulkMarkCompleted');
     this.bulkMarkCompletedLabel = document.getElementById('bulkMarkCompletedLabel');
     this.btnAddStudent = document.getElementById('btnAddStudent');
@@ -607,6 +632,9 @@ class UIController {
     this.inboxList = document.getElementById('inboxList');
     this.inboxEmptyState = document.getElementById('inboxEmptyState');
     this.btnRefreshInbox = document.getElementById('btnRefreshInbox');
+    this.batchCountBadge = document.getElementById('batchCountBadge');
+    this.batchesGrid = document.getElementById('batchesGrid');
+    this.batchesEmptyState = document.getElementById('batchesEmptyState');
 
     // Modals - Student (Full fields aligned with registration portal)
     this.studentModal = document.getElementById('studentModal');
@@ -708,6 +736,7 @@ class UIController {
     this.btnCloseDetailsBtn = document.getElementById('btnCloseDetailsBtn');
     this.btnEditFromDetails = document.getElementById('btnEditFromDetails');
     this.currentViewingStudentId = null;
+    this.completingBatchId = null;
 
     // Modals - Course Completion
     this.completionModal = document.getElementById('completionModal');
@@ -1112,6 +1141,43 @@ class UIController {
       this.btnBulkMarkCompleted.addEventListener('click', () => this.handleBulkMarkCompleted());
     }
 
+    if (this.btnCreateBatch && this.batchActionMenu) {
+      this.btnCreateBatch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = !this.batchActionMenu.classList.contains('open');
+        this.closeAllAdminDropdowns(this.batchActionMenu);
+        this.batchActionMenu.classList.toggle('open', willOpen);
+        this.btnCreateBatch.setAttribute('aria-expanded', String(willOpen));
+        if (willOpen) this.btnCreateNewBatch?.focus();
+      });
+    }
+
+    this.batchesGrid?.addEventListener('click', (e) => {
+      const button = e.target.closest('[data-batch-action]');
+      if (!button) return;
+      const batch = store.getAllBatches().find(item => item.id === button.dataset.batchId);
+      if (!batch) return;
+      if (button.dataset.batchAction === 'complete') {
+        this.selectedStudentIds = new Set((batch.studentIds || []).filter(id => store.getStudentById(id)));
+        this.handleBulkMarkCompleted(batch.id);
+      }
+      if (button.dataset.batchAction === 'complete') {
+        this.selectedStudentIds = new Set(batch.studentIds || []);
+        this.handleBulkMarkCompleted(batch.id);
+      }
+    });
+
+    [this.btnCreateNewBatch, this.btnAddToExistingBatch].forEach((option, index) => {
+      option?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        this.batchActionMenu?.classList.remove('open');
+        this.btnCreateBatch?.setAttribute('aria-expanded', 'false');
+        this.btnCreateBatch?.focus();
+        if (index === 0) await this.handleCreateNewBatch();
+        else await this.handleAddToExistingBatch();
+      });
+    });
+
     // Select All Checkbox Handler
     if (this.selectAllStudentsCheckbox) {
       this.selectAllStudentsCheckbox.addEventListener('change', (e) => this.handleSelectAllStudents(e.target.checked));
@@ -1311,6 +1377,9 @@ class UIController {
     } else if (viewName === 'courses') {
       this.pageTitle.textContent = 'Course Management';
       this.pageSubtitle.textContent = 'Curate academy courses, durations, and syllabus details';
+    } else if (viewName === 'batches') {
+      this.pageTitle.textContent = 'Batch Management';
+      this.pageSubtitle.textContent = 'Organize students and process batch certificates';
     } else if (viewName === 'inbox') {
       this.pageTitle.textContent = 'Inbox';
       this.pageSubtitle.textContent = 'Messages received from your public website';
@@ -1411,6 +1480,7 @@ class UIController {
     this.renderDashboardView();
     this.renderStudentsView();
     this.renderCoursesView();
+    this.renderBatchesView();
     this.renderInboxView();
   }
 
@@ -1690,6 +1760,67 @@ class UIController {
     }).join('');
   }
 
+  renderBatchesView() {
+    const batches = store.getAllBatches();
+    if (this.batchCountBadge) this.batchCountBadge.textContent = batches.length;
+    if (!this.batchesGrid || !this.batchesEmptyState) return;
+    this.batchesEmptyState.style.display = batches.length ? 'none' : 'block';
+    this.batchesGrid.innerHTML = batches.map(batch => {
+      const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
+      const isCompleted = batch.status === 'Completed';
+      return `<article class="batch-card">
+        <div class="batch-card-header">
+          <div><h3>${escapeHtml(batch.name)}</h3><span class="status-badge ${isCompleted ? 'status-completed' : 'status-active'}">${isCompleted ? 'Completed' : 'Active'}</span></div>
+          <strong>${members.length} Student${members.length === 1 ? '' : 's'}</strong>
+        </div>
+        <div class="batch-members">${members.length ? members.map(student => `<div class="batch-member"><span class="avatar-sm">${escapeHtml(getInitials(student.name || student.fullName))}</span><span><strong>${escapeHtml(student.name || student.fullName)}</strong><small>${escapeHtml(student.id)}</small></span></div>`).join('') : '<p class="text-muted">No students in this batch.</p>'}</div>
+        <div class="batch-card-footer">
+          <span>Created ${formatDate(batch.createdAt)}</span>
+          <button class="btn btn-success btn-sm" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${isCompleted || !members.length ? 'disabled' : ''}><i class="fa-solid fa-certificate"></i> ${isCompleted ? 'Completed' : 'Mark Batch as Completed'}</button>
+        </div>
+      </article>`;
+    }).join('');
+  }
+
+  async handleCreateNewBatch() {
+    const studentIds = Array.from(this.selectedStudentIds);
+    if (!studentIds.length) {
+      this.showToast('Select Students', 'Select one or more students before creating a batch.', 'error');
+      return;
+    }
+    const name = prompt('Enter a name for the new batch:')?.trim();
+    if (!name) return;
+    try {
+      await store.saveBatch({ name, studentIds, status: 'Active' });
+      this.selectedStudentIds.clear();
+      this.render();
+      this.switchView('batches');
+      this.showToast('Batch Created', `${name} was created successfully.`, 'success');
+    } catch (error) {
+      this.showToast('Batch Not Created', error.message, 'error');
+    }
+  }
+
+  async handleAddToExistingBatch() {
+    const studentIds = Array.from(this.selectedStudentIds);
+    const batches = store.getAllBatches().filter(batch => batch.status !== 'Completed');
+    if (!studentIds.length) return this.showToast('Select Students', 'Select one or more students to add.', 'error');
+    if (!batches.length) return this.showToast('No Active Batch', 'Create a new batch first.', 'error');
+    const choices = batches.map((batch, index) => `${index + 1}. ${batch.name}`).join('\n');
+    const selected = Number(prompt(`Choose a batch number:\n${choices}`));
+    const batch = batches[selected - 1];
+    if (!batch) return;
+    try {
+      await store.saveBatch({ ...batch, studentIds: [...new Set([...(batch.studentIds || []), ...studentIds])] });
+      this.selectedStudentIds.clear();
+      this.render();
+      this.switchView('batches');
+      this.showToast('Students Added', `Students were added to ${batch.name}.`, 'success');
+    } catch (error) {
+      this.showToast('Students Not Added', error.message, 'error');
+    }
+  }
+
   renderInboxView() {
     if (!this.inboxList || !this.inboxEmptyState) return;
     const messages = store.getAllMessages();
@@ -1786,13 +1917,15 @@ class UIController {
       this.adminStudentCourseDropdown,
       this.adminStudentStatusDropdown,
       this.adminStudentCourseFilterDropdown,
-      this.adminStudentStatusFilterDropdown
+      this.adminStudentStatusFilterDropdown,
+      this.batchActionMenu
     ];
     all.forEach(dropdown => {
       if (dropdown && dropdown !== except) {
         dropdown.classList.remove('open');
         const trigger = dropdown.querySelector('.custom-select-trigger');
         if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        if (dropdown === this.batchActionMenu) this.btnCreateBatch?.setAttribute('aria-expanded', 'false');
       }
     });
   }
@@ -2411,10 +2544,11 @@ class UIController {
     }
   }
 
-  handleBulkMarkCompleted() {
+  handleBulkMarkCompleted(batchId = null) {
     const selectedCount = this.selectedStudentIds.size;
     if (selectedCount === 0) return;
 
+    this.completingBatchId = batchId;
     this.completionForm.reset();
     this.completionModalTitle.textContent = selectedCount === 1 ? 'Complete Student Course' : 'Complete Student Courses';
     this.completionStudentCount.textContent = selectedCount === 1
@@ -2424,7 +2558,7 @@ class UIController {
     window.setTimeout(() => this.completionStartMonth.focus(), 100);
   }
 
-  handleCompletionSubmit(e) {
+  async handleCompletionSubmit(e) {
     e.preventDefault();
     const studentIds = Array.from(this.selectedStudentIds);
     if (studentIds.length === 0) {
@@ -2455,6 +2589,11 @@ class UIController {
       completionDate: `${endMonth}-01`,
       grade
     });
+    if (this.completingBatchId) {
+      const batch = store.getAllBatches().find(item => item.id === this.completingBatchId);
+      if (batch) await store.saveBatch({ ...batch, status: 'Completed', completedAt: new Date().toISOString(), certificateIssueDate: issueDate, grade });
+    }
+    this.completingBatchId = null;
     this.closeModal(this.completionModal);
     this.showToast('Course Completed', `Successfully marked ${studentIds.length} student(s) as Completed. Certificates are now available.`, 'success');
     this.selectedStudentIds.clear();
@@ -2846,7 +2985,7 @@ document.addEventListener('DOMContentLoaded', () => {
   app = new UIController();
   window.app = app;
   const initialHash = window.location.hash.replace('#', '');
-  if (['students', 'courses', 'inbox'].includes(initialHash)) {
+  if (['students', 'courses', 'batches', 'inbox'].includes(initialHash)) {
     app.switchView(initialHash, false);
   }
 });
