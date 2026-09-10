@@ -203,7 +203,8 @@ class AcademyStore {
           }
         })
       });
-      return response.ok;
+      if (!response.ok) return false;
+      return await response.json().catch(() => false);
     } catch (e) {
       return false;
     }
@@ -294,15 +295,12 @@ class AcademyStore {
     return this.students.find(s => s.id === id);
   }
 
-  addStudent(studentData) {
-    const newId = `STU-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newStudent = {
-      id: newId,
-      ...studentData
-    };
+  async addStudent(studentData) {
+    const result = await this.syncToCloud('add_student', { student: studentData });
+    if (!result?.success || !result?.student) throw new Error('The student ID could not be generated.');
+    const newStudent = result.student;
     this.students.unshift(newStudent);
     this.save();
-    this.syncToCloud('add_student', { student: newStudent });
     return newStudent;
   }
 
@@ -1864,7 +1862,7 @@ class UIController {
     this.openModal(this.studentModal);
   }
 
-  handleStudentFormSubmit(e) {
+  async handleStudentFormSubmit(e) {
     e.preventDefault();
 
     const id = this.studentIdInput.value;
@@ -1961,8 +1959,13 @@ class UIController {
       store.updateStudent(id, payload);
       this.showToast('Student Updated', `${name}'s records have been updated.`, 'success');
     } else {
-      const newStudent = store.addStudent(payload);
-      this.showToast('Student Added', `${newStudent.name} (ID: ${newStudent.id}) registered successfully.`, 'success');
+      try {
+        const newStudent = await store.addStudent(payload);
+        this.showToast('Student Added', `${newStudent.name} (ID: ${newStudent.id}) registered successfully.`, 'success');
+      } catch (error) {
+        this.showToast('Registration Error', error.message || 'The student could not be added.', 'error');
+        return;
+      }
     }
 
     this.closeModal(this.studentModal);

@@ -7,8 +7,24 @@ const COLLECTIONS = {
   PROFILE: 'profile',
   COURSES: 'courses',
   STUDENTS: 'students',
-  AUTH_TOKEN: 'auth_token'
+  AUTH_TOKEN: 'auth_token',
+  COUNTERS: 'counters'
 };
+
+async function getNextStudentId(db, ownerEmail) {
+  const counter = await db.collection(COLLECTIONS.COUNTERS).findOneAndUpdate(
+    { _id: `student-id:${ownerEmail}` },
+    [{
+      $set: {
+        sequence: {
+          $add: [{ $max: [{ $ifNull: ['$sequence', 2009] }, 2009] }, 1]
+        }
+      }
+    }],
+    { upsert: true, returnDocument: 'after' }
+  );
+  return `DCC/SMP/${String(counter.sequence).padStart(5, '0')}`;
+}
 
 const COURSE_SEED_VERSION = 2;
 function verifyImageKitStudentPhoto(student) {
@@ -394,8 +410,11 @@ export default async function handler(req, res) {
             });
           }
 
+          const studentId = await getNextStudentId(db, registrationOwnerEmail);
           const normalizedStudent = {
             ...student,
+            id: studentId,
+            certificateSerial: studentId,
             name: studentName,
             fullName: studentName,
             ownerEmail: registrationOwnerEmail,
@@ -478,8 +497,11 @@ export default async function handler(req, res) {
           if (!student || !studentName || !student?.phone) {
             return res.status(400).json({ success: false, error: 'Invalid student registration payload' });
           }
+          const studentId = await getNextStudentId(db, ownerEmail);
           const normalizedStudent = {
             ...student,
+            id: studentId,
+            certificateSerial: studentId,
             name: studentName,
             fullName: studentName,
             ownerEmail
