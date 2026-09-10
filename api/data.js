@@ -205,7 +205,7 @@ export default async function handler(req, res) {
     let email = (queryEmail || '').toLowerCase().trim();
     let slug = (querySlug || '').toLowerCase().trim();
 
-    // Check host header for custom subdomains (e.g. prantik.prantikphotography.com)
+    // Resolve legacy tenant-style hostnames when a slug was not supplied.
     if (!slug && reqHost) {
       const parts = reqHost.toLowerCase().split('.');
       if (parts.length >= 3) {

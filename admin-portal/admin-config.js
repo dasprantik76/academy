@@ -1,13 +1,13 @@
 /**
  * Central Admin Portal configuration.
- * Add each independently deployed public academy URL to publicSites.
+ * Canonical production URLs for the Diganta websites.
  */
 window.ADMIN_PORTAL_CONFIG = Object.freeze({
-  defaultPublicSiteUrl: 'https://digantacomputer.vercel.app',
+  defaultPublicSiteUrl: 'https://diganta.pixelsetu.com',
   authorizedAdminEmails: Object.freeze([
     'dasprantik76@gmail.com'
   ]),
   publicSites: Object.freeze({
-    prantik: 'https://digantacomputer.vercel.app'
+    prantik: 'https://diganta.pixelsetu.com'
   })
 });

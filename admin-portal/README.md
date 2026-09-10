@@ -34,12 +34,12 @@ Example:
 
 ```js
 window.ADMIN_PORTAL_CONFIG = Object.freeze({
-  defaultPublicSiteUrl: 'https://diganta.vercel.app',
+  defaultPublicSiteUrl: 'https://diganta.pixelsetu.com',
   authorizedAdminEmails: Object.freeze([
     'owner@example.com'
   ]),
   publicSites: Object.freeze({
-    diganta: 'https://diganta.vercel.app'
+    prantik: 'https://diganta.pixelsetu.com'
   })
 });
 ```

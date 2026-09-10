@@ -514,25 +514,14 @@ class UIController {
   }
 
   getRootDomain() {
-    const hostname = window.location.hostname.toLowerCase();
-    const parts = hostname.split('.');
-    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
-      return parts.slice(-2).join('.');
-    }
-    return 'prantikphotography.com';
+    return 'pixelsetu.com';
   }
 
   getPublicUrlForSlug(slug) {
     const configuredSites = window.ADMIN_PORTAL_CONFIG?.publicSites || {};
-    if (configuredSites[slug]) return configuredSites[slug];
-
-    const hostname = window.location.hostname.toLowerCase();
-    const parts = hostname.split('.');
-    if (parts.length >= 2 && !hostname.includes('localhost') && !hostname.endsWith('.vercel.app')) {
-      const rootDomain = parts.slice(-2).join('.');
-      return `https://${slug}.${rootDomain}`;
-    }
-    return `${window.location.origin}/?academy=${encodeURIComponent(slug)}`;
+    return configuredSites[slug]
+      || window.ADMIN_PORTAL_CONFIG?.defaultPublicSiteUrl
+      || 'https://diganta.pixelsetu.com';
   }
 
   updatePublicSiteLink() {
