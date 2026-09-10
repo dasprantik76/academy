@@ -2019,7 +2019,7 @@ class UIController {
         </div>
         <div class="profile-meta-card">
           <span class="label"><i class="fa-solid fa-id-card"></i> Aadhar Number</span>
-          <span class="value">${escapeHtml(student.aadhar || '—')}</span>
+          <span class="value">${escapeHtml(formatAadhar(student.aadhar))}</span>
         </div>
         <div class="profile-meta-card">
           <span class="label"><i class="fa-regular fa-envelope"></i> Email Address</span>
@@ -2505,6 +2505,12 @@ function formatDate(dateString) {
   } catch (e) {
     return dateString;
   }
+}
+
+function formatAadhar(value) {
+  const digits = String(value || '').replace(/\D/g, '').slice(0, 12);
+  if (!digits) return '—';
+  return (digits.match(/.{1,4}/g) || []).join('  ');
 }
 
 function escapeHtml(str) {
