@@ -41,13 +41,13 @@ export default async function handler(req, res) {
   const email = String(req.query?.email || '').trim().toLowerCase();
   const match = email.length <= 254 && email.match(EMAIL_PATTERN);
   if (!match) {
-    return res.status(400).json({ valid: false, error: 'Enter a valid email address, for example name@example.com.' });
+    return res.status(400).json({ valid: false, error: 'Please enter a valid email address.' });
   }
 
   const domain = match[1] + '.' + match[2];
   const valid = await domainAcceptsEmail(domain);
   if (!valid) {
-    return res.status(422).json({ valid: false, error: 'This email domain does not appear to accept email.' });
+    return res.status(422).json({ valid: false, error: 'Please enter a valid email address.' });
   }
   return res.status(200).json({ valid: true });
 }

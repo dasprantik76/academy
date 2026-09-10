@@ -936,6 +936,47 @@
   </div>
 
 
+  <!-- Complete Course Dialog -->
+  <div class="modal-backdrop" id="completionModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-certificate modal-icon"></i>
+          <h3 id="completionModalTitle">Complete Course</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseCompletionModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="completionForm">
+        <div class="modal-body">
+          <p class="field-hint" id="completionStudentCount"></p>
+          <div class="form-group">
+            <label for="completionIssueDate">Certificate Issue Date <span class="required">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-regular fa-calendar"></i>
+              <input type="date" id="completionIssueDate" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="completionGrade">Grade <span class="required">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-award"></i>
+              <input type="text" id="completionGrade" maxlength="30" placeholder="For example: A+" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelCompletion">Cancel</button>
+          <button type="submit" class="btn btn-success" id="btnConfirmCompletion">
+            <i class="fa-solid fa-check"></i> Mark as Completed
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
   <!-- Confirmation Dialog Modal -->
   <div class="modal-backdrop" id="confirmModal">
     <div class="modal-window modal-sm">
@@ -1071,6 +1112,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=6.2"></script>
+  <script src="admin-script.js?v=6.3"></script>
 </body>
 </html>

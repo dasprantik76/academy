@@ -688,6 +688,16 @@ class UIController {
     this.btnEditFromDetails = document.getElementById('btnEditFromDetails');
     this.currentViewingStudentId = null;
 
+    // Modals - Course Completion
+    this.completionModal = document.getElementById('completionModal');
+    this.completionForm = document.getElementById('completionForm');
+    this.completionModalTitle = document.getElementById('completionModalTitle');
+    this.completionStudentCount = document.getElementById('completionStudentCount');
+    this.completionIssueDate = document.getElementById('completionIssueDate');
+    this.completionGrade = document.getElementById('completionGrade');
+    this.btnCloseCompletionModal = document.getElementById('btnCloseCompletionModal');
+    this.btnCancelCompletion = document.getElementById('btnCancelCompletion');
+
     // Modals - Confirmation
     this.confirmModal = document.getElementById('confirmModal');
     this.confirmTitle = document.getElementById('confirmTitle');
@@ -1197,6 +1207,10 @@ class UIController {
         this.openStudentModal(this.currentViewingStudentId);
       }
     });
+
+    this.completionForm.addEventListener('submit', (e) => this.handleCompletionSubmit(e));
+    this.btnCloseCompletionModal.addEventListener('click', () => this.closeModal(this.completionModal));
+    this.btnCancelCompletion.addEventListener('click', () => this.closeModal(this.completionModal));
 
     this.btnCloseConfirmModal.addEventListener('click', () => this.closeModal(this.confirmModal));
     this.btnCancelConfirm.addEventListener('click', () => this.closeModal(this.confirmModal));
@@ -2315,16 +2329,40 @@ class UIController {
     const selectedCount = this.selectedStudentIds.size;
     if (selectedCount === 0) return;
 
-    this.promptConfirmation({
-      title: 'Mark Course as Completed?',
-      message: `Are you sure you want to mark ${selectedCount} student(s) as "Completed"? Their academic certificates will instantly become available for verification and download on the public portal.`,
-      action: () => {
-        store.bulkUpdateStudents(Array.from(this.selectedStudentIds), { status: 'Completed' });
-        this.showToast('Course Completed', `Successfully marked ${selectedCount} student(s) as Completed. Certificates are now available.`, 'success');
-        this.selectedStudentIds.clear();
-        this.render();
-      }
+    this.completionForm.reset();
+    this.completionModalTitle.textContent = selectedCount === 1 ? 'Complete Student Course' : 'Complete Student Courses';
+    this.completionStudentCount.textContent = selectedCount === 1
+      ? 'Enter the certificate details for the selected student.'
+      : `These certificate details will be applied to all ${selectedCount} selected students.`;
+    this.openModal(this.completionModal);
+    window.setTimeout(() => this.completionIssueDate.focus(), 100);
+  }
+
+  handleCompletionSubmit(e) {
+    e.preventDefault();
+    const studentIds = Array.from(this.selectedStudentIds);
+    if (studentIds.length === 0) {
+      this.closeModal(this.completionModal);
+      return;
+    }
+
+    const issueDate = this.completionIssueDate.value;
+    const grade = this.completionGrade.value.trim();
+    if (!issueDate || !grade) {
+      this.completionForm.reportValidity();
+      return;
+    }
+
+    store.bulkUpdateStudents(studentIds, {
+      status: 'Completed',
+      certificateIssueDate: issueDate,
+      completionDate: issueDate,
+      grade
     });
+    this.closeModal(this.completionModal);
+    this.showToast('Course Completed', `Successfully marked ${studentIds.length} student(s) as Completed. Certificates are now available.`, 'success');
+    this.selectedStudentIds.clear();
+    this.render();
   }
 
   // ==========================================================================
