@@ -1740,6 +1740,29 @@ input[data-capitalize="true"] {
   align-items: center;
 }
 
+.completion-period-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.completion-period-separator {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+@media (max-width: 560px) {
+  .completion-period-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .completion-period-separator {
+    display: none;
+  }
+}
+
 /* Custom Select Dropdown (opens directly underneath the input box) */
 .custom-select-container {
   position: relative;

@@ -693,6 +693,8 @@ class UIController {
     this.completionForm = document.getElementById('completionForm');
     this.completionModalTitle = document.getElementById('completionModalTitle');
     this.completionStudentCount = document.getElementById('completionStudentCount');
+    this.completionStartMonth = document.getElementById('completionStartMonth');
+    this.completionEndMonth = document.getElementById('completionEndMonth');
     this.completionIssueDate = document.getElementById('completionIssueDate');
     this.completionGrade = document.getElementById('completionGrade');
     this.btnCloseCompletionModal = document.getElementById('btnCloseCompletionModal');
@@ -2335,7 +2337,7 @@ class UIController {
       ? 'Enter the certificate details for the selected student.'
       : `These certificate details will be applied to all ${selectedCount} selected students.`;
     this.openModal(this.completionModal);
-    window.setTimeout(() => this.completionIssueDate.focus(), 100);
+    window.setTimeout(() => this.completionStartMonth.focus(), 100);
   }
 
   handleCompletionSubmit(e) {
@@ -2346,17 +2348,27 @@ class UIController {
       return;
     }
 
+    const startMonth = this.completionStartMonth.value;
+    const endMonth = this.completionEndMonth.value;
     const issueDate = this.completionIssueDate.value;
     const grade = this.completionGrade.value.trim();
-    if (!issueDate || !grade) {
+    if (!startMonth || !endMonth || !issueDate || !grade) {
       this.completionForm.reportValidity();
+      return;
+    }
+    if (endMonth < startMonth) {
+      this.completionEndMonth.setCustomValidity('The ending month must be the same as or later than the starting month.');
+      this.completionEndMonth.reportValidity();
+      this.completionEndMonth.setCustomValidity('');
       return;
     }
 
     store.bulkUpdateStudents(studentIds, {
       status: 'Completed',
+      certificateCourseStartDate: `${startMonth}-01`,
+      certificateCourseEndDate: `${endMonth}-01`,
       certificateIssueDate: issueDate,
-      completionDate: issueDate,
+      completionDate: `${endMonth}-01`,
       grade
     });
     this.closeModal(this.completionModal);
