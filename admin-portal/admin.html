@@ -12,7 +12,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=6.4">
+  <link rel="stylesheet" href="admin-style.css?v=6.10">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -121,9 +121,6 @@
               <div class="stat-info">
                 <span class="stat-label">Total Students</span>
                 <h3 class="stat-value" id="statTotalStudents">0</h3>
-                <span class="stat-trend positive" id="statActiveStudentsText">
-                  <i class="fa-solid fa-circle-check"></i> <span id="statActiveStudentsCount">0</span> Active
-                </span>
               </div>
             </div>
 
@@ -134,43 +131,25 @@
               <div class="stat-info">
                 <span class="stat-label">Total Courses</span>
                 <h3 class="stat-value" id="statTotalCourses">0</h3>
-                <span class="stat-trend positive">
-                  <i class="fa-solid fa-bolt"></i> <span id="statActiveCoursesCount">0</span> Available
-                </span>
               </div>
             </div>
           </div>
 
           <!-- Dashboard Highlights Section -->
           <div class="dashboard-grid">
-            <!-- Recent Students Table -->
+            <!-- Recent Inbox Messages -->
             <div class="dashboard-card span-2">
               <div class="card-header">
                 <div>
-                  <h3 class="card-title">Recent Student Enrollments</h3>
-                  <p class="card-subtitle">Latest learners enrolled in academy programs</p>
+                  <h3 class="card-title">Recent Inbox Messages</h3>
+                  <p class="card-subtitle">Latest enquiries received from the public website</p>
                 </div>
-                <button class="btn btn-sm btn-outline" id="btnViewAllStudents">
-                  View All Students <i class="fa-solid fa-arrow-right"></i>
+                <button class="btn btn-sm btn-outline" id="btnViewInbox">
+                  View Inbox <i class="fa-solid fa-arrow-right"></i>
                 </button>
               </div>
               <div class="card-body">
-                <div class="table-responsive">
-                  <table class="data-table">
-                    <thead>
-                      <tr>
-                        <th>Student</th>
-                        <th>Email</th>
-                        <th>Enrolled Courses</th>
-                        <th>Join Date</th>
-                        <th>Course Status</th>
-                      </tr>
-                    </thead>
-                    <tbody id="recentStudentsTableBody">
-                      <!-- Rendered dynamically -->
-                    </tbody>
-                  </table>
-                </div>
+                <div class="dashboard-inbox-list" id="dashboardInboxList"></div>
               </div>
             </div>
 
@@ -205,7 +184,7 @@
                     </span>
                     <strong class="countdown-timer" id="authCountdownTimer">05:00:00</strong>
                   </div>
-                  <div class="auth-progress-bar">
+                  <div class="auth-progress-bar" role="progressbar" aria-label="Authentication code validity remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
                     <div class="auth-progress-fill" id="authProgressFill" style="width: 100%;"></div>
                   </div>
                 </div>
@@ -1237,6 +1216,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=6.10"></script>
+  <script src="admin-script.js?v=6.14"></script>
 </body>
 </html>

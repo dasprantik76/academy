@@ -577,11 +577,9 @@ class UIController {
 
     // Dashboard Elements
     this.statTotalStudents = document.getElementById('statTotalStudents');
-    this.statActiveStudentsCount = document.getElementById('statActiveStudentsCount');
     this.statTotalCourses = document.getElementById('statTotalCourses');
-    this.statActiveCoursesCount = document.getElementById('statActiveCoursesCount');
-    this.recentStudentsTableBody = document.getElementById('recentStudentsTableBody');
-    this.btnViewAllStudents = document.getElementById('btnViewAllStudents');
+    this.dashboardInboxList = document.getElementById('dashboardInboxList');
+    this.btnViewInbox = document.getElementById('btnViewInbox');
 
     // Authentication Code Elements
     this.authCodeDigits = document.getElementById('authCodeDigits');
@@ -1011,7 +1009,7 @@ class UIController {
     this.sidebarOverlay.addEventListener('click', () => this.closeSidebar());
 
     // Dashboard shortcuts
-    this.btnViewAllStudents.addEventListener('click', () => this.switchView('students'));
+    this.btnViewInbox?.addEventListener('click', () => this.switchView('inbox'));
     if (this.btnRefreshInbox) {
       this.btnRefreshInbox.addEventListener('click', async () => {
         this.btnRefreshInbox.disabled = true;
@@ -1562,67 +1560,34 @@ class UIController {
 
     // Dashboard Metric Cards (2 Cards)
     this.statTotalStudents.textContent = stats.totalStudents;
-    this.statActiveStudentsCount.textContent = stats.activeStudents;
     this.statTotalCourses.textContent = stats.totalCourses;
-    this.statActiveCoursesCount.textContent = stats.totalCourses;
   }
 
   // ==========================================================================
   // Render Dashboard
   // ==========================================================================
   renderDashboardView() {
-    const students = store.getAllStudents();
-    const courses = store.getAllCourses();
-
-    // 1. Recent 5 Students Table
-    const recentStudents = students.slice(0, 5);
-    if (recentStudents.length === 0) {
-      this.recentStudentsTableBody.innerHTML = `
-        <tr>
-          <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
-            <i class="fa-solid fa-user-graduate" style="font-size: 1.5rem; color: var(--text-subtle); margin-bottom: 0.5rem; display: block;"></i>
-            No students registered yet. Students register directly via the public portal.
-          </td>
-        </tr>
-      `;
-    } else {
-      this.recentStudentsTableBody.innerHTML = recentStudents.map(student => {
-        const initials = getInitials(student.name);
-        const gradient = getAvatarGradient(student.name);
-        const enrolledCourseNames = (student.enrolledCourseIds || []).map(cid => {
-          const c = courses.find(item => item.id === cid);
-          return c ? `<span class="badge-course-tag">${escapeHtml(c.title)}</span>` : '';
-        }).join('');
-
-        return `
-          <tr>
-            <td>
-              <div class="student-meta-cell">
-                <div class="student-avatar" style="background: ${gradient}">${initials}</div>
-                <div class="student-name-box">
-                  <strong>${escapeHtml(student.name)}</strong>
-                  <span>ID: ${escapeHtml(student.id)}</span>
-                </div>
-              </div>
-            </td>
-            <td>
-              <span class="contact-email">${escapeHtml(student.email)}</span>
-            </td>
-            <td>
-              ${enrolledCourseNames || '<span style="color: var(--text-subtle); font-size: 0.75rem;">None</span>'}
-            </td>
-            <td>${formatDate(student.joinDate)}</td>
-            <td>
-              <span class="badge ${getStatusBadgeClass(student.status)}">
-                <i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${escapeHtml(student.status)}
-              </span>
-            </td>
-          </tr>
-        `;
-      }).join('');
+    const messages = store.getAllMessages().slice(0, 3);
+    if (this.dashboardInboxList) {
+      this.dashboardInboxList.innerHTML = messages.length ? messages.map(item => `
+        <button type="button" class="dashboard-inbox-item${item.isRead ? '' : ' unread'}" onclick="window.app.switchView('inbox')">
+          <span class="inbox-sender-avatar">${escapeHtml(getInitials(item.name))}</span>
+          <span class="dashboard-inbox-content">
+            <strong>${escapeHtml(item.name || 'Website Visitor')}</strong>
+            <span>${escapeHtml(item.message || '')}</span>
+          </span>
+          <span class="dashboard-inbox-meta">
+            ${item.isRead ? '' : '<b>New</b>'}
+            <time>${escapeHtml(formatMessageDate(item.createdAt))}</time>
+          </span>
+        </button>
+      `).join('') : `
+        <div class="dashboard-inbox-empty">
+          <i class="fa-regular fa-envelope-open"></i>
+          <span>No website messages yet.</span>
+        </div>`;
     }
 
-    // 2. Render Authentication Code OTP Card
     this.renderAuthCode();
   }
 
@@ -2703,7 +2668,9 @@ class UIController {
     if (this.authProgressFill) {
       const AUTH_DURATION = 5 * 60 * 60 * 1000;
       const percent = (remainingMs / AUTH_DURATION) * 100;
-      this.authProgressFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+      const remainingPercent = Math.max(0, Math.min(100, percent));
+      this.authProgressFill.style.width = `${remainingPercent}%`;
+      this.authProgressFill.parentElement?.setAttribute('aria-valuenow', String(Math.round(remainingPercent)));
     }
 
     // When 5-hour countdown expires, automatically generate new 6-digit code
