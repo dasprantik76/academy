@@ -1,4 +1,4 @@
-/* ========================================================================== 
+/* ==========================================================================
    EduCore Academy - Admin Panel Design System
    Modern, Premium Vanilla CSS Stylesheet
    ========================================================================== */
@@ -1388,6 +1388,137 @@ html, body {
 /* ==========================================================================
    Empty States
    ========================================================================== */
+.inbox-heading {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 1.35rem;
+}
+
+.inbox-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.inbox-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.inbox-message-card {
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid #cbd5e1;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.inbox-message-card.unread {
+  border-left-color: var(--primary);
+  background: #f8faff;
+}
+
+.inbox-message-header,
+.inbox-sender,
+.inbox-message-actions {
+  display: flex;
+  align-items: center;
+}
+
+.inbox-message-header {
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.inbox-sender {
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.inbox-sender-avatar {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.inbox-sender h3 {
+  margin: 0 0 0.25rem;
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+.inbox-sender a {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.inbox-message-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.inbox-unread-status,
+.inbox-read-status {
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+}
+
+.inbox-unread-status { color: #4338ca; background: #e0e7ff; }
+.inbox-read-status { color: #475569; background: #f1f5f9; }
+
+.inbox-course {
+  width: fit-content;
+  margin-top: 1rem;
+  padding: 0.35rem 0.65rem;
+  color: #4338ca;
+  background: #eef2ff;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.inbox-message-text {
+  margin: 1rem 0;
+  color: var(--text-main);
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.inbox-message-actions {
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+@media (max-width: 600px) {
+  .inbox-message-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .inbox-message-meta {
+    justify-items: start;
+  }
+
+  .inbox-message-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
 .empty-state {
   padding: 3.5rem 2rem;
   text-align: center;

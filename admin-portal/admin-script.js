@@ -10,6 +10,7 @@
 const STORAGE_KEYS = {
   COURSES: 'educore_academy_courses',
   STUDENTS: 'educore_academy_students',
+  MESSAGES: 'educore_academy_messages',
   AUTH_TOKEN: 'educore_academy_auth_token',
   SESSION: 'educore_admin_session',
   ACADEMY_PROFILE: 'pixelsetu_academy_profile'
@@ -100,6 +101,7 @@ class AcademyStore {
     this.ownerEmail = (ownerEmail || 'dasprantik76@gmail.com').toLowerCase().trim();
     this.courses = [];
     this.students = [];
+    this.messages = [];
     this.init();
   }
 
@@ -110,6 +112,7 @@ class AcademyStore {
   init() {
     const rawCourses = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.COURSES));
     const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+    const rawMessages = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.MESSAGES));
 
     if (rawCourses) {
       try {
@@ -143,6 +146,14 @@ class AcademyStore {
     } else {
       this.students = [];
     }
+
+    if (rawMessages) {
+      try {
+        this.messages = JSON.parse(rawMessages) || [];
+      } catch (e) {
+        this.messages = [];
+      }
+    }
   }
 
   // Asynchronously synchronize with MongoDB Multi-Tenant Cloud Storage (/api/data)
@@ -152,7 +163,7 @@ class AcademyStore {
       if (!response.ok) return false;
       const json = await response.json();
       if (json && json.success && json.data) {
-        const { profile, courses, students, authToken } = json.data;
+        const { profile, courses, students, messages, authToken } = json.data;
 
         if (Array.isArray(courses)) {
           this.courses = courses;
@@ -165,6 +176,11 @@ class AcademyStore {
           localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this.students));
         } else if (this.students.length > 0) {
           this.syncToCloud('save_students', { students: this.students });
+        }
+
+        if (Array.isArray(messages)) {
+          this.messages = messages;
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
         }
 
         if (profile) {
@@ -213,6 +229,25 @@ class AcademyStore {
   save() {
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(this.students));
+  }
+
+  getAllMessages() {
+    return this.messages;
+  }
+
+  markMessageRead(messageId) {
+    const message = this.messages.find(item => item.id === messageId);
+    if (!message || message.isRead) return;
+    message.isRead = true;
+    message.readAt = new Date().toISOString();
+    localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
+    this.syncToCloud('mark_message_read', { messageId });
+  }
+
+  deleteMessage(messageId) {
+    this.messages = this.messages.filter(item => item.id !== messageId);
+    localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
+    this.syncToCloud('delete_message', { messageId });
   }
 
   clearAllData() {
@@ -526,6 +561,7 @@ class UIController {
     this.pageSubtitle = document.getElementById('pageSubtitle');
     this.studentCountBadge = document.getElementById('studentCountBadge');
     this.courseCountBadge = document.getElementById('courseCountBadge');
+    this.inboxUnreadBadge = document.getElementById('inboxUnreadBadge');
 
     // Sidebar Mobile Toggle & User Profile
     this.sidebar = document.getElementById('sidebar');
@@ -586,6 +622,11 @@ class UIController {
     this.coursesGrid = document.getElementById('coursesGrid');
     this.coursesEmptyState = document.getElementById('coursesEmptyState');
     this.btnResetCourseFilters = document.getElementById('btnResetCourseFilters');
+
+    // Inbox Elements
+    this.inboxList = document.getElementById('inboxList');
+    this.inboxEmptyState = document.getElementById('inboxEmptyState');
+    this.btnRefreshInbox = document.getElementById('btnRefreshInbox');
 
     // Modals - Student (Full fields aligned with registration portal)
     this.studentModal = document.getElementById('studentModal');
@@ -936,7 +977,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses'].includes(hash)) {
+      if (['dashboard', 'students', 'courses', 'inbox'].includes(hash)) {
         this.switchView(hash, false);
       }
     });
@@ -948,6 +989,13 @@ class UIController {
 
     // Dashboard shortcuts
     this.btnViewAllStudents.addEventListener('click', () => this.switchView('students'));
+    if (this.btnRefreshInbox) {
+      this.btnRefreshInbox.addEventListener('click', async () => {
+        this.btnRefreshInbox.disabled = true;
+        await store.fetchCloudData(() => this.render());
+        this.btnRefreshInbox.disabled = false;
+      });
+    }
     
     // Authentication Code Actions
     if (this.btnGenerateNewAuthCode) {
@@ -1283,6 +1331,9 @@ class UIController {
     } else if (viewName === 'courses') {
       this.pageTitle.textContent = 'Course Management';
       this.pageSubtitle.textContent = 'Curate academy courses, durations, and syllabus details';
+    } else if (viewName === 'inbox') {
+      this.pageTitle.textContent = 'Inbox';
+      this.pageSubtitle.textContent = 'Messages received from your public website';
     }
 
     this.render();
@@ -1380,6 +1431,7 @@ class UIController {
     this.renderDashboardView();
     this.renderStudentsView();
     this.renderCoursesView();
+    this.renderInboxView();
   }
 
   renderUserProfile() {
@@ -1435,6 +1487,11 @@ class UIController {
     // Sidebar Badges
     this.studentCountBadge.textContent = stats.totalStudents;
     this.courseCountBadge.textContent = stats.totalCourses;
+    const unreadMessages = store.getAllMessages().filter(message => !message.isRead).length;
+    if (this.inboxUnreadBadge) {
+      this.inboxUnreadBadge.textContent = unreadMessages;
+      this.inboxUnreadBadge.style.display = unreadMessages > 0 ? '' : 'none';
+    }
 
     // Dashboard Metric Cards (2 Cards)
     this.statTotalStudents.textContent = stats.totalStudents;
@@ -1651,6 +1708,53 @@ class UIController {
         </div>
       `;
     }).join('');
+  }
+
+  renderInboxView() {
+    if (!this.inboxList || !this.inboxEmptyState) return;
+    const messages = store.getAllMessages();
+    this.inboxEmptyState.style.display = messages.length === 0 ? 'block' : 'none';
+    this.inboxList.style.display = messages.length === 0 ? 'none' : 'grid';
+    this.inboxList.innerHTML = messages.map(item => `
+      <article class="inbox-message-card${item.isRead ? '' : ' unread'}">
+        <div class="inbox-message-header">
+          <div class="inbox-sender">
+            <span class="inbox-sender-avatar">${escapeHtml(getInitials(item.name))}</span>
+            <div>
+              <h3>${escapeHtml(item.name || 'Website Visitor')}</h3>
+              <a href="tel:${escapeHtml(item.phone || '')}"><i class="fa-solid fa-phone"></i> ${escapeHtml(item.phone || '')}</a>
+            </div>
+          </div>
+          <div class="inbox-message-meta">
+            ${item.isRead ? '<span class="inbox-read-status">Read</span>' : '<span class="inbox-unread-status">New</span>'}
+            <time>${escapeHtml(formatMessageDate(item.createdAt))}</time>
+          </div>
+        </div>
+        ${item.course ? `<div class="inbox-course"><i class="fa-solid fa-book-open"></i> Interested in: ${escapeHtml(item.course)}</div>` : ''}
+        <p class="inbox-message-text">${escapeHtml(item.message || '')}</p>
+        <div class="inbox-message-actions">
+          ${item.isRead ? '' : `<button type="button" class="btn btn-outline btn-sm" onclick="window.app.markInboxMessageRead('${escapeHtml(item.id)}')"><i class="fa-regular fa-envelope-open"></i> Mark as Read</button>`}
+          <button type="button" class="btn btn-secondary btn-sm" onclick="window.app.confirmDeleteInboxMessage('${escapeHtml(item.id)}')"><i class="fa-regular fa-trash-can"></i> Delete</button>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  markInboxMessageRead(messageId) {
+    store.markMessageRead(messageId);
+    this.render();
+  }
+
+  confirmDeleteInboxMessage(messageId) {
+    this.promptConfirmation({
+      title: 'Delete Message?',
+      message: 'This message will be permanently removed from the inbox.',
+      action: () => {
+        store.deleteMessage(messageId);
+        this.render();
+        this.showToast('Message Deleted', 'The inbox message was removed.', 'info');
+      }
+    });
   }
 
   // ==========================================================================
@@ -2560,6 +2664,19 @@ function formatDate(dateString) {
   }
 }
 
+function formatMessageDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 function formatAadhar(value) {
   const digits = String(value || '').replace(/\D/g, '').slice(0, 12);
   if (!digits) return '—';
@@ -2749,7 +2866,7 @@ document.addEventListener('DOMContentLoaded', () => {
   app = new UIController();
   window.app = app;
   const initialHash = window.location.hash.replace('#', '');
-  if (['students', 'courses'].includes(initialHash)) {
+  if (['students', 'courses', 'inbox'].includes(initialHash)) {
     app.switchView(initialHash, false);
   }
 });

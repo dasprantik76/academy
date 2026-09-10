@@ -12,7 +12,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=6.2">
+  <link rel="stylesheet" href="admin-style.css?v=6.3">
   <script src="admin-config.js"></script>
 </head>
 <body>
@@ -46,6 +46,11 @@
           <i class="fa-solid fa-desktop"></i>
           <span>Courses</span>
           <span class="nav-badge" id="courseCountBadge">0</span>
+        </a>
+        <a href="#inbox" class="nav-item" data-view="inbox" id="nav-inbox">
+          <i class="fa-solid fa-inbox"></i>
+          <span>Inbox</span>
+          <span class="nav-badge" id="inboxUnreadBadge">0</span>
         </a>
       </nav>
 
@@ -331,6 +336,29 @@
             <button class="btn btn-secondary btn-sm" id="btnResetCourseFilters">
               <i class="fa-solid fa-rotate-left"></i> Reset Search
             </button>
+          </div>
+        </section>
+
+        <!-- ================= INBOX VIEW ================= -->
+        <section class="view-section" id="view-inbox">
+          <div class="view-header-bar">
+            <div>
+              <h2 class="inbox-heading">Website Messages</h2>
+              <p class="inbox-subtitle">Questions submitted through the public website contact form.</p>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" id="btnRefreshInbox">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+          </div>
+
+          <div class="inbox-list" id="inboxList"></div>
+
+          <div class="dashboard-card" id="inboxEmptyState" style="display: none;">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fa-regular fa-envelope-open"></i></div>
+              <h4>No Messages Yet</h4>
+              <p>Messages sent through the public website will appear here.</p>
+            </div>
           </div>
         </section>
 
@@ -1127,6 +1155,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=6.4"></script>
+  <script src="admin-script.js?v=6.5"></script>
 </body>
 </html>

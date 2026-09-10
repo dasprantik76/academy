@@ -2,13 +2,15 @@
 // Multi-Tenant MongoDB Partitioned SaaS API for Academy Platform
 
 import { getDatabase } from './lib/mongodb.js';
+import { randomUUID } from 'node:crypto';
 
 const COLLECTIONS = {
   PROFILE: 'profile',
   COURSES: 'courses',
   STUDENTS: 'students',
   AUTH_TOKEN: 'auth_token',
-  COUNTERS: 'counters'
+  COUNTERS: 'counters',
+  MESSAGES: 'messages'
 };
 
 async function getNextStudentId(db, ownerEmail) {
@@ -254,11 +256,15 @@ export default async function handler(req, res) {
         });
       }
 
-      let [profileDoc, coursesList, studentsList, authTokenDoc] = await Promise.all([
+      const includeAdminData = Boolean(req.query.ownerEmail);
+      let [profileDoc, coursesList, studentsList, authTokenDoc, messagesList] = await Promise.all([
         db.collection(COLLECTIONS.PROFILE).findOne({ ownerEmail }, { projection: { _id: 0 } }),
         db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).toArray(),
         db.collection(COLLECTIONS.STUDENTS).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ _id: -1 }).toArray(),
-        db.collection(COLLECTIONS.AUTH_TOKEN).findOne({ ownerEmail }, { projection: { _id: 0 } })
+        db.collection(COLLECTIONS.AUTH_TOKEN).findOne({ ownerEmail }, { projection: { _id: 0 } }),
+        includeAdminData
+          ? db.collection(COLLECTIONS.MESSAGES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray()
+          : Promise.resolve([])
       ]);
 
       // Auto-seed profile if this is a default tenant and profile doesn't exist yet
@@ -322,6 +328,7 @@ export default async function handler(req, res) {
           profile: profileDoc || null,
           courses: Array.isArray(coursesList) ? coursesList : [],
           students: Array.isArray(studentsList) ? studentsList : [],
+          messages: includeAdminData && Array.isArray(messagesList) ? messagesList : [],
           // Authentication codes are never included in academy-slug responses
           // consumed by public websites.
           authToken: req.query.ownerEmail ? (authTokenDoc || null) : null
@@ -351,6 +358,36 @@ export default async function handler(req, res) {
       const ownerEmail = await resolveOwnerEmail(payload?.ownerEmail, payload?.academySlug);
 
       switch (action) {
+        case 'submit_contact_message': {
+          const academySlug = String(payload?.academySlug || '').toLowerCase().trim();
+          const name = String(payload?.name || '').trim().slice(0, 120);
+          const phone = String(payload?.phone || '').replace(/\D/g, '').slice(0, 10);
+          const course = String(payload?.course || '').trim().slice(0, 160);
+          const messageText = String(payload?.message || '').trim().slice(0, 2000);
+          const messageOwnerEmail = await resolveOwnerEmail('', academySlug);
+
+          if (!academySlug || !messageOwnerEmail) {
+            return res.status(404).json({ success: false, error: 'Academy not found.' });
+          }
+          if (!name || phone.length !== 10 || !messageText) {
+            return res.status(400).json({ success: false, error: 'Please provide a name, valid mobile number, and message.' });
+          }
+
+          const contactMessage = {
+            id: randomUUID(),
+            ownerEmail: messageOwnerEmail,
+            academySlug,
+            name,
+            phone,
+            course,
+            message: messageText,
+            isRead: false,
+            createdAt: new Date().toISOString()
+          };
+          await db.collection(COLLECTIONS.MESSAGES).insertOne(contactMessage);
+          return res.status(201).json({ success: true, messageId: contactMessage.id });
+        }
+
         // Public registration: resolve the academy exclusively from its slug,
         // validate that academy's active code on the server, then save.
         case 'register_student': {
@@ -538,6 +575,23 @@ export default async function handler(req, res) {
             { $set: updateFields }
           );
           return res.status(200).json({ success: true, modifiedCount: result.modifiedCount });
+        }
+
+        case 'mark_message_read': {
+          const messageId = String(payload?.messageId || '').trim();
+          if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
+          await db.collection(COLLECTIONS.MESSAGES).updateOne(
+            { id: messageId, ownerEmail },
+            { $set: { isRead: true, readAt: new Date().toISOString() } }
+          );
+          return res.status(200).json({ success: true });
+        }
+
+        case 'delete_message': {
+          const messageId = String(payload?.messageId || '').trim();
+          if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
+          await db.collection(COLLECTIONS.MESSAGES).deleteOne({ id: messageId, ownerEmail });
+          return res.status(200).json({ success: true });
         }
 
         // 9. Delete Student
