@@ -15,7 +15,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="admin-style.css?v=2.2">
-  <script src="admin-config.js?v=3.1"></script>
+  <script src="admin-config.js?v=3.2"></script>
   <style>
     .btn-google-action {
       display: flex;
@@ -86,7 +86,6 @@
   <script>
     const GOOGLE_CLIENT_ID = '330236506368-38k618t0l8ick1rosohr9g3ui1teljhg.apps.googleusercontent.com';
     const SESSION_KEY = 'educore_admin_session';
-    const AUTHORIZED_ADMIN_EMAILS = window.ADMIN_PORTAL_CONFIG?.authorizedAdminEmails || [];
 
     // Clean up any legacy keys
     localStorage.removeItem('educore_google_client_id');
@@ -97,7 +96,7 @@
       try {
         const session = JSON.parse(existingSession);
         const userEmail = (session?.email || '').toLowerCase().trim();
-        if (session && session.provider === 'google' && AUTHORIZED_ADMIN_EMAILS.includes(userEmail)) {
+        if (session && session.provider === 'google' && userEmail) {
           window.location.href = 'admin.html';
         } else {
           localStorage.removeItem(SESSION_KEY);
@@ -109,37 +108,22 @@
 
     let googleAuthInitialized = false;
 
-    function decodeGoogleCredential(credential) {
-      const payloadPart = credential.split('.')[1];
-      const normalized = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
-      const decoded = decodeURIComponent(atob(normalized).split('').map(char =>
-        `%${(`00${char.charCodeAt(0).toString(16)}`).slice(-2)}`
-      ).join(''));
-      return JSON.parse(decoded);
+    const loginError = new URLSearchParams(window.location.search).get('loginError');
+    if (loginError) {
+      showLoginAlert('Google Sign-In could not be verified. Please try again.', 'error');
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
 
-    function handleGoogleCredential(response) {
-      try {
-        const user = decodeGoogleCredential(response.credential || '');
-        const nowInSeconds = Math.floor(Date.now() / 1000);
-        if (user.aud !== GOOGLE_CLIENT_ID || !user.email_verified || !user.exp || user.exp <= nowInSeconds) {
-          throw new Error('Invalid Google credential');
-        }
-        handleUserAuthenticated(user);
-      } catch (error) {
-        showLoginAlert('Google Sign-In could not be verified. Please try again.', 'error');
-      }
-    }
-
-    // Google's rendered button opens its supported account chooser without a
-    // custom redirect URI, so it works consistently with popup restrictions.
+    // Keep the Google account chooser in this browser tab. The server verifies
+    // the credential returned by Google's full-page redirect flow.
     function initGoogleAuth() {
       if (googleAuthInitialized) return;
       if (window.google && window.google.accounts && window.google.accounts.id) {
         try {
           google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
-            callback: handleGoogleCredential,
+            ux_mode: 'redirect',
+            login_uri: `${window.location.origin}/api/google-login`,
             auto_select: false,
             cancel_on_tap_outside: false
           });
@@ -158,32 +142,6 @@
           showLoginAlert('Google Sign-In could not load. Please refresh and try again.', 'error');
         }
       }
-    }
-
-    // Process Authenticated Google User
-    function handleUserAuthenticated(user) {
-      const userEmail = (user.email || '').toLowerCase().trim();
-      const isAuthorized = AUTHORIZED_ADMIN_EMAILS.some(email => email.toLowerCase().trim() === userEmail);
-
-      if (!isAuthorized) {
-        showLoginAlert('Access Denied', 'error');
-        return;
-      }
-
-      const session = {
-        name: user.name || 'Administrator',
-        email: userEmail,
-        avatar: user.picture || '',
-        provider: 'google',
-        loggedInAt: Date.now()
-      };
-
-      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-      showLoginAlert(`Welcome back, ${session.name}! Redirecting to Admin Dashboard...`, 'success');
-      
-      setTimeout(() => {
-        window.location.href = 'admin.html';
-      }, 800);
     }
 
     function showLoginAlert(message, type = 'error') {

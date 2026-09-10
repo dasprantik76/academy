@@ -97,8 +97,8 @@ function getInitials(name) {
 // 2. State & Storage Management
 // ==========================================================================
 class AcademyStore {
-  constructor(ownerEmail = 'dasprantik76@gmail.com') {
-    this.ownerEmail = (ownerEmail || 'dasprantik76@gmail.com').toLowerCase().trim();
+  constructor(academySlug = 'prantik') {
+    this.ownerEmail = (academySlug || 'prantik').toLowerCase().trim();
     this.courses = [];
     this.students = [];
     this.messages = [];
@@ -159,7 +159,7 @@ class AcademyStore {
   // Asynchronously synchronize with MongoDB Multi-Tenant Cloud Storage (/api/data)
   async fetchCloudData(onLoadedCallback) {
     try {
-      const response = await fetch(`/api/data?ownerEmail=${encodeURIComponent(this.ownerEmail)}`, { cache: 'no-store' });
+      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.ownerEmail)}`, { cache: 'no-store' });
       if (!response.ok) return false;
       const json = await response.json();
       if (json && json.success && json.data) {
@@ -215,7 +215,7 @@ class AcademyStore {
           action,
           payload: {
             ...payload,
-            ownerEmail: this.ownerEmail
+            academySlug: this.ownerEmail
           }
         })
       });
@@ -437,17 +437,9 @@ class AcademyStore {
   }
 }
 
-// Resolve Active Session Owner Email for Tenant Partitioning
-let activeAdminEmail = 'dasprantik76@gmail.com';
-try {
-  const sessionData = JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || '{}');
-  if (sessionData?.email) {
-    activeAdminEmail = sessionData.email.toLowerCase().trim();
-  }
-} catch (e) {}
-
-// Global Store Instance for Active Multi-Tenant Owner
-const store = new AcademyStore(activeAdminEmail);
+// All OAuth-approved administrators manage the configured academy.
+const activeAcademySlug = window.ADMIN_PORTAL_CONFIG?.adminAcademySlug || 'prantik';
+const store = new AcademyStore(activeAcademySlug);
 
 
 // ==========================================================================
@@ -465,8 +457,7 @@ class UIController {
     try {
       this.session = JSON.parse(rawSession);
       const userEmail = (this.session?.email || '').toLowerCase().trim();
-      const ALLOWED_ADMINS = window.ADMIN_PORTAL_CONFIG?.authorizedAdminEmails || [];
-      if (!this.session || this.session.provider !== 'google' || !ALLOWED_ADMINS.includes(userEmail)) {
+      if (!this.session || this.session.provider !== 'google' || !userEmail) {
         localStorage.removeItem(STORAGE_KEYS.SESSION);
         window.location.href = 'index.html';
         return;
@@ -477,8 +468,8 @@ class UIController {
       return;
     }
 
-    // Ensure store is set for this session's owner email
-    store.ownerEmail = this.session.email.toLowerCase().trim();
+    // Keep storage and cloud requests scoped to the configured academy.
+    store.ownerEmail = activeAcademySlug;
     store.init();
 
     this.currentView = 'dashboard';

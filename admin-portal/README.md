@@ -22,11 +22,24 @@ Keep `IMAGEKIT_PRIVATE_KEY` server-side. Never add it to public-site files, brow
 GitHub, or a variable exposed to the browser. The `/api/imagekit-auth` function uses it
 to create a short-lived, one-time signature after validating the academy registration code.
 
-## Configure owners and public websites
+## Configure Google access and public websites
 
-Edit `admin-config.js`:
+The portal does not contain an email allowlist. Manage permitted accounts in the
+Google Cloud Console under **Google Auth Platform → Audience → Test users** while
+the OAuth app's publishing status is **Testing**. Add or remove an email there,
+then that account can or cannot complete Google Sign-In.
 
-- Add every permitted owner email to `authorizedAdminEmails`.
+Add `https://academy.pixelsetu.com/api/google-login` to the OAuth web client's
+**Authorized redirect URIs**. Google uses this endpoint for the same-tab redirect
+flow; it verifies the returned ID token before opening the dashboard.
+
+Google's Test users restriction no longer applies after publishing the OAuth app
+to Production. Use a server-side authorization policy before publishing if the
+portal must remain restricted to selected accounts.
+
+Edit `admin-config.js` to configure public websites:
+
+- Set `adminAcademySlug` to the academy managed by this portal.
 - Add each academy slug and deployed public URL to `publicSites`.
 - Set `defaultPublicSiteUrl` to the main public academy site.
 
@@ -34,10 +47,8 @@ Example:
 
 ```js
 window.ADMIN_PORTAL_CONFIG = Object.freeze({
+  adminAcademySlug: 'prantik',
   defaultPublicSiteUrl: 'https://diganta.pixelsetu.com',
-  authorizedAdminEmails: Object.freeze([
-    'owner@example.com'
-  ]),
   publicSites: Object.freeze({
     prantik: 'https://diganta.pixelsetu.com'
   })
