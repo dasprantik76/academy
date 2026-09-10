@@ -159,7 +159,7 @@ class AcademyStore {
   // Asynchronously synchronize with MongoDB Multi-Tenant Cloud Storage (/api/data)
   async fetchCloudData(onLoadedCallback) {
     try {
-      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.ownerEmail)}`, { cache: 'no-store' });
+      const response = await fetch(`/api/data?academy=${encodeURIComponent(this.ownerEmail)}&admin=1`, { cache: 'no-store' });
       if (!response.ok) return false;
       const json = await response.json();
       if (json && json.success && json.data) {

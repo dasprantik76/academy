@@ -256,7 +256,7 @@ export default async function handler(req, res) {
         });
       }
 
-      const includeAdminData = Boolean(req.query.ownerEmail);
+      const includeAdminData = Boolean(req.query.ownerEmail || req.query.admin === '1');
       let [profileDoc, coursesList, studentsList, authTokenDoc, messagesList] = await Promise.all([
         db.collection(COLLECTIONS.PROFILE).findOne({ ownerEmail }, { projection: { _id: 0 } }),
         db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).toArray(),
@@ -331,7 +331,7 @@ export default async function handler(req, res) {
           messages: includeAdminData && Array.isArray(messagesList) ? messagesList : [],
           // Authentication codes are never included in academy-slug responses
           // consumed by public websites.
-          authToken: req.query.ownerEmail ? (authTokenDoc || null) : null
+          authToken: includeAdminData ? (authTokenDoc || null) : null
         }
       });
     } catch (error) {
