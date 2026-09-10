@@ -2510,7 +2510,7 @@ function formatDate(dateString) {
 function formatAadhar(value) {
   const digits = String(value || '').replace(/\D/g, '').slice(0, 12);
   if (!digits) return '—';
-  return (digits.match(/.{1,4}/g) || []).join('  ');
+  return (digits.match(/.{1,4}/g) || []).join('-');
 }
 
 function escapeHtml(str) {
