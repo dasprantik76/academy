@@ -802,8 +802,8 @@ html, body {
 }
 
 .batch-card {
-  aspect-ratio: 1 / 1;
-  min-height: 290px;
+  aspect-ratio: 1 / 0.88;
+  min-height: 250px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -825,7 +825,7 @@ html, body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 1.15rem 1.2rem 0.5rem;
+  padding: 1.05rem 1.2rem 0.35rem;
 }
 
 .batch-card-title-group {
@@ -870,7 +870,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.25rem 1.2rem;
+  padding: 0.75rem 1.2rem;
   flex: 1;
 }
 
@@ -898,53 +898,87 @@ html, body {
   letter-spacing: -0.01em;
 }
 
+.batch-stat-badge {
+  margin-top: 0.65rem;
+}
+
 .batch-card-footer {
   border-top: 1px solid var(--border-color);
   background: var(--surface-muted);
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.85rem 1.2rem 1.1rem;
+  padding: 1.15rem 1.2rem 1.25rem;
 }
 
 .batch-card-footer .btn {
-  height: 36px;
+  height: 40px;
   width: 100%;
   line-height: 1;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8125rem;
+  font-size: 0.85rem;
   font-weight: 600;
   border-radius: var(--radius-sm);
   white-space: nowrap;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .batch-download-btn {
   padding: 0 0.85rem;
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  background-color: #ffffff !important;
-  box-shadow: var(--shadow-xs);
+  color: #ffffff !important;
+  border: none !important;
+  outline: none !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #7c3aed 100%) !important;
+  box-shadow: none !important;
   gap: 0.45rem;
 }
 
+.batch-download-btn svg {
+  stroke: currentColor;
+}
+
 .batch-download-btn:hover:not(:disabled) {
-  background-color: #f8fafc !important;
-  border-color: #cbd5e1;
-  color: var(--text-main);
+  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 50%, #6d28d9 100%) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  border: none !important;
+  outline: none !important;
 }
 
 .batch-download-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none;
-  border-color: var(--border-color);
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 .batch-complete-btn {
   gap: 0.45rem;
+}
+
+.batch-complete-btn.is-completed,
+.batch-complete-btn.is-completed:disabled {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  font-weight: 500;
+  cursor: default;
+}
+
+.batch-complete-btn.is-completed:hover {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-muted) !important;
+  transform: none !important;
 }
 
 .batch-edit-icon-button {

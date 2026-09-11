@@ -1779,7 +1779,7 @@ class UIController {
           <td>${formatDate(student.joinDate)}</td>
           <td>
             <span class="badge ${getStatusBadgeClass(student.status)}">
-              <i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${escapeHtml(student.status)}
+              ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
             </span>
           </td>
           <td class="text-right">
@@ -1873,7 +1873,6 @@ class UIController {
             </div>
           </div>
           <div class="batch-card-header-actions">
-            <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')}"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${isCompleted ? 'Completed' : 'Active'}</span>
             <button class="btn btn-secondary btn-sm batch-edit-icon-button" data-batch-action="edit" data-batch-id="${escapeHtml(batch.id)}" title="Edit batch" aria-label="Edit batch"><i class="fa-regular fa-pen-to-square"></i></button>
           </div>
         </div>
@@ -1881,15 +1880,19 @@ class UIController {
           <div class="batch-stat-center">
             <div class="batch-stat-number">${members.length}</div>
             <div class="batch-stat-label">Student${members.length === 1 ? '' : 's'}</div>
+            <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')} batch-stat-badge">${getStatusBadgeIcon(isCompleted ? 'Completed' : 'Active')} ${isCompleted ? 'Completed' : 'Active'}</span>
           </div>
         </div>
         <div class="batch-card-footer">
-          <button type="button" class="btn btn-secondary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download All Certificates
-          </button>
-          <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-success'} btn-sm batch-complete-btn" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${isCompleted || !members.length ? 'disabled' : ''}>
-            <i class="fa-solid ${isCompleted ? 'fa-check' : 'fa-certificate'}"></i> ${isCompleted ? 'Completed' : 'Mark as Completed'}
-          </button>
+          ${isCompleted ? `
+            <button type="button" class="btn btn-primary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download All Certificates
+            </button>
+          ` : `
+            <button class="btn btn-success btn-sm batch-complete-btn" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Mark batch as completed"'}>
+              <i class="fa-solid fa-certificate"></i> Mark as Completed
+            </button>
+          `}
         </div>
       </article>`;
     }).join('');
@@ -2455,7 +2458,7 @@ class UIController {
           <h3>${escapeHtml(student.name)}</h3>
           <p>Student Identifier: <strong>${escapeHtml(student.id)}</strong></p>
           <span class="badge ${getStatusBadgeClass(student.status)}">
-            <i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${escapeHtml(student.status)}
+            ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
           </span>
         </div>
       </div>
@@ -2960,6 +2963,10 @@ class UIController {
   async downloadBatchCertificatesZip(batchId) {
     const batch = store.getAllBatches().find(b => b.id === batchId);
     if (!batch) return;
+    if (batch.status !== 'Completed') {
+      this.showToast('Batch Not Completed', 'Please mark this batch as completed before downloading certificates.', 'warning');
+      return;
+    }
     const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
     if (!members.length) {
       this.showToast('No Students', 'This batch does not have any students to generate certificates for.', 'warning');
@@ -2975,7 +2982,7 @@ class UIController {
     const originalHtml = btn ? btn.innerHTML : '';
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparing…`;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
     }
 
     try {
@@ -2991,9 +2998,6 @@ class UIController {
 
       for (const student of members) {
         completedCount++;
-        if (btn) {
-          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering ${completedCount}/${members.length}…`;
-        }
         const course = store.getCourseById(student.courseId);
         const pngBlob = await this.generateStudentCertificatePng(student, course, batch, templateImg);
         if (pngBlob) {
@@ -3001,10 +3005,6 @@ class UIController {
           const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
           zip.file(`Certificate-${safeId}-${safeName}.png`, pngBlob);
         }
-      }
-
-      if (btn) {
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Compressing ${completedCount} certs…`;
       }
 
       const zipBlob = await zip.generateAsync({
@@ -3206,6 +3206,12 @@ function getStatusBadgeClass(status) {
     default:
       return 'badge-category';
   }
+}
+
+function getStatusBadgeIcon(status) {
+  return status === 'Completed'
+    ? '<i class="fa-solid fa-check" style="font-size: 10px;"></i>'
+    : '<i class="fa-solid fa-circle" style="font-size: 6px;"></i>';
 }
 
 const DISPLAY_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
