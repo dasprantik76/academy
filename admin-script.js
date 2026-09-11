@@ -1878,15 +1878,7 @@ class UIController {
           </div>
         </div>
         <div class="batch-card-body">
-          <div class="batch-card-visual ${isCompleted ? 'completed' : 'active'}">
-            <div class="batch-visual-icon">
-              <i class="fa-solid ${isCompleted ? 'fa-award' : 'fa-layer-group'}"></i>
-            </div>
-            <div class="batch-visual-info">
-              <strong class="batch-visual-count">${members.length}</strong>
-              <span class="batch-visual-label">Enrolled Student${members.length === 1 ? '' : 's'}</span>
-            </div>
-          </div>
+          <div class="batch-big-students">${members.length} Student${members.length === 1 ? '' : 's'}</div>
         </div>
         <div class="batch-card-footer">
           <button type="button" class="btn btn-secondary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
