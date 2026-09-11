@@ -1866,20 +1866,26 @@ class UIController {
       const isCompleted = batch.status === 'Completed';
       return `<article class="batch-card">
         <div class="batch-card-header">
-          <div><h3>${escapeHtml(batch.name)}</h3><span class="batch-student-count">${members.length} Student${members.length === 1 ? '' : 's'}</span></div>
-          <div class="batch-card-meta">
+          <div class="batch-card-title-group">
+            <h3>${escapeHtml(batch.name)}</h3>
+            <div class="batch-card-submeta">
+              <span class="batch-student-count"><i class="fa-solid fa-user-graduate"></i> ${members.length} Student${members.length === 1 ? '' : 's'}</span>
+              <span class="batch-meta-dot">•</span>
+              <span class="batch-created-date">Created on ${formatDate(batch.createdAt)}</span>
+            </div>
+          </div>
+          <div class="batch-card-header-actions">
             <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')}"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${isCompleted ? 'Completed' : 'Active'}</span>
-            <span class="batch-created-date">Created on ${formatDate(batch.createdAt)}</span>
+            <button class="btn btn-secondary btn-sm batch-edit-icon-button" data-batch-action="edit" data-batch-id="${escapeHtml(batch.id)}" title="Edit batch" aria-label="Edit batch"><i class="fa-regular fa-pen-to-square"></i></button>
           </div>
         </div>
         <div class="batch-card-footer">
           <button type="button" class="btn btn-secondary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download All Certificates
           </button>
-          <div class="batch-card-actions">
-            <button class="btn btn-secondary btn-sm batch-edit-icon-button" data-batch-action="edit" data-batch-id="${escapeHtml(batch.id)}" title="Edit batch" aria-label="Edit batch"><i class="fa-regular fa-pen-to-square"></i></button>
-            <button class="btn btn-success btn-sm" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${isCompleted || !members.length ? 'disabled' : ''}><i class="fa-solid fa-certificate"></i> ${isCompleted ? 'Completed' : 'Mark as Completed'}</button>
-          </div>
+          <button class="btn ${isCompleted ? 'btn-secondary' : 'btn-success'} btn-sm batch-complete-btn" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${isCompleted || !members.length ? 'disabled' : ''}>
+            <i class="fa-solid ${isCompleted ? 'fa-check' : 'fa-certificate'}"></i> ${isCompleted ? 'Completed' : 'Mark as Completed'}
+          </button>
         </div>
       </article>`;
     }).join('');

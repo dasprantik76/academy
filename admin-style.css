@@ -802,7 +802,6 @@ html, body {
 }
 
 .batch-card {
-  min-height: 210px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -810,30 +809,151 @@ html, body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.batch-card-header,
-.batch-card-footer {
+.batch-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+}
+
+.batch-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.1rem 1.15rem 1rem;
+}
+
+.batch-card-title-group {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.batch-card-title-group h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.batch-card-submeta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.15rem;
+  gap: 0.45rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  flex-wrap: wrap;
 }
 
-.batch-card-header { flex: 1; align-items: stretch; border-bottom: 0; }
-.batch-card-header h3 { margin: 0 0 0.45rem; font-size: 1.05rem; }
-.batch-student-count { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
-.batch-card-meta { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 0.75rem; flex-shrink: 0; }
-.batch-created-date { color: var(--text-muted); font-size: 0.78rem; white-space: nowrap; }
-.batch-card-footer { border-top: 1px solid var(--border-color); background: var(--surface-muted); display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 1.15rem; }
-.batch-card-footer > span { color: var(--text-muted); font-size: 0.78rem; }
-.batch-card-footer .btn { height: 36px; line-height: 1; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
-.batch-download-btn { padding: 0 0.85rem; color: var(--text-main); border: 1px solid var(--border-color); background-color: #ffffff !important; box-shadow: var(--shadow-xs); gap: 0.45rem; font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
-.batch-download-btn:hover:not(:disabled) { background-color: #f8fafc !important; border-color: #cbd5e1; color: var(--text-main); }
-.batch-download-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; border-color: var(--border-color); }
-.batch-card-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.6rem; flex-wrap: wrap; }
-.batch-edit-icon-button { width: 36px; height: 36px; padding: 0; flex: 0 0 36px; display: inline-flex; align-items: center; justify-content: center; }
+.batch-student-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.batch-student-count i {
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+.batch-meta-dot {
+  color: #cbd5e1;
+  font-size: 0.75rem;
+}
+
+.batch-created-date {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.batch-card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.batch-card-footer {
+  border-top: 1px solid var(--border-color);
+  background: var(--surface-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem 1.15rem;
+  margin-top: auto;
+}
+
+.batch-card-footer .btn {
+  height: 38px;
+  width: 100%;
+  line-height: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.batch-download-btn {
+  padding: 0 0.85rem;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  background-color: #ffffff !important;
+  box-shadow: var(--shadow-xs);
+  gap: 0.45rem;
+}
+
+.batch-download-btn:hover:not(:disabled) {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1;
+  color: var(--text-main);
+}
+
+.batch-download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  border-color: var(--border-color);
+}
+
+.batch-complete-btn {
+  gap: 0.45rem;
+}
+
+.batch-edit-icon-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex: 0 0 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+}
+
+.batch-edit-icon-button:hover {
+  background: #f8fafc;
+  color: var(--primary);
+  border-color: var(--primary);
+}
 
 .batch-edit-modal-window { max-width: 650px; }
 .batch-edit-modal-window .modal-footer .btn { min-width: 110px; }
@@ -862,10 +982,6 @@ html, body {
 
 @media (max-width: 560px) {
   .batches-grid { grid-template-columns: 1fr; }
-  .batch-card-footer { align-items: stretch; flex-direction: column; gap: 0.6rem; }
-  .batch-download-btn { width: 100%; justify-content: center; }
-  .batch-card-actions { justify-content: stretch; }
-  .batch-card-actions .btn:not(.batch-edit-icon-button) { flex: 1; }
   .batch-edit-toolbar { align-items: stretch; flex-direction: column; }
   .batch-edit-selection-count { align-self: flex-start; }
   #editBatchStatusDropdown { width: 125px; margin-left: 0; }
