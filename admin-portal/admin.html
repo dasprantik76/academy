@@ -12,7 +12,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=6.10">
+  <link rel="stylesheet" href="admin-style.css?v=6.36">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -238,7 +238,7 @@
 
             <div class="view-actions">
               <div class="batch-action-menu" id="batchActionMenu">
-                <button class="btn btn-primary" type="button" id="btnCreateBatch" aria-haspopup="menu" aria-expanded="false">
+                <button class="btn btn-primary" type="button" id="btnCreateBatch" aria-haspopup="menu" aria-expanded="false" disabled>
                   <i class="fa-solid fa-layer-group"></i>
                   <span>Create Batch</span>
                   <i class="fa-solid fa-chevron-down batch-action-chevron"></i>
@@ -271,8 +271,7 @@
                       <th style="width: 44px; text-align: center;">
                         <input type="checkbox" id="selectAllStudentsCheckbox" aria-label="Select All Students" class="custom-table-checkbox">
                       </th>
-                      <th>Student</th>
-                      <th>Contact Info</th>
+                      <th>Student <span class="student-selection-count" id="studentSelectionCount" aria-live="polite" hidden>0</span></th>
                       <th>Enrolled Courses</th>
                       <th>Enrollment Date</th>
                       <th>Course Status</th>
@@ -302,12 +301,6 @@
 
         <!-- ================= BATCHES VIEW ================= -->
         <section class="view-section" id="view-batches">
-          <div class="view-header-bar">
-            <div>
-              <h2 class="inbox-heading">Student Batches</h2>
-              <p class="inbox-subtitle">Review batch members and complete a batch to generate student certificates.</p>
-            </div>
-          </div>
           <div class="batches-grid" id="batchesGrid"></div>
           <div class="dashboard-card" id="batchesEmptyState" style="display:none">
             <div class="empty-state">
@@ -1006,12 +999,15 @@
             </div>
           </div>
           <div class="form-group" id="existingBatchGroup" hidden>
-            <label for="existingBatchSelect">Select Batch <span class="required">*</span></label>
-            <div class="input-icon-wrap">
-              <i class="fa-solid fa-list"></i>
-              <select id="existingBatchSelect">
-                <option value="">Choose an active batch</option>
-              </select>
+            <label for="existingBatchTrigger">Select Batch <span class="required">*</span></label>
+            <div class="custom-select-container batch-select-dropdown" id="existingBatchDropdown">
+              <button type="button" class="custom-select-trigger" id="existingBatchTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <i class="fa-solid fa-list select-icon"></i>
+                <span class="select-label" id="existingBatchDisplay">Choose an active batch</span>
+                <i class="fa-solid fa-chevron-down select-chevron"></i>
+              </button>
+              <ul class="custom-select-menu" id="existingBatchMenu" role="listbox"></ul>
+              <input type="hidden" id="existingBatchSelect">
             </div>
           </div>
         </div>
@@ -1019,6 +1015,55 @@
           <button type="button" class="btn btn-secondary" id="btnCancelBatchModal">Cancel</button>
           <button type="submit" class="btn btn-primary" id="btnSaveBatch">
             <i class="fa-solid fa-check"></i> <span id="saveBatchLabel">Create Batch</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Batch Students Dialog -->
+  <div class="modal-backdrop" id="editBatchModal">
+    <div class="modal-window batch-edit-modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-users-gear modal-icon"></i>
+          <div>
+            <h3>Edit Batch</h3>
+            <p class="modal-title-caption" id="editBatchName"></p>
+          </div>
+          <div class="custom-select-container" id="editBatchStatusDropdown">
+            <button type="button" class="custom-select-trigger" id="editBatchStatusTrigger" aria-label="Batch status" aria-haspopup="listbox" aria-expanded="false">
+              <i class="fa-solid fa-circle-half-stroke select-icon"></i>
+              <span class="select-label" id="editBatchStatusDisplay">Active</span>
+              <i class="fa-solid fa-chevron-down select-chevron"></i>
+            </button>
+            <ul class="custom-select-menu" id="editBatchStatusMenu" role="listbox">
+              <li class="custom-select-option" data-value="Active" role="option">Active</li>
+              <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+            </ul>
+            <input type="hidden" id="editBatchStatus" value="Active">
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseEditBatchModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="editBatchForm">
+        <div class="modal-body">
+          <div class="batch-edit-toolbar">
+            <div class="search-box batch-edit-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" id="editBatchStudentSearch" placeholder="Search students by name or ID" autocomplete="off">
+            </div>
+            <span id="editBatchSelectionCount" class="batch-edit-selection-count">0 selected</span>
+          </div>
+          <div class="batch-edit-student-list" id="editBatchStudentList"></div>
+          <p class="empty-inline-state" id="editBatchEmptyState" hidden>No students match your search.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelEditBatch">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveEditBatch">
+            Save
           </button>
         </div>
       </form>
@@ -1043,17 +1088,46 @@
           <div class="form-group">
             <label>Course Duration <span class="required">*</span></label>
             <div class="completion-period-fields">
-              <div class="input-icon-wrap">
-                <i class="fa-regular fa-calendar"></i>
-                <input type="month" id="completionStartMonth" aria-label="Course start month and year" required>
+              <div class="completion-period-field">
+                <label for="completionStartMonth">Start month</label>
+                <div class="completion-date-selects">
+                  <div class="custom-select-container completion-select-dropdown" id="completionStartMonthDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionStartMonthTrigger" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionStartMonthDisplay">Month</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionStartMonthMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionStartMonth">
+                  </div>
+                  <div class="custom-select-container completion-select-dropdown completion-year-select" id="completionStartYearDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionStartYearTrigger" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionStartYearDisplay">Year</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionStartYearMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionStartYear">
+                  </div>
+                </div>
               </div>
-              <span class="completion-period-separator" aria-hidden="true">–</span>
-              <div class="input-icon-wrap">
-                <i class="fa-regular fa-calendar"></i>
-                <input type="month" id="completionEndMonth" aria-label="Course end month and year" required>
+              <span class="completion-period-separator" aria-hidden="true">to</span>
+              <div class="completion-period-field">
+                <label for="completionEndMonth">End month</label>
+                <div class="completion-date-selects">
+                  <div class="custom-select-container completion-select-dropdown" id="completionEndMonthDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionEndMonthTrigger" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionEndMonthDisplay">Month</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionEndMonthMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionEndMonth">
+                  </div>
+                  <div class="custom-select-container completion-select-dropdown completion-year-select" id="completionEndYearDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionEndYearTrigger" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionEndYearDisplay">Year</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionEndYearMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionEndYear">
+                  </div>
+                </div>
               </div>
             </div>
-            <span class="field-hint">Select the starting and ending month and year.</span>
           </div>
           <div class="form-group">
             <label for="completionIssueDate">Certificate Issue Date <span class="required">*</span></label>
@@ -1216,6 +1290,6 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=6.14"></script>
+  <script src="admin-script.js?v=6.34"></script>
 </body>
 </html>

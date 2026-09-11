@@ -501,8 +501,14 @@ class UIController {
     this.studentStatusFilterVal = 'all';
     this.courseSearchQuery = '';
     this.selectedStudentIds = new Set();
+    this.completionStudentIds = new Set();
+    this.editingBatchId = null;
+    this.editingBatchStudentIds = new Set();
+    this.editingBatchMemberIds = new Set();
+    this.editBatchSearchQuery = '';
 
     this.cacheDOMElements();
+    this.populateCompletionPeriodSelectors();
     this.bindEvents();
     this.render();
     this.startAuthCountdownTimer();
@@ -616,6 +622,7 @@ class UIController {
     this.studentsEmptyState = document.getElementById('studentsEmptyState');
     this.studentFilteredCount = document.getElementById('studentFilteredCount');
     this.studentTotalCount = document.getElementById('studentTotalCount');
+    this.studentSelectionCount = document.getElementById('studentSelectionCount');
     this.btnResetStudentFilters = document.getElementById('btnResetStudentFilters');
 
     // Course View Elements
@@ -744,19 +751,57 @@ class UIController {
     this.batchNameGroup = document.getElementById('batchNameGroup');
     this.batchNameInput = document.getElementById('batchNameInput');
     this.existingBatchGroup = document.getElementById('existingBatchGroup');
+    this.existingBatchDropdown = document.getElementById('existingBatchDropdown');
+    this.existingBatchTrigger = document.getElementById('existingBatchTrigger');
+    this.existingBatchMenu = document.getElementById('existingBatchMenu');
+    this.existingBatchDisplay = document.getElementById('existingBatchDisplay');
     this.existingBatchSelect = document.getElementById('existingBatchSelect');
     this.saveBatchLabel = document.getElementById('saveBatchLabel');
     this.btnCloseBatchModal = document.getElementById('btnCloseBatchModal');
     this.btnCancelBatchModal = document.getElementById('btnCancelBatchModal');
     this.batchModalMode = 'create';
 
+    // Modal - Edit Batch Students
+    this.editBatchModal = document.getElementById('editBatchModal');
+    this.editBatchForm = document.getElementById('editBatchForm');
+    this.editBatchName = document.getElementById('editBatchName');
+    this.editBatchStudentSearch = document.getElementById('editBatchStudentSearch');
+    this.editBatchSelectionCount = document.getElementById('editBatchSelectionCount');
+    this.editBatchStudentList = document.getElementById('editBatchStudentList');
+    this.editBatchEmptyState = document.getElementById('editBatchEmptyState');
+    this.editBatchStatusDropdown = document.getElementById('editBatchStatusDropdown');
+    this.editBatchStatusTrigger = document.getElementById('editBatchStatusTrigger');
+    this.editBatchStatusMenu = document.getElementById('editBatchStatusMenu');
+    this.editBatchStatusDisplay = document.getElementById('editBatchStatusDisplay');
+    this.editBatchStatus = document.getElementById('editBatchStatus');
+    this.btnCloseEditBatchModal = document.getElementById('btnCloseEditBatchModal');
+    this.btnCancelEditBatch = document.getElementById('btnCancelEditBatch');
+
     // Modals - Course Completion
     this.completionModal = document.getElementById('completionModal');
     this.completionForm = document.getElementById('completionForm');
     this.completionModalTitle = document.getElementById('completionModalTitle');
     this.completionStudentCount = document.getElementById('completionStudentCount');
+    this.completionStartMonthDropdown = document.getElementById('completionStartMonthDropdown');
+    this.completionStartMonthTrigger = document.getElementById('completionStartMonthTrigger');
+    this.completionStartMonthMenu = document.getElementById('completionStartMonthMenu');
+    this.completionStartMonthDisplay = document.getElementById('completionStartMonthDisplay');
     this.completionStartMonth = document.getElementById('completionStartMonth');
+    this.completionStartYearDropdown = document.getElementById('completionStartYearDropdown');
+    this.completionStartYearTrigger = document.getElementById('completionStartYearTrigger');
+    this.completionStartYearMenu = document.getElementById('completionStartYearMenu');
+    this.completionStartYearDisplay = document.getElementById('completionStartYearDisplay');
+    this.completionStartYear = document.getElementById('completionStartYear');
+    this.completionEndMonthDropdown = document.getElementById('completionEndMonthDropdown');
+    this.completionEndMonthTrigger = document.getElementById('completionEndMonthTrigger');
+    this.completionEndMonthMenu = document.getElementById('completionEndMonthMenu');
+    this.completionEndMonthDisplay = document.getElementById('completionEndMonthDisplay');
     this.completionEndMonth = document.getElementById('completionEndMonth');
+    this.completionEndYearDropdown = document.getElementById('completionEndYearDropdown');
+    this.completionEndYearTrigger = document.getElementById('completionEndYearTrigger');
+    this.completionEndYearMenu = document.getElementById('completionEndYearMenu');
+    this.completionEndYearDisplay = document.getElementById('completionEndYearDisplay');
+    this.completionEndYear = document.getElementById('completionEndYear');
     this.completionIssueDate = document.getElementById('completionIssueDate');
     this.completionGrade = document.getElementById('completionGrade');
     this.btnCloseCompletionModal = document.getElementById('btnCloseCompletionModal');
@@ -822,6 +867,47 @@ class UIController {
     this.btnSavePersonalisation = document.getElementById('btnSavePersonalisation');
 
     this.toastContainer = document.getElementById('toastContainer');
+  }
+
+  populateCompletionPeriodSelectors() {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthOptions = monthNames.map((name, index) =>
+      `<li class="custom-select-option" data-value="${String(index + 1).padStart(2, '0')}" role="option">${name}</li>`
+    ).join('');
+    const currentYear = new Date().getFullYear();
+    const yearOptions = Array.from(
+      { length: 11 },
+      (_, index) => currentYear + 5 - index
+    ).map(year => `<li class="custom-select-option" data-value="${year}" role="option">${year}</li>`).join('');
+
+    this.completionStartMonthMenu.innerHTML = monthOptions;
+    this.completionEndMonthMenu.innerHTML = monthOptions;
+    this.completionStartYearMenu.innerHTML = yearOptions;
+    this.completionEndYearMenu.innerHTML = yearOptions;
+
+    [
+      [this.completionStartMonthDropdown, this.completionStartMonthTrigger, this.completionStartMonthMenu, this.completionStartMonthDisplay, this.completionStartMonth],
+      [this.completionStartYearDropdown, this.completionStartYearTrigger, this.completionStartYearMenu, this.completionStartYearDisplay, this.completionStartYear],
+      [this.completionEndMonthDropdown, this.completionEndMonthTrigger, this.completionEndMonthMenu, this.completionEndMonthDisplay, this.completionEndMonth],
+      [this.completionEndYearDropdown, this.completionEndYearTrigger, this.completionEndYearMenu, this.completionEndYearDisplay, this.completionEndYear]
+    ].forEach(([container, trigger, menu, display, input]) => {
+      this.setupAdminDropdown(container, trigger, menu, display, input, () => {
+        trigger.classList.remove('input-error');
+        this.validateCompletionPeriodSelection();
+      });
+    });
+  }
+
+  getCompletionPeriodValue(monthSelect, yearSelect) {
+    return monthSelect.value && yearSelect.value ? `${yearSelect.value}-${monthSelect.value}` : '';
+  }
+
+  validateCompletionPeriodSelection() {
+    const startMonth = this.getCompletionPeriodValue(this.completionStartMonth, this.completionStartYear);
+    const endMonth = this.getCompletionPeriodValue(this.completionEndMonth, this.completionEndYear);
+    if (startMonth && endMonth && endMonth < startMonth) {
+      this.setAdminDropdownValue(this.completionEndMonthDropdown, this.completionEndMonthMenu, this.completionEndMonthDisplay, this.completionEndMonth, '', 'Month');
+    }
   }
 
   bindEvents() {
@@ -1169,13 +1255,12 @@ class UIController {
       if (!button) return;
       const batch = store.getAllBatches().find(item => item.id === button.dataset.batchId);
       if (!batch) return;
-      if (button.dataset.batchAction === 'complete') {
-        this.selectedStudentIds = new Set((batch.studentIds || []).filter(id => store.getStudentById(id)));
-        this.handleBulkMarkCompleted(batch.id);
+      if (button.dataset.batchAction === 'edit') {
+        this.openEditBatchModal(batch.id);
       }
       if (button.dataset.batchAction === 'complete') {
-        this.selectedStudentIds = new Set(batch.studentIds || []);
-        this.handleBulkMarkCompleted(batch.id);
+        const batchStudentIds = (batch.studentIds || []).filter(id => store.getStudentById(id));
+        this.handleBulkMarkCompleted(batch.id, batchStudentIds);
       }
     });
 
@@ -1317,11 +1402,42 @@ class UIController {
     });
 
     this.completionForm.addEventListener('submit', (e) => this.handleCompletionSubmit(e));
+    [this.completionStartMonth, this.completionStartYear, this.completionEndMonth, this.completionEndYear]
+      .forEach(select => select.addEventListener('change', () => this.validateCompletionPeriodSelection()));
     this.btnCloseCompletionModal.addEventListener('click', () => this.closeModal(this.completionModal));
     this.btnCancelCompletion.addEventListener('click', () => this.closeModal(this.completionModal));
     this.btnCloseBatchModal?.addEventListener('click', () => this.closeModal(this.batchModal));
     this.btnCancelBatchModal?.addEventListener('click', () => this.closeModal(this.batchModal));
     this.batchForm?.addEventListener('submit', (e) => this.handleBatchFormSubmit(e));
+    this.setupAdminDropdown(
+      this.existingBatchDropdown,
+      this.existingBatchTrigger,
+      this.existingBatchMenu,
+      this.existingBatchDisplay,
+      this.existingBatchSelect,
+      () => this.existingBatchTrigger.classList.remove('input-error')
+    );
+    this.btnCloseEditBatchModal?.addEventListener('click', () => this.closeModal(this.editBatchModal));
+    this.btnCancelEditBatch?.addEventListener('click', () => this.closeModal(this.editBatchModal));
+    this.editBatchForm?.addEventListener('submit', (e) => this.handleEditBatchSubmit(e));
+    this.setupAdminDropdown(
+      this.editBatchStatusDropdown,
+      this.editBatchStatusTrigger,
+      this.editBatchStatusMenu,
+      this.editBatchStatusDisplay,
+      this.editBatchStatus
+    );
+    this.editBatchStudentSearch?.addEventListener('input', (e) => {
+      this.editBatchSearchQuery = e.target.value.trim().toLowerCase();
+      this.renderEditBatchStudentList();
+    });
+    this.editBatchStudentList?.addEventListener('change', (e) => {
+      const checkbox = e.target.closest('.batch-edit-student-checkbox');
+      if (!checkbox) return;
+      if (checkbox.checked) this.editingBatchStudentIds.add(checkbox.dataset.studentId);
+      else this.editingBatchStudentIds.delete(checkbox.dataset.studentId);
+      this.renderEditBatchStudentList();
+    });
 
     this.btnCloseConfirmModal.addEventListener('click', () => this.closeModal(this.confirmModal));
     this.btnCancelConfirm.addEventListener('click', () => this.closeModal(this.confirmModal));
@@ -1630,8 +1746,6 @@ class UIController {
     this.studentsEmptyState.style.display = 'none';
 
     this.studentsTableBody.innerHTML = filteredStudents.map(student => {
-      const initials = getInitials(student.name);
-      const gradient = getAvatarGradient(student.name);
       const isChecked = this.selectedStudentIds.has(student.id);
       
       const enrolledCoursesBadges = (student.enrolledCourseIds || []).map(cid => {
@@ -1646,17 +1760,10 @@ class UIController {
           </td>
           <td>
             <div class="student-meta-cell">
-              <div class="student-avatar" style="background: ${gradient}">${initials}</div>
               <div class="student-name-box">
                 <strong>${escapeHtml(student.name)}</strong>
                 <span>ID: ${escapeHtml(student.id)}</span>
               </div>
-            </div>
-          </td>
-          <td>
-            <div class="contact-cell">
-              <span class="contact-email">${escapeHtml(student.email)}</span>
-              <span class="contact-phone">${escapeHtml(student.phone)}</span>
             </div>
           </td>
           <td>
@@ -1752,16 +1859,87 @@ class UIController {
       const isCompleted = batch.status === 'Completed';
       return `<article class="batch-card">
         <div class="batch-card-header">
-          <div><h3>${escapeHtml(batch.name)}</h3><span class="status-badge ${isCompleted ? 'status-completed' : 'status-active'}">${isCompleted ? 'Completed' : 'Active'}</span></div>
-          <strong>${members.length} Student${members.length === 1 ? '' : 's'}</strong>
+          <div><h3>${escapeHtml(batch.name)}</h3><span class="batch-student-count">${members.length} Student${members.length === 1 ? '' : 's'}</span></div>
+          <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')}"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${isCompleted ? 'Completed' : 'Active'}</span>
         </div>
-        <div class="batch-members">${members.length ? members.map(student => `<div class="batch-member"><span class="avatar-sm">${escapeHtml(getInitials(student.name || student.fullName))}</span><span><strong>${escapeHtml(student.name || student.fullName)}</strong><small>${escapeHtml(student.id)}</small></span></div>`).join('') : '<p class="text-muted">No students in this batch.</p>'}</div>
         <div class="batch-card-footer">
-          <span>Created ${formatDate(batch.createdAt)}</span>
-          <button class="btn btn-success btn-sm" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${isCompleted || !members.length ? 'disabled' : ''}><i class="fa-solid fa-certificate"></i> ${isCompleted ? 'Completed' : 'Mark Batch as Completed'}</button>
+          <span>Created on ${formatDate(batch.createdAt)}</span>
+          <div class="batch-card-actions">
+            <button class="btn btn-secondary btn-sm batch-edit-icon-button" data-batch-action="edit" data-batch-id="${escapeHtml(batch.id)}" title="Edit batch" aria-label="Edit batch"><i class="fa-regular fa-pen-to-square"></i></button>
+            <button class="btn btn-success btn-sm" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${isCompleted || !members.length ? 'disabled' : ''}><i class="fa-solid fa-certificate"></i> ${isCompleted ? 'Completed' : 'Mark as Completed'}</button>
+          </div>
         </div>
       </article>`;
     }).join('');
+  }
+
+  openEditBatchModal(batchId) {
+    const batch = store.getAllBatches().find(item => item.id === batchId);
+    if (!batch) return;
+    this.editingBatchId = batch.id;
+    this.editingBatchStudentIds = new Set((batch.studentIds || []).filter(id => store.getStudentById(id)));
+    this.editingBatchMemberIds = new Set(this.editingBatchStudentIds);
+    this.editBatchSearchQuery = '';
+    this.editBatchStudentSearch.value = '';
+    this.editBatchName.textContent = batch.name;
+    this.setAdminDropdownValue(
+      this.editBatchStatusDropdown,
+      this.editBatchStatusMenu,
+      this.editBatchStatusDisplay,
+      this.editBatchStatus,
+      batch.status === 'Completed' ? 'Completed' : 'Active',
+      'Active'
+    );
+    this.renderEditBatchStudentList();
+    this.openModal(this.editBatchModal);
+    window.setTimeout(() => this.editBatchStudentSearch.focus(), 100);
+  }
+
+  renderEditBatchStudentList() {
+    const query = this.editBatchSearchQuery;
+    const students = store.getAllStudents().filter(student => {
+      if (!this.editingBatchMemberIds.has(student.id)) return false;
+      if (!query) return true;
+      return String(student.name || student.fullName || '').toLowerCase().includes(query)
+        || String(student.id || '').toLowerCase().includes(query);
+    });
+    this.editBatchSelectionCount.textContent = `${this.editingBatchStudentIds.size} selected`;
+    this.editBatchEmptyState.hidden = students.length > 0;
+    this.editBatchStudentList.hidden = students.length === 0;
+    this.editBatchStudentList.innerHTML = students.map(student => {
+      const name = student.name || student.fullName || 'Unnamed Student';
+      return `<label class="batch-edit-student-option">
+        <input type="checkbox" class="custom-table-checkbox batch-edit-student-checkbox" data-student-id="${escapeHtml(student.id)}" ${this.editingBatchStudentIds.has(student.id) ? 'checked' : ''}>
+        <span><strong>${escapeHtml(name)}</strong><small>${escapeHtml(student.id)}</small></span>
+      </label>`;
+    }).join('');
+  }
+
+  async handleEditBatchSubmit(e) {
+    e.preventDefault();
+    const batch = store.getAllBatches().find(item => item.id === this.editingBatchId);
+    if (!batch) return this.closeModal(this.editBatchModal);
+    const studentIds = Array.from(this.editingBatchStudentIds);
+    if (!studentIds.length) {
+      this.showToast('Students Required', 'Keep at least one student in the batch.', 'error');
+      return;
+    }
+    try {
+      const shouldComplete = this.editBatchStatus.value === 'Completed' && batch.status !== 'Completed';
+      await store.saveBatch({ ...batch, studentIds, status: shouldComplete ? 'Active' : this.editBatchStatus.value });
+      this.closeModal(this.editBatchModal);
+      this.editingBatchId = null;
+      this.editingBatchStudentIds.clear();
+      this.editingBatchMemberIds.clear();
+      if (shouldComplete) {
+        this.handleBulkMarkCompleted(batch.id, studentIds);
+        return;
+      }
+      this.renderBatchesView();
+      this.showToast('Batch Updated', `${batch.name} now has ${studentIds.length} student${studentIds.length === 1 ? '' : 's'}.`, 'success');
+    } catch (error) {
+      this.showToast('Batch Not Updated', error.message, 'error');
+    }
   }
 
   handleCreateNewBatch() {
@@ -1777,7 +1955,8 @@ class UIController {
     this.batchNameGroup.hidden = false;
     this.existingBatchGroup.hidden = true;
     this.batchNameInput.required = true;
-    this.existingBatchSelect.required = false;
+    this.setAdminDropdownValue(this.existingBatchDropdown, this.existingBatchMenu, this.existingBatchDisplay, this.existingBatchSelect, '', 'Choose an active batch');
+    this.existingBatchTrigger.classList.remove('input-error');
     this.saveBatchLabel.textContent = 'Create Batch';
     this.openModal(this.batchModal);
     setTimeout(() => this.batchNameInput.focus(), 100);
@@ -1785,7 +1964,7 @@ class UIController {
 
   handleAddToExistingBatch() {
     const studentIds = Array.from(this.selectedStudentIds);
-    const batches = store.getAllBatches().filter(batch => batch.status !== 'Completed');
+    const batches = store.getAllBatches().filter(batch => String(batch.status || 'Active').toLowerCase() !== 'completed');
     if (!studentIds.length) return this.showToast('Select Students', 'Select one or more students to add.', 'error');
     if (!batches.length) return this.showToast('No Active Batch', 'Create a new batch first.', 'error');
     this.batchModalMode = 'existing';
@@ -1795,11 +1974,12 @@ class UIController {
     this.batchNameGroup.hidden = true;
     this.existingBatchGroup.hidden = false;
     this.batchNameInput.required = false;
-    this.existingBatchSelect.required = true;
-    this.existingBatchSelect.innerHTML = '<option value="">Choose an active batch</option>' + batches.map(batch => `<option value="${escapeHtml(batch.id)}">${escapeHtml(batch.name)} (${(batch.studentIds || []).length} students)</option>`).join('');
+    this.existingBatchMenu.innerHTML = batches.map(batch => `<li class="custom-select-option" data-value="${escapeHtml(batch.id)}" role="option">${escapeHtml(batch.name)} (${(batch.studentIds || []).length} students)</li>`).join('');
+    this.setAdminDropdownValue(this.existingBatchDropdown, this.existingBatchMenu, this.existingBatchDisplay, this.existingBatchSelect, '', 'Choose an active batch');
+    this.existingBatchTrigger.classList.remove('input-error');
     this.saveBatchLabel.textContent = 'Add Students';
     this.openModal(this.batchModal);
-    setTimeout(() => this.existingBatchSelect.focus(), 100);
+    setTimeout(() => this.existingBatchTrigger.focus(), 100);
   }
 
   async handleBatchFormSubmit(e) {
@@ -1809,7 +1989,12 @@ class UIController {
     const existing = this.batchModalMode === 'existing';
     const batch = existing ? store.getAllBatches().find(item => item.id === this.existingBatchSelect.value) : null;
     const name = this.batchNameInput.value.trim();
-    if ((existing && !batch) || (!existing && !name)) return this.batchForm.reportValidity();
+    if (existing && !batch) {
+      this.existingBatchTrigger.classList.add('input-error');
+      this.existingBatchTrigger.focus();
+      return;
+    }
+    if (!existing && !name) return this.batchForm.reportValidity();
     try {
       const saved = await store.saveBatch(existing
         ? { ...batch, studentIds: [...new Set([...(batch.studentIds || []), ...studentIds])] }
@@ -1921,6 +2106,12 @@ class UIController {
       this.adminStudentStatusDropdown,
       this.adminStudentCourseFilterDropdown,
       this.adminStudentStatusFilterDropdown,
+      this.completionStartMonthDropdown,
+      this.completionStartYearDropdown,
+      this.completionEndMonthDropdown,
+      this.completionEndYearDropdown,
+      this.existingBatchDropdown,
+      this.editBatchStatusDropdown,
       this.batchActionMenu
     ];
     all.forEach(dropdown => {
@@ -2540,47 +2731,80 @@ class UIController {
       const selectedCount = this.selectedStudentIds.size;
       this.btnBulkMarkCompleted.disabled = selectedCount === 0;
       if (this.bulkMarkCompletedLabel) {
-        this.bulkMarkCompletedLabel.textContent = selectedCount > 0 
-          ? `Mark as Completed (${selectedCount})` 
-          : 'Mark as Completed';
+        this.bulkMarkCompletedLabel.textContent = 'Mark as Completed';
+      }
+    }
+
+    if (this.studentSelectionCount) {
+      const selectedCount = this.selectedStudentIds.size;
+      this.studentSelectionCount.textContent = selectedCount;
+      this.studentSelectionCount.hidden = selectedCount === 0;
+    }
+
+    if (this.btnCreateBatch) {
+      const hasSelectedStudents = this.selectedStudentIds.size > 0;
+      this.btnCreateBatch.disabled = !hasSelectedStudents;
+      if (!hasSelectedStudents) {
+        this.batchActionMenu?.classList.remove('open');
+        this.btnCreateBatch.setAttribute('aria-expanded', 'false');
       }
     }
   }
 
-  handleBulkMarkCompleted(batchId = null) {
-    const selectedCount = this.selectedStudentIds.size;
+  handleBulkMarkCompleted(batchId = null, studentIds = null) {
+    this.completionStudentIds = new Set(studentIds || this.selectedStudentIds);
+    const selectedCount = this.completionStudentIds.size;
     if (selectedCount === 0) return;
 
     this.completingBatchId = batchId;
     this.completionForm.reset();
+    [
+      [this.completionStartMonthDropdown, this.completionStartMonthMenu, this.completionStartMonthDisplay, this.completionStartMonth, 'Month', this.completionStartMonthTrigger],
+      [this.completionStartYearDropdown, this.completionStartYearMenu, this.completionStartYearDisplay, this.completionStartYear, 'Year', this.completionStartYearTrigger],
+      [this.completionEndMonthDropdown, this.completionEndMonthMenu, this.completionEndMonthDisplay, this.completionEndMonth, 'Month', this.completionEndMonthTrigger],
+      [this.completionEndYearDropdown, this.completionEndYearMenu, this.completionEndYearDisplay, this.completionEndYear, 'Year', this.completionEndYearTrigger]
+    ].forEach(([container, menu, display, input, label, trigger]) => {
+      this.setAdminDropdownValue(container, menu, display, input, '', label);
+      trigger.classList.remove('input-error');
+    });
     this.completionModalTitle.textContent = selectedCount === 1 ? 'Complete Student Course' : 'Complete Student Courses';
     this.completionStudentCount.textContent = selectedCount === 1
       ? 'Enter the certificate details for the selected student.'
       : `These certificate details will be applied to all ${selectedCount} selected students.`;
     this.openModal(this.completionModal);
-    window.setTimeout(() => this.completionStartMonth.focus(), 100);
+    window.setTimeout(() => this.completionStartMonthTrigger.focus(), 100);
   }
 
   async handleCompletionSubmit(e) {
     e.preventDefault();
-    const studentIds = Array.from(this.selectedStudentIds);
+    const studentIds = Array.from(this.completionStudentIds);
     if (studentIds.length === 0) {
       this.closeModal(this.completionModal);
       return;
     }
 
-    const startMonth = this.completionStartMonth.value;
-    const endMonth = this.completionEndMonth.value;
+    const startMonth = this.getCompletionPeriodValue(this.completionStartMonth, this.completionStartYear);
+    const endMonth = this.getCompletionPeriodValue(this.completionEndMonth, this.completionEndYear);
     const issueDate = this.completionIssueDate.value;
     const grade = this.completionGrade.value.trim();
-    if (!startMonth || !endMonth || !issueDate || !grade) {
+    if (!startMonth || !endMonth) {
+      const missingSelectors = [
+        [this.completionStartMonth, this.completionStartMonthTrigger],
+        [this.completionStartYear, this.completionStartYearTrigger],
+        [this.completionEndMonth, this.completionEndMonthTrigger],
+        [this.completionEndYear, this.completionEndYearTrigger]
+      ].filter(([input]) => !input.value);
+      missingSelectors.forEach(([, trigger]) => trigger.classList.add('input-error'));
+      missingSelectors[0]?.[1].focus();
+      return;
+    }
+    if (!issueDate || !grade) {
       this.completionForm.reportValidity();
       return;
     }
     if (endMonth < startMonth) {
-      this.completionEndMonth.setCustomValidity('The ending month must be the same as or later than the starting month.');
-      this.completionEndMonth.reportValidity();
-      this.completionEndMonth.setCustomValidity('');
+      this.showToast('Invalid Course Duration', 'The ending month must be the same as or later than the starting month.', 'error');
+      this.completionEndMonthTrigger.focus();
       return;
     }
 
@@ -2592,14 +2816,16 @@ class UIController {
       completionDate: `${endMonth}-01`,
       grade
     });
-    if (this.completingBatchId) {
+    const completedFromBatch = Boolean(this.completingBatchId);
+    if (completedFromBatch) {
       const batch = store.getAllBatches().find(item => item.id === this.completingBatchId);
       if (batch) await store.saveBatch({ ...batch, status: 'Completed', completedAt: new Date().toISOString(), certificateIssueDate: issueDate, grade });
     }
     this.completingBatchId = null;
+    this.completionStudentIds.clear();
     this.closeModal(this.completionModal);
     this.showToast('Course Completed', `Successfully marked ${studentIds.length} student(s) as Completed. Certificates are now available.`, 'success');
-    this.selectedStudentIds.clear();
+    if (!completedFromBatch) this.selectedStudentIds.clear();
     this.render();
   }
 
@@ -2774,31 +3000,26 @@ function getStatusBadgeClass(status) {
   }
 }
 
+const DISPLAY_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
 function formatDate(dateString) {
   if (!dateString) return '—';
-  try {
-    const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  } catch (e) {
-    return dateString;
-  }
+  const normalizedDate = /^\d{4}-\d{2}-\d{2}$/.test(dateString) ? `${dateString}T00:00:00` : dateString;
+  const date = new Date(normalizedDate);
+  if (Number.isNaN(date.getTime())) return '—';
+  return `${date.getDate()} ${DISPLAY_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
 }
 
 function formatMessageDate(dateString) {
   if (!dateString) return '';
   const date = new Date(dateString);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
+  const time = date.toLocaleTimeString('en-IN', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: true
   });
+  return `${date.getDate()} ${DISPLAY_MONTHS[date.getMonth()]}, ${date.getFullYear()}, ${time}`;
 }
 
 function formatAadhar(value) {
