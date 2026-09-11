@@ -797,14 +797,17 @@ html, body {
 
 .batches-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.25rem;
 }
 
 .batch-card {
+  aspect-ratio: 1 / 1;
+  min-height: 290px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   background: var(--surface-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -822,14 +825,14 @@ html, body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 1.1rem 1.15rem 1rem;
+  padding: 1.15rem 1.2rem 0.5rem;
 }
 
 .batch-card-title-group {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.25rem;
   flex: 1;
 }
 
@@ -846,29 +849,9 @@ html, body {
 .batch-card-submeta {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 500;
-  flex-wrap: wrap;
-}
-
-.batch-student-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.batch-student-count i {
-  color: var(--primary);
-  font-size: 0.85rem;
-}
-
-.batch-meta-dot {
-  color: #cbd5e1;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
 }
 
 .batch-created-date {
@@ -879,8 +862,70 @@ html, body {
 .batch-card-header-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-shrink: 0;
+}
+
+.batch-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 1.2rem;
+  flex: 1;
+}
+
+.batch-card-visual {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 0.95rem;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  width: 100%;
+}
+
+.batch-card-visual.completed {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.batch-visual-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+
+.batch-card-visual.completed .batch-visual-icon {
+  background: linear-gradient(135deg, #059669, #10b981);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.batch-visual-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.batch-visual-count {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.batch-visual-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .batch-card-footer {
@@ -888,13 +933,12 @@ html, body {
   background: var(--surface-muted);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.85rem 1.15rem;
-  margin-top: auto;
+  gap: 0.45rem;
+  padding: 0.85rem 1.2rem 1.1rem;
 }
 
 .batch-card-footer .btn {
-  height: 38px;
+  height: 36px;
   width: 100%;
   line-height: 1;
   box-sizing: border-box;

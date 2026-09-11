@@ -1867,16 +1867,25 @@ class UIController {
       return `<article class="batch-card">
         <div class="batch-card-header">
           <div class="batch-card-title-group">
-            <h3>${escapeHtml(batch.name)}</h3>
+            <h3 title="${escapeHtml(batch.name)}">${escapeHtml(batch.name)}</h3>
             <div class="batch-card-submeta">
-              <span class="batch-student-count"><i class="fa-solid fa-user-graduate"></i> ${members.length} Student${members.length === 1 ? '' : 's'}</span>
-              <span class="batch-meta-dot">•</span>
               <span class="batch-created-date">Created on ${formatDate(batch.createdAt)}</span>
             </div>
           </div>
           <div class="batch-card-header-actions">
             <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')}"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${isCompleted ? 'Completed' : 'Active'}</span>
             <button class="btn btn-secondary btn-sm batch-edit-icon-button" data-batch-action="edit" data-batch-id="${escapeHtml(batch.id)}" title="Edit batch" aria-label="Edit batch"><i class="fa-regular fa-pen-to-square"></i></button>
+          </div>
+        </div>
+        <div class="batch-card-body">
+          <div class="batch-card-visual ${isCompleted ? 'completed' : 'active'}">
+            <div class="batch-visual-icon">
+              <i class="fa-solid ${isCompleted ? 'fa-award' : 'fa-layer-group'}"></i>
+            </div>
+            <div class="batch-visual-info">
+              <strong class="batch-visual-count">${members.length}</strong>
+              <span class="batch-visual-label">Enrolled Student${members.length === 1 ? '' : 's'}</span>
+            </div>
           </div>
         </div>
         <div class="batch-card-footer">
