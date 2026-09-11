@@ -93,6 +93,10 @@ function getInitials(name) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+function getInboxIconSvg() {
+  return `<svg viewBox="0 0 512 512" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M 38.5 76.0 L 39.0 75.5 L 472.0 75.5 L 473.0 76.5 L 477.0 76.5 L 478.0 77.5 L 481.0 77.5 L 484.0 79.5 L 486.0 79.5 L 490.0 82.5 L 491.0 82.5 L 493.0 84.5 L 494.0 84.5 L 502.5 93.0 L 502.5 94.0 L 506.5 99.0 L 506.5 101.0 L 509.5 106.0 L 509.5 109.0 L 510.5 110.0 L 510.5 114.0 L 511.5 115.0 L 511.5 396.0 L 510.5 397.0 L 510.5 401.0 L 509.5 402.0 L 509.5 405.0 L 504.5 415.0 L 502.5 417.0 L 502.5 418.0 L 494.0 426.5 L 493.0 426.5 L 491.0 428.5 L 481.0 433.5 L 478.0 433.5 L 477.0 434.5 L 473.0 434.5 L 472.0 435.5 L 39.0 435.5 L 38.0 434.5 L 34.0 434.5 L 33.0 433.5 L 28.0 432.5 L 20.0 428.5 L 17.0 425.5 L 16.0 425.5 L 8.5 418.0 L 8.5 417.0 L 4.5 412.0 L 4.5 410.0 L 1.5 405.0 L 1.5 402.0 L 0.5 401.0 L 0.5 397.0 L 0.0 396.0 L 0.0 115.0 L 0.5 114.0 L 0.5 110.0 L 1.5 109.0 L 1.5 106.0 L 4.5 101.0 L 4.5 99.0 L 6.5 97.0 L 8.5 93.0 L 16.0 85.5 L 17.0 85.5 L 23.0 80.5 L 25.0 80.5 L 30.0 77.5 L 33.0 77.5 L 34.0 76.5 L 38.5 76.0 Z M 51.5 106.0 L 52.0 105.5 L 459.0 105.5 L 459.5 106.0 L 265.0 300.5 L 261.0 302.5 L 250.0 302.5 L 246.0 300.5 L 51.5 106.0 Z M 29.5 127.0 L 30.0 126.5 L 158.5 255.0 L 158.5 256.0 L 30.0 384.5 L 29.5 384.0 L 29.5 127.0 Z M 480.5 127.0 L 481.0 126.5 L 481.5 127.0 L 481.5 384.0 L 481.0 384.5 L 352.5 256.0 L 352.5 255.0 L 480.5 127.0 Z M 178.5 278.0 L 181.0 277.5 L 181.5 279.0 L 223.0 320.5 L 224.0 320.5 L 231.0 326.5 L 239.0 330.5 L 241.0 330.5 L 242.0 331.5 L 245.0 331.5 L 246.0 332.5 L 265.0 332.5 L 266.0 331.5 L 269.0 331.5 L 270.0 330.5 L 272.0 330.5 L 280.0 326.5 L 286.0 321.5 L 287.0 321.5 L 331.0 277.5 L 332.0 277.5 L 459.5 405.0 L 459.0 405.5 L 52.0 405.5 L 51.5 405.0 L 178.5 278.0 Z"/></svg>`;
+}
+
 
 // ==========================================================================
 // 2. State & Storage Management
@@ -1262,6 +1266,9 @@ class UIController {
         const batchStudentIds = (batch.studentIds || []).filter(id => store.getStudentById(id));
         this.handleBulkMarkCompleted(batch.id, batchStudentIds);
       }
+      if (button.dataset.batchAction === 'download-certs') {
+        this.downloadBatchCertificatesZip(batch.id);
+      }
     });
 
     [this.btnCreateNewBatch, this.btnAddToExistingBatch].forEach((option, index) => {
@@ -1687,7 +1694,7 @@ class UIController {
     if (this.dashboardInboxList) {
       this.dashboardInboxList.innerHTML = messages.length ? messages.map(item => `
         <button type="button" class="dashboard-inbox-item${item.isRead ? '' : ' unread'}" onclick="window.app.switchView('inbox')">
-          <span class="inbox-sender-avatar">${escapeHtml(getInitials(item.name))}</span>
+          <span class="inbox-sender-avatar">${getInboxIconSvg()}</span>
           <span class="dashboard-inbox-content">
             <strong>${escapeHtml(item.name || 'Website Visitor')}</strong>
             <span>${escapeHtml(item.message || '')}</span>
@@ -1860,10 +1867,15 @@ class UIController {
       return `<article class="batch-card">
         <div class="batch-card-header">
           <div><h3>${escapeHtml(batch.name)}</h3><span class="batch-student-count">${members.length} Student${members.length === 1 ? '' : 's'}</span></div>
-          <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')}"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${isCompleted ? 'Completed' : 'Active'}</span>
+          <div class="batch-card-meta">
+            <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')}"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> ${isCompleted ? 'Completed' : 'Active'}</span>
+            <span class="batch-created-date">Created on ${formatDate(batch.createdAt)}</span>
+          </div>
         </div>
         <div class="batch-card-footer">
-          <span>Created on ${formatDate(batch.createdAt)}</span>
+          <button type="button" class="btn btn-secondary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download All Certificates
+          </button>
           <div class="batch-card-actions">
             <button class="btn btn-secondary btn-sm batch-edit-icon-button" data-batch-action="edit" data-batch-id="${escapeHtml(batch.id)}" title="Edit batch" aria-label="Edit batch"><i class="fa-regular fa-pen-to-square"></i></button>
             <button class="btn btn-success btn-sm" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${isCompleted || !members.length ? 'disabled' : ''}><i class="fa-solid fa-certificate"></i> ${isCompleted ? 'Completed' : 'Mark as Completed'}</button>
@@ -2018,7 +2030,7 @@ class UIController {
       <article class="inbox-message-card${item.isRead ? '' : ' unread'}">
         <div class="inbox-message-header">
           <div class="inbox-sender">
-            <span class="inbox-sender-avatar">${escapeHtml(getInitials(item.name))}</span>
+            <span class="inbox-sender-avatar">${getInboxIconSvg()}</span>
             <div>
               <h3>${escapeHtml(item.name || 'Website Visitor')}</h3>
               <a href="tel:${escapeHtml(item.phone || '')}"><i class="fa-solid fa-phone"></i> ${escapeHtml(item.phone || '')}</a>
@@ -2829,6 +2841,192 @@ class UIController {
     this.render();
   }
 
+  async generateStudentCertificatePng(student, course, batch, templateImg) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 3722;
+    canvas.height = 2480;
+    const ctx = canvas.getContext('2d');
+
+    // Draw base certificate background
+    ctx.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
+
+    // Set scaling transform from 1920x1280 design space to 3722x2480 output
+    ctx.setTransform(canvas.width / 1920, 0, 0, canvas.height / 1280, 0, 0);
+
+    const PHOTO_BOX = { x: 1525, y: 649, width: 227, height: 268 };
+    const QR_BOX = { x: 390, y: 1058, size: 124 };
+
+    // Serial & Issue Date
+    const serial = student.certificateSerial || student.id || '';
+    drawCertField(ctx, serial, 284, 533, 481, 34, 'left', 400);
+
+    const issueDateStr = student.certificateIssueDate || batch.certificateIssueDate || new Date().toISOString().slice(0, 10);
+    drawCertField(ctx, formatDate(issueDateStr), 1640, 533, 200, 34, 'left', 400);
+
+    // Student Name & Father's Name
+    const studentName = student.name || student.fullName || '';
+    drawCertField(ctx, studentName, 860, 642, 605);
+    drawCertField(ctx, student.fatherName || '', 442, 704, 514);
+
+    // Course Title & Duration
+    const courseTitle = course?.title || student.courseName || '';
+    const courseDuration = course?.duration || student.courseDuration || '';
+    drawCertField(ctx, courseTitle, 355, 765, 1055);
+    drawCertField(ctx, courseDuration, 583, 901, 326);
+
+    // Course Period
+    const startDate = student.certificateCourseStartDate || student.startDate;
+    const endDate = student.certificateCourseEndDate || student.endDate || student.completionDate;
+    const period = [formatMonthYear(startDate), formatMonthYear(endDate)].filter(Boolean).join(' - ');
+    drawCertField(ctx, period, 1007, 901, 437, 33);
+
+    // Grade
+    const grade = student.grade || batch.grade || 'A';
+    drawCertField(ctx, grade, 706, 962, 252);
+
+    // Student Photo (with border)
+    if (student.photoUrl) {
+      try {
+        const photo = await loadCertificateImage(student.photoUrl);
+        const scale = Math.max(PHOTO_BOX.width / photo.width, PHOTO_BOX.height / photo.height);
+        const sw = PHOTO_BOX.width / scale;
+        const sh = PHOTO_BOX.height / scale;
+        ctx.drawImage(
+          photo,
+          (photo.width - sw) / 2,
+          Math.max(0, (photo.height - sh) * 0.3),
+          sw,
+          sh,
+          PHOTO_BOX.x,
+          PHOTO_BOX.y,
+          PHOTO_BOX.width,
+          PHOTO_BOX.height
+        );
+        ctx.save();
+        ctx.strokeStyle = '#168bbb';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(
+          PHOTO_BOX.x + 1.5,
+          PHOTO_BOX.y + 1.5,
+          PHOTO_BOX.width - 3,
+          PHOTO_BOX.height - 3
+        );
+        ctx.restore();
+      } catch (err) {
+        console.warn('Could not load student photo for certificate:', err);
+      }
+    }
+
+    // Verification QR Code
+    if (window.QRious && student.id) {
+      try {
+        const qrCanvas = document.createElement('canvas');
+        const verificationUrl = new URL(window.location.origin);
+        verificationUrl.searchParams.set('certificate', student.id);
+        verificationUrl.searchParams.set('academy', student.academySlug || window.ADMIN_CONFIG?.academySlug || 'prantik');
+        verificationUrl.hash = 'certificate';
+        new window.QRious({
+          element: qrCanvas,
+          value: verificationUrl.href,
+          size: 512,
+          level: 'H',
+          foreground: '#111111',
+          background: '#ffffff'
+        });
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(QR_BOX.x - 5, QR_BOX.y - 5, QR_BOX.size + 10, QR_BOX.size + 10);
+        ctx.drawImage(qrCanvas, QR_BOX.x, QR_BOX.y, QR_BOX.size, QR_BOX.size);
+      } catch (err) {
+        console.warn('Could not render QR code on certificate:', err);
+      }
+    }
+
+    // Reset transform
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  }
+
+  async downloadBatchCertificatesZip(batchId) {
+    const batch = store.getAllBatches().find(b => b.id === batchId);
+    if (!batch) return;
+    const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
+    if (!members.length) {
+      this.showToast('No Students', 'This batch does not have any students to generate certificates for.', 'warning');
+      return;
+    }
+
+    if (typeof window.JSZip === 'undefined') {
+      this.showToast('ZIP Library Loading', 'Compression library is loading. Please try again in a few seconds.', 'info');
+      return;
+    }
+
+    const btn = document.querySelector(`[data-batch-action="download-certs"][data-batch-id="${CSS.escape(batchId)}"]`);
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparing…`;
+    }
+
+    try {
+      let templateImg;
+      try {
+        templateImg = await loadCertificateImage('assets/diganta-certificate-template.jpg');
+      } catch (e) {
+        templateImg = await loadCertificateImage('https://ik.imagekit.io/d3ycnoiwd/academy/student-certificate/diganta-certificate-template.jpg');
+      }
+
+      const zip = new window.JSZip();
+      let completedCount = 0;
+
+      for (const student of members) {
+        completedCount++;
+        if (btn) {
+          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering ${completedCount}/${members.length}…`;
+        }
+        const course = store.getCourseById(student.courseId);
+        const pngBlob = await this.generateStudentCertificatePng(student, course, batch, templateImg);
+        if (pngBlob) {
+          const safeName = (student.name || student.fullName || 'student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+          const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+          zip.file(`Certificate-${safeId}-${safeName}.png`, pngBlob);
+        }
+      }
+
+      if (btn) {
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Compressing ${completedCount} certs…`;
+      }
+
+      const zipBlob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+
+      const safeBatchName = (batch.name || 'batch').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+      const filename = `${safeBatchName}-Certificates.zip`;
+
+      const downloadUrl = URL.createObjectURL(zipBlob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = downloadUrl;
+      downloadLink.download = filename;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(downloadUrl);
+
+      this.showToast('Download Complete', `Successfully downloaded ${completedCount} certificate(s) in ZIP format.`, 'success');
+    } catch (error) {
+      console.error('[Download Batch Certificates Error]:', error);
+      this.showToast('Download Error', 'Failed to generate certificates ZIP. Check browser console.', 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+  }
+
   // ==========================================================================
   // Toast Notifications
   // ==========================================================================
@@ -3008,6 +3206,39 @@ function formatDate(dateString) {
   const date = new Date(normalizedDate);
   if (Number.isNaN(date.getTime())) return '—';
   return `${date.getDate()} ${DISPLAY_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
+}
+
+function formatMonthYear(dateString) {
+  if (!dateString) return '';
+  const normalizedDate = /^\d{4}-\d{2}-\d{2}$/.test(dateString) ? `${dateString}T00:00:00` : dateString;
+  const date = new Date(normalizedDate);
+  if (Number.isNaN(date.getTime())) return '';
+  return `${DISPLAY_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function loadCertificateImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Failed to load image: ' + url));
+    img.src = url;
+  });
+}
+
+function drawCertField(ctx, value, x, y, width, size = 37, align = 'center', weight = 500) {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!text) return;
+  ctx.save();
+  ctx.fillStyle = '#111111';
+  let currentSize = size;
+  do {
+    ctx.font = `${weight} ${currentSize--}px "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, Arial, sans-serif`;
+  } while (ctx.measureText(text).width > width - 12 && currentSize > 15);
+  ctx.textAlign = align;
+  const textX = align === 'left' ? x : x + width / 2;
+  ctx.fillText(text, textX, y, width - 12);
+  ctx.restore();
 }
 
 function formatMessageDate(dateString) {

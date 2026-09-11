@@ -6,12 +6,13 @@ const publicFiles = [
   'admin.html',
   'admin-config.js',
   'admin-script.js',
-  'admin-style.css'
+  'admin-style.css',
+  'assets'
 ];
 
 await rm(outputDirectory, { recursive: true, force: true });
 await mkdir(outputDirectory, { recursive: true });
 
 await Promise.all(
-  publicFiles.map(file => cp(new URL(file, import.meta.url), new URL(file, outputDirectory)))
+  publicFiles.map(file => cp(new URL(file, import.meta.url), new URL(file, outputDirectory), { recursive: true }))
 );
