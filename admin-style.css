@@ -874,12 +874,28 @@ html, body {
   flex: 1;
 }
 
-.batch-big-students {
-  font-size: 1.95rem;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.02em;
+.batch-stat-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+}
+
+.batch-stat-number {
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+}
+
+.batch-stat-label {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+  letter-spacing: -0.01em;
 }
 
 .batch-card-footer {

@@ -1878,7 +1878,10 @@ class UIController {
           </div>
         </div>
         <div class="batch-card-body">
-          <div class="batch-big-students">${members.length} Student${members.length === 1 ? '' : 's'}</div>
+          <div class="batch-stat-center">
+            <div class="batch-stat-number">${members.length}</div>
+            <div class="batch-stat-label">Student${members.length === 1 ? '' : 's'}</div>
+          </div>
         </div>
         <div class="batch-card-footer">
           <button type="button" class="btn btn-secondary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
