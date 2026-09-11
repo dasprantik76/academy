@@ -1885,8 +1885,8 @@ class UIController {
         </div>
         <div class="batch-card-footer">
           ${isCompleted ? `
-            <button type="button" class="btn btn-primary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download All Certificates
+            <button type="button" class="btn btn-secondary btn-sm batch-download-btn" data-batch-action="download-certs" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Download all certificates in ZIP format"'}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download All Certificates
             </button>
           ` : `
             <button class="btn btn-success btn-sm batch-complete-btn" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Mark batch as completed"'}>
