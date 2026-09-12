@@ -12,7 +12,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=6.64">
+  <link rel="stylesheet" href="admin-style.css?v=6.98">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -94,13 +94,18 @@
             <i class="fa-solid fa-bars"></i>
           </button>
           <div class="page-title-box">
-            <h1 id="pageTitle">Dashboard Overview</h1>
-            <p id="pageSubtitle">Welcome to EduCore Academy Administration Portal</p>
+            <div class="page-title-icon theme-dashboard" id="pageTitleIcon" aria-hidden="true">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div class="page-title-text-wrap">
+              <h1 id="pageTitle">Dashboard Overview</h1>
+              <p id="pageSubtitle">Monitor key metrics, student enrollments, and recent activity</p>
+            </div>
           </div>
         </div>
 
         <div class="header-right">
-          <a href="#" class="btn btn-outline btn-sm" target="_blank" rel="noopener noreferrer" title="View Public Academy Website" id="btnViewPublicSite">
+          <a href="#" class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer" title="View Public Academy Website" id="btnViewPublicSite">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
             <span>View Public Site</span>
           </a>
@@ -218,22 +223,6 @@
                 </ul>
                 <input type="hidden" id="studentCourseFilter" value="all">
               </div>
-
-              <!-- Status Filter (Custom Dropdown opens right below) -->
-              <div class="custom-select-container toolbar-filter-dropdown" id="adminStudentStatusFilterDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentStatusFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
-                  <i class="fa-solid fa-circle-notch select-icon"></i>
-                  <span id="adminStudentStatusFilterDisplay">All Statuses</span>
-                  <i class="fa-solid fa-chevron-down select-chevron"></i>
-                </button>
-                <ul class="custom-select-menu" id="adminStudentStatusFilterMenu" role="listbox">
-                  <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
-                  <li class="custom-select-option" data-value="Active" role="option">Active</li>
-                  <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
-                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
-                </ul>
-                <input type="hidden" id="studentStatusFilter" value="all">
-              </div>
             </div>
 
             <div class="view-actions">
@@ -262,7 +251,7 @@
           </div>
 
           <!-- Students List Table Card -->
-          <div class="dashboard-card">
+          <div class="dashboard-card student-table-card">
             <div class="card-body">
               <div class="table-responsive">
                 <table class="data-table" id="studentsTable">
@@ -271,10 +260,33 @@
                       <th style="width: 44px; text-align: center;">
                         <input type="checkbox" id="selectAllStudentsCheckbox" aria-label="Select All Students" class="custom-table-checkbox">
                       </th>
-                      <th>Student <span class="student-selection-count" id="studentSelectionCount" aria-live="polite" hidden>0</span></th>
-                      <th>Enrolled Courses</th>
+                      <th>
+                        <span class="th-student-label-wrap">
+                          <span>Student</span>
+                          <span class="student-selection-count" id="studentSelectionCount" aria-live="polite" hidden>0</span>
+                        </span>
+                      </th>
+                      <th>Student ID</th>
                       <th>Enrollment Date</th>
-                      <th>Course Status</th>
+                      <th>
+                        <div class="custom-select-container th-status-header-wrap th-minimal-dropdown" id="adminStudentStatusFilterDropdown">
+                          <button type="button" class="btn-th-filter btn-th-status-filter" id="adminStudentStatusFilterTrigger" title="Filter by Status" aria-label="Filter by Status" aria-haspopup="listbox" aria-expanded="false">
+                            <span>Course Status</span>
+                            <svg width="7" height="12" viewBox="0 0 217 383" fill="currentColor" aria-hidden="true" style="display: block;">
+                              <path d="M 98 10 C 103 2 114 2 119 10 L 213 148 C 219 157 213 169 202 169 L 15 169 C 4 169 -2 157 4 148 Z"/>
+                              <path d="M 98 373 C 103 381 114 381 119 373 L 213 235 C 219 226 213 214 202 214 L 15 214 C 4 214 -2 226 4 235 Z"/>
+                            </svg>
+                          </button>
+                          <span id="adminStudentStatusFilterDisplay" style="display: none;">All Statuses</span>
+                          <ul class="custom-select-menu th-filter-menu" id="adminStudentStatusFilterMenu" role="listbox">
+                            <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
+                            <li class="custom-select-option" data-value="Active" role="option">Active</li>
+                            <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                            <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                          </ul>
+                          <input type="hidden" id="studentStatusFilter" value="all">
+                        </div>
+                      </th>
                       <th class="text-right">Actions</th>
                     </tr>
                   </thead>
@@ -301,13 +313,39 @@
 
         <!-- ================= BATCHES VIEW ================= -->
         <section class="view-section" id="view-batches">
-          <div class="batches-grid" id="batchesGrid"></div>
-          <div class="dashboard-card" id="batchesEmptyState" style="display:none">
-            <div class="empty-state">
-              <div class="empty-icon"><i class="fa-solid fa-layer-group"></i></div>
-              <h4>No Batches Yet</h4>
-              <p>Select students, then use Create Batch to organize them.</p>
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="batchSearchInput" placeholder="Search batches...">
+                <button class="btn-clear-search" id="btnClearBatchSearch" title="Clear search">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
             </div>
+
+            <div class="view-actions">
+              <button class="btn btn-primary" id="btnAddBatch">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create Batch</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Batches Grid -->
+          <div class="batches-grid" id="batchesGrid"></div>
+
+          <!-- Batches Empty State -->
+          <div class="empty-state" id="batchesEmptyState" style="display:none">
+            <div class="empty-icon"><i class="fa-solid fa-layer-group"></i></div>
+            <h4 id="batchesEmptyTitle">No Batches Yet</h4>
+            <p id="batchesEmptyDesc">Create your first batch to organize students and issue certificates.</p>
+            <button class="btn btn-primary btn-sm" id="btnEmptyCreateBatch" style="margin-bottom: 0.5rem;">
+              <i class="fa-solid fa-plus"></i> Create Batch
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnResetBatchFilters" style="display: none;">
+              <i class="fa-solid fa-rotate-left"></i> Reset Search
+            </button>
           </div>
         </section>
 
@@ -353,16 +391,6 @@
 
         <!-- ================= INBOX VIEW ================= -->
         <section class="view-section" id="view-inbox">
-          <div class="view-header-bar">
-            <div>
-              <h2 class="inbox-heading">Website Messages</h2>
-              <p class="inbox-subtitle">Questions submitted through the public website contact form.</p>
-            </div>
-            <button type="button" class="btn btn-outline btn-sm" id="btnRefreshInbox">
-              <i class="fa-solid fa-rotate"></i> Refresh
-            </button>
-          </div>
-
           <div class="inbox-list" id="inboxList"></div>
 
           <div class="dashboard-card" id="inboxEmptyState" style="display: none;">
@@ -879,11 +907,14 @@
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btnCancelStudentModal">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="btnSaveStudent">
-            <i class="fa-solid fa-check"></i> Save Student
-          </button>
+        <div class="modal-footer" id="studentModalFooter" style="justify-content:space-between;">
+          <button type="button" class="btn btn-danger" id="btnDeleteStudentModal" style="display: none;">Delete Student</button>
+          <div style="display:flex;gap:0.75rem;margin-left:auto;">
+            <button type="button" class="btn btn-secondary" id="btnCancelStudentModal">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveStudent">
+              <i class="fa-solid fa-check"></i> Save Student
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -920,8 +951,8 @@
                 <i class="fa-regular fa-clock"></i>
                 <input type="number" id="courseDurationValue" min="1" step="1" required>
               </div>
-              <div class="custom-select-container" id="durationUnitDropdown">
-                <button type="button" class="custom-select-trigger" id="durationUnitTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <div class="custom-select-container has-value" id="durationUnitDropdown">
+                <button type="button" class="custom-select-trigger has-value" id="durationUnitTrigger" aria-haspopup="listbox" aria-expanded="false">
                   <span id="durationUnitDisplay">Months</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
                 </button>
@@ -966,11 +997,14 @@
       <div class="modal-body" id="studentDetailsContent">
         <!-- Rendered dynamically -->
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btnCloseDetailsBtn">Close</button>
-        <button type="button" class="btn btn-primary" id="btnEditFromDetails">
-          <i class="fa-regular fa-pen-to-square"></i> Edit Student
-        </button>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <button type="button" class="btn btn-danger" id="btnDeleteStudentFromDetails">Delete Student</button>
+        <div style="display:flex;gap:0.75rem;">
+          <button type="button" class="btn btn-secondary" id="btnCloseDetailsBtn">Close</button>
+          <button type="button" class="btn btn-primary" id="btnEditFromDetails">
+            <i class="fa-regular fa-pen-to-square"></i> Edit Student
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -978,7 +1012,7 @@
 
   <!-- Complete Course Dialog -->
   <div class="modal-backdrop" id="batchModal">
-    <div class="modal-window modal-sm">
+    <div class="modal-window batch-modal-window">
       <div class="modal-header">
         <div class="modal-title-box">
           <i class="fa-solid fa-layer-group modal-icon"></i>
@@ -990,7 +1024,7 @@
       </div>
       <form id="batchForm">
         <div class="modal-body">
-          <p class="field-hint" id="batchStudentCount"></p>
+          <p class="field-hint" id="batchStudentCount" hidden></p>
           <div class="form-group" id="batchNameGroup">
             <label for="batchNameInput">Batch Name <span class="required">*</span></label>
             <div class="input-icon-wrap">
@@ -1009,6 +1043,20 @@
               <ul class="custom-select-menu" id="existingBatchMenu" role="listbox"></ul>
               <input type="hidden" id="existingBatchSelect">
             </div>
+          </div>
+          <div class="form-group" id="batchStudentSelectionGroup">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+              <label style="margin-bottom: 0;">Select Students <span style="color: var(--text-muted); font-weight: normal; font-size: 0.8125rem;">(Optional)</span></label>
+              <span id="createBatchSelectionCount" class="batch-edit-selection-count">0 selected</span>
+            </div>
+            <div class="batch-edit-toolbar">
+              <div class="search-box batch-edit-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="createBatchStudentSearch" placeholder="Search students by name or ID" autocomplete="off">
+              </div>
+            </div>
+            <div class="batch-edit-student-list" id="createBatchStudentList" style="max-height: 240px;"></div>
+            <p class="empty-inline-state" id="createBatchEmptyState" hidden>No students found.</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -1297,6 +1345,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=6.55"></script>
+  <script src="admin-script.js?v=6.98"></script>
 </body>
 </html>

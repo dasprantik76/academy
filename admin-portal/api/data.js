@@ -260,7 +260,7 @@ export default async function handler(req, res) {
       const includeAdminData = Boolean(req.query.ownerEmail || req.query.admin === '1');
       let [profileDoc, coursesList, studentsList, authTokenDoc, messagesList, batchesList] = await Promise.all([
         db.collection(COLLECTIONS.PROFILE).findOne({ ownerEmail }, { projection: { _id: 0 } }),
-        db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).toArray(),
+        db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray(),
         db.collection(COLLECTIONS.STUDENTS).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ _id: -1 }).toArray(),
         db.collection(COLLECTIONS.AUTH_TOKEN).findOne({ ownerEmail }, { projection: { _id: 0 } }),
         includeAdminData
@@ -486,12 +486,18 @@ export default async function handler(req, res) {
         // 2. Save All Courses
         case 'save_courses': {
           const courses = Array.isArray(payload?.courses) ? payload.courses : [];
-          const taggedCourses = courses.map(c => ({ ...c, ownerEmail }));
+          const now = Date.now();
+          const taggedCourses = courses.map((c, idx) => ({
+            ...c,
+            ownerEmail,
+            createdAt: c.createdAt || new Date(now - idx * 1000).toISOString()
+          }));
           await db.collection(COLLECTIONS.COURSES).deleteMany({ ownerEmail });
           if (taggedCourses.length > 0) {
             await db.collection(COLLECTIONS.COURSES).insertMany(taggedCourses);
           }
-          return res.status(200).json({ success: true, courses: taggedCourses });
+          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
+          return res.status(200).json({ success: true, courses: updatedCourses });
         }
 
         // 3. Add or Update a Single Course
@@ -500,13 +506,13 @@ export default async function handler(req, res) {
           if (!course || !course.id) {
             return res.status(400).json({ success: false, error: 'Invalid course payload' });
           }
-          const taggedCourse = { ...course, ownerEmail };
+          const taggedCourse = { ...course, ownerEmail, createdAt: course.createdAt || new Date().toISOString() };
           await db.collection(COLLECTIONS.COURSES).updateOne(
             { id: course.id, ownerEmail },
             { $set: taggedCourse },
             { upsert: true }
           );
-          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).toArray();
+          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
           return res.status(200).json({ success: true, courses: updatedCourses });
         }
 
@@ -517,7 +523,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, error: 'Missing courseId' });
           }
           await db.collection(COLLECTIONS.COURSES).deleteOne({ id: courseId, ownerEmail });
-          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).toArray();
+          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
           return res.status(200).json({ success: true, courses: updatedCourses });
         }
 
@@ -586,12 +592,21 @@ export default async function handler(req, res) {
           const batch = payload?.batch || {};
           const name = String(batch.name || '').trim().slice(0, 100);
           const studentIds = [...new Set(Array.isArray(batch.studentIds) ? batch.studentIds.map(String) : [])];
-          if (!name || !studentIds.length) return res.status(400).json({ success: false, error: 'A batch name and students are required.' });
-          const validStudents = await db.collection(COLLECTIONS.STUDENTS).countDocuments({ ownerEmail, id: { $in: studentIds } });
-          if (validStudents !== studentIds.length) return res.status(400).json({ success: false, error: 'One or more students are invalid.' });
+          if (!name) return res.status(400).json({ success: false, error: 'A batch name is required.' });
+          if (studentIds.length > 0) {
+            const validStudents = await db.collection(COLLECTIONS.STUDENTS).countDocuments({ ownerEmail, id: { $in: studentIds } });
+            if (validStudents !== studentIds.length) return res.status(400).json({ success: false, error: 'One or more students are invalid.' });
+          }
           const savedBatch = { ...batch, id: String(batch.id || randomUUID()), name, studentIds, ownerEmail, status: batch.status === 'Completed' ? 'Completed' : 'Active', createdAt: batch.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
           await db.collection(COLLECTIONS.BATCHES).updateOne({ id: savedBatch.id, ownerEmail }, { $set: savedBatch }, { upsert: true });
           return res.status(200).json({ success: true, batch: savedBatch });
+        }
+
+        case 'delete_batch': {
+          const batchId = String(payload?.batchId || '').trim();
+          if (!batchId) return res.status(400).json({ success: false, error: 'Missing batch ID.' });
+          await db.collection(COLLECTIONS.BATCHES).deleteOne({ id: batchId, ownerEmail });
+          return res.status(200).json({ success: true, batchId });
         }
 
         case 'mark_message_read': {

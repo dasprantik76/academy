@@ -18,12 +18,12 @@ const STORAGE_KEYS = {
 };
 
 const DEFAULT_COMPUTER_COURSES = [
-  { id: 'CRS-101', title: 'Diploma in Computer Applications (DCA)', duration: '6 Months', description: 'Comprehensive fundamentals of computer operations, MS Office suite, Internet basics, and database concepts.' },
-  { id: 'CRS-102', title: 'Full Stack Web Development', duration: '1 Year', description: 'Modern front-end and back-end web development with HTML5, CSS3, JavaScript, Node.js, and databases.' },
-  { id: 'CRS-103', title: 'Post Graduate Diploma in Computer Applications (PGDCA)', duration: '1 Year', description: 'Advanced programming concepts, system architecture, database administration, and project implementation.' },
-  { id: 'CRS-104', title: 'Certificate in Office Automation', duration: '3 Months', description: 'Practical training in Word, Excel, PowerPoint, email, document formatting, and everyday office productivity.' },
-  { id: 'CRS-105', title: 'Tally Prime with GST', duration: '4 Months', description: 'Learn computerized accounting, inventory management, GST invoicing, taxation reports, and payroll using Tally Prime.' },
-  { id: 'CRS-106', title: 'Graphic Design Fundamentals', duration: '6 Months', description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.' }
+  { id: 'CRS-101', title: 'Diploma in Computer Applications (DCA)', duration: '6 Months', description: 'Comprehensive fundamentals of computer operations, MS Office suite, Internet basics, and database concepts.', createdAt: '2026-01-06T09:00:00.000Z' },
+  { id: 'CRS-102', title: 'Full Stack Web Development', duration: '1 Year', description: 'Modern front-end and back-end web development with HTML5, CSS3, JavaScript, Node.js, and databases.', createdAt: '2026-01-05T09:00:00.000Z' },
+  { id: 'CRS-103', title: 'Post Graduate Diploma in Computer Applications (PGDCA)', duration: '1 Year', description: 'Advanced programming concepts, system architecture, database administration, and project implementation.', createdAt: '2026-01-04T09:00:00.000Z' },
+  { id: 'CRS-104', title: 'Certificate in Office Automation', duration: '3 Months', description: 'Practical training in Word, Excel, PowerPoint, email, document formatting, and everyday office productivity.', createdAt: '2026-01-03T09:00:00.000Z' },
+  { id: 'CRS-105', title: 'Tally Prime with GST', duration: '4 Months', description: 'Learn computerized accounting, inventory management, GST invoicing, taxation reports, and payroll using Tally Prime.', createdAt: '2026-01-02T09:00:00.000Z' },
+  { id: 'CRS-106', title: 'Graphic Design Fundamentals', duration: '6 Months', description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.', createdAt: '2026-01-01T09:00:00.000Z' }
 ];
 const COURSE_SEED_VERSION = '1';
 
@@ -162,6 +162,27 @@ class AcademyStore {
       }
     }
     try { this.batches = JSON.parse(rawBatches || '[]') || []; } catch { this.batches = []; }
+
+    // Ensure historical/existing records have createdAt timestamps for accurate New to Old sorting
+    const baseTime = new Date('2026-01-01T00:00:00.000Z').getTime();
+    if (Array.isArray(this.courses)) {
+      this.courses = this.courses.map((c, idx) => {
+        if (!c.createdAt) return { ...c, createdAt: new Date(baseTime + (this.courses.length - idx) * 60000).toISOString() };
+        return c;
+      });
+    }
+    if (Array.isArray(this.batches)) {
+      this.batches = this.batches.map((b, idx) => {
+        if (!b.createdAt) return { ...b, createdAt: new Date(baseTime + (this.batches.length - idx) * 60000).toISOString() };
+        return b;
+      });
+    }
+    if (Array.isArray(this.messages)) {
+      this.messages = this.messages.map((m, idx) => {
+        if (!m.createdAt) return { ...m, createdAt: new Date(baseTime + (this.messages.length - idx) * 60000).toISOString() };
+        return m;
+      });
+    }
   }
 
   // Asynchronously synchronize with MongoDB Multi-Tenant Cloud Storage (/api/data)
@@ -244,10 +265,22 @@ class AcademyStore {
   }
 
   getAllMessages() {
-    return this.messages;
+    return [...this.messages].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+      return (b.id || '').localeCompare(a.id || '');
+    });
   }
 
-  getAllBatches() { return this.batches; }
+  getAllBatches() {
+    return [...this.batches].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+      return (b.id || '').localeCompare(a.id || '');
+    });
+  }
 
   async saveBatch(batch) {
     const result = await this.syncToCloud('save_batch', { batch });
@@ -257,6 +290,12 @@ class AcademyStore {
     else this.batches.unshift(result.batch);
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
     return result.batch;
+  }
+
+  async deleteBatch(batchId) {
+    this.batches = this.batches.filter(item => item.id !== batchId);
+    localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
+    await this.syncToCloud('delete_batch', { batchId });
   }
 
   markMessageRead(messageId) {
@@ -397,7 +436,12 @@ class AcademyStore {
 
   // Course Operations (3 Fields: Title/Name, Duration, Description)
   getAllCourses() {
-    return this.courses;
+    return [...this.courses].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+      return (b.id || '').localeCompare(a.id || '');
+    });
   }
 
   getCourseById(id) {
@@ -410,7 +454,8 @@ class AcademyStore {
       id: newId,
       title: courseData.title,
       duration: courseData.duration,
-      description: courseData.description
+      description: courseData.description,
+      createdAt: new Date().toISOString()
     };
     this.courses.unshift(newCourse);
     this.save();
@@ -569,6 +614,7 @@ class UIController {
     this.views = document.querySelectorAll('.view-section');
     this.pageTitle = document.getElementById('pageTitle');
     this.pageSubtitle = document.getElementById('pageSubtitle');
+    this.pageTitleIcon = document.getElementById('pageTitleIcon');
     this.studentCountBadge = document.getElementById('studentCountBadge');
     this.courseCountBadge = document.getElementById('courseCountBadge');
     this.inboxUnreadBadge = document.getElementById('inboxUnreadBadge');
@@ -644,6 +690,14 @@ class UIController {
     this.batchCountBadge = document.getElementById('batchCountBadge');
     this.batchesGrid = document.getElementById('batchesGrid');
     this.batchesEmptyState = document.getElementById('batchesEmptyState');
+    this.batchSearchInput = document.getElementById('batchSearchInput');
+    this.btnClearBatchSearch = document.getElementById('btnClearBatchSearch');
+    this.btnResetBatchFilters = document.getElementById('btnResetBatchFilters');
+    this.batchesEmptyTitle = document.getElementById('batchesEmptyTitle');
+    this.batchesEmptyDesc = document.getElementById('batchesEmptyDesc');
+    this.batchSearchQuery = '';
+    this.btnAddBatch = document.getElementById('btnAddBatch');
+    this.btnEmptyCreateBatch = document.getElementById('btnEmptyCreateBatch');
 
     // Modals - Student (Full fields aligned with registration portal)
     this.studentModal = document.getElementById('studentModal');
@@ -721,6 +775,7 @@ class UIController {
 
     this.btnCloseStudentModal = document.getElementById('btnCloseStudentModal');
     this.btnCancelStudentModal = document.getElementById('btnCancelStudentModal');
+    this.btnDeleteStudentModal = document.getElementById('btnDeleteStudentModal');
 
     // Modals - Course (Only 3 Inputs: Title/Name, Duration, Description)
     this.courseModal = document.getElementById('courseModal');
@@ -744,6 +799,7 @@ class UIController {
     this.btnCloseDetailsModal = document.getElementById('btnCloseDetailsModal');
     this.btnCloseDetailsBtn = document.getElementById('btnCloseDetailsBtn');
     this.btnEditFromDetails = document.getElementById('btnEditFromDetails');
+    this.btnDeleteStudentFromDetails = document.getElementById('btnDeleteStudentFromDetails');
     this.currentViewingStudentId = null;
     this.completingBatchId = null;
 
@@ -760,6 +816,13 @@ class UIController {
     this.existingBatchMenu = document.getElementById('existingBatchMenu');
     this.existingBatchDisplay = document.getElementById('existingBatchDisplay');
     this.existingBatchSelect = document.getElementById('existingBatchSelect');
+    this.batchStudentSelectionGroup = document.getElementById('batchStudentSelectionGroup');
+    this.createBatchSelectionCount = document.getElementById('createBatchSelectionCount');
+    this.createBatchStudentSearch = document.getElementById('createBatchStudentSearch');
+    this.createBatchStudentList = document.getElementById('createBatchStudentList');
+    this.createBatchEmptyState = document.getElementById('createBatchEmptyState');
+    this.createBatchSelectedStudentIds = new Set();
+    this.createBatchSearchQuery = '';
     this.saveBatchLabel = document.getElementById('saveBatchLabel');
     this.btnCloseBatchModal = document.getElementById('btnCloseBatchModal');
     this.btnCancelBatchModal = document.getElementById('btnCancelBatchModal');
@@ -780,6 +843,7 @@ class UIController {
     this.editBatchStatus = document.getElementById('editBatchStatus');
     this.btnCloseEditBatchModal = document.getElementById('btnCloseEditBatchModal');
     this.btnCancelEditBatch = document.getElementById('btnCancelEditBatch');
+    this.btnDeleteBatch = document.getElementById('btnDeleteBatch');
 
     // Modals - Course Completion
     this.completionModal = document.getElementById('completionModal');
@@ -1209,6 +1273,12 @@ class UIController {
       this.studentStatusFilter,
       (val) => {
         this.studentStatusFilterVal = val;
+        if (this.adminStudentStatusFilterDropdown) {
+          this.adminStudentStatusFilterDropdown.classList.toggle('is-filtered', val !== 'all');
+        }
+        if (this.adminStudentStatusFilterTrigger) {
+          this.adminStudentStatusFilterTrigger.title = val === 'all' ? 'Filter by Status' : `Status: ${val}`;
+        }
         this.renderStudentsView();
       }
     );
@@ -1234,6 +1304,12 @@ class UIController {
         'All Statuses'
       );
       this.studentStatusFilterVal = 'all';
+      if (this.adminStudentStatusFilterDropdown) {
+        this.adminStudentStatusFilterDropdown.classList.remove('is-filtered');
+      }
+      if (this.adminStudentStatusFilterTrigger) {
+        this.adminStudentStatusFilterTrigger.title = 'Filter by Status';
+      }
       this.btnClearStudentSearch.style.display = 'none';
       this.renderStudentsView();
     });
@@ -1301,6 +1377,24 @@ class UIController {
           this.updateBulkActionState();
         }
       });
+
+      this.studentsTableBody.addEventListener('click', (e) => {
+        const nameBlock = e.target.closest('.student-meta-cell');
+        if (nameBlock) {
+          const row = nameBlock.closest('tr');
+          const checkbox = row ? row.querySelector('.student-row-checkbox') : null;
+          if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+            const studentId = checkbox.getAttribute('data-student-id');
+            if (checkbox.checked) {
+              this.selectedStudentIds.add(studentId);
+            } else {
+              this.selectedStudentIds.delete(studentId);
+            }
+            this.updateBulkActionState();
+          }
+        }
+      });
     }
 
     // Course Search Handler
@@ -1323,6 +1417,67 @@ class UIController {
       this.btnClearCourseSearch.style.display = 'none';
       this.renderCoursesView();
     });
+
+    // Batch Search Handler
+    if (this.batchSearchInput) {
+      this.batchSearchInput.addEventListener('input', (e) => {
+        this.batchSearchQuery = e.target.value.trim().toLowerCase();
+        if (this.btnClearBatchSearch) {
+          this.btnClearBatchSearch.style.display = this.batchSearchQuery ? 'block' : 'none';
+        }
+        this.renderBatchesView();
+      });
+    }
+
+    if (this.btnClearBatchSearch) {
+      this.btnClearBatchSearch.addEventListener('click', () => {
+        if (this.batchSearchInput) this.batchSearchInput.value = '';
+        this.batchSearchQuery = '';
+        this.btnClearBatchSearch.style.display = 'none';
+        this.renderBatchesView();
+      });
+    }
+
+    if (this.btnResetBatchFilters) {
+      this.btnResetBatchFilters.addEventListener('click', () => {
+        if (this.batchSearchInput) this.batchSearchInput.value = '';
+        this.batchSearchQuery = '';
+        if (this.btnClearBatchSearch) this.btnClearBatchSearch.style.display = 'none';
+        this.renderBatchesView();
+      });
+    }
+
+    if (this.btnAddBatch) {
+      this.btnAddBatch.addEventListener('click', () => this.openCreateBatchModal());
+    }
+
+    if (this.btnEmptyCreateBatch) {
+      this.btnEmptyCreateBatch.addEventListener('click', () => this.openCreateBatchModal());
+    }
+
+    if (this.createBatchStudentSearch) {
+      this.createBatchStudentSearch.addEventListener('input', (e) => {
+        this.createBatchSearchQuery = e.target.value.trim().toLowerCase();
+        this.renderCreateBatchStudentList();
+      });
+    }
+
+    if (this.createBatchStudentList) {
+      this.createBatchStudentList.addEventListener('change', (e) => {
+        const checkbox = e.target.closest('.create-batch-student-checkbox');
+        if (checkbox) {
+          const studentId = checkbox.dataset.studentId;
+          if (checkbox.checked) {
+            this.createBatchSelectedStudentIds.add(studentId);
+          } else {
+            this.createBatchSelectedStudentIds.delete(studentId);
+          }
+          if (this.createBatchSelectionCount) {
+            this.createBatchSelectionCount.textContent = `${this.createBatchSelectedStudentIds.size} selected`;
+          }
+        }
+      });
+    }
 
     // Setup Admin Student Form Custom Dropdowns (opens right below)
     this.setupAdminDropdown(this.adminStudentGenderDropdown, this.adminStudentGenderTrigger, this.adminStudentGenderMenu, this.adminStudentGenderDisplay, this.studentGenderInput);
@@ -1388,6 +1543,20 @@ class UIController {
       this.closeAllAdminDropdowns();
     });
 
+    window.addEventListener('resize', () => {
+      if (this.portaledMenu) this.closeAllAdminDropdowns();
+    }, { passive: true });
+
+    window.addEventListener('scroll', () => {
+      if (this.portaledMenu) this.closeAllAdminDropdowns();
+    }, { passive: true });
+
+    document.querySelectorAll('.modal-body, .table-responsive').forEach(el => {
+      el.addEventListener('scroll', () => {
+        if (this.portaledMenu) this.closeAllAdminDropdowns();
+      }, { passive: true });
+    });
+
     // Form Submissions
     this.studentForm.addEventListener('submit', (e) => this.handleStudentFormSubmit(e));
     this.courseForm.addEventListener('submit', (e) => this.handleCourseFormSubmit(e));
@@ -1395,6 +1564,12 @@ class UIController {
     // Modal Close Buttons
     this.btnCloseStudentModal.addEventListener('click', () => this.closeModal(this.studentModal));
     this.btnCancelStudentModal.addEventListener('click', () => this.closeModal(this.studentModal));
+    this.btnDeleteStudentModal?.addEventListener('click', () => {
+      const studentId = this.studentIdInput.value;
+      if (!studentId) return;
+      this.closeModal(this.studentModal);
+      this.confirmDeleteStudent(studentId);
+    });
 
     this.btnCloseCourseModal.addEventListener('click', () => this.closeModal(this.courseModal));
     this.btnCancelCourseModal.addEventListener('click', () => this.closeModal(this.courseModal));
@@ -1406,6 +1581,12 @@ class UIController {
       if (this.currentViewingStudentId) {
         this.openStudentModal(this.currentViewingStudentId);
       }
+    });
+    this.btnDeleteStudentFromDetails?.addEventListener('click', () => {
+      const studentId = this.currentViewingStudentId;
+      if (!studentId) return;
+      this.closeModal(this.studentDetailsModal);
+      this.confirmDeleteStudent(studentId);
     });
 
     this.completionForm.addEventListener('submit', (e) => this.handleCompletionSubmit(e));
@@ -1426,6 +1607,21 @@ class UIController {
     );
     this.btnCloseEditBatchModal?.addEventListener('click', () => this.closeModal(this.editBatchModal));
     this.btnCancelEditBatch?.addEventListener('click', () => this.closeModal(this.editBatchModal));
+    this.btnDeleteBatch?.addEventListener('click', () => {
+      const batchId = this.editingBatchId;
+      const batch = store.getAllBatches().find(item => item.id === batchId);
+      if (!batch) return;
+      this.promptConfirmation({
+        title: 'Delete Batch?',
+        message: `Are you sure you want to delete the batch "${batch.name}"? This action cannot be undone.`,
+        action: async () => {
+          this.closeModal(this.editBatchModal);
+          await store.deleteBatch(batchId);
+          this.render();
+          this.showToast('Batch Deleted', `Batch "${batch.name}" has been deleted.`, 'info');
+        }
+      });
+    });
     this.editBatchForm?.addEventListener('submit', (e) => this.handleEditBatchSubmit(e));
     this.setupAdminDropdown(
       this.editBatchStatusDropdown,
@@ -1463,6 +1659,12 @@ class UIController {
     }
     if (this.durationUnitDisplay) {
       this.durationUnitDisplay.textContent = cleanUnit;
+    }
+    if (this.durationUnitDropdown) {
+      this.durationUnitDropdown.classList.add('has-value');
+    }
+    if (this.durationUnitTrigger) {
+      this.durationUnitTrigger.classList.add('has-value');
     }
     if (this.durationUnitMenu) {
       this.durationUnitMenu.querySelectorAll('.custom-select-option').forEach(opt => {
@@ -1505,22 +1707,51 @@ class UIController {
       }
     });
 
-    if (viewName === 'dashboard') {
-      const profile = store.getAcademyProfile();
-      this.pageTitle.textContent = 'Dashboard Overview';
-      this.pageSubtitle.textContent = profile?.academyName ? `Academy Management Portal • ${profile.academyName}` : 'Welcome to Academy by PixelSetu';
-    } else if (viewName === 'students') {
-      this.pageTitle.textContent = 'Student Management';
-      this.pageSubtitle.textContent = 'Register, track progress, and manage enrolled learners';
-    } else if (viewName === 'courses') {
-      this.pageTitle.textContent = 'Course Management';
-      this.pageSubtitle.textContent = 'Curate academy courses, durations, and syllabus details';
-    } else if (viewName === 'batches') {
-      this.pageTitle.textContent = 'Batch Management';
-      this.pageSubtitle.textContent = 'Organize students and process batch certificates';
-    } else if (viewName === 'inbox') {
-      this.pageTitle.textContent = 'Inbox';
-      this.pageSubtitle.textContent = 'Messages received from your public website';
+    const headerConfig = {
+      dashboard: {
+        icon: '<i class="fa-solid fa-chart-pie"></i>',
+        theme: 'theme-dashboard',
+        title: 'Dashboard Overview',
+        subtitle: 'Monitor key metrics, student enrollments, and recent activity'
+      },
+      students: {
+        icon: '<i class="fa-solid fa-user-graduate"></i>',
+        theme: 'theme-dashboard',
+        title: 'Student Management',
+        subtitle: 'Register, track progress, and manage enrolled learners'
+      },
+      courses: {
+        icon: '<i class="fa-solid fa-desktop"></i>',
+        theme: 'theme-dashboard',
+        title: 'Course Management',
+        subtitle: 'Curate academy courses, durations, and syllabus details'
+      },
+      batches: {
+        icon: '<i class="fa-solid fa-layer-group"></i>',
+        theme: 'theme-dashboard',
+        title: 'Batch Management',
+        subtitle: 'Organize students and process batch certificates'
+      },
+      inbox: {
+        icon: '<svg viewBox="0 0 512 512" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z"/></svg>',
+        theme: 'theme-dashboard',
+        title: 'Inbox',
+        subtitle: 'Messages received from your public website'
+      },
+      personalisation: {
+        icon: '<i class="fa-solid fa-sliders"></i>',
+        theme: 'theme-dashboard',
+        title: 'Personalisation',
+        subtitle: 'Customize your public website branding and settings'
+      }
+    };
+
+    const config = headerConfig[viewName] || headerConfig.dashboard;
+    if (this.pageTitle) this.pageTitle.textContent = config.title;
+    if (this.pageSubtitle) this.pageSubtitle.textContent = config.subtitle;
+    if (this.pageTitleIcon) {
+      this.pageTitleIcon.className = `page-title-icon ${config.theme}`;
+      this.pageTitleIcon.innerHTML = config.icon;
     }
 
     this.render();
@@ -1766,15 +1997,14 @@ class UIController {
             <input type="checkbox" class="student-row-checkbox custom-table-checkbox" data-student-id="${escapeHtml(student.id)}" ${isChecked ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}">
           </td>
           <td>
-            <div class="student-meta-cell">
+            <div class="student-meta-cell" title="Click to select student">
               <div class="student-name-box">
                 <strong>${escapeHtml(student.name)}</strong>
-                <span>ID: ${escapeHtml(student.id)}</span>
               </div>
             </div>
           </td>
           <td>
-            ${enrolledCoursesBadges || '<span style="color: var(--text-subtle); font-size: 0.8125rem;">No courses</span>'}
+            <span class="student-id-cell">${escapeHtml(student.id)}</span>
           </td>
           <td>${formatDate(student.joinDate)}</td>
           <td>
@@ -1789,9 +2019,6 @@ class UIController {
               </button>
               <button class="btn-icon edit" title="Edit Student" onclick="window.app.openStudentModal('${student.id}')">
                 <i class="fa-regular fa-pen-to-square"></i>
-              </button>
-              <button class="btn-icon delete" title="Delete Student" onclick="window.app.confirmDeleteStudent('${student.id}')">
-                <i class="fa-regular fa-trash-can"></i>
               </button>
             </div>
           </td>
@@ -1835,7 +2062,7 @@ class UIController {
             </span>
           </div>
           <div class="course-card-body">
-            <p class="course-desc">${escapeHtml(course.description || 'No description provided.')}</p>
+            <p class="course-desc" title="${escapeHtml(course.description || '')}">${escapeHtml(course.description || 'No description provided.')}</p>
           </div>
           <div class="course-card-footer">
             <div class="enrolled-stat">
@@ -1860,8 +2087,45 @@ class UIController {
     const batches = store.getAllBatches();
     if (this.batchCountBadge) this.batchCountBadge.textContent = batches.length;
     if (!this.batchesGrid || !this.batchesEmptyState) return;
-    this.batchesEmptyState.style.display = batches.length ? 'none' : 'block';
-    this.batchesGrid.innerHTML = batches.map(batch => {
+
+    let filteredBatches = batches;
+    if (this.batchSearchQuery) {
+      filteredBatches = batches.filter(batch => {
+        const nameMatch = (batch.name || '').toLowerCase().includes(this.batchSearchQuery);
+        const statusMatch = (batch.status || '').toLowerCase().includes(this.batchSearchQuery);
+        const dateMatch = formatDate(batch.createdAt).toLowerCase().includes(this.batchSearchQuery);
+        const studentMatch = (batch.studentIds || []).some(id => {
+          const s = store.getStudentById(id);
+          return s && (
+            (s.name || '').toLowerCase().includes(this.batchSearchQuery) ||
+            (s.regNo || '').toLowerCase().includes(this.batchSearchQuery)
+          );
+        });
+        return nameMatch || statusMatch || dateMatch || studentMatch;
+      });
+    }
+
+    if (filteredBatches.length === 0) {
+      this.batchesGrid.innerHTML = '';
+      this.batchesEmptyState.style.display = 'flex';
+      if (this.batchesEmptyTitle && this.batchesEmptyDesc) {
+        if (this.batchSearchQuery) {
+          this.batchesEmptyTitle.textContent = 'No Batches Found';
+          this.batchesEmptyDesc.textContent = 'No batches match your search keywords.';
+          if (this.btnResetBatchFilters) this.btnResetBatchFilters.style.display = 'inline-flex';
+          if (this.btnEmptyCreateBatch) this.btnEmptyCreateBatch.style.display = 'none';
+        } else {
+          this.batchesEmptyTitle.textContent = 'No Batches Yet';
+          this.batchesEmptyDesc.textContent = 'Create your first batch to organize students and issue certificates.';
+          if (this.btnResetBatchFilters) this.btnResetBatchFilters.style.display = 'none';
+          if (this.btnEmptyCreateBatch) this.btnEmptyCreateBatch.style.display = 'inline-flex';
+        }
+      }
+      return;
+    }
+
+    this.batchesEmptyState.style.display = 'none';
+    this.batchesGrid.innerHTML = filteredBatches.map(batch => {
       const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
       const isCompleted = batch.status === 'Completed';
       return `<article class="batch-card">
@@ -1967,24 +2231,65 @@ class UIController {
     }
   }
 
-  handleCreateNewBatch() {
-    const studentIds = Array.from(this.selectedStudentIds);
-    if (!studentIds.length) {
-      this.showToast('Select Students', 'Select one or more students before creating a batch.', 'error');
-      return;
-    }
+  openCreateBatchModal(initialStudentIds = []) {
     this.batchModalMode = 'create';
     this.batchForm.reset();
     this.batchModalTitle.textContent = 'Create New Batch';
-    this.batchStudentCount.textContent = `${studentIds.length} selected student${studentIds.length === 1 ? '' : 's'} will be added.`;
     this.batchNameGroup.hidden = false;
     this.existingBatchGroup.hidden = true;
+    if (this.batchStudentSelectionGroup) this.batchStudentSelectionGroup.hidden = false;
     this.batchNameInput.required = true;
-    this.setAdminDropdownValue(this.existingBatchDropdown, this.existingBatchMenu, this.existingBatchDisplay, this.existingBatchSelect, '', 'Choose an active batch');
-    this.existingBatchTrigger.classList.remove('input-error');
     this.saveBatchLabel.textContent = 'Create Batch';
+
+    const preselected = Array.isArray(initialStudentIds) && initialStudentIds.length
+      ? initialStudentIds
+      : Array.from(this.selectedStudentIds || []);
+    this.createBatchSelectedStudentIds = new Set(preselected);
+    this.createBatchSearchQuery = '';
+    if (this.createBatchStudentSearch) this.createBatchStudentSearch.value = '';
+    this.renderCreateBatchStudentList();
+
     this.openModal(this.batchModal);
     setTimeout(() => this.batchNameInput.focus(), 100);
+  }
+
+  renderCreateBatchStudentList() {
+    if (!this.createBatchStudentList) return;
+    const query = this.createBatchSearchQuery;
+    const students = store.getAllStudents().filter(student => {
+      if (!query) return true;
+      const name = String(student.name || student.fullName || '').toLowerCase();
+      const id = String(student.id || student.regNo || '').toLowerCase();
+      const course = String(student.course || student.courseName || '').toLowerCase();
+      return name.includes(query) || id.includes(query) || course.includes(query);
+    });
+
+    if (this.createBatchSelectionCount) {
+      this.createBatchSelectionCount.textContent = `${this.createBatchSelectedStudentIds.size} selected`;
+    }
+
+    if (this.createBatchEmptyState) {
+      this.createBatchEmptyState.hidden = students.length > 0;
+    }
+    this.createBatchStudentList.hidden = students.length === 0;
+
+    this.createBatchStudentList.innerHTML = students.map(student => {
+      const name = student.name || student.fullName || 'Unnamed Student';
+      const reg = student.regNo || student.id || '';
+      const course = student.course || '';
+      const isChecked = this.createBatchSelectedStudentIds.has(student.id);
+      return `<label class="batch-edit-student-option">
+        <input type="checkbox" class="custom-table-checkbox create-batch-student-checkbox" data-student-id="${escapeHtml(student.id)}" ${isChecked ? 'checked' : ''}>
+        <span>
+          <strong>${escapeHtml(name)}</strong>
+          <small>${escapeHtml(reg)}${course ? ` • ${escapeHtml(course)}` : ''}</small>
+        </span>
+      </label>`;
+    }).join('');
+  }
+
+  handleCreateNewBatch() {
+    this.openCreateBatchModal(Array.from(this.selectedStudentIds));
   }
 
   handleAddToExistingBatch() {
@@ -1995,9 +2300,9 @@ class UIController {
     this.batchModalMode = 'existing';
     this.batchForm.reset();
     this.batchModalTitle.textContent = 'Add to Existing Batch';
-    this.batchStudentCount.textContent = `${studentIds.length} selected student${studentIds.length === 1 ? '' : 's'} will be added.`;
     this.batchNameGroup.hidden = true;
     this.existingBatchGroup.hidden = false;
+    if (this.batchStudentSelectionGroup) this.batchStudentSelectionGroup.hidden = true;
     this.batchNameInput.required = false;
     this.existingBatchMenu.innerHTML = batches.map(batch => `<li class="custom-select-option" data-value="${escapeHtml(batch.id)}" role="option">${escapeHtml(batch.name)} (${(batch.studentIds || []).length} students)</li>`).join('');
     this.setAdminDropdownValue(this.existingBatchDropdown, this.existingBatchMenu, this.existingBatchDisplay, this.existingBatchSelect, '', 'Choose an active batch');
@@ -2009,28 +2314,44 @@ class UIController {
 
   async handleBatchFormSubmit(e) {
     e.preventDefault();
-    const studentIds = Array.from(this.selectedStudentIds);
-    if (!studentIds.length) return this.closeModal(this.batchModal);
     const existing = this.batchModalMode === 'existing';
-    const batch = existing ? store.getAllBatches().find(item => item.id === this.existingBatchSelect.value) : null;
-    const name = this.batchNameInput.value.trim();
-    if (existing && !batch) {
-      this.existingBatchTrigger.classList.add('input-error');
-      this.existingBatchTrigger.focus();
-      return;
-    }
-    if (!existing && !name) return this.batchForm.reportValidity();
-    try {
-      const saved = await store.saveBatch(existing
-        ? { ...batch, studentIds: [...new Set([...(batch.studentIds || []), ...studentIds])] }
-        : { name, studentIds, status: 'Active' });
-      this.closeModal(this.batchModal);
-      this.selectedStudentIds.clear();
-      this.render();
-      this.switchView('batches');
-      this.showToast(existing ? 'Students Added' : 'Batch Created', existing ? `Students were added to ${saved.name}.` : `${saved.name} was created successfully.`, 'success');
-    } catch (error) {
-      this.showToast(existing ? 'Students Not Added' : 'Batch Not Created', error.message, 'error');
+    if (existing) {
+      const studentIds = Array.from(this.selectedStudentIds);
+      if (!studentIds.length) return this.closeModal(this.batchModal);
+      const batch = store.getAllBatches().find(item => item.id === this.existingBatchSelect.value);
+      if (!batch) {
+        this.existingBatchTrigger.classList.add('input-error');
+        this.existingBatchTrigger.focus();
+        return;
+      }
+      try {
+        const saved = await store.saveBatch({
+          ...batch,
+          studentIds: [...new Set([...(batch.studentIds || []), ...studentIds])]
+        });
+        this.closeModal(this.batchModal);
+        this.selectedStudentIds.clear();
+        this.render();
+        this.switchView('batches');
+        this.showToast('Students Added', `Students were added to ${saved.name}.`, 'success');
+      } catch (error) {
+        this.showToast('Students Not Added', error.message, 'error');
+      }
+    } else {
+      const name = this.batchNameInput.value.trim();
+      if (!name) return this.batchForm.reportValidity();
+      const studentIds = Array.from(this.createBatchSelectedStudentIds);
+      try {
+        const saved = await store.saveBatch({ name, studentIds, status: 'Active' });
+        this.closeModal(this.batchModal);
+        this.selectedStudentIds.clear();
+        this.createBatchSelectedStudentIds.clear();
+        this.render();
+        this.switchView('batches');
+        this.showToast('Batch Created', `${saved.name} was created successfully.`, 'success');
+      } catch (error) {
+        this.showToast('Batch Not Created', error.message, 'error');
+      }
     }
   }
 
@@ -2089,9 +2410,69 @@ class UIController {
 
     trigger.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.closeAllAdminDropdowns(container);
-      const isOpen = container.classList.toggle('open');
-      trigger.setAttribute('aria-expanded', String(isOpen));
+      const wasOpen = container.classList.contains('open');
+
+      if (wasOpen) {
+        this.closeAllAdminDropdowns();
+        return;
+      }
+
+      this.closeAllAdminDropdowns();
+
+      const isStudentModal = Boolean(container.closest('#studentModal'));
+      const isTableDropdown = Boolean(container.closest('.table-responsive') || container.closest('.data-table') || container.classList.contains('th-minimal-dropdown'));
+
+      if (isStudentModal || isTableDropdown) {
+        // Open below the trigger and portal to body to avoid clipping by modal bodies, table scrollbars, or empty states
+        const triggerRect = trigger.getBoundingClientRect();
+        this.portaledMenu = menu;
+        this.portaledOriginalParent = container;
+        this.portaledNextSibling = menu.nextSibling;
+
+        const maxAvailableBelow = window.innerHeight - triggerRect.bottom - 12;
+
+        menu.classList.add('portal-select-menu');
+        menu.style.top = `${triggerRect.bottom + 4}px`;
+
+        if (container.classList.contains('th-minimal-dropdown')) {
+          menu.style.minWidth = '145px';
+          menu.style.width = 'max-content';
+          const menuWidth = 155;
+          if (triggerRect.left + menuWidth > window.innerWidth - 16) {
+            menu.style.left = `${Math.max(8, triggerRect.right - menuWidth)}px`;
+          } else {
+            menu.style.left = `${triggerRect.left}px`;
+          }
+        } else {
+          menu.style.left = `${triggerRect.left}px`;
+          menu.style.width = `${triggerRect.width}px`;
+          menu.style.minWidth = '';
+        }
+
+        menu.style.maxHeight = `${Math.max(140, Math.min(240, maxAvailableBelow))}px`;
+        document.body.appendChild(menu);
+
+        container.classList.remove('drop-up');
+        container.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      } else {
+        // Measure trigger position and scroll parent boundaries to decide drop-down vs drop-up
+        const triggerRect = trigger.getBoundingClientRect();
+        const scrollParent = container.closest('.modal-body') || document.body;
+        const parentRect = scrollParent.getBoundingClientRect();
+
+        const spaceBelow = parentRect.bottom - triggerRect.bottom;
+        const spaceAbove = triggerRect.top - parentRect.top;
+        const viewportBelow = window.innerHeight - triggerRect.bottom;
+        const viewportAbove = triggerRect.top;
+
+        // Open upwards if space below is tight (< 230px) and there is more room above
+        const shouldDropUp = (spaceBelow < 230 || viewportBelow < 230) && (spaceAbove > spaceBelow || viewportAbove > viewportBelow);
+
+        container.classList.toggle('drop-up', shouldDropUp);
+        container.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
     });
 
     menu.addEventListener('click', (e) => {
@@ -2108,8 +2489,9 @@ class UIController {
       menu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
 
-      container.classList.remove('open');
+      container.classList.remove('open', 'drop-up');
       trigger.setAttribute('aria-expanded', 'false');
+      this.closeAllAdminDropdowns();
 
       if (typeof onChangeCallback === 'function') {
         onChangeCallback(value);
@@ -2118,6 +2500,21 @@ class UIController {
   }
 
   closeAllAdminDropdowns(except = null) {
+    if (this.portaledMenu && this.portaledOriginalParent && this.portaledOriginalParent !== except) {
+      if (this.portaledMenu.parentElement === document.body) {
+        this.portaledOriginalParent.insertBefore(this.portaledMenu, this.portaledNextSibling || null);
+      }
+      this.portaledMenu.classList.remove('portal-select-menu');
+      this.portaledMenu.style.top = '';
+      this.portaledMenu.style.left = '';
+      this.portaledMenu.style.width = '';
+      this.portaledMenu.style.minWidth = '';
+      this.portaledMenu.style.maxHeight = '';
+      this.portaledMenu = null;
+      this.portaledOriginalParent = null;
+      this.portaledNextSibling = null;
+    }
+
     const all = [
       this.durationUnitDropdown,
       this.adminStudentGenderDropdown,
@@ -2141,7 +2538,7 @@ class UIController {
     ];
     all.forEach(dropdown => {
       if (dropdown && dropdown !== except) {
-        dropdown.classList.remove('open');
+        dropdown.classList.remove('open', 'drop-up');
         const trigger = dropdown.querySelector('.custom-select-trigger');
         if (trigger) trigger.setAttribute('aria-expanded', 'false');
         if (dropdown === this.batchActionMenu) this.btnCreateBatch?.setAttribute('aria-expanded', 'false');
@@ -2286,6 +2683,7 @@ class UIController {
       this.setAdminDropdownValue(this.adminStudentCourseDropdown, this.adminStudentCourseMenu, this.adminStudentCourseDisplay, this.studentCourseInput, enrolledId, courseLabel);
       this.setAdminDropdownValue(this.adminStudentStatusDropdown, this.adminStudentStatusMenu, this.adminStudentStatusDisplay, this.studentStatusSelect, student.status || 'Active', student.status || 'Active');
       if (this.studentDobInput) this.studentDobInput.classList.toggle('has-value', Boolean(this.studentDobInput.value));
+      if (this.btnDeleteStudentModal) this.btnDeleteStudentModal.style.display = 'inline-flex';
     } else {
       this.studentModalTitle.textContent = 'Add New Student';
       this.studentIdInput.value = '';
@@ -2309,6 +2707,7 @@ class UIController {
       this.setAdminDropdownValue(this.adminStudentQualificationDropdown, this.adminStudentQualificationMenu, this.adminStudentQualificationDisplay, this.studentQualificationInput, '', 'Select Qualification');
       this.setAdminDropdownValue(this.adminStudentCourseDropdown, this.adminStudentCourseMenu, this.adminStudentCourseDisplay, this.studentCourseInput, '', 'Select Course');
       this.setAdminDropdownValue(this.adminStudentStatusDropdown, this.adminStudentStatusMenu, this.adminStudentStatusDisplay, this.studentStatusSelect, 'Active', 'Active');
+      if (this.btnDeleteStudentModal) this.btnDeleteStudentModal.style.display = 'none';
     }
 
     this.openModal(this.studentModal);
@@ -2560,6 +2959,7 @@ class UIController {
       title: 'Delete Student Record?',
       message: `Are you sure you want to delete "${student.name}" (ID: ${student.id})? This action cannot be undone.`,
       action: () => {
+        this.selectedStudentIds.delete(studentId);
         store.deleteStudent(studentId);
         this.render();
         this.showToast('Student Deleted', `${student.name} was removed from the registry.`, 'info');
@@ -2672,6 +3072,7 @@ class UIController {
   }
 
   closeModal(modalElement) {
+    this.closeAllAdminDropdowns();
     modalElement.classList.remove('open');
     if (document.querySelectorAll('.modal-backdrop.open').length === 0) {
       document.body.style.overflow = '';
