@@ -307,6 +307,21 @@ class AcademyStore {
     this.syncToCloud('mark_message_read', { messageId });
   }
 
+  markAllMessagesRead() {
+    let changed = false;
+    this.messages.forEach(item => {
+      if (!item.isRead) {
+        item.isRead = true;
+        item.readAt = new Date().toISOString();
+        changed = true;
+      }
+    });
+    if (changed) {
+      localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
+      this.syncToCloud('mark_all_messages_read', {});
+    }
+  }
+
   deleteMessage(messageId) {
     this.messages = this.messages.filter(item => item.id !== messageId);
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
@@ -432,6 +447,13 @@ class AcademyStore {
     this.students = this.students.filter(s => s.id !== id);
     this.save();
     this.syncToCloud('delete_student', { studentId: id });
+  }
+
+  bulkDeleteStudents(ids) {
+    const idSet = new Set(ids);
+    this.students = this.students.filter(s => !idSet.has(s.id));
+    this.save();
+    this.syncToCloud('bulk_delete_students', { studentIds: Array.from(ids) });
   }
 
   // Course Operations (3 Fields: Title/Name, Duration, Description)
@@ -666,6 +688,29 @@ class UIController {
     this.btnAddToExistingBatch = document.getElementById('btnAddToExistingBatch');
     this.btnBulkMarkCompleted = document.getElementById('btnBulkMarkCompleted');
     this.bulkMarkCompletedLabel = document.getElementById('bulkMarkCompletedLabel');
+    this.studentMoreActionsMenu = document.getElementById('studentMoreActionsMenu');
+    this.btnStudentMoreActions = document.getElementById('btnStudentMoreActions');
+    this.studentMoreDropdown = document.getElementById('studentMoreDropdown');
+    this.btnMoreDownloadCert = document.getElementById('btnMoreDownloadCert');
+    this.btnMoreChangeStatus = document.getElementById('btnMoreChangeStatus');
+    this.btnMoreDeleteStudent = document.getElementById('btnMoreDeleteStudent');
+    this.labelMoreDownloadCert = document.getElementById('labelMoreDownloadCert');
+    this.labelMoreChangeStatus = document.getElementById('labelMoreChangeStatus');
+    this.labelMoreDeleteStudent = document.getElementById('labelMoreDeleteStudent');
+
+    // Bulk Status Modal Elements
+    this.bulkStatusModal = document.getElementById('bulkStatusModal');
+    this.bulkStatusModalTitle = document.getElementById('bulkStatusModalTitle');
+    this.bulkStatusModalSubtitle = document.getElementById('bulkStatusModalSubtitle');
+    this.btnCloseBulkStatusModal = document.getElementById('btnCloseBulkStatusModal');
+    this.btnCancelBulkStatus = document.getElementById('btnCancelBulkStatus');
+    this.bulkStatusForm = document.getElementById('bulkStatusForm');
+    this.bulkStatusDropdown = document.getElementById('bulkStatusDropdown');
+    this.bulkStatusTrigger = document.getElementById('bulkStatusTrigger');
+    this.bulkStatusDisplay = document.getElementById('bulkStatusDisplay');
+    this.bulkStatusMenu = document.getElementById('bulkStatusMenu');
+    this.bulkStatusSelect = document.getElementById('bulkStatusSelect');
+    this.pendingCertificateDownloadIds = null;
     this.btnAddStudent = document.getElementById('btnAddStudent');
     this.selectAllStudentsCheckbox = document.getElementById('selectAllStudentsCheckbox');
     this.studentsTableBody = document.getElementById('studentsTableBody');
@@ -686,7 +731,13 @@ class UIController {
     // Inbox Elements
     this.inboxList = document.getElementById('inboxList');
     this.inboxEmptyState = document.getElementById('inboxEmptyState');
-    this.btnRefreshInbox = document.getElementById('btnRefreshInbox');
+    this.inboxSearchInput = document.getElementById('inboxSearchInput');
+    this.btnClearInboxSearch = document.getElementById('btnClearInboxSearch');
+    this.btnMarkAllInboxRead = document.getElementById('btnMarkAllInboxRead');
+    this.inboxEmptyTitle = document.getElementById('inboxEmptyTitle');
+    this.inboxEmptyDesc = document.getElementById('inboxEmptyDesc');
+    this.btnResetInboxSearch = document.getElementById('btnResetInboxSearch');
+    this.inboxSearchQuery = '';
     this.batchCountBadge = document.getElementById('batchCountBadge');
     this.batchesGrid = document.getElementById('batchesGrid');
     this.batchesEmptyState = document.getElementById('batchesEmptyState');
@@ -1319,6 +1370,49 @@ class UIController {
       this.btnBulkMarkCompleted.addEventListener('click', () => this.handleBulkMarkCompleted());
     }
 
+    if (this.btnStudentMoreActions && this.studentMoreActionsMenu) {
+      this.btnStudentMoreActions.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const willOpen = !this.studentMoreActionsMenu.classList.contains('open');
+        this.closeAllAdminDropdowns(this.studentMoreActionsMenu);
+        this.studentMoreActionsMenu.classList.toggle('open', willOpen);
+        this.btnStudentMoreActions.setAttribute('aria-expanded', String(willOpen));
+      });
+    }
+
+    this.btnMoreDownloadCert?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      this.studentMoreActionsMenu?.classList.remove('open');
+      this.btnStudentMoreActions?.setAttribute('aria-expanded', 'false');
+      await this.handleMoreDownloadCertificates();
+    });
+
+    this.btnMoreChangeStatus?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.studentMoreActionsMenu?.classList.remove('open');
+      this.btnStudentMoreActions?.setAttribute('aria-expanded', 'false');
+      this.openBulkStatusModal();
+    });
+
+    this.btnMoreDeleteStudent?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.studentMoreActionsMenu?.classList.remove('open');
+      this.btnStudentMoreActions?.setAttribute('aria-expanded', 'false');
+      this.handleMoreDeleteStudents();
+    });
+
+    // Bulk Status Modal handlers
+    this.btnCloseBulkStatusModal?.addEventListener('click', () => this.closeModal(this.bulkStatusModal));
+    this.btnCancelBulkStatus?.addEventListener('click', () => this.closeModal(this.bulkStatusModal));
+    this.bulkStatusForm?.addEventListener('submit', (e) => this.handleBulkStatusSubmit(e));
+    this.setupAdminDropdown(
+      this.bulkStatusDropdown,
+      this.bulkStatusTrigger,
+      this.bulkStatusMenu,
+      this.bulkStatusDisplay,
+      this.bulkStatusSelect
+    );
+
     if (this.btnCreateBatch && this.batchActionMenu) {
       this.btnCreateBatch.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1374,27 +1468,47 @@ class UIController {
           } else {
             this.selectedStudentIds.delete(studentId);
           }
+          const row = checkbox.closest('tr');
+          if (row) row.classList.toggle('is-selected', checkbox.checked);
           this.updateBulkActionState();
         }
       });
 
       this.studentsTableBody.addEventListener('click', (e) => {
-        const nameBlock = e.target.closest('.student-meta-cell');
-        if (nameBlock) {
-          const row = nameBlock.closest('tr');
-          const checkbox = row ? row.querySelector('.student-row-checkbox') : null;
-          if (checkbox) {
-            checkbox.checked = !checkbox.checked;
-            const studentId = checkbox.getAttribute('data-student-id');
-            if (checkbox.checked) {
-              this.selectedStudentIds.add(studentId);
-            } else {
-              this.selectedStudentIds.delete(studentId);
-            }
-            this.updateBulkActionState();
+        // If clicking directly on a button, link, or input (checkbox handled by change event), skip
+        if (e.target.closest('button, a, select, input')) {
+          return;
+        }
+
+        const row = e.target.closest('tr');
+        if (!row) return;
+
+        const checkbox = row.querySelector('.student-row-checkbox');
+        if (checkbox) {
+          checkbox.checked = !checkbox.checked;
+          const studentId = checkbox.getAttribute('data-student-id');
+          if (checkbox.checked) {
+            this.selectedStudentIds.add(studentId);
+          } else {
+            this.selectedStudentIds.delete(studentId);
           }
+          row.classList.toggle('is-selected', checkbox.checked);
+          this.updateBulkActionState();
         }
       });
+
+      // Auto-hiding and appearing scrollbar for student table
+      const studentScrollContainer = this.studentsTableBody.closest('.table-responsive');
+      if (studentScrollContainer) {
+        let studentScrollTimeout;
+        studentScrollContainer.addEventListener('scroll', () => {
+          studentScrollContainer.classList.add('is-scrolling');
+          clearTimeout(studentScrollTimeout);
+          studentScrollTimeout = setTimeout(() => {
+            studentScrollContainer.classList.remove('is-scrolling');
+          }, 1000);
+        }, { passive: true });
+      }
     }
 
     // Course Search Handler
@@ -1444,6 +1558,43 @@ class UIController {
         this.batchSearchQuery = '';
         if (this.btnClearBatchSearch) this.btnClearBatchSearch.style.display = 'none';
         this.renderBatchesView();
+      });
+    }
+
+    // Inbox Search & Action Handlers
+    if (this.inboxSearchInput) {
+      this.inboxSearchInput.addEventListener('input', (e) => {
+        this.inboxSearchQuery = e.target.value.trim().toLowerCase();
+        if (this.btnClearInboxSearch) {
+          this.btnClearInboxSearch.style.display = this.inboxSearchQuery ? 'block' : 'none';
+        }
+        this.renderInboxView();
+      });
+    }
+
+    if (this.btnClearInboxSearch) {
+      this.btnClearInboxSearch.addEventListener('click', () => {
+        if (this.inboxSearchInput) this.inboxSearchInput.value = '';
+        this.inboxSearchQuery = '';
+        this.btnClearInboxSearch.style.display = 'none';
+        this.renderInboxView();
+      });
+    }
+
+    if (this.btnResetInboxSearch) {
+      this.btnResetInboxSearch.addEventListener('click', () => {
+        if (this.inboxSearchInput) this.inboxSearchInput.value = '';
+        this.inboxSearchQuery = '';
+        if (this.btnClearInboxSearch) this.btnClearInboxSearch.style.display = 'none';
+        this.renderInboxView();
+      });
+    }
+
+    if (this.btnMarkAllInboxRead) {
+      this.btnMarkAllInboxRead.addEventListener('click', () => {
+        store.markAllMessagesRead();
+        this.render();
+        this.showToast('All Messages Read', 'All messages have been marked as read.', 'success');
       });
     }
 
@@ -1992,7 +2143,7 @@ class UIController {
       }).join('');
 
       return `
-        <tr>
+        <tr class="${isChecked ? 'is-selected' : ''}" title="Click to select student">
           <td style="text-align: center; width: 44px;">
             <input type="checkbox" class="student-row-checkbox custom-table-checkbox" data-student-id="${escapeHtml(student.id)}" ${isChecked ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}">
           </td>
@@ -2003,11 +2154,11 @@ class UIController {
               </div>
             </div>
           </td>
-          <td>
+          <td class="text-center">
             <span class="student-id-cell">${escapeHtml(student.id)}</span>
           </td>
-          <td>${formatDate(student.joinDate)}</td>
-          <td>
+          <td class="text-center">${formatDate(student.joinDate)}</td>
+          <td class="text-center">
             <span class="badge ${getStatusBadgeClass(student.status)}">
               ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
             </span>
@@ -2357,31 +2508,90 @@ class UIController {
 
   renderInboxView() {
     if (!this.inboxList || !this.inboxEmptyState) return;
-    const messages = store.getAllMessages();
-    this.inboxEmptyState.style.display = messages.length === 0 ? 'block' : 'none';
-    this.inboxList.style.display = messages.length === 0 ? 'none' : 'grid';
-    this.inboxList.innerHTML = messages.map(item => `
-      <article class="inbox-message-card${item.isRead ? '' : ' unread'}">
-        <div class="inbox-message-header">
-          <div class="inbox-sender">
-            <span class="inbox-sender-avatar">${getInboxIconSvg()}</span>
-            <div>
-              <h3>${escapeHtml(item.name || 'Website Visitor')}</h3>
-              <a href="tel:${escapeHtml(item.phone || '')}"><i class="fa-solid fa-phone"></i> ${escapeHtml(item.phone || '')}</a>
+    const allMessages = store.getAllMessages();
+
+    // Filter by search query if present
+    let filteredMessages = allMessages;
+    if (this.inboxSearchQuery) {
+      filteredMessages = allMessages.filter(item => {
+        const name = (item.name || '').toLowerCase();
+        const phone = (item.phone || '').toLowerCase();
+        const course = (item.course || '').toLowerCase();
+        const message = (item.message || '').toLowerCase();
+        return name.includes(this.inboxSearchQuery) ||
+               phone.includes(this.inboxSearchQuery) ||
+               course.includes(this.inboxSearchQuery) ||
+               message.includes(this.inboxSearchQuery);
+      });
+    }
+
+    const hasMessages = allMessages.length > 0;
+    const hasFiltered = filteredMessages.length > 0;
+
+    // Update Mark All Read button state
+    if (this.btnMarkAllInboxRead) {
+      const unreadCount = allMessages.filter(m => !m.isRead).length;
+      this.btnMarkAllInboxRead.disabled = unreadCount === 0;
+    }
+
+    if (!hasFiltered) {
+      this.inboxList.style.display = 'none';
+      this.inboxEmptyState.style.display = 'flex';
+      if (this.inboxEmptyTitle && this.inboxEmptyDesc) {
+        if (!hasMessages) {
+          this.inboxEmptyTitle.textContent = 'No Messages Yet';
+          this.inboxEmptyDesc.textContent = 'Messages sent through the public website will appear here.';
+          if (this.btnResetInboxSearch) this.btnResetInboxSearch.style.display = 'none';
+        } else {
+          this.inboxEmptyTitle.textContent = 'No Messages Found';
+          this.inboxEmptyDesc.textContent = 'No messages match your search keywords.';
+          if (this.btnResetInboxSearch) this.btnResetInboxSearch.style.display = 'inline-flex';
+        }
+      }
+      return;
+    }
+
+    this.inboxEmptyState.style.display = 'none';
+    this.inboxList.style.display = 'grid';
+
+    this.inboxList.innerHTML = filteredMessages.map(item => `
+      <div class="inbox-card${item.isRead ? '' : ' unread'}">
+        <div class="inbox-card-header">
+          <div class="inbox-card-title-group">
+            <h3 title="${escapeHtml(item.name || 'Website Visitor')}">${escapeHtml(item.name || 'Website Visitor')}</h3>
+            <a class="inbox-card-phone" href="tel:${escapeHtml(item.phone || '')}" title="Call ${escapeHtml(item.name || '')}">
+              <i class="fa-solid fa-phone"></i> <span>${escapeHtml(item.phone || 'No phone')}</span>
+            </a>
+          </div>
+          <span class="${item.isRead ? 'inbox-badge-read' : 'inbox-badge-new'}">
+            ${item.isRead ? 'Read' : '● New'}
+          </span>
+        </div>
+        <div class="inbox-card-body">
+          ${item.course ? `
+            <div class="inbox-course-pill" title="Course Inquiry: ${escapeHtml(item.course)}">
+              <i class="fa-solid fa-book-open"></i> <span>${escapeHtml(item.course)}</span>
             </div>
+          ` : ''}
+          <p class="inbox-card-message" title="${escapeHtml(item.message || '')}">${escapeHtml(item.message || 'No message content.')}</p>
+        </div>
+        <div class="inbox-card-footer">
+          <div class="inbox-card-time">
+            <i class="fa-regular fa-clock"></i>
+            <span>${escapeHtml(formatMessageDate(item.createdAt))}</span>
           </div>
-          <div class="inbox-message-meta">
-            ${item.isRead ? '<span class="inbox-read-status">Read</span>' : '<span class="inbox-unread-status">New</span>'}
-            <time>${escapeHtml(formatMessageDate(item.createdAt))}</time>
+          <div class="inbox-card-actions">
+            ${item.isRead ? '' : `
+              <button class="btn-icon" title="Mark as Read" onclick="window.app.markInboxMessageRead('${escapeHtml(item.id)}')">
+                <i class="fa-regular fa-envelope-open"></i>
+              </button>
+            `}
+            <button class="btn-icon delete" title="Delete Message" onclick="window.app.confirmDeleteInboxMessage('${escapeHtml(item.id)}')">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
           </div>
         </div>
-        ${item.course ? `<div class="inbox-course"><i class="fa-solid fa-book-open"></i> Interested in: ${escapeHtml(item.course)}</div>` : ''}
-        <p class="inbox-message-text">${escapeHtml(item.message || '')}</p>
-        <div class="inbox-message-actions">
-          ${item.isRead ? '' : `<button type="button" class="btn btn-outline btn-sm" onclick="window.app.markInboxMessageRead('${escapeHtml(item.id)}')"><i class="fa-regular fa-envelope-open"></i> Mark as Read</button>`}
-          <button type="button" class="btn btn-secondary btn-sm" onclick="window.app.confirmDeleteInboxMessage('${escapeHtml(item.id)}')"><i class="fa-regular fa-trash-can"></i> Delete</button>
-        </div>
-      </article>
+      </div>
     `).join('');
   }
 
@@ -2419,10 +2629,10 @@ class UIController {
 
       this.closeAllAdminDropdowns();
 
-      const isStudentModal = Boolean(container.closest('#studentModal'));
+      const isPortalModal = Boolean(container.closest('#studentModal') || container.closest('#bulkStatusModal'));
       const isTableDropdown = Boolean(container.closest('.table-responsive') || container.closest('.data-table') || container.classList.contains('th-minimal-dropdown'));
 
-      if (isStudentModal || isTableDropdown) {
+      if (isPortalModal || isTableDropdown) {
         // Open below the trigger and portal to body to avoid clipping by modal bodies, table scrollbars, or empty states
         const triggerRect = trigger.getBoundingClientRect();
         this.portaledMenu = menu;
@@ -2534,7 +2744,9 @@ class UIController {
       this.completionEndYearDropdown,
       this.existingBatchDropdown,
       this.editBatchStatusDropdown,
-      this.batchActionMenu
+      this.bulkStatusDropdown,
+      this.batchActionMenu,
+      this.studentMoreActionsMenu
     ];
     all.forEach(dropdown => {
       if (dropdown && dropdown !== except) {
@@ -2542,6 +2754,7 @@ class UIController {
         const trigger = dropdown.querySelector('.custom-select-trigger');
         if (trigger) trigger.setAttribute('aria-expanded', 'false');
         if (dropdown === this.batchActionMenu) this.btnCreateBatch?.setAttribute('aria-expanded', 'false');
+        if (dropdown === this.studentMoreActionsMenu) this.btnStudentMoreActions?.setAttribute('aria-expanded', 'false');
       }
     });
   }
@@ -3073,6 +3286,9 @@ class UIController {
 
   closeModal(modalElement) {
     this.closeAllAdminDropdowns();
+    if (modalElement === this.completionModal) {
+      this.pendingCertificateDownloadIds = null;
+    }
     modalElement.classList.remove('open');
     if (document.querySelectorAll('.modal-backdrop.open').length === 0) {
       document.body.style.overflow = '';
@@ -3107,11 +3323,13 @@ class UIController {
       filteredStudents.forEach(s => this.selectedStudentIds.delete(s.id));
     }
 
-    // Update row checkbox DOM inputs
+    // Update row checkbox DOM inputs and selected styling
     if (this.studentsTableBody) {
       const checkboxes = this.studentsTableBody.querySelectorAll('.student-row-checkbox');
       checkboxes.forEach(cb => {
         cb.checked = isChecked;
+        const row = cb.closest('tr');
+        if (row) row.classList.toggle('is-selected', isChecked);
       });
     }
 
@@ -3161,6 +3379,26 @@ class UIController {
       }
     }
 
+    if (this.btnStudentMoreActions) {
+      const selectedCount = this.selectedStudentIds.size;
+      this.btnStudentMoreActions.disabled = selectedCount === 0;
+      if (selectedCount === 0) {
+        this.studentMoreActionsMenu?.classList.remove('open');
+        this.btnStudentMoreActions.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    const currentSelectionCount = this.selectedStudentIds.size;
+    if (this.labelMoreDownloadCert) {
+      this.labelMoreDownloadCert.textContent = currentSelectionCount > 1 ? 'Download Certificates' : 'Download Certificate';
+    }
+    if (this.labelMoreChangeStatus) {
+      this.labelMoreChangeStatus.textContent = 'Change Status';
+    }
+    if (this.labelMoreDeleteStudent) {
+      this.labelMoreDeleteStudent.textContent = currentSelectionCount > 1 ? 'Delete Students' : 'Delete Student';
+    }
+
     if (this.studentSelectionCount) {
       const selectedCount = this.selectedStudentIds.size;
       this.studentSelectionCount.textContent = selectedCount;
@@ -3198,7 +3436,14 @@ class UIController {
       ? 'Enter the certificate details for the selected student.'
       : `These certificate details will be applied to all ${selectedCount} selected students.`;
     this.openModal(this.completionModal);
-    window.setTimeout(() => this.completionStartMonthTrigger.focus(), 100);
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+    window.setTimeout(() => {
+      if (this.completionModal && this.completionModal.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
+    }, 50);
   }
 
   async handleCompletionSubmit(e) {
@@ -3247,15 +3492,213 @@ class UIController {
       const batch = store.getAllBatches().find(item => item.id === this.completingBatchId);
       if (batch) await store.saveBatch({ ...batch, status: 'Completed', completedAt: new Date().toISOString(), certificateIssueDate: issueDate, grade });
     }
+    const shouldDownloadAfterCompletion = Boolean(this.pendingCertificateDownloadIds && this.pendingCertificateDownloadIds.length > 0);
+    const downloadIds = shouldDownloadAfterCompletion ? [...this.pendingCertificateDownloadIds] : null;
+    this.pendingCertificateDownloadIds = null;
     this.completingBatchId = null;
     this.completionStudentIds.clear();
     this.closeModal(this.completionModal);
     this.showToast('Course Completed', `Successfully marked ${studentIds.length} student(s) as Completed. Certificates are now available.`, 'success');
     if (!completedFromBatch) this.selectedStudentIds.clear();
     this.render();
+
+    if (shouldDownloadAfterCompletion && downloadIds) {
+      await this.executeCertificateDownload(downloadIds);
+    }
   }
 
-  async generateStudentCertificatePng(student, course, batch, templateImg) {
+  async handleMoreDownloadCertificates() {
+    const selectedIds = Array.from(this.selectedStudentIds);
+    if (selectedIds.length === 0) return;
+
+    const students = selectedIds.map(id => store.getStudentById(id)).filter(Boolean);
+    if (students.length === 0) return;
+
+    // Check if any selected student is not completed
+    const hasIncomplete = students.some(s => s.status !== 'Completed');
+
+    if (hasIncomplete) {
+      this.pendingCertificateDownloadIds = selectedIds;
+      this.handleBulkMarkCompleted(null, selectedIds);
+      this.completionModalTitle.textContent = selectedIds.length === 1 ? 'Complete Course & Download Certificate' : 'Complete Courses & Download Certificates';
+      this.completionStudentCount.textContent = selectedIds.length === 1
+        ? 'Enter the completion details before downloading the certificate.'
+        : `These certificate details will be applied to all ${selectedIds.length} selected students before downloading.`;
+    } else {
+      await this.executeCertificateDownload(selectedIds);
+    }
+  }
+
+  async executeCertificateDownload(studentIds) {
+    const students = studentIds.map(id => store.getStudentById(id)).filter(Boolean);
+    if (students.length === 0) return;
+
+    if (students.length > 1 && typeof window.JSZip === 'undefined') {
+      this.showToast('ZIP Library Loading', 'Compression library is loading. Please try again in a few seconds.', 'info');
+      return;
+    }
+
+    const btn = this.btnStudentMoreActions;
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
+    }
+
+    try {
+      this.showToast('Generating Certificates', `Generating ${students.length} certificate(s)...`, 'info');
+
+      let templateImg;
+      try {
+        templateImg = await loadCertificateImage('assets/diganta-certificate-template.jpg');
+      } catch (e) {
+        templateImg = await loadCertificateImage('https://ik.imagekit.io/d3ycnoiwd/academy/student-certificate/diganta-certificate-template.jpg');
+      }
+
+      if (students.length === 1) {
+        const student = students[0];
+        const course = store.getCourseById(student.courseId);
+        const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id)) || {};
+        const pngBlob = await this.generateStudentCertificatePng(student, course, batch, templateImg);
+        if (!pngBlob) throw new Error('Failed to generate PNG blob');
+
+        const safeName = (student.name || student.fullName || 'student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+        const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+        const filename = `Certificate-${safeId}-${safeName}.png`;
+
+        const downloadUrl = URL.createObjectURL(pngBlob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = downloadUrl;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadUrl);
+
+        this.showToast('Download Complete', `Certificate downloaded for ${student.name}.`, 'success');
+      } else {
+        const zip = new window.JSZip();
+        let successCount = 0;
+
+        for (const student of students) {
+          const course = store.getCourseById(student.courseId);
+          const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id)) || {};
+          const pngBlob = await this.generateStudentCertificatePng(student, course, batch, templateImg);
+          if (pngBlob) {
+            successCount++;
+            const safeName = (student.name || student.fullName || 'student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+            const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+            zip.file(`Certificate-${safeId}-${safeName}.png`, pngBlob);
+          }
+        }
+
+        const zipBlob = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 6 }
+        });
+
+        const filename = `Certificates-${students.length}-Students.zip`;
+        const downloadUrl = URL.createObjectURL(zipBlob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = downloadUrl;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadUrl);
+
+        this.showToast('Download Complete', `Downloaded ${successCount} certificates in ZIP format.`, 'success');
+      }
+    } catch (err) {
+      console.error('[Certificate Download Error]:', err);
+      this.showToast('Download Error', 'Failed to generate certificate(s). Check console for details.', 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = this.selectedStudentIds.size === 0;
+        btn.innerHTML = originalHtml;
+      }
+    }
+  }
+
+  openBulkStatusModal() {
+    const selectedIds = Array.from(this.selectedStudentIds);
+    const count = selectedIds.length;
+    if (count === 0) return;
+
+    this.bulkStatusModalTitle.textContent = count === 1 ? 'Change Student Status' : 'Change Student Statuses';
+    this.bulkStatusModalSubtitle.textContent = count === 1
+      ? 'Select a new status for the selected student.'
+      : `Select a new status for all ${count} selected students.`;
+
+    const firstStudent = store.getStudentById(selectedIds[0]);
+    const initialStatus = (count === 1 && firstStudent?.status) ? firstStudent.status : 'Active';
+    this.setAdminDropdownValue(
+      this.bulkStatusDropdown,
+      this.bulkStatusMenu,
+      this.bulkStatusDisplay,
+      this.bulkStatusSelect,
+      initialStatus,
+      initialStatus
+    );
+
+    this.openModal(this.bulkStatusModal);
+  }
+
+  handleBulkStatusSubmit(e) {
+    e.preventDefault();
+    const studentIds = Array.from(this.selectedStudentIds);
+    if (studentIds.length === 0) {
+      this.closeModal(this.bulkStatusModal);
+      return;
+    }
+
+    const newStatus = this.bulkStatusSelect.value;
+    this.closeModal(this.bulkStatusModal);
+
+    if (newStatus === 'Completed') {
+      this.handleBulkMarkCompleted(null, studentIds);
+    } else {
+      store.bulkUpdateStudents(studentIds, { status: newStatus });
+      this.showToast('Status Updated', `Successfully updated ${studentIds.length} student(s) to ${newStatus}.`, 'success');
+      this.selectedStudentIds.clear();
+      this.render();
+    }
+  }
+
+  handleMoreDeleteStudents() {
+    const selectedIds = Array.from(this.selectedStudentIds);
+    const count = selectedIds.length;
+    if (count === 0) return;
+
+    if (count === 1) {
+      const student = store.getStudentById(selectedIds[0]);
+      if (!student) return;
+      this.promptConfirmation({
+        title: 'Delete Student Record?',
+        message: `Are you sure you want to delete "${student.name}" (ID: ${student.id})? This action cannot be undone.`,
+        action: () => {
+          this.selectedStudentIds.delete(student.id);
+          store.deleteStudent(student.id);
+          this.render();
+          this.showToast('Student Deleted', `${student.name} was removed from the registry.`, 'info');
+        }
+      });
+    } else {
+      this.promptConfirmation({
+        title: `Delete ${count} Students?`,
+        message: `Are you sure you want to delete ${count} selected student records? This action cannot be undone.`,
+        action: () => {
+          store.bulkDeleteStudents(selectedIds);
+          this.selectedStudentIds.clear();
+          this.render();
+          this.showToast('Students Deleted', `${count} students were removed from the registry.`, 'info');
+        }
+      });
+    }
+  }
+
+  async generateStudentCertificatePng(student, course, batch = {}, templateImg) {
     const canvas = document.createElement('canvas');
     canvas.width = 3722;
     canvas.height = 2480;
@@ -3274,7 +3717,7 @@ class UIController {
     const serial = student.certificateSerial || student.id || '';
     drawCertField(ctx, serial, 284, 533, 481, 34, 'left', 400);
 
-    const issueDateStr = student.certificateIssueDate || batch.certificateIssueDate || new Date().toISOString().slice(0, 10);
+    const issueDateStr = student.certificateIssueDate || batch?.certificateIssueDate || new Date().toISOString().slice(0, 10);
     drawCertField(ctx, formatDate(issueDateStr), 1640, 533, 200, 34, 'left', 400);
 
     // Student Name & Father's Name
@@ -3295,7 +3738,7 @@ class UIController {
     drawCertField(ctx, period, 1007, 901, 437, 33);
 
     // Grade
-    const grade = student.grade || batch.grade || 'A';
+    const grade = student.grade || batch?.grade || 'A';
     drawCertField(ctx, grade, 706, 962, 252);
 
     // Student Photo (with border)

@@ -12,7 +12,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=6.98">
+  <link rel="stylesheet" href="admin-style.css?v=7.31">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -247,6 +247,25 @@
                 <i class="fa-solid fa-certificate"></i>
                 <span id="bulkMarkCompletedLabel">Mark as Completed</span>
               </button>
+              <div class="student-more-actions-menu" id="studentMoreActionsMenu">
+                <button class="btn btn-secondary btn-more-actions" type="button" id="btnStudentMoreActions" aria-haspopup="menu" aria-expanded="false" disabled title="More Options">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="student-more-dropdown" id="studentMoreDropdown" role="menu">
+                  <button type="button" class="student-more-option" id="btnMoreDownloadCert" role="menuitem">
+                    <i class="fa-solid fa-download"></i>
+                    <span id="labelMoreDownloadCert">Download Certificate</span>
+                  </button>
+                  <button type="button" class="student-more-option" id="btnMoreChangeStatus" role="menuitem">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span id="labelMoreChangeStatus">Change Status</span>
+                  </button>
+                  <button type="button" class="student-more-option danger" id="btnMoreDeleteStudent" role="menuitem">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <span id="labelMoreDeleteStudent">Delete Student</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -262,13 +281,13 @@
                       </th>
                       <th>
                         <span class="th-student-label-wrap">
-                          <span>Student</span>
+                          <span>Student Name</span>
                           <span class="student-selection-count" id="studentSelectionCount" aria-live="polite" hidden>0</span>
                         </span>
                       </th>
-                      <th>Student ID</th>
-                      <th>Enrollment Date</th>
-                      <th>
+                      <th class="text-center">Student ID</th>
+                      <th class="text-center">Enrollment Date</th>
+                      <th class="text-center">
                         <div class="custom-select-container th-status-header-wrap th-minimal-dropdown" id="adminStudentStatusFilterDropdown">
                           <button type="button" class="btn-th-filter btn-th-status-filter" id="adminStudentStatusFilterTrigger" title="Filter by Status" aria-label="Filter by Status" aria-haspopup="listbox" aria-expanded="false">
                             <span>Course Status</span>
@@ -391,14 +410,38 @@
 
         <!-- ================= INBOX VIEW ================= -->
         <section class="view-section" id="view-inbox">
-          <div class="inbox-list" id="inboxList"></div>
-
-          <div class="dashboard-card" id="inboxEmptyState" style="display: none;">
-            <div class="empty-state">
-              <div class="empty-icon"><i class="fa-regular fa-envelope-open"></i></div>
-              <h4>No Messages Yet</h4>
-              <p>Messages sent through the public website will appear here.</p>
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inboxSearchInput" placeholder="Search messages...">
+                <button class="btn-clear-search" id="btnClearInboxSearch" title="Clear search" style="display: none;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
             </div>
+
+            <div class="view-actions">
+              <button class="btn btn-primary" id="btnMarkAllInboxRead">
+                <i class="fa-regular fa-envelope-open"></i>
+                <span>Mark All Read</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Inbox Grid -->
+          <div class="inbox-grid" id="inboxList"></div>
+
+          <!-- Inbox Empty State -->
+          <div class="empty-state" id="inboxEmptyState" style="display: none;">
+            <div class="empty-icon">
+              <i class="fa-regular fa-envelope-open"></i>
+            </div>
+            <h4 id="inboxEmptyTitle">No Messages Yet</h4>
+            <p id="inboxEmptyDesc">Messages sent through the public website will appear here.</p>
+            <button class="btn btn-secondary btn-sm" id="btnResetInboxSearch" style="display: none;">
+              <i class="fa-solid fa-rotate-left"></i> Reset Search
+            </button>
           </div>
         </section>
 
@@ -1206,6 +1249,51 @@
   </div>
 
 
+  <!-- Bulk Change Status Modal -->
+  <div class="modal-backdrop" id="bulkStatusModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-arrows-rotate modal-icon text-primary"></i>
+          <div>
+            <h3 id="bulkStatusModalTitle">Change Status</h3>
+            <p class="modal-subtitle" id="bulkStatusModalSubtitle">Select a new status for the selected students.</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="btnCloseBulkStatusModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="bulkStatusForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>New Status <span class="required">*</span></label>
+            <div class="custom-select-container" id="bulkStatusDropdown">
+              <button type="button" class="custom-select-trigger" id="bulkStatusTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <i class="fa-solid fa-circle-check select-icon"></i>
+                <span id="bulkStatusDisplay">Active</span>
+                <i class="fa-solid fa-chevron-down select-chevron"></i>
+              </button>
+              <ul class="custom-select-menu" id="bulkStatusMenu" role="listbox">
+                <li class="custom-select-option selected" data-value="Active" role="option">Active</li>
+                <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+              </ul>
+              <input type="hidden" id="bulkStatusSelect" value="Active" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelBulkStatus">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnConfirmBulkStatus">
+            <i class="fa-solid fa-check"></i> Apply Status
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
   <!-- Confirmation Dialog Modal -->
   <div class="modal-backdrop" id="confirmModal">
     <div class="modal-window modal-sm">
@@ -1345,6 +1433,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=6.98"></script>
+  <script src="admin-script.js?v=7.11"></script>
 </body>
 </html>
