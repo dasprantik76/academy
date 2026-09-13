@@ -48,6 +48,25 @@ function verifyImageKitStudentPhoto(student) {
   }
 }
 
+async function deleteImageKitFile(fileId) {
+  if (!fileId || typeof fileId !== 'string') return false;
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+  if (!privateKey) return false;
+  try {
+    const authHeader = `Basic ${Buffer.from(privateKey + ':').toString('base64')}`;
+    const response = await fetch(`https://api.imagekit.io/v1/files/${encodeURIComponent(fileId)}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: authHeader
+      }
+    });
+    return response.ok || response.status === 404;
+  } catch (err) {
+    console.warn('[ImageKit Delete Error]:', err);
+    return false;
+  }
+}
+
 // Default seed profiles for multi-tenant academies
 const DEFAULT_TENANTS = {
   'dasprantik76@gmail.com': {
@@ -564,6 +583,20 @@ export default async function handler(req, res) {
           if (!studentId || !updatedData) {
             return res.status(400).json({ success: false, error: 'Missing studentId or updatedData' });
           }
+
+          // If changing or removing student photo, delete the old photo from ImageKit
+          if ('imageKitFileId' in updatedData || 'photoUrl' in updatedData) {
+            const currentStudent = await db.collection(COLLECTIONS.STUDENTS).findOne(
+              { id: studentId, ownerEmail },
+              { projection: { _id: 0, imageKitFileId: 1 } }
+            );
+            const oldFileId = currentStudent?.imageKitFileId;
+            const newFileId = updatedData.imageKitFileId;
+            if (oldFileId && oldFileId !== newFileId) {
+              await deleteImageKitFile(oldFileId);
+            }
+          }
+
           const result = await db.collection(COLLECTIONS.STUDENTS).updateOne(
             { id: studentId, ownerEmail },
             { $set: updatedData }
@@ -628,8 +661,25 @@ export default async function handler(req, res) {
           if (!studentId) {
             return res.status(400).json({ success: false, error: 'Missing studentId' });
           }
+          const studentToDelete = await db.collection(COLLECTIONS.STUDENTS).findOne(
+            { id: studentId, ownerEmail },
+            { projection: { _id: 0, imageKitFileId: 1 } }
+          );
+          if (studentToDelete?.imageKitFileId) {
+            await deleteImageKitFile(studentToDelete.imageKitFileId);
+          }
           await db.collection(COLLECTIONS.STUDENTS).deleteOne({ id: studentId, ownerEmail });
           return res.status(200).json({ success: true, studentId });
+        }
+
+        // 9b. Explicit Delete Student Photo Action
+        case 'delete_student_photo': {
+          const fileId = payload?.fileId;
+          if (!fileId) {
+            return res.status(400).json({ success: false, error: 'Missing fileId' });
+          }
+          const success = await deleteImageKitFile(fileId);
+          return res.status(200).json({ success });
         }
 
         // 10. Save Authentication Token (6-Digit OTP)

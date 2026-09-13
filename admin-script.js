@@ -440,9 +440,12 @@ class AcademyStore {
   async updateStudent(id, updatedData) {
     const index = this.students.findIndex(s => String(s.id).trim().toLowerCase() === String(id).trim().toLowerCase());
     if (index !== -1) {
+      const existing = this.students[index];
       this.students[index] = {
-        ...this.students[index],
-        ...updatedData
+        ...existing,
+        ...updatedData,
+        // Always preserve the original registration date — never overwrite it on edit.
+        joinDate: existing.joinDate || updatedData.joinDate
       };
       this.save();
       await this.syncToCloud('update_student', { studentId: id, updatedData });
@@ -791,6 +794,11 @@ class UIController {
     this.idCardBatchFilterDisplay = document.getElementById('idCardBatchFilterDisplay');
     this.idCardBatchFilterMenu = document.getElementById('idCardBatchFilterMenu');
     this.idCardBatchFilterVal = document.getElementById('idCardBatchFilterVal');
+    this.idCardStatusFilterDropdown = document.getElementById('idCardStatusFilterDropdown');
+    this.idCardStatusFilterTrigger = document.getElementById('idCardStatusFilterTrigger');
+    this.idCardStatusFilterDisplay = document.getElementById('idCardStatusFilterDisplay');
+    this.idCardStatusFilterMenu = document.getElementById('idCardStatusFilterMenu');
+    this.idCardStatusFilterVal = document.getElementById('idCardStatusFilterVal');
     this.btnClearIdCardFilter = document.getElementById('btnClearIdCardFilter');
     this.idCardStudentCountBadge = document.getElementById('idCardStudentCountBadge');
     this.idCardSelectAllCheckbox = document.getElementById('idCardSelectAllCheckbox');
@@ -812,6 +820,7 @@ class UIController {
     this.idCardSearchQuery = '';
     this.idCardCourseFilterValue = 'all';
     this.idCardBatchFilterValue = 'all';
+    this.idCardStatusFilterValue = 'all';
     this.cachedIdCardTemplate = null;
 
     // Modals - Student (Full fields aligned with registration portal)
@@ -819,6 +828,18 @@ class UIController {
     this.studentForm = document.getElementById('studentForm');
     this.studentModalTitle = document.getElementById('studentModalTitle');
     this.studentIdInput = document.getElementById('studentId');
+    this.studentPhotoPreview = document.getElementById('studentPhotoPreview');
+    this.studentPhotoPreviewImg = document.getElementById('studentPhotoPreviewImg');
+    this.studentPhotoPreviewInitials = document.getElementById('studentPhotoPreviewInitials');
+    this.studentPhotoInput = document.getElementById('studentPhotoInput');
+    this.btnClearStudentPhoto = document.getElementById('btnClearStudentPhoto');
+    this.studentPhotoError = document.getElementById('studentPhotoError');
+    this.studentPhotoUploadWrapper = document.getElementById('studentPhotoUploadWrapper');
+    this.studentPhotoUrl = document.getElementById('studentPhotoUrl');
+    this.studentImageKitFileId = document.getElementById('studentImageKitFileId');
+    this.studentImageKitFilePath = document.getElementById('studentImageKitFilePath');
+    this.selectedStudentPhotoFile = null;
+    this.photoMarkedForRemoval = false;
     this.studentNameInput = document.getElementById('studentName');
     this.studentDobInput = document.getElementById('studentDob');
     this.studentFatherNameInput = document.getElementById('studentFatherName');
@@ -1835,15 +1856,15 @@ class UIController {
       });
 
       this.idCardStudentList.addEventListener('click', (e) => {
-        if (e.target.closest('button, a, select, input')) {
-          return;
-        }
+        // If the click is on the checkbox or its label hit area, let the 'change' handler deal with it
+        if (e.target.closest('.idcard-checkbox-hit, .idcard-student-checkbox')) return;
+        if (e.target.closest('button, a, select')) return;
         const item = e.target.closest('.idcard-student-item');
         if (item) {
           const studentId = item.getAttribute('data-student-id');
           if (studentId) {
-            const willSelect = !this.selectedIdCardStudentIds.has(studentId);
-            this.toggleIdCardStudentSelection(studentId, willSelect);
+            // Soft selection: only update preview, do not change bulk selection
+            this.softSelectIdCardStudent(studentId);
           }
         }
       });
@@ -1856,8 +1877,8 @@ class UIController {
             e.preventDefault();
             const studentId = item.getAttribute('data-student-id');
             if (studentId) {
-              const willSelect = !this.selectedIdCardStudentIds.has(studentId);
-              this.toggleIdCardStudentSelection(studentId, willSelect);
+              // Keyboard nav also does soft selection
+              this.softSelectIdCardStudent(studentId);
             }
           }
         }
@@ -1887,6 +1908,26 @@ class UIController {
         this.idCardBatchFilterVal,
         (val) => {
           this.idCardBatchFilterValue = val;
+          this.renderIdCardsView();
+        }
+      );
+    }
+
+    if (this.idCardStatusFilterDropdown) {
+      this.setupAdminDropdown(
+        this.idCardStatusFilterDropdown,
+        this.idCardStatusFilterTrigger,
+        this.idCardStatusFilterMenu,
+        this.idCardStatusFilterDisplay,
+        this.idCardStatusFilterVal,
+        (val) => {
+          this.idCardStatusFilterValue = val;
+          if (this.idCardStatusFilterDropdown) {
+            this.idCardStatusFilterDropdown.classList.toggle('is-filtered', val !== 'all');
+          }
+          if (this.idCardStatusFilterTrigger) {
+            this.idCardStatusFilterTrigger.title = val === 'all' ? 'Filter by Status' : `Status: ${val}`;
+          }
           this.renderIdCardsView();
         }
       );
@@ -2006,6 +2047,18 @@ class UIController {
     this.studentForm.addEventListener('submit', (e) => this.handleStudentFormSubmit(e));
     this.courseForm.addEventListener('submit', (e) => this.handleCourseFormSubmit(e));
 
+    // Student Photo Upload Events
+    this.studentPhotoInput?.addEventListener('change', () => this.handleStudentPhotoSelection());
+    this.btnClearStudentPhoto?.addEventListener('click', () => this.clearStudentPhoto());
+    this.studentNameInput?.addEventListener('input', () => {
+      if (!this.selectedStudentPhotoFile && !this.studentPhotoUrl?.value) {
+        if (this.studentPhotoPreviewInitials) {
+          const initials = getInitials(this.studentNameInput.value.trim()) || 'SP';
+          this.studentPhotoPreviewInitials.textContent = initials;
+        }
+      }
+    });
+
     // Modal Close Buttons
     this.btnCloseStudentModal.addEventListener('click', () => this.closeModal(this.studentModal));
     this.btnCancelStudentModal.addEventListener('click', () => this.closeModal(this.studentModal));
@@ -2110,15 +2163,23 @@ class UIController {
       const isKeyD = e.key === 'd' || e.key === 'D' || e.code === 'KeyD';
 
       if (isCmdOrCtrl && isKeyD) {
+        // If a modal dialog is open, do not deselect
+        if (document.querySelector('.modal-backdrop.open')) return;
+
         const isStudentsPage = this.currentView === 'students' ||
           Boolean(document.getElementById('view-students')?.classList.contains('active'));
 
-        if (isStudentsPage) {
-          // If a modal dialog is open, do not deselect
-          if (document.querySelector('.modal-backdrop.open')) return;
+        const isIdCardsPage = this.currentView === 'idcards' ||
+          Boolean(document.getElementById('view-idcards')?.classList.contains('active'));
 
+        if (isStudentsPage) {
           e.preventDefault();
           this.deselectAllStudents();
+        } else if (isIdCardsPage) {
+          e.preventDefault();
+          this.selectedIdCardStudentIds.clear();
+          this.lastSelectedIdCardStudentId = null;
+          this.updateIdCardSelectionUI();
         }
       }
     });
@@ -2528,15 +2589,11 @@ class UIController {
 
       return `
         <tr class="${isChecked ? 'is-selected' : ''}" title="Click to select student">
-          <td style="text-align: center; width: 44px;">
+          <td class="td-checkbox-col">
             <input type="checkbox" class="student-row-checkbox custom-table-checkbox" data-student-id="${escapeHtml(student.id)}" ${isChecked ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}">
           </td>
           <td>
-            <div class="student-meta-cell" title="Click to select student">
-              <div class="student-name-box">
-                <strong>${escapeHtml(student.name)}</strong>
-              </div>
-            </div>
+            <span class="student-name-text">${escapeHtml(student.name)}</span>
           </td>
           <td class="text-center">
             <span class="student-id-cell">${escapeHtml(student.id)}</span>
@@ -2923,6 +2980,21 @@ class UIController {
       'All Batches'
     );
     this.idCardBatchFilterValue = 'all';
+    this.setAdminDropdownValue(
+      this.idCardStatusFilterDropdown,
+      this.idCardStatusFilterMenu,
+      this.idCardStatusFilterDisplay,
+      this.idCardStatusFilterVal,
+      'all',
+      'All Statuses'
+    );
+    this.idCardStatusFilterValue = 'all';
+    if (this.idCardStatusFilterDropdown) {
+      this.idCardStatusFilterDropdown.classList.remove('is-filtered');
+    }
+    if (this.idCardStatusFilterTrigger) {
+      this.idCardStatusFilterTrigger.title = 'Filter by Status';
+    }
     this.renderIdCardsView();
   }
 
@@ -2977,6 +3049,8 @@ class UIController {
     const query = (this.idCardSearchQuery || '').toLowerCase();
     const courseFilter = this.idCardCourseFilterVal ? this.idCardCourseFilterVal.value : 'all';
     const batchFilter = this.idCardBatchFilterVal ? this.idCardBatchFilterVal.value : 'all';
+    const statusFilter = this.idCardStatusFilterVal ? this.idCardStatusFilterVal.value : 'all';
+    this.idCardStatusFilterValue = statusFilter;
     const activeBatchObj = batchFilter !== 'all' ? batches.find(b => b.id === batchFilter) : null;
 
     const filteredStudents = students.filter(student => {
@@ -2993,12 +3067,16 @@ class UIController {
         Boolean(activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(student.id)) ||
         student.batchId === batchFilter;
 
-      return matchesSearch && matchesCourse && matchesBatch;
+      const matchesStatus = statusFilter === 'all' ||
+        String(student.status || '').toLowerCase() === String(statusFilter).toLowerCase();
+
+      return matchesSearch && matchesCourse && matchesBatch && matchesStatus;
     });
 
     // Update clear filter button state
     const hasActiveFilter = Boolean((this.idCardCourseFilterValue && this.idCardCourseFilterValue !== 'all') ||
                                     (this.idCardBatchFilterValue && this.idCardBatchFilterValue !== 'all') ||
+                                    (this.idCardStatusFilterValue && this.idCardStatusFilterValue !== 'all') ||
                                     this.idCardSearchQuery);
 
     if (this.btnClearIdCardFilter) {
@@ -3015,6 +3093,14 @@ class UIController {
     if (this.idCardBatchFilterDropdown) {
       this.idCardBatchFilterDropdown.classList.toggle('is-filtered', Boolean(this.idCardBatchFilterValue && this.idCardBatchFilterValue !== 'all'));
     }
+    if (this.idCardStatusFilterDropdown) {
+      this.idCardStatusFilterDropdown.classList.toggle('is-filtered', Boolean(this.idCardStatusFilterValue && this.idCardStatusFilterValue !== 'all'));
+    }
+    if (this.idCardStatusFilterTrigger) {
+      this.idCardStatusFilterTrigger.title = (this.idCardStatusFilterValue && this.idCardStatusFilterValue !== 'all')
+        ? `Status: ${this.idCardStatusFilterValue}`
+        : 'Filter by Status';
+    }
 
     const idCardPanel = this.idCardStudentList ? this.idCardStudentList.closest('.idcards-list-panel') : null;
     const idCardSelectAllRow = idCardPanel ? idCardPanel.querySelector('.idcards-select-all-row') : null;
@@ -3027,12 +3113,13 @@ class UIController {
         this.idCardStudentList.style.display = 'none';
       }
       if (this.idCardListEmptyState) this.idCardListEmptyState.style.display = 'flex';
-      if (this.idCardMockupWrapper) this.idCardMockupWrapper.style.display = 'none';
+      if (this.idCardMockupWrapper) this.idCardMockupWrapper.style.display = 'flex';
       if (this.idCardPreviewActions) this.idCardPreviewActions.style.display = 'flex';
       if (this.btnDownloadIdCard) this.btnDownloadIdCard.disabled = true;
       if (this.idCardNoSelection) this.idCardNoSelection.style.display = 'flex';
       this.selectedIdCardStudentIds.clear();
       this.lastSelectedIdCardStudentId = null;
+      this.renderIdCardBlankTemplate();
       this.updateIdCardSelectionUI(filteredStudents);
       return;
     }
@@ -3042,11 +3129,20 @@ class UIController {
     if (this.idCardStudentList) this.idCardStudentList.style.display = '';
     if (this.idCardListEmptyState) this.idCardListEmptyState.style.display = 'none';
 
-    // Auto-select first student if none selected or if none in filtered list
-    if (this.selectedIdCardStudentIds.size === 0 || !filteredStudents.some(s => this.selectedIdCardStudentIds.has(s.id))) {
-      this.selectedIdCardStudentIds.clear();
-      this.selectedIdCardStudentIds.add(filteredStudents[0].id);
-      this.lastSelectedIdCardStudentId = filteredStudents[0].id;
+    const validFilteredIds = new Set(filteredStudents.map(s => s.id));
+    // No student selected from the beginning; retain previous selection only if still present in filtered list
+    if (this.selectedIdCardStudentIds.size > 0) {
+      for (const id of this.selectedIdCardStudentIds) {
+        if (!validFilteredIds.has(id)) {
+          this.selectedIdCardStudentIds.delete(id);
+        }
+      }
+      if (this.lastSelectedIdCardStudentId && !validFilteredIds.has(this.lastSelectedIdCardStudentId)) {
+        const remaining = Array.from(this.selectedIdCardStudentIds);
+        this.lastSelectedIdCardStudentId = remaining.length > 0 ? remaining[remaining.length - 1] : null;
+      }
+    } else if (this.lastSelectedIdCardStudentId && !validFilteredIds.has(this.lastSelectedIdCardStudentId)) {
+      this.lastSelectedIdCardStudentId = null;
     }
 
     this.idCardStudentList.innerHTML = filteredStudents.map(student => {
@@ -3056,7 +3152,7 @@ class UIController {
 
       return `
         <div class="idcard-student-item ${isSelected ? 'is-selected' : ''} ${isPreviewed ? 'is-previewed' : ''}" data-student-id="${escapeHtml(student.id)}" role="button" tabindex="0">
-          <input type="checkbox" class="custom-table-checkbox idcard-student-checkbox" data-student-id="${escapeHtml(student.id)}" ${isSelected ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}">
+          <label class="idcard-checkbox-hit" aria-label="Select student ${escapeHtml(student.name)}"><input type="checkbox" class="custom-table-checkbox idcard-student-checkbox" data-student-id="${escapeHtml(student.id)}" ${isSelected ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}"></label>
           <span class="idcard-student-name">${escapeHtml(student.name)}</span>
           <div class="idcard-student-status-col">
             <span class="badge ${getStatusBadgeClass(statusText)} idcard-student-status">
@@ -3085,6 +3181,35 @@ class UIController {
     this.updateIdCardSelectionUI();
   }
 
+  // Soft-select: update preview only, do not affect bulk selectedIdCardStudentIds
+  softSelectIdCardStudent(studentId) {
+    if (this.lastSelectedIdCardStudentId === studentId && this.currentRenderedIdCardStudentId === studentId && this.idCardNoSelection && this.idCardNoSelection.style.display === 'none') {
+      return;
+    }
+    this.lastSelectedIdCardStudentId = studentId;
+    // Update .is-previewed class on all rows
+    if (this.idCardStudentList) {
+      this.idCardStudentList.querySelectorAll('.idcard-student-item').forEach(item => {
+        item.classList.toggle('is-previewed', item.getAttribute('data-student-id') === studentId);
+      });
+    }
+    // Render preview for this student
+    const student = store.getStudentById(studentId);
+    if (student) {
+      this.updateIdCardPreview(student);
+    }
+    // If no checkboxes are checked, enable download button for this soft-selected student
+    if (this.selectedIdCardStudentIds.size === 0 && this.btnDownloadIdCard) {
+      const downloadIconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg>`;
+      const labelText = 'Download ID Card';
+      const btnContent = `${downloadIconSvg} ${labelText}`;
+      this.btnDownloadIdCard.innerHTML = btnContent;
+      this.btnDownloadIdCard.dataset.originalHtml = btnContent;
+      this.btnDownloadIdCard.title = labelText;
+      this.btnDownloadIdCard.disabled = false;
+    }
+  }
+
   handleSelectAllIdCards(isChecked) {
     const allStudents = store.getAllStudents();
     const batches = store.getAllBatches();
@@ -3104,7 +3229,10 @@ class UIController {
         Boolean(activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(student.id)) ||
         student.batchId === this.idCardBatchFilterValue;
 
-      return matchesSearch && matchesCourse && matchesBatch;
+      const matchesStatus = this.idCardStatusFilterValue === 'all' ||
+        String(student.status || '').toLowerCase() === String(this.idCardStatusFilterValue).toLowerCase();
+
+      return matchesSearch && matchesCourse && matchesBatch && matchesStatus;
     });
 
     if (isChecked) {
@@ -3140,7 +3268,10 @@ class UIController {
           Boolean(activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(student.id)) ||
           student.batchId === this.idCardBatchFilterValue;
 
-        return matchesSearch && matchesCourse && matchesBatch;
+        const matchesStatus = this.idCardStatusFilterValue === 'all' ||
+          String(student.status || '').toLowerCase() === String(this.idCardStatusFilterValue).toLowerCase();
+
+        return matchesSearch && matchesCourse && matchesBatch && matchesStatus;
       });
     }
 
@@ -3192,22 +3323,47 @@ class UIController {
     }
 
 
-    // Always show preview of the LAST SELECTED student
-    if (selectedCount > 0 && this.lastSelectedIdCardStudentId) {
+    // Always show preview of the LAST SELECTED student (whether hard selected or soft selected)
+    if (this.lastSelectedIdCardStudentId) {
       const student = store.getStudentById(this.lastSelectedIdCardStudentId);
       if (student) {
         this.updateIdCardPreview(student);
       }
+      if (selectedCount === 0 && this.btnDownloadIdCard) {
+        const downloadIconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg>`;
+        const labelText = 'Download ID Card';
+        const btnContent = `${downloadIconSvg} ${labelText}`;
+        this.btnDownloadIdCard.innerHTML = btnContent;
+        this.btnDownloadIdCard.dataset.originalHtml = btnContent;
+        this.btnDownloadIdCard.title = labelText;
+        this.btnDownloadIdCard.disabled = false;
+      }
     } else {
       if (this.idCardPreviewActions) this.idCardPreviewActions.style.display = 'flex';
       if (this.btnDownloadIdCard) this.btnDownloadIdCard.disabled = true;
-      if (this.idCardMockupWrapper) this.idCardMockupWrapper.style.display = 'none';
+      if (this.idCardMockupWrapper) this.idCardMockupWrapper.style.display = 'flex';
       if (this.idCardNoSelection) this.idCardNoSelection.style.display = 'flex';
+      this.renderIdCardBlankTemplate();
+    }
+  }
+
+  async renderIdCardBlankTemplate() {
+    this.currentRenderedIdCardStudentId = null;
+    if (!this.idCardPreviewCanvas) return;
+    try {
+      const templateImg = await this.loadIdCardTemplateImage();
+      const ctx = this.idCardPreviewCanvas.getContext('2d');
+      ctx.drawImage(templateImg, 0, 0, 1250, 2000);
+    } catch (e) {
+      console.warn('Could not render blank ID card template:', e);
     }
   }
 
   async updateIdCardPreview(student) {
     if (!student) return;
+    if (this.currentRenderedIdCardStudentId === student.id && this.idCardNoSelection && this.idCardNoSelection.style.display === 'none') {
+      return;
+    }
     const courses = store.getAllCourses();
     const enrolledCourse = courses.find(c => student.enrolledCourseIds && student.enrolledCourseIds.includes(c.id));
     const courseTitle = enrolledCourse ? `${enrolledCourse.title} (${enrolledCourse.duration})` : (student.courseName || 'General Curriculum');
@@ -3456,6 +3612,10 @@ class UIController {
         return;
       }
 
+      if (canvas === this.idCardPreviewCanvas) {
+        this.currentRenderedIdCardStudentId = student.id;
+      }
+
     } catch (err) {
       console.error('[Render ID Card Error]:', err);
     } finally {
@@ -3475,10 +3635,14 @@ class UIController {
   }
 
   async downloadSelectedStudentIdCard() {
-    const studentIds = Array.from(this.selectedIdCardStudentIds);
+    let studentIds = Array.from(this.selectedIdCardStudentIds);
     if (studentIds.length === 0) {
-      this.showToast('No Student Selected', 'Please select at least one student to download ID card.', 'warning');
-      return;
+      if (this.lastSelectedIdCardStudentId) {
+        studentIds = [this.lastSelectedIdCardStudentId];
+      } else {
+        this.showToast('No Student Selected', 'Please select at least one student to download ID card.', 'warning');
+        return;
+      }
     }
 
     const btn = this.btnDownloadIdCard;
@@ -3821,6 +3985,7 @@ class UIController {
       if (wasOpen) {
         container.classList.remove('open', 'drop-up');
         trigger.setAttribute('aria-expanded', 'false');
+        trigger.blur();
         return;
       }
 
@@ -3842,12 +4007,12 @@ class UIController {
         if (container.classList.contains('th-minimal-dropdown')) {
           menu.style.minWidth = '145px';
           menu.style.width = 'max-content';
-          const menuWidth = 155;
-          if (triggerRect.left + menuWidth > window.innerWidth - 16) {
-            menu.style.left = `${Math.max(8, triggerRect.right - menuWidth)}px`;
-          } else {
-            menu.style.left = `${triggerRect.left}px`;
-          }
+          // Anchor the menu card's left edge to the trigger button's rendered left edge.
+          // This gives the most visually predictable alignment with the label text.
+          const approxMenuWidth = 160;
+          const rawLeft = triggerRect.left;
+          const targetLeft = Math.max(8, Math.min(rawLeft, window.innerWidth - approxMenuWidth - 8));
+          menu.style.left = `${targetLeft}px`;
         } else {
           menu.style.left = `${triggerRect.left}px`;
           menu.style.width = `${triggerRect.width}px`;
@@ -3904,6 +4069,7 @@ class UIController {
 
       container.classList.remove('open', 'drop-up');
       trigger.setAttribute('aria-expanded', 'false');
+      trigger.blur();
       this.closeAllAdminDropdowns();
 
       if (typeof onChangeCallback === 'function') {
@@ -3953,6 +4119,7 @@ class UIController {
       this.adminStudentStatusFilterDropdown,
       this.idCardCourseFilterDropdown,
       this.idCardBatchFilterDropdown,
+      this.idCardStatusFilterDropdown,
       this.completionStartMonthDropdown,
       this.completionStartYearDropdown,
       this.completionEndMonthDropdown,
@@ -4061,6 +4228,182 @@ class UIController {
     }
   }
 
+  // --------------------------------------------------------------------------
+  // Student Passport Photo Management (ImageKit)
+  // --------------------------------------------------------------------------
+  setStudentPhotoError(message) {
+    if (!this.studentPhotoError) return;
+    this.studentPhotoError.textContent = message || '';
+    this.studentPhotoError.style.display = message ? 'block' : 'none';
+    this.studentPhotoUploadWrapper?.classList.toggle('input-error', Boolean(message));
+  }
+
+  handleStudentPhotoSelection() {
+    if (!this.studentPhotoInput) return;
+    const file = this.studentPhotoInput.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.setStudentPhotoError('Please select a JPG, JPEG, PNG or WebP passport photo.');
+      this.studentPhotoInput.value = '';
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.setStudentPhotoError('Passport photo must be 2 MB or smaller.');
+      this.studentPhotoInput.value = '';
+      return;
+    }
+
+    this.setStudentPhotoError('');
+    this.selectedStudentPhotoFile = file;
+    this.photoMarkedForRemoval = false;
+
+    if (this.studentPhotoPreviewImg) {
+      this.studentPhotoPreviewImg.src = URL.createObjectURL(file);
+      this.studentPhotoPreviewImg.hidden = false;
+    }
+    if (this.studentPhotoPreviewInitials) {
+      this.studentPhotoPreviewInitials.hidden = true;
+    }
+    if (this.btnClearStudentPhoto) {
+      this.btnClearStudentPhoto.hidden = false;
+    }
+  }
+
+  clearStudentPhoto() {
+    if (this.studentPhotoInput) this.studentPhotoInput.value = '';
+    this.selectedStudentPhotoFile = null;
+    this.photoMarkedForRemoval = true;
+    if (this.studentPhotoUrl) this.studentPhotoUrl.value = '';
+    if (this.studentImageKitFileId) this.studentImageKitFileId.value = '';
+    if (this.studentImageKitFilePath) this.studentImageKitFilePath.value = '';
+
+    if (this.studentPhotoPreviewImg) {
+      this.studentPhotoPreviewImg.src = '';
+      this.studentPhotoPreviewImg.hidden = true;
+    }
+    if (this.studentPhotoPreviewInitials) {
+      this.studentPhotoPreviewInitials.hidden = false;
+      const currentName = this.studentNameInput?.value?.trim() || 'SP';
+      this.studentPhotoPreviewInitials.textContent = getInitials(currentName) || 'SP';
+    }
+    if (this.btnClearStudentPhoto) {
+      this.btnClearStudentPhoto.hidden = true;
+    }
+    this.setStudentPhotoError('');
+  }
+
+  async compressStudentPhoto(file) {
+    const sourceUrl = URL.createObjectURL(file);
+    const image = new Image();
+    try {
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = () => reject(new Error('The selected passport photo could not be processed.'));
+        image.src = sourceUrl;
+      });
+
+      const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
+      let scale = Math.min(1, 800 / longestSide);
+      let quality = 0.82;
+      let blob = null;
+
+      while (scale >= 0.2) {
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(160, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(160, Math.round(image.naturalHeight * scale));
+        const context = canvas.getContext('2d');
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (!blob) throw new Error('The selected passport photo could not be compressed.');
+        if (blob.size <= 50 * 1024) break;
+
+        if (quality > 0.38) quality -= 0.08;
+        else {
+          scale *= 0.85;
+          quality = 0.7;
+        }
+      }
+
+      if (!blob || blob.size > 50 * 1024) {
+        throw new Error('The passport photo could not be reduced below 50 KB. Please choose another image.');
+      }
+
+      const baseName = file.name.replace(/\.[^.]+$/, '') || 'passport-photo';
+      return new File([blob], `${baseName}.jpg`, { type: 'image/jpeg', lastModified: Date.now() });
+    } finally {
+      URL.revokeObjectURL(sourceUrl);
+    }
+  }
+
+  async uploadStudentPhoto(file, studentId) {
+    const uploadFile = await this.compressStudentPhoto(file);
+
+    let authResponse;
+    try {
+      authResponse = await fetch('/api/imagekit-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isAdmin: true,
+          ownerEmail: store.ownerEmail,
+          academySlug: store.ownerEmail,
+          fileType: uploadFile.type,
+          fileSize: uploadFile.size
+        })
+      });
+    } catch {
+      throw new Error('Could not connect to photo upload service.');
+    }
+
+    const auth = await authResponse.json().catch(() => null);
+    if (!authResponse.ok || !auth?.success) {
+      throw new Error(auth?.error || 'Could not authorize photo upload.');
+    }
+
+    const safeStudentId = String(studentId || 'student').replace(/[^a-zA-Z0-9_-]+/g, '_');
+    const fileName = `${safeStudentId}.jpg`;
+
+    const uploadBody = new FormData();
+    uploadBody.append('file', uploadFile);
+    uploadBody.append('fileName', fileName);
+    uploadBody.append('folder', '/academy/student-photos/');
+    uploadBody.append('useUniqueFileName', 'false');
+    uploadBody.append('overwriteFile', 'true');
+    uploadBody.append('publicKey', auth.publicKey);
+    uploadBody.append('token', auth.token);
+    uploadBody.append('signature', auth.signature);
+    uploadBody.append('expire', String(auth.expire));
+
+    let uploadResponse;
+    try {
+      uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+        method: 'POST',
+        body: uploadBody
+      });
+    } catch {
+      throw new Error('Photo could not reach ImageKit. Please check connection.');
+    }
+
+    const uploaded = await uploadResponse.json().catch(() => null);
+    if (!uploadResponse.ok || !uploaded?.url || !uploaded?.fileId) {
+      throw new Error(uploaded?.message || 'Passport photo upload failed.');
+    }
+
+    const photoUrl = uploaded.url.includes('?') ? uploaded.url : `${uploaded.url}?updatedAt=${Date.now()}`;
+
+    return {
+      photoUrl,
+      imageKitFileId: uploaded.fileId,
+      imageKitFilePath: uploaded.filePath
+    };
+  }
+
   // ==========================================================================
   // Student Modals & Actions (Aligned with Public Registration Fields)
   // ==========================================================================
@@ -4072,6 +4415,11 @@ class UIController {
     if (this.studentPhoneError) this.studentPhoneError.style.display = 'none';
     if (this.studentPinCodeInput) this.studentPinCodeInput.classList.remove('input-error');
     if (this.studentPinCodeError) this.studentPinCodeError.style.display = 'none';
+
+    this.selectedStudentPhotoFile = null;
+    this.photoMarkedForRemoval = false;
+    if (this.studentPhotoInput) this.studentPhotoInput.value = '';
+    this.setStudentPhotoError('');
 
     const courses = store.getAllCourses();
     this.populateAdminStudentCourseMenu(courses);
@@ -4087,6 +4435,37 @@ class UIController {
       if (this.studentFatherNameInput) this.studentFatherNameInput.value = student.fatherName || '';
       if (this.studentMotherNameInput) this.studentMotherNameInput.value = student.motherName || '';
       if (this.studentAadharInput) this.studentAadharInput.value = student.aadhar || '';
+
+      // Initialize Photo Preview & Hidden Inputs
+      if (this.studentPhotoUrl) this.studentPhotoUrl.value = student.photoUrl || '';
+      if (this.studentImageKitFileId) this.studentImageKitFileId.value = student.imageKitFileId || '';
+      if (this.studentImageKitFilePath) this.studentImageKitFilePath.value = student.imageKitFilePath || '';
+
+      const initials = getInitials(student.name) || 'SP';
+      if (student.photoUrl) {
+        if (this.studentPhotoPreviewImg) {
+          this.studentPhotoPreviewImg.src = student.photoUrl;
+          this.studentPhotoPreviewImg.hidden = false;
+        }
+        if (this.studentPhotoPreviewInitials) {
+          this.studentPhotoPreviewInitials.hidden = true;
+        }
+        if (this.btnClearStudentPhoto) {
+          this.btnClearStudentPhoto.hidden = false;
+        }
+      } else {
+        if (this.studentPhotoPreviewImg) {
+          this.studentPhotoPreviewImg.src = '';
+          this.studentPhotoPreviewImg.hidden = true;
+        }
+        if (this.studentPhotoPreviewInitials) {
+          this.studentPhotoPreviewInitials.hidden = false;
+          this.studentPhotoPreviewInitials.textContent = initials;
+        }
+        if (this.btnClearStudentPhoto) {
+          this.btnClearStudentPhoto.hidden = true;
+        }
+      }
 
       this.setAdminDropdownValue(this.adminStudentGenderDropdown, this.adminStudentGenderMenu, this.adminStudentGenderDisplay, this.studentGenderInput, student.gender || '', 'Select Gender');
       this.setAdminDropdownValue(this.adminStudentMaritalStatusDropdown, this.adminStudentMaritalStatusMenu, this.adminStudentMaritalStatusDisplay, this.studentMaritalStatusInput, student.maritalStatus || '', 'Select Marital Status');
@@ -4129,6 +4508,22 @@ class UIController {
       if (this.studentFatherNameInput) this.studentFatherNameInput.value = '';
       if (this.studentMotherNameInput) this.studentMotherNameInput.value = '';
       if (this.studentAadharInput) this.studentAadharInput.value = '';
+
+      if (this.studentPhotoUrl) this.studentPhotoUrl.value = '';
+      if (this.studentImageKitFileId) this.studentImageKitFileId.value = '';
+      if (this.studentImageKitFilePath) this.studentImageKitFilePath.value = '';
+      if (this.studentPhotoPreviewImg) {
+        this.studentPhotoPreviewImg.src = '';
+        this.studentPhotoPreviewImg.hidden = true;
+      }
+      if (this.studentPhotoPreviewInitials) {
+        this.studentPhotoPreviewInitials.hidden = false;
+        this.studentPhotoPreviewInitials.textContent = 'SP';
+      }
+      if (this.btnClearStudentPhoto) {
+        this.btnClearStudentPhoto.hidden = true;
+      }
+
       this.setAdminDropdownValue(this.adminStudentGenderDropdown, this.adminStudentGenderMenu, this.adminStudentGenderDisplay, this.studentGenderInput, '', 'Select Gender');
       this.setAdminDropdownValue(this.adminStudentMaritalStatusDropdown, this.adminStudentMaritalStatusMenu, this.adminStudentMaritalStatusDisplay, this.studentMaritalStatusInput, '', 'Select Marital Status');
       this.setAdminDropdownValue(this.adminStudentCategoryDropdown, this.adminStudentCategoryMenu, this.adminStudentCategoryDisplay, this.studentCategoryInput, '', 'Select Category');
@@ -4254,6 +4649,29 @@ class UIController {
       // If validation endpoint times out or is offline, continue gracefully
     }
 
+    let photoUrl = this.studentPhotoUrl?.value || '';
+    let imageKitFileId = this.studentImageKitFileId?.value || '';
+    let imageKitFilePath = this.studentImageKitFilePath?.value || '';
+
+    // Handle photo upload if a new file was chosen
+    if (this.selectedStudentPhotoFile) {
+      try {
+        const uploadResult = await this.uploadStudentPhoto(this.selectedStudentPhotoFile, id || 'temp');
+        photoUrl = uploadResult.photoUrl;
+        imageKitFileId = uploadResult.imageKitFileId;
+        imageKitFilePath = uploadResult.imageKitFilePath;
+      } catch (uploadError) {
+        setButtonLoading(saveBtn, false);
+        this.setStudentPhotoError(uploadError.message || 'Passport photo upload failed.');
+        this.showToast('Upload Error', uploadError.message || 'Photo upload failed. Please try again.', 'error');
+        return;
+      }
+    } else if (this.photoMarkedForRemoval) {
+      photoUrl = '';
+      imageKitFileId = '';
+      imageKitFilePath = '';
+    }
+
     const payload = {
       name,
       dob,
@@ -4272,14 +4690,26 @@ class UIController {
       address,
       qualification,
       status,
-      joinDate: new Date().toISOString().split('T')[0],
-      enrolledCourseIds: [courseId]
+      enrolledCourseIds: [courseId],
+      photoUrl,
+      imageKitFileId,
+      imageKitFilePath
     };
+
+    // For new students, stamp the registration date now.
+    // For existing students, joinDate is intentionally excluded from the payload
+    // so updateStudent never overwrites the original registration date.
+    if (!id) {
+      payload.joinDate = new Date().toISOString().split('T')[0];
+    }
 
     try {
       if (id) {
         await store.updateStudent(id, payload);
         this.showToast('Student Updated', `${name}'s records have been updated.`, 'success');
+        if (this.currentViewingStudentId === id) {
+          this.viewStudentProfile(id);
+        }
       } else {
         const newStudent = await store.addStudent(payload);
         this.showToast('Student Added', `${newStudent.name} (ID: ${newStudent.id}) registered successfully.`, 'success');
@@ -4325,7 +4755,7 @@ class UIController {
         </div>
         <div class="profile-info">
           <h3>${escapeHtml(student.name)}</h3>
-          <p>Student Identifier: <strong>${escapeHtml(student.id)}</strong></p>
+          <p>Student ID: <strong>${escapeHtml(student.id)}</strong></p>
           <span class="badge ${getStatusBadgeClass(student.status)}">
             ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
           </span>
@@ -4398,7 +4828,7 @@ class UIController {
           </div>
         ` : ''}
         <div class="profile-meta-card">
-          <span class="label"><i class="fa-regular fa-calendar-check"></i> Enrollment Date</span>
+          <span class="label"><i class="fa-regular fa-calendar-check"></i> Registration Date</span>
           <span class="value">${formatDate(student.joinDate)}</span>
         </div>
       </div>
@@ -5432,11 +5862,23 @@ function formatMonthYear(dateString) {
   return `${DISPLAY_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
+const certificateImageCache = new Map();
+
 function loadCertificateImage(url) {
+  if (!url) return Promise.reject(new Error('No image URL'));
+  if (certificateImageCache.has(url)) {
+    const cached = certificateImageCache.get(url);
+    if (cached && cached.complete && cached.naturalWidth > 0) {
+      return Promise.resolve(cached);
+    }
+  }
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
+    img.onload = () => {
+      certificateImageCache.set(url, img);
+      resolve(img);
+    };
     img.onerror = () => reject(new Error('Failed to load image: ' + url));
     img.src = url;
   });
