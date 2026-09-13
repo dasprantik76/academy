@@ -593,10 +593,6 @@ export default async function handler(req, res) {
           const name = String(batch.name || '').trim().slice(0, 100);
           const studentIds = [...new Set(Array.isArray(batch.studentIds) ? batch.studentIds.map(String) : [])];
           if (!name) return res.status(400).json({ success: false, error: 'A batch name is required.' });
-          if (studentIds.length > 0) {
-            const validStudents = await db.collection(COLLECTIONS.STUDENTS).countDocuments({ ownerEmail, id: { $in: studentIds } });
-            if (validStudents !== studentIds.length) return res.status(400).json({ success: false, error: 'One or more students are invalid.' });
-          }
           const savedBatch = { ...batch, id: String(batch.id || randomUUID()), name, studentIds, ownerEmail, status: batch.status === 'Completed' ? 'Completed' : 'Active', createdAt: batch.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
           await db.collection(COLLECTIONS.BATCHES).updateOne({ id: savedBatch.id, ownerEmail }, { $set: savedBatch }, { upsert: true });
           return res.status(200).json({ success: true, batch: savedBatch });

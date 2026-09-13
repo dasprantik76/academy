@@ -1618,18 +1618,30 @@ textarea {
   min-width: 220px;
 }
 
-.registration-spinner {
+.registration-spinner,
+.btn-spinner {
+  display: inline-block;
   width: 22px;
   height: 22px;
   border: 3px solid rgba(255, 255, 255, 0.4);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: registration-spin 0.7s linear infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.btn-outline .btn-spinner,
+.btn-secondary .btn-spinner {
+  border-color: rgba(0, 0, 0, 0.15);
+  border-top-color: currentColor;
 }
 
 @keyframes registration-spin {
   to { transform: rotate(360deg); }
 }
+
 
 #studentRegForm .input-icon-wrap input:not(:disabled):hover,
 #studentRegForm .form-group textarea:not(:disabled):hover,

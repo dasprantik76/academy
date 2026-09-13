@@ -283,13 +283,31 @@ class AcademyStore {
   }
 
   async saveBatch(batch) {
-    const result = await this.syncToCloud('save_batch', { batch });
-    if (!result?.success || !result.batch) throw new Error('Batch could not be saved.');
-    const index = this.batches.findIndex(item => item.id === result.batch.id);
-    if (index >= 0) this.batches[index] = result.batch;
-    else this.batches.unshift(result.batch);
+    const batchData = {
+      ...batch,
+      id: batch.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'batch_' + Date.now()),
+      status: batch.status === 'Completed' ? 'Completed' : 'Active',
+      updatedAt: new Date().toISOString()
+    };
+    const index = this.batches.findIndex(item => item.id === batchData.id);
+    if (index >= 0) this.batches[index] = batchData;
+    else this.batches.unshift(batchData);
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
-    return result.batch;
+
+    try {
+      const result = await this.syncToCloud('save_batch', { batch: batchData });
+      if (result?.success && result.batch) {
+        const cloudIndex = this.batches.findIndex(item => item.id === result.batch.id);
+        if (cloudIndex >= 0) {
+          this.batches[cloudIndex] = { ...this.batches[cloudIndex], ...result.batch };
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
+        }
+        return result.batch;
+      }
+    } catch (e) {
+      console.warn('[Cloud Sync Warning]: Failed to sync batch to cloud:', e);
+    }
+    return batchData;
   }
 
   async deleteBatch(batchId) {
@@ -298,16 +316,16 @@ class AcademyStore {
     await this.syncToCloud('delete_batch', { batchId });
   }
 
-  markMessageRead(messageId) {
+  async markMessageRead(messageId) {
     const message = this.messages.find(item => item.id === messageId);
     if (!message || message.isRead) return;
     message.isRead = true;
     message.readAt = new Date().toISOString();
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
-    this.syncToCloud('mark_message_read', { messageId });
+    return await this.syncToCloud('mark_message_read', { messageId });
   }
 
-  markAllMessagesRead() {
+  async markAllMessagesRead() {
     let changed = false;
     this.messages.forEach(item => {
       if (!item.isRead) {
@@ -318,21 +336,21 @@ class AcademyStore {
     });
     if (changed) {
       localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
-      this.syncToCloud('mark_all_messages_read', {});
+      return await this.syncToCloud('mark_all_messages_read', {});
     }
   }
 
-  deleteMessage(messageId) {
+  async deleteMessage(messageId) {
     this.messages = this.messages.filter(item => item.id !== messageId);
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
-    this.syncToCloud('delete_message', { messageId });
+    return await this.syncToCloud('delete_message', { messageId });
   }
 
-  clearAllData() {
+  async clearAllData() {
     this.courses = [];
     this.students = [];
     this.save();
-    this.syncToCloud('clear_all', {});
+    return await this.syncToCloud('clear_all', {});
   }
 
   // Academy Profile (Universal SaaS Multi-Owner Setup)
@@ -365,21 +383,21 @@ class AcademyStore {
     }
   }
 
-  saveAcademyProfile(profile) {
+  async saveAcademyProfile(profile) {
     const updated = { ...profile, ownerEmail: this.ownerEmail };
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE), JSON.stringify(updated));
-    this.syncToCloud('save_profile', { profile: updated });
+    return await this.syncToCloud('save_profile', { profile: updated });
   }
 
   // Authentication Token (6-Digit OTP, 5-Hour Expiry)
   getOrGenerateAuthToken(forceNew = false) {
     const AUTH_DURATION = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
     if (!forceNew) {
-      const raw = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN));
+      const raw = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN)) || localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
       if (raw) {
         try {
           const token = JSON.parse(raw);
-          if (token && token.code && token.expiresAt && Date.now() < token.expiresAt) {
+          if (token && token.code && String(token.code).length === 6 && !isNaN(Number(token.code)) && token.expiresAt && Date.now() < token.expiresAt) {
             return token;
           }
         } catch (e) {}
@@ -395,7 +413,7 @@ class AcademyStore {
     };
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(token));
     localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(token));
-    this.syncToCloud('save_auth_token', { token });
+    this.syncToCloud('save_auth_token', { token }).catch(() => {});
     return token;
   }
 
@@ -405,7 +423,9 @@ class AcademyStore {
   }
 
   getStudentById(id) {
-    return this.students.find(s => s.id === id);
+    if (!id) return null;
+    const target = String(id).trim().toLowerCase();
+    return this.students.find(s => String(s.id).trim().toLowerCase() === target) || null;
   }
 
   async addStudent(studentData) {
@@ -417,43 +437,43 @@ class AcademyStore {
     return newStudent;
   }
 
-  updateStudent(id, updatedData) {
-    const index = this.students.findIndex(s => s.id === id);
+  async updateStudent(id, updatedData) {
+    const index = this.students.findIndex(s => String(s.id).trim().toLowerCase() === String(id).trim().toLowerCase());
     if (index !== -1) {
       this.students[index] = {
         ...this.students[index],
         ...updatedData
       };
       this.save();
-      this.syncToCloud('update_student', { studentId: id, updatedData });
+      await this.syncToCloud('update_student', { studentId: id, updatedData });
       return this.students[index];
     }
     return null;
   }
 
-  bulkUpdateStudents(studentIds, updateFields) {
-    const idSet = new Set(studentIds);
+  async bulkUpdateStudents(studentIds, updateFields) {
+    const idSet = new Set((studentIds || []).map(id => String(id).trim().toLowerCase()));
     this.students = this.students.map(student => {
-      if (idSet.has(student.id)) {
+      if (idSet.has(String(student.id).trim().toLowerCase())) {
         return { ...student, ...updateFields };
       }
       return student;
     });
     this.save();
-    this.syncToCloud('bulk_update_students', { studentIds: Array.from(studentIds), updateFields });
+    return await this.syncToCloud('bulk_update_students', { studentIds: Array.from(studentIds), updateFields });
   }
 
-  deleteStudent(id) {
+  async deleteStudent(id) {
     this.students = this.students.filter(s => s.id !== id);
     this.save();
-    this.syncToCloud('delete_student', { studentId: id });
+    return await this.syncToCloud('delete_student', { studentId: id });
   }
 
-  bulkDeleteStudents(ids) {
+  async bulkDeleteStudents(ids) {
     const idSet = new Set(ids);
     this.students = this.students.filter(s => !idSet.has(s.id));
     this.save();
-    this.syncToCloud('bulk_delete_students', { studentIds: Array.from(ids) });
+    return await this.syncToCloud('bulk_delete_students', { studentIds: Array.from(ids) });
   }
 
   // Course Operations (3 Fields: Title/Name, Duration, Description)
@@ -470,7 +490,7 @@ class AcademyStore {
     return this.courses.find(c => c.id === id);
   }
 
-  addCourse(courseData) {
+  async addCourse(courseData) {
     const newId = `CRS-${Math.floor(100 + Math.random() * 900)}`;
     const newCourse = {
       id: newId,
@@ -481,11 +501,11 @@ class AcademyStore {
     };
     this.courses.unshift(newCourse);
     this.save();
-    this.syncToCloud('add_course', { course: newCourse });
+    await this.syncToCloud('add_course', { course: newCourse });
     return newCourse;
   }
 
-  updateCourse(id, updatedData) {
+  async updateCourse(id, updatedData) {
     const index = this.courses.findIndex(c => c.id === id);
     if (index !== -1) {
       this.courses[index] = {
@@ -493,13 +513,13 @@ class AcademyStore {
         ...updatedData
       };
       this.save();
-      this.syncToCloud('save_courses', { courses: this.courses });
+      await this.syncToCloud('save_courses', { courses: this.courses });
       return this.courses[index];
     }
     return null;
   }
 
-  deleteCourse(id) {
+  async deleteCourse(id) {
     this.courses = this.courses.filter(c => c.id !== id);
     // Un-enroll deleted course from any students who had it
     this.students.forEach(student => {
@@ -508,7 +528,7 @@ class AcademyStore {
       }
     });
     this.save();
-    this.syncToCloud('delete_course', { courseId: id });
+    return await this.syncToCloud('delete_course', { courseId: id });
   }
 
   getCourseEnrollmentCount(courseId) {
@@ -588,6 +608,7 @@ class UIController {
     // Synchronize with Multi-Tenant MongoDB cloud storage in background
     store.fetchCloudData(() => {
       this.populateCourseFilterDropdown();
+      this.populateBatchFilterDropdown();
       this.populateCourseDropdownInStudentModal();
       this.render();
       this.updatePublicSiteLink();
@@ -675,6 +696,13 @@ class UIController {
     this.adminStudentCourseFilterMenu = document.getElementById('adminStudentCourseFilterMenu');
     this.studentCourseFilter = document.getElementById('studentCourseFilter');
 
+    this.adminStudentBatchFilterDropdown = document.getElementById('adminStudentBatchFilterDropdown');
+    this.adminStudentBatchFilterTrigger = document.getElementById('adminStudentBatchFilterTrigger');
+    this.adminStudentBatchFilterDisplay = document.getElementById('adminStudentBatchFilterDisplay');
+    this.adminStudentBatchFilterMenu = document.getElementById('adminStudentBatchFilterMenu');
+    this.studentBatchFilter = document.getElementById('studentBatchFilter');
+    this.studentBatchFilterVal = 'all';
+
     this.adminStudentStatusFilterDropdown = document.getElementById('adminStudentStatusFilterDropdown');
     this.adminStudentStatusFilterTrigger = document.getElementById('adminStudentStatusFilterTrigger');
     this.adminStudentStatusFilterDisplay = document.getElementById('adminStudentStatusFilterDisplay');
@@ -749,6 +777,42 @@ class UIController {
     this.batchSearchQuery = '';
     this.btnAddBatch = document.getElementById('btnAddBatch');
     this.btnEmptyCreateBatch = document.getElementById('btnEmptyCreateBatch');
+
+    // ID Cards View Elements
+    this.idCardStudentSearchInput = document.getElementById('idCardStudentSearchInput');
+    this.btnClearIdCardSearch = document.getElementById('btnClearIdCardSearch');
+    this.idCardCourseFilterDropdown = document.getElementById('idCardCourseFilterDropdown');
+    this.idCardCourseFilterTrigger = document.getElementById('idCardCourseFilterTrigger');
+    this.idCardCourseFilterDisplay = document.getElementById('idCardCourseFilterDisplay');
+    this.idCardCourseFilterMenu = document.getElementById('idCardCourseFilterMenu');
+    this.idCardCourseFilterVal = document.getElementById('idCardCourseFilterVal');
+    this.idCardBatchFilterDropdown = document.getElementById('idCardBatchFilterDropdown');
+    this.idCardBatchFilterTrigger = document.getElementById('idCardBatchFilterTrigger');
+    this.idCardBatchFilterDisplay = document.getElementById('idCardBatchFilterDisplay');
+    this.idCardBatchFilterMenu = document.getElementById('idCardBatchFilterMenu');
+    this.idCardBatchFilterVal = document.getElementById('idCardBatchFilterVal');
+    this.btnClearIdCardFilter = document.getElementById('btnClearIdCardFilter');
+    this.idCardStudentCountBadge = document.getElementById('idCardStudentCountBadge');
+    this.idCardSelectAllCheckbox = document.getElementById('idCardSelectAllCheckbox');
+    this.idCardSelectionCountBadge = document.getElementById('idCardSelectionCountBadge');
+    this.idCardStudentList = document.getElementById('idCardStudentList');
+    this.idCardListEmptyState = document.getElementById('idCardListEmptyState');
+    this.btnResetIdCardFilters = document.getElementById('btnResetIdCardFilters');
+    this.idCardSelectedStudentName = document.getElementById('idCardSelectedStudentName');
+    this.idCardSelectedStudentMeta = document.getElementById('idCardSelectedStudentMeta');
+    this.idCardPreviewActions = document.getElementById('idCardPreviewActions');
+    this.btnDownloadIdCard = document.getElementById('btnDownloadIdCard');
+    this.idCardMockupWrapper = document.getElementById('idCardMockupWrapper');
+    this.idCardPreviewCanvas = document.getElementById('idCardPreviewCanvas');
+    this.idCardLoadingOverlay = document.getElementById('idCardLoadingOverlay');
+    this.idCardNoSelection = document.getElementById('idCardNoSelection');
+
+    this.selectedIdCardStudentIds = new Set();
+    this.lastSelectedIdCardStudentId = null;
+    this.idCardSearchQuery = '';
+    this.idCardCourseFilterValue = 'all';
+    this.idCardBatchFilterValue = 'all';
+    this.cachedIdCardTemplate = null;
 
     // Modals - Student (Full fields aligned with registration portal)
     this.studentModal = document.getElementById('studentModal');
@@ -827,6 +891,7 @@ class UIController {
     this.btnCloseStudentModal = document.getElementById('btnCloseStudentModal');
     this.btnCancelStudentModal = document.getElementById('btnCancelStudentModal');
     this.btnDeleteStudentModal = document.getElementById('btnDeleteStudentModal');
+    this.btnSaveStudent = document.getElementById('btnSaveStudent');
 
     // Modals - Course (Only 3 Inputs: Title/Name, Duration, Description)
     this.courseModal = document.getElementById('courseModal');
@@ -843,6 +908,7 @@ class UIController {
     this.courseDescriptionInput = document.getElementById('courseDescription');
     this.btnCloseCourseModal = document.getElementById('btnCloseCourseModal');
     this.btnCancelCourseModal = document.getElementById('btnCancelCourseModal');
+    this.btnSaveCourse = document.getElementById('btnSaveCourse');
 
     // Modals - Student Details
     this.studentDetailsModal = document.getElementById('studentDetailsModal');
@@ -877,6 +943,7 @@ class UIController {
     this.saveBatchLabel = document.getElementById('saveBatchLabel');
     this.btnCloseBatchModal = document.getElementById('btnCloseBatchModal');
     this.btnCancelBatchModal = document.getElementById('btnCancelBatchModal');
+    this.btnSaveBatch = document.getElementById('btnSaveBatch');
     this.batchModalMode = 'create';
 
     // Modal - Edit Batch Students
@@ -894,6 +961,7 @@ class UIController {
     this.editBatchStatus = document.getElementById('editBatchStatus');
     this.btnCloseEditBatchModal = document.getElementById('btnCloseEditBatchModal');
     this.btnCancelEditBatch = document.getElementById('btnCancelEditBatch');
+    this.btnSaveEditBatch = document.getElementById('btnSaveEditBatch');
     this.btnDeleteBatch = document.getElementById('btnDeleteBatch');
 
     // Modals - Course Completion
@@ -925,6 +993,7 @@ class UIController {
     this.completionGrade = document.getElementById('completionGrade');
     this.btnCloseCompletionModal = document.getElementById('btnCloseCompletionModal');
     this.btnCancelCompletion = document.getElementById('btnCancelCompletion');
+    this.btnConfirmCompletion = document.getElementById('btnConfirmCompletion');
 
     // Modals - Confirmation
     this.confirmModal = document.getElementById('confirmModal');
@@ -995,8 +1064,8 @@ class UIController {
     ).join('');
     const currentYear = new Date().getFullYear();
     const yearOptions = Array.from(
-      { length: 11 },
-      (_, index) => currentYear + 5 - index
+      { length: 10 },
+      (_, index) => currentYear - index
     ).map(year => `<li class="custom-select-option" data-value="${year}" role="option">${year}</li>`).join('');
 
     this.completionStartMonthMenu.innerHTML = monthOptions;
@@ -1022,14 +1091,82 @@ class UIController {
   }
 
   validateCompletionPeriodSelection() {
-    const startMonth = this.getCompletionPeriodValue(this.completionStartMonth, this.completionStartYear);
-    const endMonth = this.getCompletionPeriodValue(this.completionEndMonth, this.completionEndYear);
-    if (startMonth && endMonth && endMonth < startMonth) {
-      this.setAdminDropdownValue(this.completionEndMonthDropdown, this.completionEndMonthMenu, this.completionEndMonthDisplay, this.completionEndMonth, '', 'Month');
-    }
+    const ready = Boolean(this.completionStartMonth.value && this.completionStartYear.value);
+    const startYear = Number(this.completionStartYear.value);
+    const years = ready ? Array.from(
+      { length: 10 },
+      (_, index) => startYear + index
+    ) : [];
+    let endYear = this.completionEndYear.value;
+    let endMonth = this.completionEndMonth.value;
+    if (!years.includes(Number(endYear))) endYear = '';
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = ready ? monthNames.map((label, index) => ({
+      label, value: String(index + 1).padStart(2, '0')
+    })) : [];
+    if (!months.some(month => month.value === endMonth)) endMonth = '';
+    this.completionEndYearMenu.innerHTML = years.map(year =>
+      `<li class="custom-select-option" data-value="${year}" role="option">${year}</li>`
+    ).join('');
+    this.completionEndMonthMenu.innerHTML = months.map(month =>
+      `<li class="custom-select-option" data-value="${month.value}" role="option">${month.label}</li>`
+    ).join('');
+    [
+      [this.completionEndMonthDropdown, this.completionEndMonthMenu, this.completionEndMonthDisplay, this.completionEndMonth, this.completionEndMonthTrigger, endMonth, 'Month'],
+      [this.completionEndYearDropdown, this.completionEndYearMenu, this.completionEndYearDisplay, this.completionEndYear, this.completionEndYearTrigger, endYear, 'Year']
+    ].forEach(([container, menu, display, input, trigger, value, label]) => {
+      trigger.disabled = !ready;
+      trigger.setAttribute('aria-disabled', String(!ready));
+      this.setAdminDropdownValue(container, menu, display, input, value, label);
+    });
+    this.validateCompletionDates();
+  }
+
+  validateCompletionDates() {
+    const start = this.getCompletionPeriodValue(this.completionStartMonth, this.completionStartYear);
+    const end = this.getCompletionPeriodValue(this.completionEndMonth, this.completionEndYear);
+    const issue = this.completionIssueDate.value;
+    const invalidDuration = Boolean(start && end && end <= start);
+    const invalidIssue = this.completionIssueDate.validity.badInput || Boolean(issue && (
+      !/^\d{4}-\d{2}-\d{2}$/.test(issue)
+      || issue < '0001-01-01' || issue > '9999-12-31'
+      || (end && issue.slice(0, 7) < end)
+    ));
+    const durationError = document.getElementById('completionDurationError');
+    const issueError = document.getElementById('completionIssueDateError');
+    durationError.textContent = invalidDuration ? 'Please select a valid course duration.' : '';
+    durationError.hidden = !invalidDuration;
+    issueError.textContent = invalidIssue ? 'Please select a valid certificate issuing date.' : '';
+    issueError.hidden = !invalidIssue;
+    const fields = [
+      [this.completionStartMonth, this.completionStartMonthTrigger, false],
+      [this.completionStartYear, this.completionStartYearTrigger, false],
+      [this.completionEndMonth, this.completionEndMonthTrigger, invalidDuration],
+      [this.completionEndYear, this.completionEndYearTrigger, invalidDuration],
+      [this.completionIssueDate, this.completionIssueDate, invalidIssue],
+      [this.completionGrade, this.completionGrade, false]
+    ];
+    let missing = false;
+    fields.forEach(([input, field, invalid]) => {
+      const empty = !input.value.trim();
+      missing ||= empty;
+      const error = invalid || Boolean(this.completionSubmitted && empty);
+      field.classList.toggle('input-error', error);
+      field.setAttribute('aria-invalid', String(error));
+    });
+    this.btnConfirmCompletion.disabled = invalidDuration || invalidIssue;
+    return !missing && !invalidDuration && !invalidIssue;
   }
 
   bindEvents() {
+    this.completionGrade.addEventListener('input', () => {
+      const input = this.completionGrade;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      input.value = input.value.toUpperCase();
+      input.setSelectionRange(start, end);
+      this.validateCompletionDates();
+    });
     // Copy Public Link Button
     if (this.btnCopyPublicUrl) {
       this.btnCopyPublicUrl.addEventListener('click', () => {
@@ -1116,7 +1253,7 @@ class UIController {
       this.btnCancelAcademySettings.addEventListener('click', () => this.closeAcademySettingsModal());
     }
     if (this.academySettingsForm) {
-      this.academySettingsForm.addEventListener('submit', (e) => {
+      this.academySettingsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const academyName = this.settingsAcademyName.value.trim();
         const ownerName = this.settingsOwnerName.value.trim();
@@ -1132,6 +1269,9 @@ class UIController {
           slug = currentProfile.slug || (this.session?.email?.includes('poulami') ? 'poulami' : 'prantik');
         }
 
+        const submitBtn = this.academySettingsForm.querySelector('button[type="submit"]');
+        setButtonLoading(submitBtn, true);
+
         const updatedProfile = {
           ...currentProfile,
           academyName,
@@ -1139,17 +1279,24 @@ class UIController {
           slug,
           updatedAt: Date.now()
         };
-        store.saveAcademyProfile(updatedProfile);
 
-        if (this.session) {
-          this.session.name = ownerName;
-          localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(this.session));
+        try {
+          await store.saveAcademyProfile(updatedProfile);
+
+          if (this.session) {
+            this.session.name = ownerName;
+            localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(this.session));
+          }
+
+          this.closeAcademySettingsModal();
+          this.render();
+          this.updatePublicSiteLink();
+          this.showToast('Settings Saved', `Academy details & subdomain (${slug}) updated successfully!`, 'success');
+        } catch (err) {
+          this.showToast('Save Failed', err.message || 'Could not update academy settings.', 'error');
+        } finally {
+          setButtonLoading(submitBtn, false);
         }
-
-        this.closeAcademySettingsModal();
-        this.render();
-        this.updatePublicSiteLink();
-        this.showToast('Settings Saved', `Academy details & subdomain (${slug}) updated successfully!`, 'success');
       });
     }
 
@@ -1203,7 +1350,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses', 'inbox'].includes(hash)) {
+      if (['dashboard', 'students', 'courses', 'batches', 'idcards', 'inbox'].includes(hash)) {
         this.switchView(hash, false);
       }
     });
@@ -1225,10 +1372,17 @@ class UIController {
     
     // Authentication Code Actions
     if (this.btnGenerateNewAuthCode) {
-      this.btnGenerateNewAuthCode.addEventListener('click', () => {
-        const token = store.getOrGenerateAuthToken(true);
-        this.renderAuthCode();
-        this.showToast('New Code Generated', `Security OTP: ${token.code}`, 'success');
+      this.btnGenerateNewAuthCode.addEventListener('click', async () => {
+        setButtonLoading(this.btnGenerateNewAuthCode, true);
+        try {
+          const token = await store.getOrGenerateAuthToken(true);
+          this.renderAuthCode();
+          this.showToast('New Code Generated', `Security OTP: ${token.code}`, 'success');
+        } catch (e) {
+          this.showToast('Error', 'Failed to generate new code.', 'error');
+        } finally {
+          setButtonLoading(this.btnGenerateNewAuthCode, false);
+        }
       });
     }
 
@@ -1317,6 +1471,18 @@ class UIController {
     );
 
     this.setupAdminDropdown(
+      this.adminStudentBatchFilterDropdown,
+      this.adminStudentBatchFilterTrigger,
+      this.adminStudentBatchFilterMenu,
+      this.adminStudentBatchFilterDisplay,
+      this.studentBatchFilter,
+      (val) => {
+        this.studentBatchFilterVal = val;
+        this.renderStudentsView();
+      }
+    );
+
+    this.setupAdminDropdown(
       this.adminStudentStatusFilterDropdown,
       this.adminStudentStatusFilterTrigger,
       this.adminStudentStatusFilterMenu,
@@ -1346,6 +1512,15 @@ class UIController {
         'All Courses'
       );
       this.studentCourseFilterVal = 'all';
+      this.setAdminDropdownValue(
+        this.adminStudentBatchFilterDropdown,
+        this.adminStudentBatchFilterMenu,
+        this.adminStudentBatchFilterDisplay,
+        this.studentBatchFilter,
+        'all',
+        'All Batches'
+      );
+      this.studentBatchFilterVal = 'all';
       this.setAdminDropdownValue(
         this.adminStudentStatusFilterDropdown,
         this.adminStudentStatusFilterMenu,
@@ -1591,11 +1766,130 @@ class UIController {
     }
 
     if (this.btnMarkAllInboxRead) {
-      this.btnMarkAllInboxRead.addEventListener('click', () => {
-        store.markAllMessagesRead();
-        this.render();
-        this.showToast('All Messages Read', 'All messages have been marked as read.', 'success');
+      this.btnMarkAllInboxRead.addEventListener('click', async () => {
+        setButtonLoading(this.btnMarkAllInboxRead, true);
+        try {
+          await store.markAllMessagesRead();
+          this.render();
+          this.showToast('All Messages Read', 'All messages have been marked as read.', 'success');
+        } catch (e) {
+          this.showToast('Error', 'Failed to mark messages as read.', 'error');
+        } finally {
+          setButtonLoading(this.btnMarkAllInboxRead, false);
+        }
       });
+    }
+
+    // ID Cards Search & Action Handlers
+    if (this.idCardStudentSearchInput) {
+      this.idCardStudentSearchInput.addEventListener('input', (e) => {
+        this.idCardSearchQuery = e.target.value.trim().toLowerCase();
+        if (this.btnClearIdCardSearch) {
+          this.btnClearIdCardSearch.style.display = this.idCardSearchQuery ? 'block' : 'none';
+        }
+        this.renderIdCardsView();
+      });
+    }
+
+    if (this.btnClearIdCardSearch) {
+      this.btnClearIdCardSearch.addEventListener('click', () => {
+        if (this.idCardStudentSearchInput) this.idCardStudentSearchInput.value = '';
+        this.idCardSearchQuery = '';
+        this.btnClearIdCardSearch.style.display = 'none';
+        this.renderIdCardsView();
+      });
+    }
+
+    if (this.btnResetIdCardFilters) {
+      this.btnResetIdCardFilters.addEventListener('click', () => {
+        this.resetIdCardFilters();
+      });
+    }
+
+    if (this.btnClearIdCardFilter) {
+      this.btnClearIdCardFilter.addEventListener('click', () => {
+        this.resetIdCardFilters();
+      });
+    }
+
+    if (this.btnDownloadIdCard) {
+      this.btnDownloadIdCard.addEventListener('click', () => this.downloadSelectedStudentIdCard());
+    }
+
+
+    if (this.idCardSelectAllCheckbox) {
+      this.idCardSelectAllCheckbox.addEventListener('change', (e) => {
+        this.handleSelectAllIdCards(e.target.checked);
+      });
+    }
+
+    if (this.idCardStudentList) {
+      this.idCardStudentList.addEventListener('change', (e) => {
+        const checkbox = e.target.closest('.idcard-student-checkbox');
+        if (checkbox) {
+          const studentId = checkbox.getAttribute('data-student-id');
+          if (studentId) {
+            this.toggleIdCardStudentSelection(studentId, checkbox.checked);
+          }
+        }
+      });
+
+      this.idCardStudentList.addEventListener('click', (e) => {
+        if (e.target.closest('button, a, select, input')) {
+          return;
+        }
+        const item = e.target.closest('.idcard-student-item');
+        if (item) {
+          const studentId = item.getAttribute('data-student-id');
+          if (studentId) {
+            const willSelect = !this.selectedIdCardStudentIds.has(studentId);
+            this.toggleIdCardStudentSelection(studentId, willSelect);
+          }
+        }
+      });
+
+      this.idCardStudentList.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (e.target.closest('input, button, a, select')) return;
+          const item = e.target.closest('.idcard-student-item');
+          if (item) {
+            e.preventDefault();
+            const studentId = item.getAttribute('data-student-id');
+            if (studentId) {
+              const willSelect = !this.selectedIdCardStudentIds.has(studentId);
+              this.toggleIdCardStudentSelection(studentId, willSelect);
+            }
+          }
+        }
+      });
+    }
+
+    if (this.idCardCourseFilterDropdown) {
+      this.setupAdminDropdown(
+        this.idCardCourseFilterDropdown,
+        this.idCardCourseFilterTrigger,
+        this.idCardCourseFilterMenu,
+        this.idCardCourseFilterDisplay,
+        this.idCardCourseFilterVal,
+        (val) => {
+          this.idCardCourseFilterValue = val;
+          this.renderIdCardsView();
+        }
+      );
+    }
+
+    if (this.idCardBatchFilterDropdown) {
+      this.setupAdminDropdown(
+        this.idCardBatchFilterDropdown,
+        this.idCardBatchFilterTrigger,
+        this.idCardBatchFilterMenu,
+        this.idCardBatchFilterDisplay,
+        this.idCardBatchFilterVal,
+        (val) => {
+          this.idCardBatchFilterValue = val;
+          this.renderIdCardsView();
+        }
+      );
     }
 
     if (this.btnAddBatch) {
@@ -1740,6 +2034,7 @@ class UIController {
       this.confirmDeleteStudent(studentId);
     });
 
+    ['input', 'change'].forEach(event => this.completionIssueDate.addEventListener(event, () => this.validateCompletionDates()));
     this.completionForm.addEventListener('submit', (e) => this.handleCompletionSubmit(e));
     [this.completionStartMonth, this.completionStartYear, this.completionEndMonth, this.completionEndYear]
       .forEach(select => select.addEventListener('change', () => this.validateCompletionPeriodSelection()));
@@ -1795,11 +2090,37 @@ class UIController {
 
     this.btnCloseConfirmModal.addEventListener('click', () => this.closeModal(this.confirmModal));
     this.btnCancelConfirm.addEventListener('click', () => this.closeModal(this.confirmModal));
-    this.btnExecuteConfirm.addEventListener('click', () => {
+    this.btnExecuteConfirm.addEventListener('click', async () => {
       if (typeof this.confirmCallback === 'function') {
-        this.confirmCallback();
+        setButtonLoading(this.btnExecuteConfirm, true);
+        try {
+          await this.confirmCallback();
+        } catch (e) {
+          console.error('[Confirm Callback Error]:', e);
+        } finally {
+          setButtonLoading(this.btnExecuteConfirm, false);
+        }
       }
       this.closeModal(this.confirmModal);
+    });
+
+    // Keyboard shortcut: Cmd+D (Mac) / Ctrl+D (Windows) to deselect all students on students page only
+    window.addEventListener('keydown', (e) => {
+      const isCmdOrCtrl = (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey;
+      const isKeyD = e.key === 'd' || e.key === 'D' || e.code === 'KeyD';
+
+      if (isCmdOrCtrl && isKeyD) {
+        const isStudentsPage = this.currentView === 'students' ||
+          Boolean(document.getElementById('view-students')?.classList.contains('active'));
+
+        if (isStudentsPage) {
+          // If a modal dialog is open, do not deselect
+          if (document.querySelector('.modal-backdrop.open')) return;
+
+          e.preventDefault();
+          this.deselectAllStudents();
+        }
+      }
     });
   }
 
@@ -1883,6 +2204,12 @@ class UIController {
         title: 'Batch Management',
         subtitle: 'Organize students and process batch certificates'
       },
+      idcards: {
+        icon: '<i class="fa-solid fa-id-card"></i>',
+        theme: 'theme-dashboard',
+        title: 'Student ID Cards',
+        subtitle: 'Generate, preview, and print official student identity cards'
+      },
       inbox: {
         icon: '<svg viewBox="0 0 512 512" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z"/></svg>',
         theme: 'theme-dashboard',
@@ -1964,6 +2291,9 @@ class UIController {
       this.persHighlight4?.value.trim()
     ].filter(Boolean);
 
+    setButtonLoading(this.btnSavePersonalisation, true);
+    setButtonLoading(this.btnSavePersonalisationTop, true);
+
     const updatedProfile = {
       ...store.getAcademyProfile(),
       slug: sanitizedSlug,
@@ -1985,22 +2315,31 @@ class UIController {
       updatedAt: Date.now()
     };
 
-    store.saveAcademyProfile(updatedProfile);
-    this.updatePublicSiteLink();
-    this.populatePersonalisationForm();
-    this.render();
+    try {
+      await store.saveAcademyProfile(updatedProfile);
+      this.updatePublicSiteLink();
+      this.populatePersonalisationForm();
+      this.render();
 
-    this.showToast('Personalisation Published!', `Your updates and live subdomain (${sanitizedSlug}) are now synced live to the public portal.`, 'success');
+      this.showToast('Personalisation Published!', `Your updates and live subdomain (${sanitizedSlug}) are now synced live to the public portal.`, 'success');
+    } catch (err) {
+      this.showToast('Save Failed', err.message || 'Could not update academy profile.', 'error');
+    } finally {
+      setButtonLoading(this.btnSavePersonalisation, false);
+      setButtonLoading(this.btnSavePersonalisationTop, false);
+    }
   }
 
   render() {
     this.renderUserProfile();
     this.populateCourseFilterDropdown();
+    this.populateBatchFilterDropdown();
     this.renderBadgesAndStats();
     this.renderDashboardView();
     this.renderStudentsView();
     this.renderCoursesView();
     this.renderBatchesView();
+    this.renderIdCardsView();
     this.renderInboxView();
   }
 
@@ -2045,7 +2384,31 @@ class UIController {
         this.adminStudentCourseFilterMenu,
         this.adminStudentCourseFilterDisplay,
         this.studentCourseFilter,
-        currentVal || 'all',
+        currentVal,
+        label
+      );
+    }
+  }
+
+  populateBatchFilterDropdown() {
+    const currentVal = this.studentBatchFilter ? this.studentBatchFilter.value : 'all';
+    const batches = store.getAllBatches();
+
+    if (this.adminStudentBatchFilterMenu) {
+      let html = '<li class="custom-select-option" data-value="all" role="option">All Batches</li>';
+      batches.forEach(batch => {
+        html += `<li class="custom-select-option" data-value="${escapeHtml(batch.id)}" role="option">${escapeHtml(batch.name)}</li>`;
+      });
+      this.adminStudentBatchFilterMenu.innerHTML = html;
+
+      const selectedBatch = batches.find(b => b.id === currentVal);
+      const label = selectedBatch ? selectedBatch.name : 'All Batches';
+      this.setAdminDropdownValue(
+        this.adminStudentBatchFilterDropdown,
+        this.adminStudentBatchFilterMenu,
+        this.adminStudentBatchFilterDisplay,
+        this.studentBatchFilter,
+        currentVal,
         label
       );
     }
@@ -2057,6 +2420,9 @@ class UIController {
     // Sidebar Badges
     this.studentCountBadge.textContent = stats.totalStudents;
     this.courseCountBadge.textContent = stats.totalCourses;
+    if (this.batchCountBadge) {
+      this.batchCountBadge.textContent = stats.totalBatches || store.getAllBatches().length;
+    }
     const unreadMessages = store.getAllMessages().filter(message => !message.isRead).length;
     if (this.inboxUnreadBadge) {
       this.inboxUnreadBadge.textContent = unreadMessages;
@@ -2102,6 +2468,8 @@ class UIController {
   renderStudentsView() {
     const allStudents = store.getAllStudents();
     const allCourses = store.getAllCourses();
+    const batches = store.getAllBatches();
+    const activeBatchObj = this.studentBatchFilterVal !== 'all' ? batches.find(b => b.id === this.studentBatchFilterVal) : null;
 
     if (this.studentTotalCount) this.studentTotalCount.textContent = allStudents.length;
 
@@ -2117,21 +2485,37 @@ class UIController {
       const matchesCourse = this.studentCourseFilterVal === 'all' ||
         (Array.isArray(student.enrolledCourseIds) && student.enrolledCourseIds.includes(this.studentCourseFilterVal));
 
+      const matchesBatch = this.studentBatchFilterVal === 'all' ||
+        Boolean(activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(student.id)) ||
+        student.batchId === this.studentBatchFilterVal;
+
       const matchesStatus = this.studentStatusFilterVal === 'all' ||
         student.status === this.studentStatusFilterVal;
 
-      return matchesSearch && matchesCourse && matchesStatus;
+      return matchesSearch && matchesCourse && matchesBatch && matchesStatus;
     });
 
     if (this.studentFilteredCount) this.studentFilteredCount.textContent = filteredStudents.length;
 
+    if (this.adminStudentCourseFilterDropdown) {
+      this.adminStudentCourseFilterDropdown.classList.toggle('is-filtered', Boolean(this.studentCourseFilterVal && this.studentCourseFilterVal !== 'all'));
+    }
+    if (this.adminStudentBatchFilterDropdown) {
+      this.adminStudentBatchFilterDropdown.classList.toggle('is-filtered', Boolean(this.studentBatchFilterVal && this.studentBatchFilterVal !== 'all'));
+    }
+    if (this.adminStudentStatusFilterDropdown) {
+      this.adminStudentStatusFilterDropdown.classList.toggle('is-filtered', Boolean(this.studentStatusFilterVal && this.studentStatusFilterVal !== 'all'));
+    }
+
     if (filteredStudents.length === 0) {
       this.studentsTableBody.innerHTML = '';
       this.studentsEmptyState.style.display = 'flex';
+      this.studentsEmptyState.closest('.student-table-card')?.classList.add('is-empty');
       this.updateBulkActionState(filteredStudents);
       return;
     }
 
+    this.studentsEmptyState.closest('.student-table-card')?.classList.remove('is-empty');
     this.studentsEmptyState.style.display = 'none';
 
     this.studentsTableBody.innerHTML = filteredStudents.map(student => {
@@ -2305,7 +2689,7 @@ class UIController {
             </button>
           ` : `
             <button class="btn btn-success btn-sm batch-complete-btn" data-batch-action="complete" data-batch-id="${escapeHtml(batch.id)}" ${!members.length ? 'disabled title="No students in this batch"' : 'title="Mark batch as completed"'}>
-              <i class="fa-solid fa-certificate"></i> Mark as Completed
+              <i class="fa-solid fa-check"></i> Mark as Completed
             </button>
           `}
         </div>
@@ -2332,7 +2716,6 @@ class UIController {
     );
     this.renderEditBatchStudentList();
     this.openModal(this.editBatchModal);
-    window.setTimeout(() => this.editBatchStudentSearch.focus(), 100);
   }
 
   renderEditBatchStudentList() {
@@ -2364,6 +2747,8 @@ class UIController {
       this.showToast('Students Required', 'Keep at least one student in the batch.', 'error');
       return;
     }
+    const submitBtn = this.btnSaveEditBatch || this.editBatchForm.querySelector('button[type="submit"]');
+    setButtonLoading(submitBtn, true);
     try {
       const shouldComplete = this.editBatchStatus.value === 'Completed' && batch.status !== 'Completed';
       await store.saveBatch({ ...batch, studentIds, status: shouldComplete ? 'Active' : this.editBatchStatus.value });
@@ -2379,6 +2764,8 @@ class UIController {
       this.showToast('Batch Updated', `${batch.name} now has ${studentIds.length} student${studentIds.length === 1 ? '' : 's'}.`, 'success');
     } catch (error) {
       this.showToast('Batch Not Updated', error.message, 'error');
+    } finally {
+      setButtonLoading(submitBtn, false);
     }
   }
 
@@ -2386,6 +2773,7 @@ class UIController {
     this.batchModalMode = 'create';
     this.batchForm.reset();
     this.batchModalTitle.textContent = 'Create New Batch';
+    this.batchModal.querySelector('.modal-icon').className = 'fa-solid fa-plus modal-icon';
     this.batchNameGroup.hidden = false;
     this.existingBatchGroup.hidden = true;
     if (this.batchStudentSelectionGroup) this.batchStudentSelectionGroup.hidden = false;
@@ -2401,7 +2789,6 @@ class UIController {
     this.renderCreateBatchStudentList();
 
     this.openModal(this.batchModal);
-    setTimeout(() => this.batchNameInput.focus(), 100);
   }
 
   renderCreateBatchStudentList() {
@@ -2451,6 +2838,7 @@ class UIController {
     this.batchModalMode = 'existing';
     this.batchForm.reset();
     this.batchModalTitle.textContent = 'Add to Existing Batch';
+    this.batchModal.querySelector('.modal-icon').className = 'fa-solid fa-arrow-right-to-bracket modal-icon';
     this.batchNameGroup.hidden = true;
     this.existingBatchGroup.hidden = false;
     if (this.batchStudentSelectionGroup) this.batchStudentSelectionGroup.hidden = true;
@@ -2460,11 +2848,11 @@ class UIController {
     this.existingBatchTrigger.classList.remove('input-error');
     this.saveBatchLabel.textContent = 'Add Students';
     this.openModal(this.batchModal);
-    setTimeout(() => this.existingBatchTrigger.focus(), 100);
   }
 
   async handleBatchFormSubmit(e) {
     e.preventDefault();
+    const submitBtn = this.btnSaveBatch || this.batchForm.querySelector('button[type="submit"]');
     const existing = this.batchModalMode === 'existing';
     if (existing) {
       const studentIds = Array.from(this.selectedStudentIds);
@@ -2475,6 +2863,7 @@ class UIController {
         this.existingBatchTrigger.focus();
         return;
       }
+      setButtonLoading(submitBtn, true);
       try {
         const saved = await store.saveBatch({
           ...batch,
@@ -2483,26 +2872,831 @@ class UIController {
         this.closeModal(this.batchModal);
         this.selectedStudentIds.clear();
         this.render();
-        this.switchView('batches');
         this.showToast('Students Added', `Students were added to ${saved.name}.`, 'success');
       } catch (error) {
         this.showToast('Students Not Added', error.message, 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
     } else {
       const name = this.batchNameInput.value.trim();
       if (!name) return this.batchForm.reportValidity();
       const studentIds = Array.from(this.createBatchSelectedStudentIds);
+      setButtonLoading(submitBtn, true);
       try {
         const saved = await store.saveBatch({ name, studentIds, status: 'Active' });
         this.closeModal(this.batchModal);
         this.selectedStudentIds.clear();
         this.createBatchSelectedStudentIds.clear();
         this.render();
-        this.switchView('batches');
         this.showToast('Batch Created', `${saved.name} was created successfully.`, 'success');
       } catch (error) {
         this.showToast('Batch Not Created', error.message, 'error');
+      } finally {
+        setButtonLoading(submitBtn, false);
       }
+    }
+  }
+
+  // ==========================================================================
+  // Render & Manage ID Cards View
+  // ==========================================================================
+  resetIdCardFilters() {
+    if (this.idCardStudentSearchInput) this.idCardStudentSearchInput.value = '';
+    this.idCardSearchQuery = '';
+    if (this.btnClearIdCardSearch) this.btnClearIdCardSearch.style.display = 'none';
+    this.setAdminDropdownValue(
+      this.idCardCourseFilterDropdown,
+      this.idCardCourseFilterMenu,
+      this.idCardCourseFilterDisplay,
+      this.idCardCourseFilterVal,
+      'all',
+      'All Courses'
+    );
+    this.idCardCourseFilterValue = 'all';
+    this.setAdminDropdownValue(
+      this.idCardBatchFilterDropdown,
+      this.idCardBatchFilterMenu,
+      this.idCardBatchFilterDisplay,
+      this.idCardBatchFilterVal,
+      'all',
+      'All Batches'
+    );
+    this.idCardBatchFilterValue = 'all';
+    this.renderIdCardsView();
+  }
+
+  renderIdCardsView() {
+    if (!this.idCardStudentList) return;
+
+    const students = store.getAllStudents();
+    const courses = store.getAllCourses();
+    const batches = store.getAllBatches();
+
+    // Populate ID Cards Course filter dropdown
+    if (this.idCardCourseFilterMenu) {
+      const currentVal = this.idCardCourseFilterVal ? this.idCardCourseFilterVal.value : 'all';
+      let html = '<li class="custom-select-option" data-value="all" role="option">All Courses</li>';
+      courses.forEach(course => {
+        html += `<li class="custom-select-option" data-value="${escapeHtml(course.id)}" role="option">${escapeHtml(course.title)}</li>`;
+      });
+      this.idCardCourseFilterMenu.innerHTML = html;
+      const selectedCourse = courses.find(c => c.id === currentVal);
+      const label = selectedCourse ? selectedCourse.title : 'All Courses';
+      this.setAdminDropdownValue(
+        this.idCardCourseFilterDropdown,
+        this.idCardCourseFilterMenu,
+        this.idCardCourseFilterDisplay,
+        this.idCardCourseFilterVal,
+        currentVal,
+        label
+      );
+    }
+
+    // Populate ID Cards Batch filter dropdown
+    if (this.idCardBatchFilterMenu) {
+      const currentBatchVal = this.idCardBatchFilterVal ? this.idCardBatchFilterVal.value : 'all';
+      let bHtml = '<li class="custom-select-option" data-value="all" role="option">All Batches</li>';
+      batches.forEach(b => {
+        bHtml += `<li class="custom-select-option" data-value="${escapeHtml(b.id)}" role="option">${escapeHtml(b.name)}</li>`;
+      });
+      this.idCardBatchFilterMenu.innerHTML = bHtml;
+      const selectedBatch = batches.find(b => b.id === currentBatchVal);
+      const bLabel = selectedBatch ? selectedBatch.name : 'All Batches';
+      this.setAdminDropdownValue(
+        this.idCardBatchFilterDropdown,
+        this.idCardBatchFilterMenu,
+        this.idCardBatchFilterDisplay,
+        this.idCardBatchFilterVal,
+        currentBatchVal,
+        bLabel
+      );
+    }
+
+    // Filter students
+    const query = (this.idCardSearchQuery || '').toLowerCase();
+    const courseFilter = this.idCardCourseFilterVal ? this.idCardCourseFilterVal.value : 'all';
+    const batchFilter = this.idCardBatchFilterVal ? this.idCardBatchFilterVal.value : 'all';
+    const activeBatchObj = batchFilter !== 'all' ? batches.find(b => b.id === batchFilter) : null;
+
+    const filteredStudents = students.filter(student => {
+      const matchesSearch = !query ||
+        String(student.name || '').toLowerCase().includes(query) ||
+        String(student.id || '').toLowerCase().includes(query) ||
+        String(student.phone || '').toLowerCase().includes(query) ||
+        String(student.email || '').toLowerCase().includes(query);
+
+      const matchesCourse = courseFilter === 'all' ||
+        (Array.isArray(student.enrolledCourseIds) && student.enrolledCourseIds.includes(courseFilter));
+
+      const matchesBatch = batchFilter === 'all' ||
+        Boolean(activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(student.id)) ||
+        student.batchId === batchFilter;
+
+      return matchesSearch && matchesCourse && matchesBatch;
+    });
+
+    // Update clear filter button state
+    const hasActiveFilter = Boolean((this.idCardCourseFilterValue && this.idCardCourseFilterValue !== 'all') ||
+                                    (this.idCardBatchFilterValue && this.idCardBatchFilterValue !== 'all') ||
+                                    this.idCardSearchQuery);
+
+    if (this.btnClearIdCardFilter) {
+      this.btnClearIdCardFilter.disabled = !hasActiveFilter;
+    }
+
+    if (this.idCardStudentCountBadge) {
+      this.idCardStudentCountBadge.textContent = `${filteredStudents.length} Student${filteredStudents.length === 1 ? '' : 's'}`;
+    }
+
+    if (this.idCardCourseFilterDropdown) {
+      this.idCardCourseFilterDropdown.classList.toggle('is-filtered', Boolean(this.idCardCourseFilterValue && this.idCardCourseFilterValue !== 'all'));
+    }
+    if (this.idCardBatchFilterDropdown) {
+      this.idCardBatchFilterDropdown.classList.toggle('is-filtered', Boolean(this.idCardBatchFilterValue && this.idCardBatchFilterValue !== 'all'));
+    }
+
+    const idCardPanel = this.idCardStudentList ? this.idCardStudentList.closest('.idcards-list-panel') : null;
+    const idCardSelectAllRow = idCardPanel ? idCardPanel.querySelector('.idcards-select-all-row') : null;
+
+    if (filteredStudents.length === 0) {
+      if (idCardPanel) idCardPanel.classList.add('is-empty');
+      if (idCardSelectAllRow) idCardSelectAllRow.style.display = 'none';
+      if (this.idCardStudentList) {
+        this.idCardStudentList.innerHTML = '';
+        this.idCardStudentList.style.display = 'none';
+      }
+      if (this.idCardListEmptyState) this.idCardListEmptyState.style.display = 'flex';
+      if (this.idCardMockupWrapper) this.idCardMockupWrapper.style.display = 'none';
+      if (this.idCardPreviewActions) this.idCardPreviewActions.style.display = 'flex';
+      if (this.btnDownloadIdCard) this.btnDownloadIdCard.disabled = true;
+      if (this.idCardNoSelection) this.idCardNoSelection.style.display = 'flex';
+      this.selectedIdCardStudentIds.clear();
+      this.lastSelectedIdCardStudentId = null;
+      this.updateIdCardSelectionUI(filteredStudents);
+      return;
+    }
+
+    if (idCardPanel) idCardPanel.classList.remove('is-empty');
+    if (idCardSelectAllRow) idCardSelectAllRow.style.display = '';
+    if (this.idCardStudentList) this.idCardStudentList.style.display = '';
+    if (this.idCardListEmptyState) this.idCardListEmptyState.style.display = 'none';
+
+    // Auto-select first student if none selected or if none in filtered list
+    if (this.selectedIdCardStudentIds.size === 0 || !filteredStudents.some(s => this.selectedIdCardStudentIds.has(s.id))) {
+      this.selectedIdCardStudentIds.clear();
+      this.selectedIdCardStudentIds.add(filteredStudents[0].id);
+      this.lastSelectedIdCardStudentId = filteredStudents[0].id;
+    }
+
+    this.idCardStudentList.innerHTML = filteredStudents.map(student => {
+      const isSelected = this.selectedIdCardStudentIds.has(student.id);
+      const isPreviewed = student.id === this.lastSelectedIdCardStudentId;
+      const statusText = student.status || 'Active';
+
+      return `
+        <div class="idcard-student-item ${isSelected ? 'is-selected' : ''} ${isPreviewed ? 'is-previewed' : ''}" data-student-id="${escapeHtml(student.id)}" role="button" tabindex="0">
+          <input type="checkbox" class="custom-table-checkbox idcard-student-checkbox" data-student-id="${escapeHtml(student.id)}" ${isSelected ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}">
+          <span class="idcard-student-name">${escapeHtml(student.name)}</span>
+          <div class="idcard-student-status-col">
+            <span class="badge ${getStatusBadgeClass(statusText)} idcard-student-status">
+              ${getStatusBadgeIcon(statusText)} ${escapeHtml(statusText)}
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    this.updateIdCardSelectionUI(filteredStudents);
+  }
+
+  toggleIdCardStudentSelection(studentId, isSelected) {
+    if (isSelected) {
+      this.selectedIdCardStudentIds.delete(studentId);
+      this.selectedIdCardStudentIds.add(studentId);
+      this.lastSelectedIdCardStudentId = studentId;
+    } else {
+      this.selectedIdCardStudentIds.delete(studentId);
+      if (this.lastSelectedIdCardStudentId === studentId) {
+        const remaining = Array.from(this.selectedIdCardStudentIds);
+        this.lastSelectedIdCardStudentId = remaining.length > 0 ? remaining[remaining.length - 1] : null;
+      }
+    }
+    this.updateIdCardSelectionUI();
+  }
+
+  handleSelectAllIdCards(isChecked) {
+    const allStudents = store.getAllStudents();
+    const batches = store.getAllBatches();
+    const activeBatchObj = this.idCardBatchFilterValue !== 'all' ? batches.find(b => b.id === this.idCardBatchFilterValue) : null;
+
+    const filteredStudents = allStudents.filter(student => {
+      const query = this.idCardSearchQuery;
+      const matchesSearch = !query ||
+        student.name.toLowerCase().includes(query) ||
+        student.id.toLowerCase().includes(query) ||
+        (student.phone && student.phone.includes(query));
+
+      const matchesCourse = this.idCardCourseFilterValue === 'all' ||
+        (Array.isArray(student.enrolledCourseIds) && student.enrolledCourseIds.includes(this.idCardCourseFilterValue));
+
+      const matchesBatch = this.idCardBatchFilterValue === 'all' ||
+        Boolean(activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(student.id)) ||
+        student.batchId === this.idCardBatchFilterValue;
+
+      return matchesSearch && matchesCourse && matchesBatch;
+    });
+
+    if (isChecked) {
+      filteredStudents.forEach(s => this.selectedIdCardStudentIds.add(s.id));
+      if (filteredStudents.length > 0) {
+        this.lastSelectedIdCardStudentId = filteredStudents[filteredStudents.length - 1].id;
+      }
+    } else {
+      filteredStudents.forEach(s => this.selectedIdCardStudentIds.delete(s.id));
+      const remaining = Array.from(this.selectedIdCardStudentIds);
+      this.lastSelectedIdCardStudentId = remaining.length > 0 ? remaining[remaining.length - 1] : null;
+    }
+    this.updateIdCardSelectionUI(filteredStudents);
+  }
+
+  updateIdCardSelectionUI(filteredStudents = null) {
+    if (!filteredStudents) {
+      const allStudents = store.getAllStudents();
+      const batches = store.getAllBatches();
+      const activeBatchObj = this.idCardBatchFilterValue !== 'all' ? batches.find(b => b.id === this.idCardBatchFilterValue) : null;
+
+      filteredStudents = allStudents.filter(student => {
+        const query = this.idCardSearchQuery;
+        const matchesSearch = !query ||
+          student.name.toLowerCase().includes(query) ||
+          student.id.toLowerCase().includes(query) ||
+          (student.phone && student.phone.includes(query));
+
+        const matchesCourse = this.idCardCourseFilterValue === 'all' ||
+          (Array.isArray(student.enrolledCourseIds) && student.enrolledCourseIds.includes(this.idCardCourseFilterValue));
+
+        const matchesBatch = this.idCardBatchFilterValue === 'all' ||
+          Boolean(activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(student.id)) ||
+          student.batchId === this.idCardBatchFilterValue;
+
+        return matchesSearch && matchesCourse && matchesBatch;
+      });
+    }
+
+    // Update row states in DOM
+    if (this.idCardStudentList) {
+      this.idCardStudentList.querySelectorAll('.idcard-student-item').forEach(item => {
+        const studentId = item.getAttribute('data-student-id');
+        const isSelected = this.selectedIdCardStudentIds.has(studentId);
+        const isPreviewed = studentId === this.lastSelectedIdCardStudentId;
+        item.classList.toggle('is-selected', isSelected);
+        item.classList.toggle('is-previewed', isPreviewed);
+        const cb = item.querySelector('.idcard-student-checkbox');
+        if (cb) cb.checked = isSelected;
+      });
+    }
+
+    // Update Select All Checkbox state
+    if (this.idCardSelectAllCheckbox) {
+      if (filteredStudents.length === 0) {
+        this.idCardSelectAllCheckbox.checked = false;
+        this.idCardSelectAllCheckbox.indeterminate = false;
+      } else {
+        const selectedVisibleCount = filteredStudents.filter(s => this.selectedIdCardStudentIds.has(s.id)).length;
+        const allSelected = selectedVisibleCount === filteredStudents.length && filteredStudents.length > 0;
+        const someSelected = selectedVisibleCount > 0 && selectedVisibleCount < filteredStudents.length;
+
+        this.idCardSelectAllCheckbox.checked = allSelected;
+        this.idCardSelectAllCheckbox.indeterminate = someSelected;
+      }
+    }
+
+    // Update Selection Count Badge
+    const selectedCount = this.selectedIdCardStudentIds.size;
+    if (this.idCardSelectionCountBadge) {
+      this.idCardSelectionCountBadge.textContent = selectedCount;
+      this.idCardSelectionCountBadge.hidden = selectedCount === 0;
+      this.idCardSelectionCountBadge.style.display = selectedCount > 0 ? 'inline-flex' : 'none';
+    }
+
+    // Update Action Buttons
+    if (this.btnDownloadIdCard) {
+      const downloadIconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg>`;
+      const labelText = selectedCount >= 2 ? 'Download ID Cards' : 'Download ID Card';
+      const btnContent = `${downloadIconSvg} ${labelText}`;
+      this.btnDownloadIdCard.innerHTML = btnContent;
+      this.btnDownloadIdCard.dataset.originalHtml = btnContent;
+      this.btnDownloadIdCard.title = labelText;
+      this.btnDownloadIdCard.disabled = selectedCount === 0;
+    }
+
+
+    // Always show preview of the LAST SELECTED student
+    if (selectedCount > 0 && this.lastSelectedIdCardStudentId) {
+      const student = store.getStudentById(this.lastSelectedIdCardStudentId);
+      if (student) {
+        this.updateIdCardPreview(student);
+      }
+    } else {
+      if (this.idCardPreviewActions) this.idCardPreviewActions.style.display = 'flex';
+      if (this.btnDownloadIdCard) this.btnDownloadIdCard.disabled = true;
+      if (this.idCardMockupWrapper) this.idCardMockupWrapper.style.display = 'none';
+      if (this.idCardNoSelection) this.idCardNoSelection.style.display = 'flex';
+    }
+  }
+
+  async updateIdCardPreview(student) {
+    if (!student) return;
+    const courses = store.getAllCourses();
+    const enrolledCourse = courses.find(c => student.enrolledCourseIds && student.enrolledCourseIds.includes(c.id));
+    const courseTitle = enrolledCourse ? `${enrolledCourse.title} (${enrolledCourse.duration})` : (student.courseName || 'General Curriculum');
+
+    if (this.idCardSelectedStudentName) {
+      this.idCardSelectedStudentName.textContent = student.name;
+    }
+    if (this.idCardSelectedStudentMeta) {
+      this.idCardSelectedStudentMeta.textContent = `${student.id} • ${courseTitle} • Status: ${student.status}`;
+    }
+    if (this.idCardPreviewActions) {
+      this.idCardPreviewActions.style.display = 'flex';
+    }
+    if (this.idCardNoSelection) {
+      this.idCardNoSelection.style.display = 'none';
+    }
+    if (this.idCardMockupWrapper) {
+      this.idCardMockupWrapper.style.display = 'flex';
+    }
+
+    await this.renderIdCardToCanvas(student);
+  }
+
+  async loadIdCardTemplateImage() {
+    if (this.cachedIdCardTemplate && this.cachedIdCardTemplate.complete && this.cachedIdCardTemplate.naturalWidth > 0) {
+      return this.cachedIdCardTemplate;
+    }
+    const localUrl = 'assets/student-idcard.jpg?v=3';
+    const remoteUrl = 'https://ik.imagekit.io/d3ycnoiwd/academy/student-certificate/student-idcard.jpg?v=3';
+
+    try {
+      this.cachedIdCardTemplate = await loadCertificateImage(localUrl);
+      return this.cachedIdCardTemplate;
+    } catch {
+      this.cachedIdCardTemplate = await loadCertificateImage(remoteUrl);
+      return this.cachedIdCardTemplate;
+    }
+  }
+
+  drawIdCardPhotoFallback(ctx, student, box) {
+    ctx.save();
+    ctx.beginPath();
+    drawRoundedRect(ctx, box.x, box.y, box.width, box.height, box.radius);
+    ctx.fillStyle = '#1e293b';
+    ctx.fill();
+
+    const initials = getInitials(student.name || 'ST');
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 110px "SF Pro Display", "SF Pro", -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(initials, box.x + box.width / 2, box.y + box.height / 2);
+    ctx.restore();
+  }
+
+  async renderIdCardToCanvas(student, targetCanvas = null) {
+    const canvas = targetCanvas || this.idCardPreviewCanvas;
+    if (!canvas || !student) return;
+
+    if (canvas === this.idCardPreviewCanvas) {
+      this.currentRenderingIdCardStudentId = student.id;
+    }
+
+    if (this.idCardLoadingOverlay && canvas === this.idCardPreviewCanvas) {
+      this.idCardLoadingOverlay.style.display = 'flex';
+    }
+
+    try {
+      const templateImg = await this.loadIdCardTemplateImage();
+      const ctx = canvas.getContext('2d');
+
+      // 1. Draw template image onto 1250 x 2000 canvas unedited
+      ctx.drawImage(templateImg, 0, 0, 1250, 2000);
+
+      // 2. Draw Student Photo with thick white stroke strictly outside the photo placeholder
+      const STROKE_WIDTH = 16;
+      const PHOTO_BOX = { x: 422, y: 596, width: 407, height: 433, radius: 36 };
+      const OUTER_BOX = {
+        x: PHOTO_BOX.x - STROKE_WIDTH,
+        y: PHOTO_BOX.y - STROKE_WIDTH,
+        width: PHOTO_BOX.width + STROKE_WIDTH * 2,
+        height: PHOTO_BOX.height + STROKE_WIDTH * 2,
+        radius: PHOTO_BOX.radius + STROKE_WIDTH
+      };
+
+      // Draw thick white outer stroke strictly outside the photo area
+      ctx.save();
+      ctx.beginPath();
+      drawRoundedRect(ctx, OUTER_BOX.x, OUTER_BOX.y, OUTER_BOX.width, OUTER_BOX.height, OUTER_BOX.radius);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.restore();
+
+      if (student.photoUrl) {
+        try {
+          const photo = await loadCertificateImage(student.photoUrl);
+          ctx.save();
+          ctx.beginPath();
+          drawRoundedRect(ctx, PHOTO_BOX.x, PHOTO_BOX.y, PHOTO_BOX.width, PHOTO_BOX.height, PHOTO_BOX.radius);
+          ctx.clip();
+          const scale = Math.max(PHOTO_BOX.width / photo.width, PHOTO_BOX.height / photo.height);
+          const sw = PHOTO_BOX.width / scale;
+          const sh = PHOTO_BOX.height / scale;
+          ctx.drawImage(
+            photo,
+            (photo.width - sw) / 2,
+            Math.max(0, (photo.height - sh) * 0.25),
+            sw,
+            sh,
+            PHOTO_BOX.x,
+            PHOTO_BOX.y,
+            PHOTO_BOX.width,
+            PHOTO_BOX.height
+          );
+          ctx.restore();
+        } catch (photoErr) {
+          console.warn('Could not load student photo for ID card:', photoErr);
+          this.drawIdCardPhotoFallback(ctx, student, PHOTO_BOX);
+        }
+      } else {
+        this.drawIdCardPhotoFallback(ctx, student, PHOTO_BOX);
+      }
+
+      // Calibrated parameters for ID Card typography and layout
+      const tuning = {
+        nameSize: 100,
+        nameY: 1160,
+        detSize: 54,
+        weight: '500',
+        valX: 560,
+        maxWidth: 600,
+        idY: 1311,
+        phoneY: 1395,
+        courseY: 1480,
+        lineHeight: 54
+      };
+      try {
+        const savedTuning = localStorage.getItem('idcard_tuning_config');
+        if (savedTuning) {
+          const parsed = JSON.parse(savedTuning);
+          Object.assign(tuning, parsed);
+        }
+      } catch (err) {
+        console.warn('Could not read idcard_tuning_config:', err);
+      }
+
+      // Ensure SF Pro font is loaded before rendering canvas text
+      try {
+        if (document.fonts && typeof document.fonts.load === 'function') {
+          await Promise.all([
+            document.fonts.load(`800 ${tuning.nameSize}px "SF Pro Display"`),
+            document.fonts.load(`${tuning.weight} ${tuning.detSize}px "SF Pro Display"`),
+            document.fonts.load(`${tuning.weight} ${tuning.detSize}px "SF Pro Text"`)
+          ]);
+        }
+      } catch {}
+
+      // 3. Draw Student Name in SF Pro (Bold and large, centered uppercase)
+      const studentName = (student.name || student.fullName || '').toUpperCase();
+      if (studentName) {
+        ctx.save();
+        ctx.fillStyle = '#0f172a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        let fontSize = tuning.nameSize;
+        ctx.font = `800 ${fontSize}px "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", sans-serif`;
+        while (ctx.measureText(studentName).width > 980 && fontSize > 48) {
+          fontSize -= 2;
+          ctx.font = `800 ${fontSize}px "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", sans-serif`;
+        }
+        ctx.fillText(studentName, 625, tuning.nameY);
+        ctx.restore();
+      }
+
+      // 4. Draw Dynamic Field Values in SF Pro matching labels in visual size, weight, and tone
+      const VAL_X = tuning.valX;
+      const MAX_VAL_WIDTH = tuning.maxWidth;
+      const FIELD_FONT = `${tuning.weight} ${tuning.detSize}px "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", sans-serif`;
+
+      const drawValue = (val, y) => {
+        if (!val) return;
+        ctx.save();
+        ctx.textBaseline = 'middle';
+        ctx.font = FIELD_FONT;
+        ctx.fillStyle = '#1e293b';
+        ctx.textAlign = 'left';
+        ctx.fillText(val, VAL_X, y);
+        ctx.restore();
+      };
+
+      // Value 1: Student ID
+      const studentId = student.id || student.regNo || '';
+      if (studentId) drawValue(studentId, tuning.idY);
+
+      // Value 2: Mobile No.
+      const phone = student.phone || '';
+      if (phone) drawValue(phone, tuning.phoneY);
+
+      // Value 3: Course Title (Dynamic multi-line wrap without text cropping)
+      const courses = store.getAllCourses();
+      const courseObj = courses.find(c => student.enrolledCourseIds && student.enrolledCourseIds.includes(c.id));
+      const courseTitle = courseObj ? courseObj.title : (student.courseName || '');
+      if (courseTitle) {
+        ctx.save();
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#1e293b';
+        ctx.textAlign = 'left';
+
+        let fontSize = tuning.detSize;
+        let lineHeight = tuning.lineHeight;
+        const maxTextWidth = tuning.maxWidth;
+
+        const computeLines = (fSize) => {
+          ctx.font = `${tuning.weight} ${fSize}px "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", sans-serif`;
+          const words = courseTitle.split(/\s+/);
+          const res = [];
+          let cur = '';
+          for (const w of words) {
+            const test = cur ? `${cur} ${w}` : w;
+            if (ctx.measureText(test).width <= maxTextWidth) {
+              cur = test;
+            } else {
+              if (cur) res.push(cur);
+              cur = w;
+            }
+          }
+          if (cur) res.push(cur);
+          return res;
+        };
+
+        let lines = computeLines(fontSize);
+        while (lines.length > 2 && fontSize > 36) {
+          fontSize -= 2;
+          lineHeight = Math.round(fontSize * 1.18);
+          lines = computeLines(fontSize);
+        }
+
+        ctx.font = `${tuning.weight} ${fontSize}px "SF Pro Display", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", sans-serif`;
+        lines.forEach((lineText, idx) => {
+          ctx.fillText(lineText, VAL_X, tuning.courseY + idx * lineHeight);
+        });
+        ctx.restore();
+      }
+
+      if (canvas === this.idCardPreviewCanvas && this.currentRenderingIdCardStudentId !== student.id) {
+        return;
+      }
+
+    } catch (err) {
+      console.error('[Render ID Card Error]:', err);
+    } finally {
+      if (this.idCardLoadingOverlay && canvas === this.idCardPreviewCanvas && this.currentRenderingIdCardStudentId === student.id) {
+        this.idCardLoadingOverlay.style.display = 'none';
+      }
+    }
+  }
+
+  async generateStudentIdCardBlob(student) {
+    if (!student) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = 1250;
+    canvas.height = 2000;
+    await this.renderIdCardToCanvas(student, canvas);
+    return await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  }
+
+  async downloadSelectedStudentIdCard() {
+    const studentIds = Array.from(this.selectedIdCardStudentIds);
+    if (studentIds.length === 0) {
+      this.showToast('No Student Selected', 'Please select at least one student to download ID card.', 'warning');
+      return;
+    }
+
+    const btn = this.btnDownloadIdCard;
+    setButtonLoading(btn, true);
+
+    try {
+      if (studentIds.length === 1) {
+        const student = store.getStudentById(studentIds[0]);
+        if (!student) throw new Error('Student data not found.');
+
+        let blob;
+        if (student.id === this.lastSelectedIdCardStudentId && this.idCardPreviewCanvas) {
+          blob = await new Promise(resolve => this.idCardPreviewCanvas.toBlob(resolve, 'image/png'));
+        } else {
+          blob = await this.generateStudentIdCardBlob(student);
+        }
+        if (!blob) throw new Error('Could not export ID card image.');
+
+        const safeName = (student.name || student.fullName || 'Student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+        const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+        const filename = `IDCard_${safeId}_${safeName}.png`;
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        this.showToast('ID Card Downloaded', `Saved ID Card for ${student.name}`, 'success');
+      } else {
+        if (typeof window.JSZip === 'undefined') {
+          this.showToast('ZIP Library Loading', 'Compression library is loading. Please try again in a few seconds.', 'info');
+          return;
+        }
+
+        const students = studentIds.map(id => store.getStudentById(id)).filter(Boolean);
+        if (students.length === 0) throw new Error('No valid student records found.');
+
+        this.showToast('Generating ID Cards', `Preparing ZIP archive for ${students.length} students...`, 'info');
+        const zip = new window.JSZip();
+        let renderedCount = 0;
+
+        for (const student of students) {
+          let blob;
+          if (student.id === this.lastSelectedIdCardStudentId && this.idCardPreviewCanvas) {
+            blob = await new Promise(resolve => this.idCardPreviewCanvas.toBlob(resolve, 'image/png'));
+          } else {
+            blob = await this.generateStudentIdCardBlob(student);
+          }
+
+          if (blob) {
+            const safeName = (student.name || student.fullName || 'Student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+            const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+            zip.file(`IDCard_${safeId}_${safeName}.png`, blob);
+            renderedCount++;
+          }
+        }
+
+        if (renderedCount === 0) throw new Error('Failed to generate any ID cards for download.');
+
+        const zipBlob = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 6 }
+        });
+
+        const timestamp = new Date().toISOString().slice(0, 10);
+        const filename = `IDCards_Batch_${renderedCount}_Students_${timestamp}.zip`;
+
+        const url = URL.createObjectURL(zipBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        this.showToast('Bulk Download Complete', `Downloaded ${renderedCount} ID cards in ZIP package.`, 'success');
+      }
+    } catch (err) {
+      console.error('[ID Card Download Error]:', err);
+      this.showToast('Download Error', err.message || 'Failed to generate ID card download.', 'error');
+    } finally {
+      setButtonLoading(btn, false);
+      this.updateIdCardSelectionUI();
+    }
+  }
+
+  async printSelectedStudentIdCard() {
+    const studentIds = Array.from(this.selectedIdCardStudentIds);
+    if (studentIds.length === 0) {
+      this.showToast('No Student Selected', 'Please select at least one student to print.', 'warning');
+      return;
+    }
+
+    const students = studentIds.map(id => store.getStudentById(id)).filter(Boolean);
+    if (students.length === 0) return;
+
+    const btn = this.btnPrintIdCard;
+    setButtonLoading(btn, true);
+
+    try {
+      const cardImages = [];
+      for (const student of students) {
+        let dataUrl;
+        if (student.id === this.lastSelectedIdCardStudentId && this.idCardPreviewCanvas) {
+          dataUrl = this.idCardPreviewCanvas.toDataURL('image/png');
+        } else {
+          const canvas = document.createElement('canvas');
+          canvas.width = 1250;
+          canvas.height = 2000;
+          await this.renderIdCardToCanvas(student, canvas);
+          dataUrl = canvas.toDataURL('image/png');
+        }
+        cardImages.push({
+          dataUrl,
+          student
+        });
+      }
+
+      const printWindow = window.open('', '_blank', 'width=800,height=900');
+      if (!printWindow) {
+        this.showToast('Print Popup Blocked', 'Please allow popups to print ID cards.', 'warning');
+        return;
+      }
+
+      const title = students.length === 1
+        ? `Print ID Card - ${escapeHtml(students[0].name)} (${escapeHtml(students[0].id)})`
+        : `Print ID Cards - ${students.length} Students`;
+
+      const cardsHtml = cardImages.map(item => `
+        <div class="idcard-print-card">
+          <img src="${item.dataUrl}" alt="ID Card - ${escapeHtml(item.student.name)}">
+        </div>
+      `).join('');
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            @page {
+              size: 54mm 86mm;
+              margin: 0;
+            }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+              background: #f8fafc;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              min-height: 100vh;
+              font-family: system-ui, sans-serif;
+              padding: 20px 0;
+              gap: 20px;
+            }
+            .idcard-print-card {
+              width: 54mm;
+              height: 86mm;
+              border-radius: 3.5mm;
+              overflow: hidden;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+              background: #fff;
+              page-break-after: always;
+              break-after: page;
+            }
+            .idcard-print-card:last-child {
+              page-break-after: auto;
+              break-after: auto;
+            }
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              display: block;
+            }
+            @media print {
+              body {
+                background: transparent;
+                min-height: auto;
+                padding: 0;
+                gap: 0;
+              }
+              .idcard-print-card {
+                width: 54mm;
+                height: 86mm;
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          ${cardsHtml}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+                window.close();
+              }, 300);
+            };
+          </script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    } catch (err) {
+      console.error('[ID Card Print Error]:', err);
+      this.showToast('Print Error', 'Failed to prepare ID cards for printing.', 'error');
+    } finally {
+      setButtonLoading(btn, false);
     }
   }
 
@@ -2622,17 +3816,18 @@ class UIController {
       e.stopPropagation();
       const wasOpen = container.classList.contains('open');
 
+      this.closeAllAdminDropdowns();
+
       if (wasOpen) {
-        this.closeAllAdminDropdowns();
+        container.classList.remove('open', 'drop-up');
+        trigger.setAttribute('aria-expanded', 'false');
         return;
       }
-
-      this.closeAllAdminDropdowns();
 
       const isPortalModal = Boolean(container.closest('#studentModal') || container.closest('#bulkStatusModal'));
       const isTableDropdown = Boolean(container.closest('.table-responsive') || container.closest('.data-table') || container.classList.contains('th-minimal-dropdown'));
 
-      if (isPortalModal || isTableDropdown) {
+      if (isPortalModal || isTableDropdown || container === this.existingBatchDropdown) {
         // Open below the trigger and portal to body to avoid clipping by modal bodies, table scrollbars, or empty states
         const triggerRect = trigger.getBoundingClientRect();
         this.portaledMenu = menu;
@@ -2696,6 +3891,14 @@ class UIController {
       if (display) display.textContent = label;
       container.classList.toggle('has-value', Boolean(value));
 
+      const isFilter = container.classList.contains('toolbar-filter-dropdown') ||
+        container.classList.contains('idcards-filter-dropdown') ||
+        container.classList.contains('th-minimal-dropdown') ||
+        Boolean(container.id && container.id.toLowerCase().includes('filter'));
+      if (isFilter) {
+        container.classList.toggle('is-filtered', Boolean(value && value !== 'all'));
+      }
+
       menu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('selected'));
       option.classList.add('selected');
 
@@ -2725,6 +3928,15 @@ class UIController {
       this.portaledNextSibling = null;
     }
 
+    const openDropdowns = document.querySelectorAll('.custom-select-container.open, .custom-dropdown.open, .batch-action-menu.open, .student-more-actions-menu.open');
+    openDropdowns.forEach(dropdown => {
+      if (dropdown && dropdown !== except) {
+        dropdown.classList.remove('open', 'drop-up');
+        const trigger = dropdown.querySelector('.custom-select-trigger, [aria-haspopup="listbox"], [aria-haspopup="true"]');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
     const all = [
       this.durationUnitDropdown,
       this.adminStudentGenderDropdown,
@@ -2737,7 +3949,10 @@ class UIController {
       this.adminStudentCourseDropdown,
       this.adminStudentStatusDropdown,
       this.adminStudentCourseFilterDropdown,
+      this.adminStudentBatchFilterDropdown,
       this.adminStudentStatusFilterDropdown,
+      this.idCardCourseFilterDropdown,
+      this.idCardBatchFilterDropdown,
       this.completionStartMonthDropdown,
       this.completionStartYearDropdown,
       this.completionEndMonthDropdown,
@@ -2763,6 +3978,14 @@ class UIController {
     if (!container || !menu || !display || !hiddenInput) return;
     hiddenInput.value = value || '';
     container.classList.toggle('has-value', Boolean(value));
+
+    const isFilter = container.classList.contains('toolbar-filter-dropdown') ||
+      container.classList.contains('idcards-filter-dropdown') ||
+      container.classList.contains('th-minimal-dropdown') ||
+      Boolean(container.id && container.id.toLowerCase().includes('filter'));
+    if (isFilter) {
+      container.classList.toggle('is-filtered', Boolean(value && value !== 'all'));
+    }
 
     let matchedLabel = defaultLabel;
     menu.querySelectorAll('.custom-select-option').forEach(opt => {
@@ -2997,6 +4220,40 @@ class UIController {
       return;
     }
 
+    // Email format validation
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}$/i.test(email)) {
+      this.studentEmailInput.classList.add('input-error');
+      if (this.studentEmailError) {
+        this.studentEmailError.textContent = 'Please enter a valid email address.';
+        this.studentEmailError.style.display = 'block';
+      }
+      this.studentEmailInput.focus();
+      this.showToast('Validation Error', 'Please enter a valid email address.', 'error');
+      return;
+    }
+
+    const saveBtn = this.btnSaveStudent || this.studentForm.querySelector('button[type="submit"]');
+    setButtonLoading(saveBtn, true);
+
+    // Backend Email Validation Check
+    try {
+      const emailCheckRes = await fetch(`/api/validate-email?email=${encodeURIComponent(email)}`, { cache: 'no-store' });
+      const emailCheck = await emailCheckRes.json().catch(() => null);
+      if (!emailCheckRes.ok || !emailCheck?.valid) {
+        setButtonLoading(saveBtn, false);
+        this.studentEmailInput.classList.add('input-error');
+        if (this.studentEmailError) {
+          this.studentEmailError.textContent = 'Please enter a valid email address.';
+          this.studentEmailError.style.display = 'block';
+        }
+        this.studentEmailInput.focus();
+        this.showToast('Validation Error', 'Please enter a valid email address.', 'error');
+        return;
+      }
+    } catch (err) {
+      // If validation endpoint times out or is offline, continue gracefully
+    }
+
     const payload = {
       name,
       dob,
@@ -3019,21 +4276,21 @@ class UIController {
       enrolledCourseIds: [courseId]
     };
 
-    if (id) {
-      store.updateStudent(id, payload);
-      this.showToast('Student Updated', `${name}'s records have been updated.`, 'success');
-    } else {
-      try {
+    try {
+      if (id) {
+        await store.updateStudent(id, payload);
+        this.showToast('Student Updated', `${name}'s records have been updated.`, 'success');
+      } else {
         const newStudent = await store.addStudent(payload);
         this.showToast('Student Added', `${newStudent.name} (ID: ${newStudent.id}) registered successfully.`, 'success');
-      } catch (error) {
-        this.showToast('Registration Error', error.message || 'The student could not be added.', 'error');
-        return;
       }
+      this.closeModal(this.studentModal);
+      this.render();
+    } catch (error) {
+      this.showToast('Registration Error', error.message || 'The student could not be added.', 'error');
+    } finally {
+      setButtonLoading(saveBtn, false);
     }
-
-    this.closeModal(this.studentModal);
-    this.render();
   }
 
   viewStudentProfile(studentId) {
@@ -3213,7 +4470,7 @@ class UIController {
     this.openModal(this.courseModal);
   }
 
-  handleCourseFormSubmit(e) {
+  async handleCourseFormSubmit(e) {
     e.preventDefault();
 
     const id = this.courseIdInput.value;
@@ -3221,6 +4478,11 @@ class UIController {
     const durationVal = this.courseDurationValueInput.value.trim();
     const durationUnit = this.courseDurationUnitInput ? this.courseDurationUnitInput.value : 'Months';
     const description = this.courseDescriptionInput.value.trim();
+
+    if (!title || !durationVal || !description) {
+      this.showToast('Validation Error', 'Please complete all course fields.', 'error');
+      return;
+    }
 
     const num = parseFloat(durationVal);
     let unitText = durationUnit;
@@ -3231,22 +4493,30 @@ class UIController {
     }
     const duration = `${durationVal} ${unitText}`;
 
+    const saveBtn = this.btnSaveCourse || this.courseForm.querySelector('button[type="submit"]');
+    setButtonLoading(saveBtn, true);
+
     const payload = {
       title,
       duration,
       description
     };
 
-    if (id) {
-      store.updateCourse(id, payload);
-      this.showToast('Course Updated', `"${title}" has been updated.`, 'success');
-    } else {
-      const newCourse = store.addCourse(payload);
-      this.showToast('Course Created', `"${newCourse.title}" was created successfully.`, 'success');
+    try {
+      if (id) {
+        await store.updateCourse(id, payload);
+        this.showToast('Course Updated', `"${title}" has been updated.`, 'success');
+      } else {
+        const newCourse = await store.addCourse(payload);
+        this.showToast('Course Created', `"${newCourse.title}" was created successfully.`, 'success');
+      }
+      this.closeModal(this.courseModal);
+      this.render();
+    } catch (error) {
+      this.showToast('Course Error', error.message || 'Failed to save course.', 'error');
+    } finally {
+      setButtonLoading(saveBtn, false);
     }
-
-    this.closeModal(this.courseModal);
-    this.render();
   }
 
   confirmDeleteCourse(courseId) {
@@ -3280,8 +4550,12 @@ class UIController {
   }
 
   openModal(modalElement) {
+    this.closeAllAdminDropdowns();
     modalElement.classList.add('open');
     document.body.style.overflow = 'hidden';
+    const dialog = modalElement.querySelector('.modal-window') || modalElement;
+    dialog.setAttribute('tabindex', '-1');
+    dialog.focus({ preventScroll: true });
   }
 
   closeModal(modalElement) {
@@ -3336,6 +4610,27 @@ class UIController {
     this.updateBulkActionState(filteredStudents);
   }
 
+  deselectAllStudents() {
+    if (!this.selectedStudentIds || this.selectedStudentIds.size === 0) return;
+    this.selectedStudentIds.clear();
+
+    if (this.studentsTableBody) {
+      const checkboxes = this.studentsTableBody.querySelectorAll('.student-row-checkbox');
+      checkboxes.forEach(cb => {
+        cb.checked = false;
+        const row = cb.closest('tr');
+        if (row) row.classList.remove('is-selected');
+      });
+    }
+
+    if (this.selectAllStudentsCheckbox) {
+      this.selectAllStudentsCheckbox.checked = false;
+      this.selectAllStudentsCheckbox.indeterminate = false;
+    }
+
+    this.updateBulkActionState();
+  }
+
   updateBulkActionState(filteredStudents) {
     if (!filteredStudents) {
       const allStudents = store.getAllStudents();
@@ -3373,9 +4668,29 @@ class UIController {
 
     if (this.btnBulkMarkCompleted) {
       const selectedCount = this.selectedStudentIds.size;
-      this.btnBulkMarkCompleted.disabled = selectedCount === 0;
+      const selectedStudents = Array.from(this.selectedStudentIds)
+        .map(id => store.getStudentById(id))
+        .filter(Boolean);
+      const hasActiveStudent = selectedStudents.some(
+        s => String(s?.status || '').toLowerCase() !== 'completed'
+      );
+      const hasCompletedStudent = selectedStudents.some(
+        s => String(s?.status || '').toLowerCase() === 'completed'
+      );
+      const allCompleted = selectedStudents.length > 0 && !hasActiveStudent;
+
+      this.btnBulkMarkCompleted.disabled = selectedCount === 0 || allCompleted;
       if (this.bulkMarkCompletedLabel) {
         this.bulkMarkCompletedLabel.textContent = 'Mark as Completed';
+      }
+      if (selectedCount === 0) {
+        this.btnBulkMarkCompleted.title = 'Select students to mark as completed';
+      } else if (allCompleted) {
+        this.btnBulkMarkCompleted.title = 'Selected student(s) are already marked as completed';
+      } else if (hasCompletedStudent) {
+        this.btnBulkMarkCompleted.title = 'Mark as completed and merge completion data for all selected students';
+      } else {
+        this.btnBulkMarkCompleted.title = 'Mark selected students as Course Completed';
       }
     }
 
@@ -3420,7 +4735,20 @@ class UIController {
     const selectedCount = this.completionStudentIds.size;
     if (selectedCount === 0) return;
 
+    const targetStudents = Array.from(this.completionStudentIds)
+      .map(id => store.getStudentById(id))
+      .filter(Boolean);
+    const hasActiveStudent = targetStudents.some(
+      s => String(s?.status || '').toLowerCase() !== 'completed'
+    );
+
+    if (!batchId && targetStudents.length > 0 && !hasActiveStudent) {
+      this.showToast('Already Completed', 'Selected student(s) are already marked as completed.', 'warning');
+      return;
+    }
+
     this.completingBatchId = batchId;
+    this.completionSubmitted = false;
     this.completionForm.reset();
     [
       [this.completionStartMonthDropdown, this.completionStartMonthMenu, this.completionStartMonthDisplay, this.completionStartMonth, 'Month', this.completionStartMonthTrigger],
@@ -3431,10 +4759,20 @@ class UIController {
       this.setAdminDropdownValue(container, menu, display, input, '', label);
       trigger.classList.remove('input-error');
     });
+    this.validateCompletionPeriodSelection();
     this.completionModalTitle.textContent = selectedCount === 1 ? 'Complete Student Course' : 'Complete Student Courses';
-    this.completionStudentCount.textContent = selectedCount === 1
-      ? 'Enter the certificate details for the selected student.'
-      : `These certificate details will be applied to all ${selectedCount} selected students.`;
+
+    const activeStudents = targetStudents.filter(s => String(s?.status || '').toLowerCase() !== 'completed');
+    const completedStudents = targetStudents.filter(s => String(s?.status || '').toLowerCase() === 'completed');
+
+    if (activeStudents.length > 0 && completedStudents.length > 0) {
+      this.completionStudentCount.textContent = `These certificate details will complete ${activeStudents.length} active student(s) and be merged to ${completedStudents.length} already completed student(s).`;
+    } else if (selectedCount === 1) {
+      this.completionStudentCount.textContent = 'Enter the certificate details for the selected student.';
+    } else {
+      this.completionStudentCount.textContent = `These certificate details will be applied to all ${selectedCount} selected students.`;
+    }
+
     this.openModal(this.completionModal);
     if (document.activeElement && typeof document.activeElement.blur === 'function') {
       document.activeElement.blur();
@@ -3457,53 +4795,65 @@ class UIController {
     const startMonth = this.getCompletionPeriodValue(this.completionStartMonth, this.completionStartYear);
     const endMonth = this.getCompletionPeriodValue(this.completionEndMonth, this.completionEndYear);
     const issueDate = this.completionIssueDate.value;
-    const grade = this.completionGrade.value.trim();
-    if (!startMonth || !endMonth) {
-      const missingSelectors = [
-        [this.completionStartMonth, this.completionStartMonthTrigger],
-        [this.completionStartYear, this.completionStartYearTrigger],
-        [this.completionEndMonth, this.completionEndMonthTrigger],
-        [this.completionEndYear, this.completionEndYearTrigger]
-      ].filter(([input]) => !input.value);
-      missingSelectors.forEach(([, trigger]) => trigger.classList.add('input-error'));
-      missingSelectors[0]?.[1].focus();
-      return;
-    }
-    if (!issueDate || !grade) {
-      this.completionForm.reportValidity();
-      return;
-    }
-    if (endMonth < startMonth) {
-      this.showToast('Invalid Course Duration', 'The ending month must be the same as or later than the starting month.', 'error');
-      this.completionEndMonthTrigger.focus();
+    const grade = this.completionGrade.value.trim().toUpperCase();
+    this.completionSubmitted = true;
+    if (!this.validateCompletionDates()) {
+      this.completionForm.querySelector('.input-error:not(:disabled)')?.focus();
       return;
     }
 
-    store.bulkUpdateStudents(studentIds, {
-      status: 'Completed',
-      certificateCourseStartDate: `${startMonth}-01`,
-      certificateCourseEndDate: `${endMonth}-01`,
-      certificateIssueDate: issueDate,
-      completionDate: `${endMonth}-01`,
-      grade
-    });
-    const completedFromBatch = Boolean(this.completingBatchId);
-    if (completedFromBatch) {
-      const batch = store.getAllBatches().find(item => item.id === this.completingBatchId);
-      if (batch) await store.saveBatch({ ...batch, status: 'Completed', completedAt: new Date().toISOString(), certificateIssueDate: issueDate, grade });
-    }
-    const shouldDownloadAfterCompletion = Boolean(this.pendingCertificateDownloadIds && this.pendingCertificateDownloadIds.length > 0);
-    const downloadIds = shouldDownloadAfterCompletion ? [...this.pendingCertificateDownloadIds] : null;
-    this.pendingCertificateDownloadIds = null;
-    this.completingBatchId = null;
-    this.completionStudentIds.clear();
-    this.closeModal(this.completionModal);
-    this.showToast('Course Completed', `Successfully marked ${studentIds.length} student(s) as Completed. Certificates are now available.`, 'success');
-    if (!completedFromBatch) this.selectedStudentIds.clear();
-    this.render();
+    const submitBtn = this.btnConfirmCompletion || this.completionForm?.querySelector('button[type="submit"]');
+    setButtonLoading(submitBtn, true);
+    if (this.btnCancelCompletion) this.btnCancelCompletion.disabled = true;
+    if (this.btnCloseCompletionModal) this.btnCloseCompletionModal.disabled = true;
 
-    if (shouldDownloadAfterCompletion && downloadIds) {
-      await this.executeCertificateDownload(downloadIds);
+    try {
+      const allStudentsBefore = store.getAllStudents();
+      const activeCount = studentIds.filter(id => {
+        const s = allStudentsBefore.find(item => item.id === id);
+        return s && String(s.status || '').toLowerCase() !== 'completed';
+      }).length;
+      const completedCount = studentIds.length - activeCount;
+
+      await store.bulkUpdateStudents(studentIds, {
+        status: 'Completed',
+        certificateCourseStartDate: `${startMonth}-01`,
+        certificateCourseEndDate: `${endMonth}-01`,
+        certificateIssueDate: issueDate,
+        completionDate: `${endMonth}-01`,
+        grade
+      });
+      const completedFromBatch = Boolean(this.completingBatchId);
+      if (completedFromBatch) {
+        const batch = store.getAllBatches().find(item => item.id === this.completingBatchId);
+        if (batch) await store.saveBatch({ ...batch, status: 'Completed', completedAt: new Date().toISOString(), certificateIssueDate: issueDate, grade });
+      }
+      const shouldDownloadAfterCompletion = Boolean(this.pendingCertificateDownloadIds && this.pendingCertificateDownloadIds.length > 0);
+      const downloadIds = shouldDownloadAfterCompletion ? [...this.pendingCertificateDownloadIds] : null;
+      this.pendingCertificateDownloadIds = null;
+      this.completingBatchId = null;
+      this.completionStudentIds.clear();
+      this.closeModal(this.completionModal);
+
+      if (activeCount > 0 && completedCount > 0) {
+        this.showToast('Course Completed', `Successfully completed ${activeCount} student(s) and merged completion data to ${completedCount} completed student(s). Certificates are now available.`, 'success');
+      } else {
+        this.showToast('Course Completed', `Successfully marked ${studentIds.length} student(s) as Completed. Certificates are now available.`, 'success');
+      }
+
+      if (!completedFromBatch) this.selectedStudentIds.clear();
+      this.render();
+
+      if (shouldDownloadAfterCompletion && downloadIds) {
+        await this.executeCertificateDownload(downloadIds);
+      }
+    } catch (err) {
+      console.error('[Completion Error]:', err);
+      this.showToast('Completion Error', 'Failed to complete the course. Please try again.', 'error');
+    } finally {
+      setButtonLoading(submitBtn, false);
+      if (this.btnCancelCompletion) this.btnCancelCompletion.disabled = false;
+      if (this.btnCloseCompletionModal) this.btnCloseCompletionModal.disabled = false;
     }
   }
 
@@ -3645,7 +4995,7 @@ class UIController {
     this.openModal(this.bulkStatusModal);
   }
 
-  handleBulkStatusSubmit(e) {
+  async handleBulkStatusSubmit(e) {
     e.preventDefault();
     const studentIds = Array.from(this.selectedStudentIds);
     if (studentIds.length === 0) {
@@ -3654,15 +5004,24 @@ class UIController {
     }
 
     const newStatus = this.bulkStatusSelect.value;
-    this.closeModal(this.bulkStatusModal);
-
     if (newStatus === 'Completed') {
+      this.closeModal(this.bulkStatusModal);
       this.handleBulkMarkCompleted(null, studentIds);
-    } else {
-      store.bulkUpdateStudents(studentIds, { status: newStatus });
+      return;
+    }
+
+    const submitBtn = this.bulkStatusForm?.querySelector('button[type="submit"]');
+    setButtonLoading(submitBtn, true);
+    try {
+      await store.bulkUpdateStudents(studentIds, { status: newStatus });
+      this.closeModal(this.bulkStatusModal);
       this.showToast('Status Updated', `Successfully updated ${studentIds.length} student(s) to ${newStatus}.`, 'success');
       this.selectedStudentIds.clear();
       this.render();
+    } catch (err) {
+      this.showToast('Status Error', err.message || 'Failed to update status.', 'error');
+    } finally {
+      setButtonLoading(submitBtn, false);
     }
   }
 
@@ -3926,7 +5285,10 @@ class UIController {
   // ==========================================================================
   renderAuthCode() {
     if (!this.authCodeDigits || !this.authCountdownTimer) return;
-    const token = store.getOrGenerateAuthToken();
+    let token = store.getOrGenerateAuthToken();
+    if (!token || !token.code || !token.expiresAt || String(token.code).length !== 6 || isNaN(Number(token.code))) {
+      token = store.getOrGenerateAuthToken(true);
+    }
     const now = Date.now();
     const remainingMs = Math.max(0, token.expiresAt - now);
 
@@ -3989,9 +5351,6 @@ class UIController {
     }
 
     this.openModal(this.academySettingsModal);
-    setTimeout(() => {
-      if (this.settingsAcademyName) this.settingsAcademyName.focus();
-    }, 200);
   }
 
   closeAcademySettingsModal() {
@@ -4025,9 +5384,6 @@ class UIController {
     }
 
     this.openModal(this.onboardingModal);
-    setTimeout(() => {
-      if (this.onboardingAcademyName) this.onboardingAcademyName.focus();
-    }, 200);
   }
 
   closeOnboardingModal() {
@@ -4101,6 +5457,22 @@ function drawCertField(ctx, value, x, y, width, size = 37, align = 'center', wei
   ctx.restore();
 }
 
+function drawRoundedRect(ctx, x, y, width, height, radius) {
+  if (typeof ctx.roundRect === 'function') {
+    ctx.roundRect(x, y, width, height, radius);
+    return;
+  }
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+}
+
 function formatMessageDate(dateString) {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -4149,6 +5521,38 @@ function parseDuration(durationStr) {
 function escapeQuotes(str) {
   if (!str) return '';
   return String(str).replace(/"/g, '""');
+}
+
+function setButtonLoading(btn, isLoading, loadingText = '') {
+  if (!btn) return;
+  if (isLoading) {
+    if (!btn.dataset.originalHtml) {
+      btn.dataset.originalHtml = btn.innerHTML;
+    }
+    const rect = btn.getBoundingClientRect();
+    if (rect.width > 0 && !btn.style.minWidth) {
+      btn.style.minWidth = `${Math.ceil(rect.width)}px`;
+    }
+    if (rect.height > 0 && !btn.style.minHeight) {
+      btn.style.minHeight = `${Math.ceil(rect.height)}px`;
+    }
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    btn.setAttribute('aria-busy', 'true');
+    btn.innerHTML = loadingText
+      ? `<span class="btn-spinner" aria-hidden="true"></span> <span>${loadingText}</span>`
+      : '<span class="btn-spinner" aria-hidden="true"></span>';
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('is-loading');
+    btn.removeAttribute('aria-busy');
+    if (btn.dataset.originalHtml) {
+      btn.innerHTML = btn.dataset.originalHtml;
+      delete btn.dataset.originalHtml;
+    }
+    btn.style.minWidth = '';
+    btn.style.minHeight = '';
+  }
 }
 
 // ==========================================================================
@@ -4302,7 +5706,7 @@ document.addEventListener('DOMContentLoaded', () => {
   app = new UIController();
   window.app = app;
   const initialHash = window.location.hash.replace('#', '');
-  if (['students', 'courses', 'batches', 'inbox'].includes(initialHash)) {
+  if (['students', 'courses', 'batches', 'idcards', 'inbox'].includes(initialHash)) {
     app.switchView(initialHash, false);
   }
 });
