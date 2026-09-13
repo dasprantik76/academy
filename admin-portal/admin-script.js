@@ -2488,12 +2488,13 @@ class UIController {
       });
     }
 
-    const updateBatchesHeaderScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop || (this.batchesGrid?.scrollTop || 0);
-      document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', scrollY > 2);
-    };
-    window.addEventListener('scroll', updateBatchesHeaderScroll, { passive: true });
-    this.batchesGrid?.addEventListener('scroll', updateBatchesHeaderScroll, { passive: true });
+    if (this.batchesGrid) {
+      const updateBatchesHeaderScroll = () => {
+        const isScrolled = this.batchesGrid.scrollTop > 2;
+        document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', isScrolled);
+      };
+      this.batchesGrid.addEventListener('scroll', updateBatchesHeaderScroll, { passive: true });
+    }
 
     // Inbox Search & Action Handlers
     if (this.inboxSearchInput) {
@@ -3143,8 +3144,8 @@ class UIController {
     this.applyViewLayout(viewName);
     this.render();
     if (viewName === 'batches') {
-      const scrollY = window.scrollY || document.documentElement.scrollTop || (this.batchesGrid?.scrollTop || 0);
-      document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', scrollY > 2);
+      const isScrolled = (this.batchesGrid?.scrollTop || 0) > 2;
+      document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', isScrolled);
     }
     store.fetchCloudData(() => {
       this.render();
