@@ -185,6 +185,687 @@ const DEFAULT_COURSES_BY_TENANT = {
   ]
 };
 
+const DEFAULT_MESSAGES_BY_TENANT = {
+  'dasprantik76@gmail.com': [
+    {
+      id: 'msg_101',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Sourav Mukherjee',
+      phone: '9830145291',
+      course: 'Certificate in Financial Accounting (Tally Prime & GST)',
+      message: 'Hello Sir, I have completed B.Com and want to learn practical Tally Prime with GST filing and e-way billing. Are there weekend morning batches available? Please let me know the course fee and start date.',
+      isRead: false,
+      createdAt: '2026-09-13T13:31:25.413Z'
+    },
+    {
+      id: 'msg_102',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Priyanka Sengupta',
+      phone: '9874120365',
+      course: 'Diploma in Computer Applications (DCA)',
+      message: 'Hi, I want to enroll in the 6-month DCA course for college students. Do you provide ISO/government-recognized certificates upon course completion? Kindly share the detailed syllabus.',
+      isRead: false,
+      createdAt: '2026-09-13T12:06:25.413Z'
+    },
+    {
+      id: 'msg_103',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Subhajit Karmakar',
+      phone: '9123456780',
+      course: 'Full Stack Web Development',
+      message: 'I am interested in the Web Development batch starting this month. Does the curriculum cover React and Node.js with live database projects? Can I attend a demo class this Saturday?',
+      isRead: false,
+      createdAt: '2026-09-13T09:06:25.413Z'
+    },
+    {
+      id: 'msg_104',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Ananya Roychowdhury',
+      phone: '9433219087',
+      course: 'Advanced Excel & Business Analytics',
+      message: 'Good evening. I work as an accountant and need to master VLOOKUP, XLOOKUP, Pivot Tables, and financial dashboards. How long is the weekend crash course and what are the timings?',
+      isRead: false,
+      createdAt: '2026-09-13T06:06:25.413Z'
+    },
+    {
+      id: 'msg_105',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Debjit Banerjee',
+      phone: '9836541298',
+      course: 'Desktop Publishing & Graphic Design',
+      message: 'Sir, do you teach Adobe Photoshop, Illustrator, and CorelDRAW in the DTP course? I want to learn design for print and social media banners. Are individual workstations provided for practice?',
+      isRead: false,
+      createdAt: '2026-09-12T16:06:25.413Z'
+    },
+    {
+      id: 'msg_106',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Riya Chakraborty',
+      phone: '9748231905',
+      course: 'Python Programming & Data Science',
+      message: 'Hello, I am a 2nd year BCA student looking for a practical Python programming course that covers pandas and data visualization. Please share the admission procedure and fee installments.',
+      isRead: false,
+      createdAt: '2026-09-12T10:06:25.413Z'
+    },
+    {
+      id: 'msg_107',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Tanmay Dutta',
+      phone: '9831098234',
+      course: 'Diploma in Computer Applications (DCA)',
+      message: 'I want to enroll my younger sister in the computer basics and office automation batch after her 12th board exams. What are the daily batch hours for the afternoon session?',
+      isRead: true,
+      readAt: '2026-09-13T13:36:25.413Z',
+      createdAt: '2026-09-11T14:06:25.413Z'
+    },
+    {
+      id: 'msg_108',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Sneha Bhattacharya',
+      phone: '9051876432',
+      course: 'Certificate in Financial Accounting (Tally Prime & GST)',
+      message: 'Inquired about the Tally certification last week. Can I pay the admission fee online through UPI or visit the center in person? Please confirm center timings tomorrow.',
+      isRead: true,
+      readAt: '2026-09-13T12:06:25.413Z',
+      createdAt: '2026-09-11T07:06:25.413Z'
+    },
+    {
+      id: 'msg_109',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Arindam Halder',
+      phone: '9874561230',
+      course: 'Hardware & Networking Essentials',
+      message: 'Respected Sir, does the hardware networking course include hands-on PC assembling, OS installation, and router troubleshooting? Kindly inform when the new batch commences.',
+      isRead: true,
+      readAt: '2026-09-13T08:06:25.413Z',
+      createdAt: '2026-09-10T14:06:25.413Z'
+    },
+    {
+      id: 'msg_110',
+      ownerEmail: 'dasprantik76@gmail.com',
+      academySlug: 'prantik',
+      name: 'Moumita Paul',
+      phone: '9432109876',
+      course: 'Full Stack Web Development',
+      message: 'Thank you for sharing the syllabus earlier. I would like to confirm my seat for the evening batch. Please guide me through the registration and student ID verification process.',
+      isRead: true,
+      readAt: '2026-09-13T02:06:25.413Z',
+      createdAt: '2026-09-09T14:06:25.413Z'
+    }
+  ]
+};
+
+const DEFAULT_BATCHES_BY_TENANT = {
+  "dasprantik76@gmail.com": [
+  {
+    "id": "6e3812a3-9c16-4c92-810d-91d8c1a34b9c",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-13T09:38:36.607Z",
+    "name": "Full Stack Web Development - Batch 2026",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02075",
+      "DCC/SMP/02081",
+      "STU-1444",
+      "DCC/SMP/02058",
+      "DCC/SMP/02020",
+      "DCC/SMP/02037",
+      "DCC/SMP/02100",
+      "DCC/SMP/02028"
+    ],
+    "updatedAt": "2026-09-13T09:38:36.607Z"
+  },
+  {
+    "id": "666b2ca0-cc40-4857-a244-dbd5bd6c8558",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-12T11:02:27.287Z",
+    "name": "DCC Course",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02109",
+      "STU-6309",
+      "DCC/SMP/02096",
+      "DCC/SMP/02095",
+      "DCC/SMP/02108"
+    ],
+    "updatedAt": "2026-09-12T17:07:54.605Z",
+    "certificateIssueDate": "2026-09-12",
+    "completedAt": "2026-09-12T15:54:08.926Z",
+    "grade": "A+"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "22ffd44f-bdfb-4ae5-aeee-65fc7d6b883c",
+    "createdAt": "2026-09-11T17:29:02.591Z",
+    "name": "New Batch 2021",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02109",
+      "DCC/SMP/02085",
+      "DCC/SMP/02061"
+    ],
+    "updatedAt": "2026-09-11T17:29:32.270Z",
+    "certificateIssueDate": "2026-09-11",
+    "completedAt": "2026-09-11T17:29:31.834Z",
+    "grade": "A+"
+  },
+  {
+    "id": "d751d0a3-6fbf-4dd9-90aa-4872718ccd5a",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-11T13:52:29.133Z",
+    "name": "computer science",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02106",
+      "DCC/SMP/02096",
+      "DCC/SMP/02095",
+      "DCC/SMP/02094",
+      "DCC/SMP/02093",
+      "DCC/SMP/02092",
+      "DCC/SMP/02091",
+      "DCC/SMP/02090"
+    ],
+    "updatedAt": "2026-09-12T15:46:04.069Z",
+    "certificateIssueDate": "2030-08-12",
+    "completedAt": "2026-09-12T15:46:01.407Z",
+    "grade": "A+"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "360c0a7b-dd41-4988-9e88-16ad6a123f33",
+    "createdAt": "2026-09-10T15:41:50.551Z",
+    "name": "ABC",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02010",
+      "STU-7383",
+      "STU-9970",
+      "STU-1444",
+      "DCC/SMP/02081"
+    ],
+    "updatedAt": "2026-09-12T15:38:31.373Z"
+  },
+  {
+    "id": "ff4eff8d-e437-4476-ba82-9c3d88067f60",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-10T15:34:22.539Z",
+    "name": "Python for Data Analytics - Morning Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02047",
+      "DCC/SMP/02105",
+      "DCC/SMP/02083",
+      "DCC/SMP/02026",
+      "DCC/SMP/02090"
+    ],
+    "updatedAt": "2026-09-10T15:34:22.539Z"
+  },
+  {
+    "id": "46703bae-aba5-468d-9f57-a1ddfcafb62c",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-08T10:56:46.934Z",
+    "name": "Tally Prime & GST Filing - Weekend Batch",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02102",
+      "STU-1444",
+      "DCC/SMP/02054",
+      "DCC/SMP/02022",
+      "DCC/SMP/02039",
+      "STU-9970",
+      "DCC/SMP/02028",
+      "DCC/SMP/02013",
+      "DCC/SMP/02042",
+      "DCC/SMP/02053",
+      "DCC/SMP/02044"
+    ],
+    "updatedAt": "2026-09-08T10:56:46.934Z"
+  },
+  {
+    "id": "af86a220-831a-4c25-9287-5b62ad4d00d1",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-05T08:15:45.050Z",
+    "name": "Advanced Excel & MIS Reporting - Fast Track",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02200",
+      "DCC/SMP/02098",
+      "STU-1444",
+      "DCC/SMP/02035",
+      "DCC/SMP/02100",
+      "DCC/SMP/02091",
+      "DCC/SMP/02068",
+      "DCC/SMP/02077",
+      "DCC/SMP/02093",
+      "DCC/SMP/02052",
+      "DCC/SMP/02094",
+      "DCC/SMP/02040"
+    ],
+    "updatedAt": "2026-09-05T08:15:45.050Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "64b3974f-848b-43a3-a77e-b580959c3b2e",
+    "createdAt": "2026-09-02T18:03:54.477Z",
+    "name": "Graphic Design & UI/UX - Batch Alpha",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02056",
+      "DCC/SMP/02200",
+      "DCC/SMP/02017",
+      "STU-1444",
+      "DCC/SMP/02039",
+      "DCC/SMP/02103",
+      "DCC/SMP/02045",
+      "DCC/SMP/02059",
+      "DCC/SMP/02021",
+      "DCC/SMP/02038",
+      "DCC/SMP/02082",
+      "DCC/SMP/02081",
+      "DCC/SMP/02069",
+      "DCC/SMP/02026",
+      "DCC/SMP/02100"
+    ],
+    "updatedAt": "2026-09-02T18:03:54.477Z"
+  },
+  {
+    "id": "af929672-216c-4f3c-b5fd-db314934ca0c",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-31T14:35:44.976Z",
+    "name": "Cybersecurity & Ethical Hacking - Cohort 1",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02025",
+      "DCC/SMP/02220",
+      "STU-9970",
+      "DCC/SMP/02105",
+      "DCC/SMP/02073",
+      "DCC/SMP/02217",
+      "DCC/SMP/02028",
+      "DCC/SMP/02037",
+      "DCC/SMP/02019",
+      "DCC/SMP/02078",
+      "DCC/SMP/02034",
+      "DCC/SMP/02035",
+      "DCC/SMP/02023",
+      "DCC/SMP/02027",
+      "DCC/SMP/02026",
+      "DCC/SMP/02011"
+    ],
+    "updatedAt": "2026-08-31T14:35:44.976Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "a0357697-9e15-4d7f-9d5f-80719dd77105",
+    "createdAt": "2026-08-28T19:29:32.922Z",
+    "name": "Diploma in Computer Applications (DCA) - Regular",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02028",
+      "DCC/SMP/02053",
+      "DCC/SMP/02052",
+      "DCC/SMP/02205",
+      "DCC/SMP/02207",
+      "DCC/SMP/02068",
+      "DCC/SMP/02105",
+      "DCC/SMP/02200",
+      "DCC/SMP/02041",
+      "DCC/SMP/02102",
+      "DCC/SMP/02218",
+      "DCC/SMP/02045",
+      "DCC/SMP/02215"
+    ],
+    "updatedAt": "2026-08-28T19:29:32.922Z"
+  },
+  {
+    "id": "b12bb9b2-e59d-469e-9830-103282c99e6b",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-26T12:02:13.493Z",
+    "name": "Cloud Computing & AWS - Evening Batch",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02038",
+      "DCC/SMP/02204",
+      "DCC/SMP/02070",
+      "DCC/SMP/02083",
+      "DCC/SMP/02102"
+    ],
+    "updatedAt": "2026-08-26T12:02:13.493Z"
+  },
+  {
+    "id": "25e45c23-c0d9-40bc-9461-9e78cb5fabfe",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-24T14:41:04.297Z",
+    "name": "Digital Marketing & SEO - Batch 2026-A",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02078",
+      "DCC/SMP/02055",
+      "DCC/SMP/02044",
+      "DCC/SMP/02067",
+      "DCC/SMP/02053",
+      "DCC/SMP/02211",
+      "DCC/SMP/02021",
+      "DCC/SMP/02051",
+      "DCC/SMP/02066",
+      "DCC/SMP/02052"
+    ],
+    "updatedAt": "2026-08-24T14:41:04.297Z"
+  },
+  {
+    "id": "ae43300f-cefb-4860-b94f-0a174e43b69b",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-21T16:10:35.675Z",
+    "name": "Java Enterprise & Spring Boot - Weekend Intensive",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02109",
+      "DCC/SMP/02033",
+      "DCC/SMP/02022",
+      "DCC/SMP/02096",
+      "DCC/SMP/02085",
+      "DCC/SMP/02083",
+      "DCC/SMP/02038"
+    ],
+    "updatedAt": "2026-08-21T16:10:35.675Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "b7e12059-53bd-4b11-8ede-b8d45c41967e",
+    "createdAt": "2026-08-18T18:01:08.148Z",
+    "name": "AutoCAD 2D/3D & Interior Drafting - Batch 3",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02070",
+      "DCC/SMP/02069",
+      "DCC/SMP/02219",
+      "STU-1444",
+      "DCC/SMP/02106",
+      "DCC/SMP/02012",
+      "DCC/SMP/02038",
+      "DCC/SMP/02039",
+      "DCC/SMP/02104",
+      "DCC/SMP/02029"
+    ],
+    "updatedAt": "2026-08-18T18:01:08.148Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "872ad8c1-fe23-4734-b2e3-289a2a224fac",
+    "createdAt": "2026-08-16T23:22:11.177Z",
+    "name": "Computer Hardware & Networking - Morning 1",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02044",
+      "DCC/SMP/02091",
+      "DCC/SMP/02043",
+      "DCC/SMP/02069",
+      "DCC/SMP/02062",
+      "DCC/SMP/02079",
+      "DCC/SMP/02037",
+      "DCC/SMP/02106"
+    ],
+    "updatedAt": "2026-08-16T23:22:11.177Z"
+  },
+  {
+    "id": "ef5221d4-a9fb-4d36-8054-e6359d7782a9",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-13T23:31:46.243Z",
+    "name": "React & Next.js Masterclass - Cohort B",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02084",
+      "DCC/SMP/02093",
+      "DCC/SMP/02080",
+      "DCC/SMP/02220",
+      "DCC/SMP/02074"
+    ],
+    "updatedAt": "2026-08-13T23:31:46.243Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "68530de7-71f1-4292-b770-50cbb396623a",
+    "createdAt": "2026-08-12T03:05:40.728Z",
+    "name": "Financial Accounting with Tally - Batch Delta",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02202",
+      "DCC/SMP/02038",
+      "DCC/SMP/02045",
+      "DCC/SMP/02013",
+      "DCC/SMP/02098",
+      "DCC/SMP/02081",
+      "DCC/SMP/02213",
+      "DCC/SMP/02082",
+      "STU-9970",
+      "DCC/SMP/02084",
+      "DCC/SMP/02072",
+      "DCC/SMP/02102"
+    ],
+    "updatedAt": "2026-08-12T03:05:40.728Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "c697dff2-e7b6-4b55-8edf-bf57de3491a2",
+    "createdAt": "2026-08-09T12:29:44.247Z",
+    "name": "C++ & Algorithms - Winter Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02043",
+      "DCC/SMP/02059",
+      "DCC/SMP/02017",
+      "DCC/SMP/02038",
+      "DCC/SMP/02047",
+      "DCC/SMP/02023",
+      "DCC/SMP/02027",
+      "DCC/SMP/02099",
+      "DCC/SMP/02021",
+      "DCC/SMP/02108"
+    ],
+    "updatedAt": "2026-08-09T12:29:44.247Z"
+  },
+  {
+    "id": "07c8a65d-da29-4cbc-ab78-95b5018e8fbc",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-06T05:40:42.880Z",
+    "name": "Office Automation & Typing - Regular Batch",
+    "status": "Active",
+    "studentIds": [
+      "STU-9970",
+      "DCC/SMP/02038",
+      "STU-7383",
+      "DCC/SMP/02028"
+    ],
+    "updatedAt": "2026-08-06T05:40:42.880Z"
+  },
+  {
+    "id": "8c2694a8-62d1-4574-a98c-2aa515b09153",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-03T17:56:23.714Z",
+    "name": "Flutter & Mobile App Development - Weekend",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02095",
+      "STU-1444",
+      "DCC/SMP/02037",
+      "DCC/SMP/02040",
+      "DCC/SMP/02056",
+      "DCC/SMP/02036",
+      "DCC/SMP/02058",
+      "DCC/SMP/02034",
+      "DCC/SMP/02027",
+      "DCC/SMP/02015",
+      "STU-9970",
+      "DCC/SMP/02048",
+      "DCC/SMP/02209"
+    ],
+    "updatedAt": "2026-08-03T17:56:23.714Z"
+  },
+  {
+    "id": "89ee35d0-c9f8-4206-93ea-2e93d5c19e68",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-01T20:28:22.458Z",
+    "name": "Artificial Intelligence & Prompt Engineering - Cohort 2",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02223",
+      "STU-1444",
+      "DCC/SMP/02070",
+      "DCC/SMP/02088",
+      "DCC/SMP/02203",
+      "DCC/SMP/02051",
+      "DCC/SMP/02017",
+      "DCC/SMP/02025",
+      "DCC/SMP/02073",
+      "DCC/SMP/02206"
+    ],
+    "updatedAt": "2026-08-01T20:28:22.458Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "f54c9bf4-4ea1-4f99-a0f9-06d3f0b25014",
+    "createdAt": "2026-07-30T10:47:11.803Z",
+    "name": "DTP, InDesign & Photoshop - Evening Batch",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02016",
+      "DCC/SMP/02206",
+      "DCC/SMP/02075",
+      "DCC/SMP/02042",
+      "DCC/SMP/02207",
+      "DCC/SMP/02101",
+      "STU-1444",
+      "DCC/SMP/02200",
+      "DCC/SMP/02210",
+      "DCC/SMP/02074",
+      "DCC/SMP/02092",
+      "DCC/SMP/02080",
+      "DCC/SMP/02036",
+      "DCC/SMP/02011",
+      "DCC/SMP/02021"
+    ],
+    "updatedAt": "2026-07-30T10:47:11.803Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "1d403882-815e-45b6-bb76-5b54ec3a51ea",
+    "createdAt": "2026-07-28T02:31:56.036Z",
+    "name": "SQL & Database Administration - Fast Track",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02093",
+      "DCC/SMP/02037",
+      "STU-6309",
+      "DCC/SMP/02038",
+      "DCC/SMP/02011",
+      "DCC/SMP/02069"
+    ],
+    "updatedAt": "2026-07-28T02:31:56.036Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "72f3a4af-5b8f-4a12-a6b5-7940f0c06767",
+    "createdAt": "2026-07-25T14:16:02.899Z",
+    "name": "IT Support & System Administration - Batch 4",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02094",
+      "DCC/SMP/02013",
+      "DCC/SMP/02080",
+      "DCC/SMP/02083",
+      "STU-1444",
+      "DCC/SMP/02034",
+      "DCC/SMP/02063",
+      "DCC/SMP/02022",
+      "DCC/SMP/02025",
+      "DCC/SMP/02043"
+    ],
+    "updatedAt": "2026-07-25T14:16:02.899Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "6a5aabdf-f78a-4abb-bb36-683b703e1d0f",
+    "createdAt": "2026-07-22T12:55:11.620Z",
+    "name": "Web Design & Frontend Development - Cohort Gamma",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02208",
+      "DCC/SMP/02081",
+      "DCC/SMP/02064",
+      "DCC/SMP/02066"
+    ],
+    "updatedAt": "2026-07-22T12:55:11.620Z"
+  },
+  {
+    "id": "615a4275-6c74-40ee-9840-2d7b28965654",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-07-20T10:25:42.909Z",
+    "name": "Node.js & Microservices - Weekend Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02092",
+      "DCC/SMP/02026",
+      "DCC/SMP/02053",
+      "DCC/SMP/02030",
+      "DCC/SMP/02042",
+      "DCC/SMP/02038",
+      "DCC/SMP/02029",
+      "DCC/SMP/02067",
+      "DCC/SMP/02051"
+    ],
+    "updatedAt": "2026-07-20T10:25:42.909Z"
+  },
+  {
+    "id": "8dcf54cd-92cd-4386-b3f7-fc10d2dd1c5a",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-07-18T01:51:06.481Z",
+    "name": "Certificate in Financial Management (CFM) - Batch 2",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02045",
+      "STU-7383",
+      "DCC/SMP/02072",
+      "STU-1444",
+      "DCC/SMP/02219",
+      "DCC/SMP/02207",
+      "DCC/SMP/02084",
+      "DCC/SMP/02089",
+      "DCC/SMP/02037",
+      "DCC/SMP/02014",
+      "DCC/SMP/02028",
+      "DCC/SMP/02016"
+    ],
+    "updatedAt": "2026-07-18T01:51:06.481Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "a1ab6746-a5f4-4c1e-a4ab-0415e17c5ac3",
+    "createdAt": "2026-07-15T12:11:18.614Z",
+    "name": "Python Django & REST API - Evening Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02205",
+      "DCC/SMP/02029",
+      "STU-7383",
+      "DCC/SMP/02020",
+      "DCC/SMP/02034",
+      "DCC/SMP/02033",
+      "DCC/SMP/02015"
+    ],
+    "updatedAt": "2026-07-15T12:11:18.614Z"
+  }
+]
+};
+
 export default async function handler(req, res) {
   // Universal CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -280,7 +961,7 @@ export default async function handler(req, res) {
       let [profileDoc, coursesList, studentsList, authTokenDoc, messagesList, batchesList] = await Promise.all([
         db.collection(COLLECTIONS.PROFILE).findOne({ ownerEmail }, { projection: { _id: 0 } }),
         db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray(),
-        db.collection(COLLECTIONS.STUDENTS).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ _id: -1 }).toArray(),
+        db.collection(COLLECTIONS.STUDENTS).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ joinDate: -1, createdAt: -1, _id: -1 }).toArray(),
         db.collection(COLLECTIONS.AUTH_TOKEN).findOne({ ownerEmail }, { projection: { _id: 0 } }),
         includeAdminData
           ? db.collection(COLLECTIONS.MESSAGES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray()
@@ -351,8 +1032,12 @@ export default async function handler(req, res) {
           profile: profileDoc || null,
           courses: Array.isArray(coursesList) ? coursesList : [],
           students: Array.isArray(studentsList) ? studentsList : [],
-          messages: includeAdminData && Array.isArray(messagesList) ? messagesList : [],
-          batches: includeAdminData && Array.isArray(batchesList) ? batchesList : [],
+          messages: includeAdminData && Array.isArray(messagesList)
+            ? (messagesList.length > 0 ? messagesList : (DEFAULT_MESSAGES_BY_TENANT[ownerEmail] || []))
+            : [],
+          batches: includeAdminData && Array.isArray(batchesList)
+            ? (batchesList.length > 0 ? batchesList : (DEFAULT_BATCHES_BY_TENANT[ownerEmail] || []))
+            : [],
           // Authentication codes are never included in academy-slug responses
           // consumed by public websites.
           authToken: includeAdminData ? (authTokenDoc || null) : null
@@ -644,6 +1329,16 @@ export default async function handler(req, res) {
           await db.collection(COLLECTIONS.MESSAGES).updateOne(
             { id: messageId, ownerEmail },
             { $set: { isRead: true, readAt: new Date().toISOString() } }
+          );
+          return res.status(200).json({ success: true });
+        }
+
+        case 'mark_message_unread': {
+          const messageId = String(payload?.messageId || '').trim();
+          if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
+          await db.collection(COLLECTIONS.MESSAGES).updateOne(
+            { id: messageId, ownerEmail },
+            { $set: { isRead: false }, $unset: { readAt: '' } }
           );
           return res.status(200).json({ success: true });
         }

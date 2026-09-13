@@ -13,7 +13,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-7.89">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-8.07">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -634,19 +634,43 @@
             </div>
           </div>
 
-          <!-- Inbox Grid -->
-          <div class="inbox-grid" id="inboxList"></div>
+          <!-- Inbox Container Card (like student management page) -->
+          <div class="dashboard-card inbox-table-card">
+            <div class="card-body">
+              <div class="inbox-table-header">
+                <label class="inbox-header-checkbox-col" for="selectAllInboxCheckbox" title="Select All Messages">
+                  <input type="checkbox" id="selectAllInboxCheckbox" aria-label="Select All Messages" class="custom-table-checkbox">
+                </label>
+                <div class="inbox-header-info-col">
+                  <span class="inbox-header-label">All Messages</span>
+                  <span class="inbox-selection-count" id="inboxSelectionCount" aria-live="polite" hidden>0</span>
+                </div>
+                <div class="inbox-header-actions" id="inboxBulkActions" style="display: none;">
+                  <button type="button" class="btn btn-sm btn-secondary" id="btnBulkMarkInboxRead" title="Mark selected as read">
+                    <i class="fa-regular fa-envelope-open"></i> <span>Mark Read</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-danger" id="btnBulkDeleteInbox" title="Delete selected messages">
+                    <i class="fa-regular fa-trash-can"></i> <span>Delete (<span id="inboxBulkDeleteCount">0</span>)</span>
+                  </button>
+                </div>
+              </div>
+              <div class="inbox-scroll-container">
+                <!-- Inbox List (Single Column Rows) -->
+                <div class="inbox-list" id="inboxList"></div>
 
-          <!-- Inbox Empty State -->
-          <div class="empty-state" id="inboxEmptyState" style="display: none;">
-            <div class="empty-icon">
-              <i class="fa-regular fa-envelope-open"></i>
+                <!-- Inbox Empty State -->
+                <div class="empty-state" id="inboxEmptyState" style="display: none;">
+                  <div class="empty-icon">
+                    <i class="fa-regular fa-envelope-open"></i>
+                  </div>
+                  <h4 id="inboxEmptyTitle">No Messages Yet</h4>
+                  <p id="inboxEmptyDesc">Messages sent through the public website will appear here.</p>
+                  <button class="btn btn-secondary btn-sm" id="btnResetInboxSearch" style="display: none;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Search
+                  </button>
+                </div>
+              </div>
             </div>
-            <h4 id="inboxEmptyTitle">No Messages Yet</h4>
-            <p id="inboxEmptyDesc">Messages sent through the public website will appear here.</p>
-            <button class="btn btn-secondary btn-sm" id="btnResetInboxSearch" style="display: none;">
-              <i class="fa-solid fa-rotate-left"></i> Reset Search
-            </button>
           </div>
         </section>
 
@@ -1552,6 +1576,70 @@
   </div>
 
 
+  <!-- Inbox Message View Dialog Modal -->
+  <div class="modal-backdrop" id="inboxMessageModal">
+    <div class="modal-window inbox-message-modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-envelope-open-text modal-icon"></i>
+          <div>
+            <h3>Message Details</h3>
+            <p class="modal-title-caption" id="inboxModalReceivedTime"></p>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="btnCloseInboxMessageModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="inboxMessageModalBody">
+        <div class="inbox-modal-sender-card">
+          <div class="inbox-modal-avatar" id="inboxModalAvatar"></div>
+          <div class="inbox-modal-sender-info">
+            <div class="inbox-modal-name-row">
+              <h4 id="inboxModalSenderName"></h4>
+              <span class="inbox-modal-badge" id="inboxModalStatusBadge"></span>
+            </div>
+            <div class="inbox-modal-contact-row">
+              <a class="inbox-modal-phone-link" id="inboxModalPhone" href="#">
+                <i class="fa-solid fa-phone"></i>
+                <span id="inboxModalPhoneText"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="inbox-modal-section" id="inboxModalCourseSection">
+          <span class="inbox-modal-label">Inquired Course</span>
+          <div class="inbox-modal-course-pill">
+            <i class="fa-solid fa-book-open"></i>
+            <span id="inboxModalCourseName"></span>
+          </div>
+        </div>
+
+        <div class="inbox-modal-section">
+          <span class="inbox-modal-label">Inquiry Message</span>
+          <div class="inbox-modal-message-box" id="inboxModalMessageText"></div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-danger" id="btnDeleteInboxMessageFromModal">
+            <i class="fa-regular fa-trash-can"></i> Delete
+          </button>
+          <button type="button" class="btn btn-secondary" id="btnToggleReadFromModal">
+            <i class="fa-regular fa-envelope"></i> <span id="labelToggleRead">Mark as Unread</span>
+          </button>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn btn-secondary" id="btnCloseInboxMessageModalBtn">Close</button>
+          <a class="btn btn-primary" id="btnCallVisitorFromModal" href="#">
+            <i class="fa-solid fa-phone"></i> Call Visitor
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Academy & Client Profile Settings Modal -->
   <div class="modal-backdrop" id="academySettingsModal">
     <div class="modal-window modal-sm">
@@ -1668,6 +1756,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=7.84"></script>
+  <script src="admin-script.js?v=7.96"></script>
 </body>
 </html>

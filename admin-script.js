@@ -98,6 +98,683 @@ function getInboxIconSvg() {
 }
 
 
+const DEFAULT_INBOX_MESSAGES = [
+  {
+    id: "msg_101",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Sourav Mukherjee",
+    phone: "9830145291",
+    course: "Certificate in Financial Accounting (Tally Prime & GST)",
+    message: "Hello Sir, I have completed B.Com and want to learn practical Tally Prime with GST filing and e-way billing. Are there weekend morning batches available? Please let me know the course fee and start date.",
+    isRead: false,
+    createdAt: "2026-09-13T13:31:25.413Z"
+  },
+  {
+    id: "msg_102",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Priyanka Sengupta",
+    phone: "9874120365",
+    course: "Diploma in Computer Applications (DCA)",
+    message: "Hi, I want to enroll in the 6-month DCA course for college students. Do you provide ISO/government-recognized certificates upon course completion? Kindly share the detailed syllabus.",
+    isRead: false,
+    createdAt: "2026-09-13T12:06:25.413Z"
+  },
+  {
+    id: "msg_103",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Subhajit Karmakar",
+    phone: "9123456780",
+    course: "Full Stack Web Development",
+    message: "I am interested in the Web Development batch starting this month. Does the curriculum cover React and Node.js with live database projects? Can I attend a demo class this Saturday?",
+    isRead: false,
+    createdAt: "2026-09-13T09:06:25.413Z"
+  },
+  {
+    id: "msg_104",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Ananya Roychowdhury",
+    phone: "9433219087",
+    course: "Advanced Excel & Business Analytics",
+    message: "Good evening. I work as an accountant and need to master VLOOKUP, XLOOKUP, Pivot Tables, and financial dashboards. How long is the weekend crash course and what are the timings?",
+    isRead: false,
+    createdAt: "2026-09-13T06:06:25.413Z"
+  },
+  {
+    id: "msg_105",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Debjit Banerjee",
+    phone: "9836541298",
+    course: "Desktop Publishing & Graphic Design",
+    message: "Sir, do you teach Adobe Photoshop, Illustrator, and CorelDRAW in the DTP course? I want to learn design for print and social media banners. Are individual workstations provided for practice?",
+    isRead: false,
+    createdAt: "2026-09-12T16:06:25.413Z"
+  },
+  {
+    id: "msg_106",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Riya Chakraborty",
+    phone: "9748231905",
+    course: "Python Programming & Data Science",
+    message: "Hello, I am a 2nd year BCA student looking for a practical Python programming course that covers pandas and data visualization. Please share the admission procedure and fee installments.",
+    isRead: false,
+    createdAt: "2026-09-12T10:06:25.413Z"
+  },
+  {
+    id: "msg_107",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Tanmay Dutta",
+    phone: "9831098234",
+    course: "Diploma in Computer Applications (DCA)",
+    message: "I want to enroll my younger sister in the computer basics and office automation batch after her 12th board exams. What are the daily batch hours for the afternoon session?",
+    isRead: true,
+    readAt: "2026-09-13T13:36:25.413Z",
+    createdAt: "2026-09-11T14:06:25.413Z"
+  },
+  {
+    id: "msg_108",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Sneha Bhattacharya",
+    phone: "9051876432",
+    course: "Certificate in Financial Accounting (Tally Prime & GST)",
+    message: "Inquired about the Tally certification last week. Can I pay the admission fee online through UPI or visit the center in person? Please confirm center timings tomorrow.",
+    isRead: true,
+    readAt: "2026-09-13T12:06:25.413Z",
+    createdAt: "2026-09-11T07:06:25.413Z"
+  },
+  {
+    id: "msg_109",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Arindam Halder",
+    phone: "9874561230",
+    course: "Hardware & Networking Essentials",
+    message: "Respected Sir, does the hardware networking course include hands-on PC assembling, OS installation, and router troubleshooting? Kindly inform when the new batch commences.",
+    isRead: true,
+    readAt: "2026-09-13T08:06:25.413Z",
+    createdAt: "2026-09-10T14:06:25.413Z"
+  },
+  {
+    id: "msg_110",
+    ownerEmail: "dasprantik76@gmail.com",
+    academySlug: "prantik",
+    name: "Moumita Paul",
+    phone: "9432109876",
+    course: "Full Stack Web Development",
+    message: "Thank you for sharing the syllabus earlier. I would like to confirm my seat for the evening batch. Please guide me through the registration and student ID verification process.",
+    isRead: true,
+    readAt: "2026-09-13T02:06:25.413Z",
+    createdAt: "2026-09-09T14:06:25.413Z"
+  }
+];
+
+const DEFAULT_BATCHES = [
+  {
+    "id": "6e3812a3-9c16-4c92-810d-91d8c1a34b9c",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-13T09:38:36.607Z",
+    "name": "Full Stack Web Development - Batch 2026",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02075",
+      "DCC/SMP/02081",
+      "STU-1444",
+      "DCC/SMP/02058",
+      "DCC/SMP/02020",
+      "DCC/SMP/02037",
+      "DCC/SMP/02100",
+      "DCC/SMP/02028"
+    ],
+    "updatedAt": "2026-09-13T09:38:36.607Z"
+  },
+  {
+    "id": "666b2ca0-cc40-4857-a244-dbd5bd6c8558",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-12T11:02:27.287Z",
+    "name": "DCC Course",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02109",
+      "STU-6309",
+      "DCC/SMP/02096",
+      "DCC/SMP/02095",
+      "DCC/SMP/02108"
+    ],
+    "updatedAt": "2026-09-12T17:07:54.605Z",
+    "certificateIssueDate": "2026-09-12",
+    "completedAt": "2026-09-12T15:54:08.926Z",
+    "grade": "A+"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "22ffd44f-bdfb-4ae5-aeee-65fc7d6b883c",
+    "createdAt": "2026-09-11T17:29:02.591Z",
+    "name": "New Batch 2021",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02109",
+      "DCC/SMP/02085",
+      "DCC/SMP/02061"
+    ],
+    "updatedAt": "2026-09-11T17:29:32.270Z",
+    "certificateIssueDate": "2026-09-11",
+    "completedAt": "2026-09-11T17:29:31.834Z",
+    "grade": "A+"
+  },
+  {
+    "id": "d751d0a3-6fbf-4dd9-90aa-4872718ccd5a",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-11T13:52:29.133Z",
+    "name": "computer science",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02106",
+      "DCC/SMP/02096",
+      "DCC/SMP/02095",
+      "DCC/SMP/02094",
+      "DCC/SMP/02093",
+      "DCC/SMP/02092",
+      "DCC/SMP/02091",
+      "DCC/SMP/02090"
+    ],
+    "updatedAt": "2026-09-12T15:46:04.069Z",
+    "certificateIssueDate": "2030-08-12",
+    "completedAt": "2026-09-12T15:46:01.407Z",
+    "grade": "A+"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "360c0a7b-dd41-4988-9e88-16ad6a123f33",
+    "createdAt": "2026-09-10T15:41:50.551Z",
+    "name": "ABC",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02010",
+      "STU-7383",
+      "STU-9970",
+      "STU-1444",
+      "DCC/SMP/02081"
+    ],
+    "updatedAt": "2026-09-12T15:38:31.373Z"
+  },
+  {
+    "id": "ff4eff8d-e437-4476-ba82-9c3d88067f60",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-10T15:34:22.539Z",
+    "name": "Python for Data Analytics - Morning Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02047",
+      "DCC/SMP/02105",
+      "DCC/SMP/02083",
+      "DCC/SMP/02026",
+      "DCC/SMP/02090"
+    ],
+    "updatedAt": "2026-09-10T15:34:22.539Z"
+  },
+  {
+    "id": "46703bae-aba5-468d-9f57-a1ddfcafb62c",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-08T10:56:46.934Z",
+    "name": "Tally Prime & GST Filing - Weekend Batch",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02102",
+      "STU-1444",
+      "DCC/SMP/02054",
+      "DCC/SMP/02022",
+      "DCC/SMP/02039",
+      "STU-9970",
+      "DCC/SMP/02028",
+      "DCC/SMP/02013",
+      "DCC/SMP/02042",
+      "DCC/SMP/02053",
+      "DCC/SMP/02044"
+    ],
+    "updatedAt": "2026-09-08T10:56:46.934Z"
+  },
+  {
+    "id": "af86a220-831a-4c25-9287-5b62ad4d00d1",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-09-05T08:15:45.050Z",
+    "name": "Advanced Excel & MIS Reporting - Fast Track",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02200",
+      "DCC/SMP/02098",
+      "STU-1444",
+      "DCC/SMP/02035",
+      "DCC/SMP/02100",
+      "DCC/SMP/02091",
+      "DCC/SMP/02068",
+      "DCC/SMP/02077",
+      "DCC/SMP/02093",
+      "DCC/SMP/02052",
+      "DCC/SMP/02094",
+      "DCC/SMP/02040"
+    ],
+    "updatedAt": "2026-09-05T08:15:45.050Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "64b3974f-848b-43a3-a77e-b580959c3b2e",
+    "createdAt": "2026-09-02T18:03:54.477Z",
+    "name": "Graphic Design & UI/UX - Batch Alpha",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02056",
+      "DCC/SMP/02200",
+      "DCC/SMP/02017",
+      "STU-1444",
+      "DCC/SMP/02039",
+      "DCC/SMP/02103",
+      "DCC/SMP/02045",
+      "DCC/SMP/02059",
+      "DCC/SMP/02021",
+      "DCC/SMP/02038",
+      "DCC/SMP/02082",
+      "DCC/SMP/02081",
+      "DCC/SMP/02069",
+      "DCC/SMP/02026",
+      "DCC/SMP/02100"
+    ],
+    "updatedAt": "2026-09-02T18:03:54.477Z"
+  },
+  {
+    "id": "af929672-216c-4f3c-b5fd-db314934ca0c",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-31T14:35:44.976Z",
+    "name": "Cybersecurity & Ethical Hacking - Cohort 1",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02025",
+      "DCC/SMP/02220",
+      "STU-9970",
+      "DCC/SMP/02105",
+      "DCC/SMP/02073",
+      "DCC/SMP/02217",
+      "DCC/SMP/02028",
+      "DCC/SMP/02037",
+      "DCC/SMP/02019",
+      "DCC/SMP/02078",
+      "DCC/SMP/02034",
+      "DCC/SMP/02035",
+      "DCC/SMP/02023",
+      "DCC/SMP/02027",
+      "DCC/SMP/02026",
+      "DCC/SMP/02011"
+    ],
+    "updatedAt": "2026-08-31T14:35:44.976Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "a0357697-9e15-4d7f-9d5f-80719dd77105",
+    "createdAt": "2026-08-28T19:29:32.922Z",
+    "name": "Diploma in Computer Applications (DCA) - Regular",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02028",
+      "DCC/SMP/02053",
+      "DCC/SMP/02052",
+      "DCC/SMP/02205",
+      "DCC/SMP/02207",
+      "DCC/SMP/02068",
+      "DCC/SMP/02105",
+      "DCC/SMP/02200",
+      "DCC/SMP/02041",
+      "DCC/SMP/02102",
+      "DCC/SMP/02218",
+      "DCC/SMP/02045",
+      "DCC/SMP/02215"
+    ],
+    "updatedAt": "2026-08-28T19:29:32.922Z"
+  },
+  {
+    "id": "b12bb9b2-e59d-469e-9830-103282c99e6b",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-26T12:02:13.493Z",
+    "name": "Cloud Computing & AWS - Evening Batch",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02038",
+      "DCC/SMP/02204",
+      "DCC/SMP/02070",
+      "DCC/SMP/02083",
+      "DCC/SMP/02102"
+    ],
+    "updatedAt": "2026-08-26T12:02:13.493Z"
+  },
+  {
+    "id": "25e45c23-c0d9-40bc-9461-9e78cb5fabfe",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-24T14:41:04.297Z",
+    "name": "Digital Marketing & SEO - Batch 2026-A",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02078",
+      "DCC/SMP/02055",
+      "DCC/SMP/02044",
+      "DCC/SMP/02067",
+      "DCC/SMP/02053",
+      "DCC/SMP/02211",
+      "DCC/SMP/02021",
+      "DCC/SMP/02051",
+      "DCC/SMP/02066",
+      "DCC/SMP/02052"
+    ],
+    "updatedAt": "2026-08-24T14:41:04.297Z"
+  },
+  {
+    "id": "ae43300f-cefb-4860-b94f-0a174e43b69b",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-21T16:10:35.675Z",
+    "name": "Java Enterprise & Spring Boot - Weekend Intensive",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02109",
+      "DCC/SMP/02033",
+      "DCC/SMP/02022",
+      "DCC/SMP/02096",
+      "DCC/SMP/02085",
+      "DCC/SMP/02083",
+      "DCC/SMP/02038"
+    ],
+    "updatedAt": "2026-08-21T16:10:35.675Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "b7e12059-53bd-4b11-8ede-b8d45c41967e",
+    "createdAt": "2026-08-18T18:01:08.148Z",
+    "name": "AutoCAD 2D/3D & Interior Drafting - Batch 3",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02070",
+      "DCC/SMP/02069",
+      "DCC/SMP/02219",
+      "STU-1444",
+      "DCC/SMP/02106",
+      "DCC/SMP/02012",
+      "DCC/SMP/02038",
+      "DCC/SMP/02039",
+      "DCC/SMP/02104",
+      "DCC/SMP/02029"
+    ],
+    "updatedAt": "2026-08-18T18:01:08.148Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "872ad8c1-fe23-4734-b2e3-289a2a224fac",
+    "createdAt": "2026-08-16T23:22:11.177Z",
+    "name": "Computer Hardware & Networking - Morning 1",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02044",
+      "DCC/SMP/02091",
+      "DCC/SMP/02043",
+      "DCC/SMP/02069",
+      "DCC/SMP/02062",
+      "DCC/SMP/02079",
+      "DCC/SMP/02037",
+      "DCC/SMP/02106"
+    ],
+    "updatedAt": "2026-08-16T23:22:11.177Z"
+  },
+  {
+    "id": "ef5221d4-a9fb-4d36-8054-e6359d7782a9",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-13T23:31:46.243Z",
+    "name": "React & Next.js Masterclass - Cohort B",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02084",
+      "DCC/SMP/02093",
+      "DCC/SMP/02080",
+      "DCC/SMP/02220",
+      "DCC/SMP/02074"
+    ],
+    "updatedAt": "2026-08-13T23:31:46.243Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "68530de7-71f1-4292-b770-50cbb396623a",
+    "createdAt": "2026-08-12T03:05:40.728Z",
+    "name": "Financial Accounting with Tally - Batch Delta",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02202",
+      "DCC/SMP/02038",
+      "DCC/SMP/02045",
+      "DCC/SMP/02013",
+      "DCC/SMP/02098",
+      "DCC/SMP/02081",
+      "DCC/SMP/02213",
+      "DCC/SMP/02082",
+      "STU-9970",
+      "DCC/SMP/02084",
+      "DCC/SMP/02072",
+      "DCC/SMP/02102"
+    ],
+    "updatedAt": "2026-08-12T03:05:40.728Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "c697dff2-e7b6-4b55-8edf-bf57de3491a2",
+    "createdAt": "2026-08-09T12:29:44.247Z",
+    "name": "C++ & Algorithms - Winter Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02043",
+      "DCC/SMP/02059",
+      "DCC/SMP/02017",
+      "DCC/SMP/02038",
+      "DCC/SMP/02047",
+      "DCC/SMP/02023",
+      "DCC/SMP/02027",
+      "DCC/SMP/02099",
+      "DCC/SMP/02021",
+      "DCC/SMP/02108"
+    ],
+    "updatedAt": "2026-08-09T12:29:44.247Z"
+  },
+  {
+    "id": "07c8a65d-da29-4cbc-ab78-95b5018e8fbc",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-06T05:40:42.880Z",
+    "name": "Office Automation & Typing - Regular Batch",
+    "status": "Active",
+    "studentIds": [
+      "STU-9970",
+      "DCC/SMP/02038",
+      "STU-7383",
+      "DCC/SMP/02028"
+    ],
+    "updatedAt": "2026-08-06T05:40:42.880Z"
+  },
+  {
+    "id": "8c2694a8-62d1-4574-a98c-2aa515b09153",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-03T17:56:23.714Z",
+    "name": "Flutter & Mobile App Development - Weekend",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02095",
+      "STU-1444",
+      "DCC/SMP/02037",
+      "DCC/SMP/02040",
+      "DCC/SMP/02056",
+      "DCC/SMP/02036",
+      "DCC/SMP/02058",
+      "DCC/SMP/02034",
+      "DCC/SMP/02027",
+      "DCC/SMP/02015",
+      "STU-9970",
+      "DCC/SMP/02048",
+      "DCC/SMP/02209"
+    ],
+    "updatedAt": "2026-08-03T17:56:23.714Z"
+  },
+  {
+    "id": "89ee35d0-c9f8-4206-93ea-2e93d5c19e68",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-08-01T20:28:22.458Z",
+    "name": "Artificial Intelligence & Prompt Engineering - Cohort 2",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02223",
+      "STU-1444",
+      "DCC/SMP/02070",
+      "DCC/SMP/02088",
+      "DCC/SMP/02203",
+      "DCC/SMP/02051",
+      "DCC/SMP/02017",
+      "DCC/SMP/02025",
+      "DCC/SMP/02073",
+      "DCC/SMP/02206"
+    ],
+    "updatedAt": "2026-08-01T20:28:22.458Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "f54c9bf4-4ea1-4f99-a0f9-06d3f0b25014",
+    "createdAt": "2026-07-30T10:47:11.803Z",
+    "name": "DTP, InDesign & Photoshop - Evening Batch",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02016",
+      "DCC/SMP/02206",
+      "DCC/SMP/02075",
+      "DCC/SMP/02042",
+      "DCC/SMP/02207",
+      "DCC/SMP/02101",
+      "STU-1444",
+      "DCC/SMP/02200",
+      "DCC/SMP/02210",
+      "DCC/SMP/02074",
+      "DCC/SMP/02092",
+      "DCC/SMP/02080",
+      "DCC/SMP/02036",
+      "DCC/SMP/02011",
+      "DCC/SMP/02021"
+    ],
+    "updatedAt": "2026-07-30T10:47:11.803Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "1d403882-815e-45b6-bb76-5b54ec3a51ea",
+    "createdAt": "2026-07-28T02:31:56.036Z",
+    "name": "SQL & Database Administration - Fast Track",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02093",
+      "DCC/SMP/02037",
+      "STU-6309",
+      "DCC/SMP/02038",
+      "DCC/SMP/02011",
+      "DCC/SMP/02069"
+    ],
+    "updatedAt": "2026-07-28T02:31:56.036Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "72f3a4af-5b8f-4a12-a6b5-7940f0c06767",
+    "createdAt": "2026-07-25T14:16:02.899Z",
+    "name": "IT Support & System Administration - Batch 4",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02094",
+      "DCC/SMP/02013",
+      "DCC/SMP/02080",
+      "DCC/SMP/02083",
+      "STU-1444",
+      "DCC/SMP/02034",
+      "DCC/SMP/02063",
+      "DCC/SMP/02022",
+      "DCC/SMP/02025",
+      "DCC/SMP/02043"
+    ],
+    "updatedAt": "2026-07-25T14:16:02.899Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "6a5aabdf-f78a-4abb-bb36-683b703e1d0f",
+    "createdAt": "2026-07-22T12:55:11.620Z",
+    "name": "Web Design & Frontend Development - Cohort Gamma",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02208",
+      "DCC/SMP/02081",
+      "DCC/SMP/02064",
+      "DCC/SMP/02066"
+    ],
+    "updatedAt": "2026-07-22T12:55:11.620Z"
+  },
+  {
+    "id": "615a4275-6c74-40ee-9840-2d7b28965654",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-07-20T10:25:42.909Z",
+    "name": "Node.js & Microservices - Weekend Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02092",
+      "DCC/SMP/02026",
+      "DCC/SMP/02053",
+      "DCC/SMP/02030",
+      "DCC/SMP/02042",
+      "DCC/SMP/02038",
+      "DCC/SMP/02029",
+      "DCC/SMP/02067",
+      "DCC/SMP/02051"
+    ],
+    "updatedAt": "2026-07-20T10:25:42.909Z"
+  },
+  {
+    "id": "8dcf54cd-92cd-4386-b3f7-fc10d2dd1c5a",
+    "ownerEmail": "dasprantik76@gmail.com",
+    "createdAt": "2026-07-18T01:51:06.481Z",
+    "name": "Certificate in Financial Management (CFM) - Batch 2",
+    "status": "Completed",
+    "studentIds": [
+      "DCC/SMP/02045",
+      "STU-7383",
+      "DCC/SMP/02072",
+      "STU-1444",
+      "DCC/SMP/02219",
+      "DCC/SMP/02207",
+      "DCC/SMP/02084",
+      "DCC/SMP/02089",
+      "DCC/SMP/02037",
+      "DCC/SMP/02014",
+      "DCC/SMP/02028",
+      "DCC/SMP/02016"
+    ],
+    "updatedAt": "2026-07-18T01:51:06.481Z"
+  },
+  {
+    "ownerEmail": "dasprantik76@gmail.com",
+    "id": "a1ab6746-a5f4-4c1e-a4ab-0415e17c5ac3",
+    "createdAt": "2026-07-15T12:11:18.614Z",
+    "name": "Python Django & REST API - Evening Cohort",
+    "status": "Active",
+    "studentIds": [
+      "DCC/SMP/02205",
+      "DCC/SMP/02029",
+      "STU-7383",
+      "DCC/SMP/02020",
+      "DCC/SMP/02034",
+      "DCC/SMP/02033",
+      "DCC/SMP/02015"
+    ],
+    "updatedAt": "2026-07-15T12:11:18.614Z"
+  }
+];
+
 // ==========================================================================
 // 2. State & Storage Management
 // ==========================================================================
@@ -161,7 +838,13 @@ class AcademyStore {
         this.messages = [];
       }
     }
+    if (!Array.isArray(this.messages) || this.messages.length === 0) {
+      this.messages = JSON.parse(JSON.stringify(DEFAULT_INBOX_MESSAGES));
+    }
     try { this.batches = JSON.parse(rawBatches || '[]') || []; } catch { this.batches = []; }
+    if (!Array.isArray(this.batches) || this.batches.length === 0) {
+      this.batches = JSON.parse(JSON.stringify(DEFAULT_BATCHES));
+    }
 
     // Ensure historical/existing records have createdAt timestamps for accurate New to Old sorting
     const baseTime = new Date('2026-01-01T00:00:00.000Z').getTime();
@@ -325,6 +1008,15 @@ class AcademyStore {
     return await this.syncToCloud('mark_message_read', { messageId });
   }
 
+  async markMessageUnread(messageId) {
+    const message = this.messages.find(item => item.id === messageId);
+    if (!message || !message.isRead) return;
+    message.isRead = false;
+    delete message.readAt;
+    localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
+    return await this.syncToCloud('mark_message_unread', { messageId });
+  }
+
   async markAllMessagesRead() {
     let changed = false;
     this.messages.forEach(item => {
@@ -419,7 +1111,15 @@ class AcademyStore {
 
   // Student Operations
   getAllStudents() {
-    return this.students;
+    return [...this.students].sort((a, b) => {
+      const timeA = a.joinDate ? new Date(a.joinDate).getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+      const timeB = b.joinDate ? new Date(b.joinDate).getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+      if (timeB !== timeA) return timeB - timeA;
+      const createA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const createB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (createB !== createA) return createB - createA;
+      return (b.id || '').localeCompare(a.id || '', undefined, { numeric: true });
+    });
   }
 
   getStudentById(id) {
@@ -598,6 +1298,7 @@ class UIController {
     this.studentStatusFilterVal = 'all';
     this.courseSearchQuery = '';
     this.selectedStudentIds = new Set();
+    this.selectedInboxMessageIds = new Set();
     this.completionStudentIds = new Set();
     this.editingBatchId = null;
     this.editingBatchStudentIds = new Set();
@@ -774,6 +1475,12 @@ class UIController {
     this.inboxEmptyTitle = document.getElementById('inboxEmptyTitle');
     this.inboxEmptyDesc = document.getElementById('inboxEmptyDesc');
     this.btnResetInboxSearch = document.getElementById('btnResetInboxSearch');
+    this.selectAllInboxCheckbox = document.getElementById('selectAllInboxCheckbox');
+    this.inboxSelectionCount = document.getElementById('inboxSelectionCount');
+    this.inboxBulkActions = document.getElementById('inboxBulkActions');
+    this.btnBulkMarkInboxRead = document.getElementById('btnBulkMarkInboxRead');
+    this.btnBulkDeleteInbox = document.getElementById('btnBulkDeleteInbox');
+    this.inboxBulkDeleteCount = document.getElementById('inboxBulkDeleteCount');
     this.inboxSearchQuery = '';
     this.batchCountBadge = document.getElementById('batchCountBadge');
     this.batchesGrid = document.getElementById('batchesGrid');
@@ -1029,6 +1736,24 @@ class UIController {
     this.btnExecuteConfirm = document.getElementById('btnExecuteConfirm');
     this.btnCancelConfirm = document.getElementById('btnCancelConfirm');
     this.btnCloseConfirmModal = document.getElementById('btnCloseConfirmModal');
+
+    // Modals - Inbox Message Details
+    this.inboxMessageModal = document.getElementById('inboxMessageModal');
+    this.btnCloseInboxMessageModal = document.getElementById('btnCloseInboxMessageModal');
+    this.btnCloseInboxMessageModalBtn = document.getElementById('btnCloseInboxMessageModalBtn');
+    this.btnDeleteInboxMessageFromModal = document.getElementById('btnDeleteInboxMessageFromModal');
+    this.btnToggleReadFromModal = document.getElementById('btnToggleReadFromModal');
+    this.btnCallVisitorFromModal = document.getElementById('btnCallVisitorFromModal');
+    this.inboxModalReceivedTime = document.getElementById('inboxModalReceivedTime');
+    this.inboxModalAvatar = document.getElementById('inboxModalAvatar');
+    this.inboxModalSenderName = document.getElementById('inboxModalSenderName');
+    this.inboxModalStatusBadge = document.getElementById('inboxModalStatusBadge');
+    this.inboxModalPhone = document.getElementById('inboxModalPhone');
+    this.inboxModalPhoneText = document.getElementById('inboxModalPhoneText');
+    this.inboxModalCourseSection = document.getElementById('inboxModalCourseSection');
+    this.inboxModalCourseName = document.getElementById('inboxModalCourseName');
+    this.inboxModalMessageText = document.getElementById('inboxModalMessageText');
+    this.labelToggleRead = document.getElementById('labelToggleRead');
 
     // Dashboard Public Portal Widgets
     this.dashboardFullUrlText = document.getElementById('dashboardFullUrlText');
@@ -1763,6 +2488,13 @@ class UIController {
       });
     }
 
+    const updateBatchesHeaderScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop || (this.batchesGrid?.scrollTop || 0);
+      document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', scrollY > 2);
+    };
+    window.addEventListener('scroll', updateBatchesHeaderScroll, { passive: true });
+    this.batchesGrid?.addEventListener('scroll', updateBatchesHeaderScroll, { passive: true });
+
     // Inbox Search & Action Handlers
     if (this.inboxSearchInput) {
       this.inboxSearchInput.addEventListener('input', (e) => {
@@ -1804,6 +2536,100 @@ class UIController {
         } finally {
           setButtonLoading(this.btnMarkAllInboxRead, false);
         }
+      });
+    }
+
+    if (this.selectAllInboxCheckbox) {
+      this.selectAllInboxCheckbox.addEventListener('change', () => {
+        const filteredMessages = this.getFilteredInboxMessages();
+        if (this.selectAllInboxCheckbox.checked) {
+          filteredMessages.forEach(m => this.selectedInboxMessageIds.add(m.id));
+        } else {
+          filteredMessages.forEach(m => this.selectedInboxMessageIds.delete(m.id));
+        }
+        this.renderInboxView();
+      });
+    }
+
+    if (this.inboxList) {
+      this.inboxList.addEventListener('change', (e) => {
+        const checkbox = e.target.closest('.inbox-row-checkbox');
+        if (checkbox) {
+          const messageId = checkbox.getAttribute('data-message-id');
+          if (checkbox.checked) {
+            this.selectedInboxMessageIds.add(messageId);
+          } else {
+            this.selectedInboxMessageIds.delete(messageId);
+          }
+          const row = checkbox.closest('.inbox-row');
+          if (row) row.classList.toggle('is-selected', checkbox.checked);
+          this.updateInboxBulkActionState();
+        }
+      });
+
+      this.inboxList.addEventListener('click', (e) => {
+        if (e.target.closest('.inbox-checkbox-hit, .inbox-row-checkbox-col, .inbox-row-checkbox')) return;
+        if (e.target.closest('button, a, select')) return;
+        const row = e.target.closest('.inbox-row');
+        if (row) {
+          const messageId = row.getAttribute('data-message-id');
+          if (messageId) {
+            this.openInboxMessageModal(messageId);
+          }
+        }
+      });
+
+      this.inboxList.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (e.target.closest('.inbox-checkbox-hit, .inbox-row-checkbox-col, .inbox-row-checkbox, button, a, select')) return;
+          const row = e.target.closest('.inbox-row');
+          if (row) {
+            e.preventDefault();
+            const messageId = row.getAttribute('data-message-id');
+            if (messageId) {
+              this.openInboxMessageModal(messageId);
+            }
+          }
+        }
+      });
+    }
+
+    if (this.btnBulkMarkInboxRead) {
+      this.btnBulkMarkInboxRead.addEventListener('click', async () => {
+        const ids = Array.from(this.selectedInboxMessageIds);
+        if (ids.length === 0) return;
+        setButtonLoading(this.btnBulkMarkInboxRead, true);
+        try {
+          for (const id of ids) {
+            await store.markMessageRead(id);
+          }
+          this.selectedInboxMessageIds.clear();
+          this.render();
+          this.showToast('Messages Marked as Read', `${ids.length} message(s) marked as read.`, 'success');
+        } catch (e) {
+          this.showToast('Error', 'Failed to mark messages as read.', 'error');
+        } finally {
+          setButtonLoading(this.btnBulkMarkInboxRead, false);
+        }
+      });
+    }
+
+    if (this.btnBulkDeleteInbox) {
+      this.btnBulkDeleteInbox.addEventListener('click', () => {
+        const ids = Array.from(this.selectedInboxMessageIds);
+        if (ids.length === 0) return;
+        this.promptConfirmation({
+          title: `Delete ${ids.length} Message(s)?`,
+          message: `The selected ${ids.length} message(s) will be permanently removed from your inbox.`,
+          action: async () => {
+            for (const id of ids) {
+              await store.deleteMessage(id);
+            }
+            this.selectedInboxMessageIds.clear();
+            this.render();
+            this.showToast('Messages Deleted', `${ids.length} message(s) removed.`, 'info');
+          }
+        });
       });
     }
 
@@ -2149,6 +2975,13 @@ class UIController {
 
     this.btnCloseConfirmModal.addEventListener('click', () => this.closeModal(this.confirmModal));
     this.btnCancelConfirm.addEventListener('click', () => this.closeModal(this.confirmModal));
+
+    if (this.btnCloseInboxMessageModal) {
+      this.btnCloseInboxMessageModal.addEventListener('click', () => this.closeModal(this.inboxMessageModal));
+    }
+    if (this.btnCloseInboxMessageModalBtn) {
+      this.btnCloseInboxMessageModalBtn.addEventListener('click', () => this.closeModal(this.inboxMessageModal));
+    }
     this.btnExecuteConfirm.addEventListener('click', async () => {
       if (typeof this.confirmCallback === 'function') {
         setButtonLoading(this.btnExecuteConfirm, true);
@@ -2163,7 +2996,7 @@ class UIController {
       this.closeModal(this.confirmModal);
     });
 
-    // Keyboard shortcut: Cmd+D (Mac) / Ctrl+D (Windows) to deselect all students on students page only
+    // Keyboard shortcut: Cmd+D (Mac) / Ctrl+D (Windows) to deselect all selections
     window.addEventListener('keydown', (e) => {
       const isCmdOrCtrl = (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey;
       const isKeyD = e.key === 'd' || e.key === 'D' || e.code === 'KeyD';
@@ -2178,6 +3011,9 @@ class UIController {
         const isIdCardsPage = this.currentView === 'idcards' ||
           Boolean(document.getElementById('view-idcards')?.classList.contains('active'));
 
+        const isInboxPage = this.currentView === 'inbox' ||
+          Boolean(document.getElementById('view-inbox')?.classList.contains('active'));
+
         if (isStudentsPage) {
           e.preventDefault();
           this.deselectAllStudents();
@@ -2186,6 +3022,9 @@ class UIController {
           this.selectedIdCardStudentIds.clear();
           this.lastSelectedIdCardStudentId = null;
           this.updateIdCardSelectionUI();
+        } else if (isInboxPage) {
+          e.preventDefault();
+          this.deselectAllMessages();
         }
       }
     });
@@ -2303,6 +3142,10 @@ class UIController {
 
     this.applyViewLayout(viewName);
     this.render();
+    if (viewName === 'batches') {
+      const scrollY = window.scrollY || document.documentElement.scrollTop || (this.batchesGrid?.scrollTop || 0);
+      document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', scrollY > 2);
+    }
     store.fetchCloudData(() => {
       this.render();
     });
@@ -3930,51 +4773,180 @@ class UIController {
           if (this.btnResetInboxSearch) this.btnResetInboxSearch.style.display = 'inline-flex';
         }
       }
+      this.updateInboxBulkActionState([]);
       return;
     }
 
     this.inboxEmptyState.style.display = 'none';
-    this.inboxList.style.display = 'grid';
+    this.inboxList.style.display = 'flex';
 
-    this.inboxList.innerHTML = filteredMessages.map(item => `
-      <div class="inbox-card${item.isRead ? '' : ' unread'}">
-        <div class="inbox-card-header">
-          <div class="inbox-card-title-group">
-            <h3 title="${escapeHtml(item.name || 'Website Visitor')}">${escapeHtml(item.name || 'Website Visitor')}</h3>
-            <a class="inbox-card-phone" href="tel:${escapeHtml(item.phone || '')}" title="Call ${escapeHtml(item.name || '')}">
-              <i class="fa-solid fa-phone"></i> <span>${escapeHtml(item.phone || 'No phone')}</span>
-            </a>
-          </div>
-          <span class="${item.isRead ? 'inbox-badge-read' : 'inbox-badge-new'}">
-            ${item.isRead ? 'Read' : '● New'}
-          </span>
-        </div>
-        <div class="inbox-card-body">
-          ${item.course ? `
-            <div class="inbox-course-pill" title="Course Inquiry: ${escapeHtml(item.course)}">
-              <i class="fa-solid fa-book-open"></i> <span>${escapeHtml(item.course)}</span>
+    this.inboxList.innerHTML = filteredMessages.map(item => {
+      const isSelected = this.selectedInboxMessageIds.has(item.id);
+      return `
+        <div class="inbox-row ${item.isRead ? 'is-read' : 'is-unread'} ${isSelected ? 'is-selected' : ''}" data-message-id="${escapeHtml(item.id)}" role="button" tabindex="0" title="Click to view message from ${escapeHtml(item.name || 'Website Visitor')}">
+          <label class="inbox-checkbox-hit inbox-row-checkbox-col" aria-label="Select message from ${escapeHtml(item.name || 'Website Visitor')}">
+            <input type="checkbox" class="inbox-row-checkbox custom-table-checkbox" data-message-id="${escapeHtml(item.id)}" ${isSelected ? 'checked' : ''} aria-label="Select message from ${escapeHtml(item.name || 'Website Visitor')}">
+          </label>
+          <div class="inbox-row-main">
+            <div class="inbox-row-icon" aria-hidden="true">
+              <i class="${item.isRead ? 'fa-solid fa-envelope-open' : 'fa-solid fa-envelope'}"></i>
             </div>
-          ` : ''}
-          <p class="inbox-card-message" title="${escapeHtml(item.message || '')}">${escapeHtml(item.message || 'No message content.')}</p>
-        </div>
-        <div class="inbox-card-footer">
-          <div class="inbox-card-time">
-            <i class="fa-regular fa-clock"></i>
-            <span>${escapeHtml(formatMessageDate(item.createdAt))}</span>
+            <div class="inbox-row-sender">${escapeHtml(item.name || 'Website Visitor')}</div>
+            <div class="inbox-row-snippet">${escapeHtml(item.message || 'No message content.')}</div>
           </div>
-          <div class="inbox-card-actions">
-            ${item.isRead ? '' : `
-              <button class="btn-icon" title="Mark as Read" onclick="window.app.markInboxMessageRead('${escapeHtml(item.id)}')">
-                <i class="fa-regular fa-envelope-open"></i>
-              </button>
-            `}
-            <button class="btn-icon delete" title="Delete Message" onclick="window.app.confirmDeleteInboxMessage('${escapeHtml(item.id)}')">
-              <i class="fa-regular fa-trash-can"></i>
-            </button>
+          <div class="inbox-row-time">
+            ${escapeHtml(formatInboxRowTime(item.createdAt))}
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+
+    this.updateInboxBulkActionState(filteredMessages);
+  }
+
+  getFilteredInboxMessages() {
+    const allMessages = store.getAllMessages();
+    if (!this.inboxSearchQuery) return allMessages;
+    return allMessages.filter(item => {
+      const name = (item.name || '').toLowerCase();
+      const phone = (item.phone || '').toLowerCase();
+      const course = (item.course || '').toLowerCase();
+      const message = (item.message || '').toLowerCase();
+      return name.includes(this.inboxSearchQuery) ||
+             phone.includes(this.inboxSearchQuery) ||
+             course.includes(this.inboxSearchQuery) ||
+             message.includes(this.inboxSearchQuery);
+    });
+  }
+
+  updateInboxBulkActionState(filteredMessages) {
+    if (!filteredMessages) filteredMessages = this.getFilteredInboxMessages();
+    const count = this.selectedInboxMessageIds.size;
+    const hasSelections = count > 0;
+
+    if (this.inboxSelectionCount) {
+      this.inboxSelectionCount.textContent = count;
+      this.inboxSelectionCount.hidden = !hasSelections;
+    }
+
+    if (this.inboxBulkActions) {
+      this.inboxBulkActions.style.display = hasSelections ? 'inline-flex' : 'none';
+    }
+
+    if (this.inboxBulkDeleteCount) {
+      this.inboxBulkDeleteCount.textContent = count;
+    }
+
+    if (this.selectAllInboxCheckbox) {
+      const allSelected = filteredMessages.length > 0 && filteredMessages.every(m => this.selectedInboxMessageIds.has(m.id));
+      const someSelected = filteredMessages.some(m => this.selectedInboxMessageIds.has(m.id));
+      this.selectAllInboxCheckbox.checked = allSelected;
+      this.selectAllInboxCheckbox.indeterminate = !allSelected && someSelected;
+    }
+  }
+
+  openInboxMessageModal(messageId) {
+    const allMessages = store.getAllMessages();
+    const message = allMessages.find(m => m.id === messageId);
+    if (!message) return;
+
+    this.currentViewingMessageId = messageId;
+
+    if (this.inboxModalReceivedTime) {
+      this.inboxModalReceivedTime.textContent = formatMessageDate(message.createdAt);
+    }
+    if (this.inboxModalSenderName) {
+      this.inboxModalSenderName.textContent = message.name || 'Website Visitor';
+    }
+    if (this.inboxModalAvatar) {
+      this.inboxModalAvatar.textContent = getInitials(message.name || 'Visitor');
+      this.inboxModalAvatar.style.background = getAvatarGradient(message.name || 'Visitor');
+    }
+    if (this.inboxModalPhone && this.inboxModalPhoneText) {
+      const phone = message.phone || '';
+      if (phone) {
+        this.inboxModalPhone.href = `tel:${phone}`;
+        this.inboxModalPhoneText.textContent = phone;
+        this.inboxModalPhone.style.display = 'inline-flex';
+      } else {
+        this.inboxModalPhone.style.display = 'none';
+      }
+    }
+    if (this.btnCallVisitorFromModal) {
+      if (message.phone) {
+        this.btnCallVisitorFromModal.href = `tel:${message.phone}`;
+        this.btnCallVisitorFromModal.style.display = 'inline-flex';
+      } else {
+        this.btnCallVisitorFromModal.style.display = 'none';
+      }
+    }
+
+    if (this.inboxModalStatusBadge) {
+      if (message.isRead) {
+        this.inboxModalStatusBadge.className = 'inbox-modal-badge is-read';
+        this.inboxModalStatusBadge.textContent = 'Read';
+      } else {
+        this.inboxModalStatusBadge.className = 'inbox-modal-badge is-unread';
+        this.inboxModalStatusBadge.textContent = '● New';
+      }
+    }
+
+    if (this.labelToggleRead) {
+      this.labelToggleRead.textContent = message.isRead ? 'Mark as Unread' : 'Mark as Read';
+    }
+
+    if (this.inboxModalCourseSection && this.inboxModalCourseName) {
+      if (message.course) {
+        this.inboxModalCourseName.textContent = message.course;
+        this.inboxModalCourseSection.style.display = 'block';
+      } else {
+        this.inboxModalCourseSection.style.display = 'none';
+      }
+    }
+
+    if (this.inboxModalMessageText) {
+      this.inboxModalMessageText.textContent = message.message || 'No message content.';
+    }
+
+    // Bind footer action buttons
+    if (this.btnDeleteInboxMessageFromModal) {
+      this.btnDeleteInboxMessageFromModal.onclick = () => {
+        this.closeModal(this.inboxMessageModal);
+        this.confirmDeleteInboxMessage(messageId);
+      };
+    }
+
+    if (this.btnToggleReadFromModal) {
+      this.btnToggleReadFromModal.onclick = async () => {
+        const msg = store.getAllMessages().find(m => m.id === messageId);
+        if (!msg) return;
+        if (msg.isRead) {
+          await store.markMessageUnread(messageId);
+          this.showToast('Marked as Unread', 'The message is now marked as unread.', 'info');
+        } else {
+          await store.markMessageRead(messageId);
+          this.showToast('Marked as Read', 'The message is now marked as read.', 'info');
+        }
+        this.render();
+        this.closeModal(this.inboxMessageModal);
+      };
+    }
+
+    // Automatically mark as read if it was unread
+    if (!message.isRead) {
+      store.markMessageRead(messageId);
+      this.renderBadgesAndStats();
+      this.renderInboxView();
+      if (this.inboxModalStatusBadge) {
+        this.inboxModalStatusBadge.className = 'inbox-modal-badge is-read';
+        this.inboxModalStatusBadge.textContent = 'Read';
+      }
+      if (this.labelToggleRead) {
+        this.labelToggleRead.textContent = 'Mark as Unread';
+      }
+    }
+
+    this.openModal(this.inboxMessageModal);
   }
 
   markInboxMessageRead(messageId) {
@@ -5085,6 +6057,27 @@ class UIController {
     this.updateBulkActionState();
   }
 
+  deselectAllMessages() {
+    if (!this.selectedInboxMessageIds || this.selectedInboxMessageIds.size === 0) return;
+    this.selectedInboxMessageIds.clear();
+
+    if (this.inboxList) {
+      const checkboxes = this.inboxList.querySelectorAll('.inbox-row-checkbox');
+      checkboxes.forEach(cb => {
+        cb.checked = false;
+        const row = cb.closest('.inbox-row');
+        if (row) row.classList.remove('is-selected');
+      });
+    }
+
+    if (this.selectAllInboxCheckbox) {
+      this.selectAllInboxCheckbox.checked = false;
+      this.selectAllInboxCheckbox.indeterminate = false;
+    }
+
+    this.updateInboxBulkActionState();
+  }
+
   updateBulkActionState(filteredStudents) {
     if (!filteredStudents) {
       const allStudents = store.getAllStudents();
@@ -5949,6 +6942,34 @@ function formatMessageDate(dateString) {
     hour12: true
   });
   return `${date.getDate()} ${DISPLAY_MONTHS[date.getMonth()]}, ${date.getFullYear()}, ${time}`;
+}
+
+const INBOX_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+
+function formatInboxRowTime(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '';
+
+  const now = new Date();
+  const isToday = now.getFullYear() === date.getFullYear() &&
+                  now.getMonth() === date.getMonth() &&
+                  now.getDate() === date.getDate();
+  const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+  if (isToday && diffHours < 24 && diffHours >= 0) {
+    const rawHours = date.getHours();
+    const hours12 = rawHours % 12 === 0 ? 12 : rawHours % 12;
+    const hh = String(hours12).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    const period = rawHours >= 12 ? 'pm' : 'am';
+    return `${hh}:${mm} ${period}`;
+  }
+
+  const day = date.getDate();
+  const month = INBOX_MONTHS[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
 }
 
 function formatAadhar(value) {
