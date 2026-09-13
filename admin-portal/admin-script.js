@@ -586,7 +586,10 @@ class UIController {
     store.ownerEmail = activeAcademySlug;
     store.init();
 
-    this.currentView = 'dashboard';
+    const initialHash = (window.location.hash || '').replace('#', '');
+    const validViews = ['dashboard', 'students', 'courses', 'batches', 'idcards', 'inbox', 'personalisation'];
+    const targetView = validViews.includes(initialHash) ? initialHash : 'dashboard';
+    this.currentView = targetView;
     this.confirmCallback = null;
 
     // Filter states
@@ -604,6 +607,9 @@ class UIController {
     this.cacheDOMElements();
     this.populateCompletionPeriodSelectors();
     this.bindEvents();
+    if (targetView !== 'dashboard') {
+      this.applyViewLayout(targetView);
+    }
     this.render();
     this.startAuthCountdownTimer();
     this.updatePublicSiteLink();
@@ -2218,12 +2224,7 @@ class UIController {
     this.sidebarOverlay.classList.remove('active');
   }
 
-  switchView(viewName, updateHash = true) {
-    this.currentView = viewName;
-    if (updateHash) {
-      window.location.hash = viewName;
-    }
-
+  applyViewLayout(viewName) {
     this.navItems.forEach(item => {
       if (item.getAttribute('data-view') === viewName) {
         item.classList.add('active');
@@ -2292,7 +2293,15 @@ class UIController {
       this.pageTitleIcon.className = `page-title-icon ${config.theme}`;
       this.pageTitleIcon.innerHTML = config.icon;
     }
+  }
 
+  switchView(viewName, updateHash = true) {
+    this.currentView = viewName;
+    if (updateHash) {
+      window.location.hash = viewName;
+    }
+
+    this.applyViewLayout(viewName);
     this.render();
     store.fetchCloudData(() => {
       this.render();
@@ -2995,7 +3004,27 @@ class UIController {
     if (this.idCardStatusFilterTrigger) {
       this.idCardStatusFilterTrigger.title = 'Filter by Status';
     }
+
+    // Deselect student selections
+    this.selectedIdCardStudentIds.clear();
+    this.lastSelectedIdCardStudentId = null;
+
     this.renderIdCardsView();
+  }
+
+  updateIdCardClearButtonState() {
+    const hasActiveFilterOrSelection = Boolean(
+      (this.idCardCourseFilterValue && this.idCardCourseFilterValue !== 'all') ||
+      (this.idCardBatchFilterValue && this.idCardBatchFilterValue !== 'all') ||
+      (this.idCardStatusFilterValue && this.idCardStatusFilterValue !== 'all') ||
+      this.idCardSearchQuery ||
+      this.selectedIdCardStudentIds.size > 0 ||
+      this.lastSelectedIdCardStudentId
+    );
+
+    if (this.btnClearIdCardFilter) {
+      this.btnClearIdCardFilter.disabled = !hasActiveFilterOrSelection;
+    }
   }
 
   renderIdCardsView() {
@@ -3074,14 +3103,7 @@ class UIController {
     });
 
     // Update clear filter button state
-    const hasActiveFilter = Boolean((this.idCardCourseFilterValue && this.idCardCourseFilterValue !== 'all') ||
-                                    (this.idCardBatchFilterValue && this.idCardBatchFilterValue !== 'all') ||
-                                    (this.idCardStatusFilterValue && this.idCardStatusFilterValue !== 'all') ||
-                                    this.idCardSearchQuery);
-
-    if (this.btnClearIdCardFilter) {
-      this.btnClearIdCardFilter.disabled = !hasActiveFilter;
-    }
+    this.updateIdCardClearButtonState();
 
     if (this.idCardStudentCountBadge) {
       this.idCardStudentCountBadge.textContent = `${filteredStudents.length} Student${filteredStudents.length === 1 ? '' : 's'}`;
@@ -3208,6 +3230,7 @@ class UIController {
       this.btnDownloadIdCard.title = labelText;
       this.btnDownloadIdCard.disabled = false;
     }
+    this.updateIdCardClearButtonState();
   }
 
   handleSelectAllIdCards(isChecked) {
@@ -3345,6 +3368,7 @@ class UIController {
       if (this.idCardNoSelection) this.idCardNoSelection.style.display = 'flex';
       this.renderIdCardBlankTemplate();
     }
+    this.updateIdCardClearButtonState();
   }
 
   async renderIdCardBlankTemplate() {
@@ -6147,8 +6171,4 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
   app = new UIController();
   window.app = app;
-  const initialHash = window.location.hash.replace('#', '');
-  if (['students', 'courses', 'batches', 'idcards', 'inbox'].includes(initialHash)) {
-    app.switchView(initialHash, false);
-  }
 });
