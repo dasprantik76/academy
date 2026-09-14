@@ -1,6 +1,6 @@
 /**
  * EduCore Academy - Admin Panel Management Script
- * Pure Vanilla JavaScript (Zero frameworks, zero dummy data)
+ * Pure Vanilla JavaScript (Zero frameworks; includes sample seed data)
  * Course Model: Course Name, Duration, Description
  */
 
@@ -17,15 +17,51 @@ const STORAGE_KEYS = {
   ACADEMY_PROFILE: 'pixelsetu_academy_profile'
 };
 
+function sortCourseOrBatchRecords(records, order, nameKey) {
+  const nameCompare = (a, b) => String(a[nameKey] || '').localeCompare(String(b[nameKey] || ''), 'en', { sensitivity: 'base', numeric: true });
+  const timestamp = record => Date.parse(record.createdAt) || 0;
+  return [...records].sort((a, b) => {
+    if (order === 'name-asc') return nameCompare(a, b);
+    if (order === 'name-desc') return nameCompare(b, a);
+    const difference = timestamp(a) - timestamp(b);
+    return (order === 'oldest' ? difference : -difference) || nameCompare(a, b);
+  });
+}
+
 const DEFAULT_COMPUTER_COURSES = [
   { id: 'CRS-101', title: 'Diploma in Computer Applications (DCA)', duration: '6 Months', description: 'Comprehensive fundamentals of computer operations, MS Office suite, Internet basics, and database concepts.', createdAt: '2026-01-06T09:00:00.000Z' },
   { id: 'CRS-102', title: 'Full Stack Web Development', duration: '1 Year', description: 'Modern front-end and back-end web development with HTML5, CSS3, JavaScript, Node.js, and databases.', createdAt: '2026-01-05T09:00:00.000Z' },
   { id: 'CRS-103', title: 'Post Graduate Diploma in Computer Applications (PGDCA)', duration: '1 Year', description: 'Advanced programming concepts, system architecture, database administration, and project implementation.', createdAt: '2026-01-04T09:00:00.000Z' },
   { id: 'CRS-104', title: 'Certificate in Office Automation', duration: '3 Months', description: 'Practical training in Word, Excel, PowerPoint, email, document formatting, and everyday office productivity.', createdAt: '2026-01-03T09:00:00.000Z' },
   { id: 'CRS-105', title: 'Tally Prime with GST', duration: '4 Months', description: 'Learn computerized accounting, inventory management, GST invoicing, taxation reports, and payroll using Tally Prime.', createdAt: '2026-01-02T09:00:00.000Z' },
-  { id: 'CRS-106', title: 'Graphic Design Fundamentals', duration: '6 Months', description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.', createdAt: '2026-01-01T09:00:00.000Z' }
+  { id: 'CRS-106', title: 'Graphic Design Fundamentals', duration: '6 Months', description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.', createdAt: '2026-01-01T09:00:00.000Z' },
+  {"id": "CRS-DEMO-001", "title": "Advanced Excel & MIS Reporting", "duration": "3 Months", "description": "Build spreadsheet models using lookup functions, PivotTables, data validation, Power Query, and interactive dashboards. Complete a monthly sales reporting project.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-002", "title": "Python Programming", "duration": "4 Months", "description": "Learn variables, control flow, functions, collections, file handling, exceptions, and object-oriented programming. Build command-line utilities and automate routine tasks.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-003", "title": "Data Analysis with Python", "duration": "6 Months", "description": "Clean and explore datasets with pandas and NumPy, visualize results with Matplotlib, and summarize findings using descriptive statistics and reproducible notebooks.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-004", "title": "SQL & Database Design", "duration": "3 Months", "description": "Write queries with joins, subqueries, aggregate functions, and window functions. Design relational schemas, apply normalization, and practice transactions and indexing.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-005", "title": "Power BI Dashboard Development", "duration": "3 Months", "description": "Import and transform data with Power Query, build relationships and DAX measures, and create interactive reports with filters, drill-through pages, and business metrics.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-006", "title": "Web Design with HTML & CSS", "duration": "3 Months", "description": "Create responsive websites with semantic HTML, CSS Grid, Flexbox, accessible forms, and media queries. Publish a portfolio website with layouts for mobile and desktop.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-007", "title": "JavaScript Programming", "duration": "4 Months", "description": "Practice functions, arrays, objects, DOM manipulation, events, promises, and asynchronous requests. Build interactive browser applications with validation and error handling.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-008", "title": "React Frontend Development", "duration": "4 Months", "description": "Build reusable components with props, state, hooks, routing, and forms. Connect a frontend to an API and complete an accessible multi-page application.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-009", "title": "Node.js & Express Backend Development", "duration": "4 Months", "description": "Create REST APIs with routing, middleware, validation, authentication, and database integration. Practice automated tests, error handling, and application deployment.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-010", "title": "Django Web Development", "duration": "4 Months", "description": "Develop database-backed websites using models, views, templates, forms, authentication, and the Django admin. Build and deploy a complete student project.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-011", "title": "Java Programming", "duration": "6 Months", "description": "Learn Java syntax, classes, inheritance, interfaces, collections, exceptions, and JDBC. Develop a database-connected application using structured object-oriented design.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-012", "title": "C Programming Fundamentals", "duration": "3 Months", "description": "Understand data types, loops, functions, arrays, pointers, structures, and file operations. Practice debugging and implement small programs for common computing problems.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-013", "title": "C++ & Data Structures", "duration": "6 Months", "description": "Study classes, templates, the standard library, linked lists, stacks, queues, trees, and graphs. Compare sorting and searching algorithms using time and space complexity.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-014", "title": "Computer Hardware & Troubleshooting", "duration": "4 Months", "description": "Identify desktop components, assemble systems, install operating systems and drivers, diagnose common faults, and practice backups and preventive maintenance.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-015", "title": "Computer Networking Fundamentals", "duration": "4 Months", "description": "Learn network devices, Ethernet, IP addressing, subnetting, DNS, DHCP, routing, and wireless networks. Configure a small office network and troubleshoot connectivity.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-016", "title": "Linux Administration", "duration": "4 Months", "description": "Use the Linux shell, manage users and permissions, configure services, inspect logs, schedule jobs, and write shell scripts for routine administration tasks.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-017", "title": "Cybersecurity Fundamentals", "duration": "4 Months", "description": "Study access control, secure configuration, phishing awareness, network security, backups, and incident response. Practice defensive analysis in isolated training labs.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-018", "title": "Cloud Computing Fundamentals", "duration": "3 Months", "description": "Understand virtual machines, storage, networking, identity management, monitoring, and shared responsibility. Design a small cloud-hosted application and estimate resource usage.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-019", "title": "Git, Docker & CI/CD Fundamentals", "duration": "4 Months", "description": "Manage branches and code reviews with Git, package applications in Docker containers, and build automated pipelines for testing and deployment.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-020", "title": "UI & UX Design with Figma", "duration": "4 Months", "description": "Practice user interviews, information architecture, wireframes, component libraries, responsive layouts, and interactive prototypes. Conduct usability testing on a design project.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-021", "title": "Adobe Photoshop & Image Editing", "duration": "3 Months", "description": "Edit photographs using layers, masks, selections, retouching, color correction, and nondestructive adjustments. Prepare images for print, websites, and social media.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-022", "title": "Vector Illustration with Adobe Illustrator", "duration": "3 Months", "description": "Create vector artwork with shapes, paths, the Pen tool, typography, and reusable graphic assets. Design logos, icons, packaging layouts, and print-ready illustrations.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-023", "title": "Video Editing with Adobe Premiere Pro", "duration": "4 Months", "description": "Organize footage, edit sequences, synchronize audio, add titles and transitions, correct color, and export video. Complete a short promotional film from raw footage.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-024", "title": "WordPress Website Development", "duration": "3 Months", "description": "Build websites using themes, blocks, menus, forms, and plugins. Practice backups, security updates, performance optimization, and basic search-friendly site structure.", "createdAt": "2026-09-01T09:00:00.000Z"},
+  {"id": "CRS-DEMO-025", "title": "AutoCAD 2D Drafting", "duration": "4 Months", "description": "Create technical drawings with precise dimensions, layers, blocks, annotations, layouts, and plotting. Produce a complete set of 2D plans for a drafting project.", "createdAt": "2026-09-01T09:00:00.000Z"}
 ];
-const COURSE_SEED_VERSION = '1';
+const COURSE_SEED_VERSION = '2';
 
 const INDIAN_STATES_DISTRICTS = {
   "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Ananthapuramu", "Annamayya", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema", "East Godavari", "Eluru", "Guntur", "Kakinada", "Krishna", "Kurnool", "Nandyal", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "Sri Potti Sriramulu Nellore", "Sri Sathya Sai", "Srikakulam", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
@@ -1287,7 +1323,7 @@ class UIController {
     store.init();
 
     const initialHash = (window.location.hash || '').replace('#', '');
-    const validViews = ['dashboard', 'students', 'courses', 'batches', 'idcards', 'inbox', 'personalisation'];
+    const validViews = ['dashboard', 'students', 'courses', 'batches', 'certificates', 'idcards', 'inbox', 'personalisation'];
     const targetView = validViews.includes(initialHash) ? initialHash : 'dashboard';
     this.currentView = targetView;
     this.confirmCallback = null;
@@ -1452,10 +1488,18 @@ class UIController {
     this.btnAddStudent = document.getElementById('btnAddStudent');
     this.selectAllStudentsCheckbox = document.getElementById('selectAllStudentsCheckbox');
     this.studentsTableBody = document.getElementById('studentsTableBody');
-    // Keep the edge columns anchored and space only the four middle labels.
+    // Keep the checkbox and name anchored and space the four remaining labels.
     const studentsTable = document.getElementById('studentsTable');
     if (studentsTable) {
+      const rowsTable = document.getElementById('studentsRowsTable');
+      const rowViewport = rowsTable.closest('.table-responsive');
+      const labelViewport = document.getElementById('studentTableLabels');
+      rowViewport.addEventListener('scroll', () => {
+        labelViewport.scrollLeft = rowViewport.scrollLeft;
+      }, { passive: true });
       const alignStudentColumns = () => {
+        studentsTable.style.width = `${rowsTable.getBoundingClientRect().width}px`;
+        labelViewport.style.marginRight = `${rowViewport.offsetWidth - rowViewport.clientWidth}px`;
         const tableWidth = studentsTable.getBoundingClientRect().width;
         if (!tableWidth) return;
         const headers = [...studentsTable.querySelectorAll('thead th')];
@@ -1468,14 +1512,10 @@ class UIController {
         });
         const checkboxWidth = headers[0].getBoundingClientRect().width;
         const nameWidth = Math.max(180, Math.min(240, tableWidth * 0.18));
-        const actionsStyle = getComputedStyle(headers[6]);
-        const actionsWidth = headers[6].querySelector('.student-actions-label').getBoundingClientRect().width
-          + parseFloat(actionsStyle.paddingLeft) + parseFloat(actionsStyle.paddingRight);
-        const available = tableWidth - checkboxWidth - nameWidth - actionsWidth;
+        const available = tableWidth - checkboxWidth - nameWidth;
         const gap = (available - labelWidths.reduce((sum, width) => sum + width, 0)) / middleHeaders.length;
         if (gap < 0) return;
         headers[1].style.width = `${nameWidth}px`;
-        headers[6].style.width = `${actionsWidth}px`;
         middleHeaders.forEach((header, index) => {
           header.style.width = `${labelWidths[index] + gap}px`;
         });
@@ -1487,9 +1527,12 @@ class UIController {
         const adjustedIdWidth = nameWidth + labelWidths[0] + gap - adjustedNameWidth;
         headers[1].style.width = `${adjustedNameWidth}px`;
         headers[2].style.width = `${adjustedIdWidth}px`;
+        rowsTable.querySelectorAll('col').forEach((column, index) => {
+          column.style.width = `${headers[index].getBoundingClientRect().width}px`;
+        });
       };
       this.studentColumnsResizeObserver = new ResizeObserver(alignStudentColumns);
-      this.studentColumnsResizeObserver.observe(studentsTable.parentElement);
+      this.studentColumnsResizeObserver.observe(rowViewport);
       document.fonts.ready.then(alignStudentColumns);
     }
     this.studentsEmptyState = document.getElementById('studentsEmptyState');
@@ -1517,8 +1560,6 @@ class UIController {
     this.btnResetInboxSearch = document.getElementById('btnResetInboxSearch');
     this.selectAllInboxCheckbox = document.getElementById('selectAllInboxCheckbox');
     this.inboxSelectionCount = document.getElementById('inboxSelectionCount');
-    this.inboxBulkActions = document.getElementById('inboxBulkActions');
-    this.btnBulkMarkInboxRead = document.getElementById('btnBulkMarkInboxRead');
     this.btnBulkDeleteInbox = document.getElementById('btnBulkDeleteInbox');
     this.inboxBulkDeleteCount = document.getElementById('inboxBulkDeleteCount');
     this.inboxSearchQuery = '';
@@ -1564,6 +1605,19 @@ class UIController {
     this.idCardPreviewActions = document.getElementById('idCardPreviewActions');
     this.btnDownloadIdCard = document.getElementById('btnDownloadIdCard');
     this.idCardMockupWrapper = document.getElementById('idCardMockupWrapper');
+    const idCardStage = document.querySelector('.idcards-card-stage');
+    if (idCardStage && this.idCardMockupWrapper) {
+      this.idCardPreviewResizeObserver = new ResizeObserver(([entry]) => {
+        const { width, height } = entry.contentRect;
+        if (!width || !height) return;
+        const desktop = window.matchMedia('(min-width: 901px)').matches;
+        const frame = this.idCardMockupWrapper.querySelector('.idcard-frame-holder');
+        const naturalHeight = frame.offsetHeight + 19;
+        const scale = desktop ? Math.min(1, width / 320, height / naturalHeight) : 1;
+        this.idCardMockupWrapper.style.setProperty('--idcard-preview-scale', String(scale));
+      });
+      this.idCardPreviewResizeObserver.observe(idCardStage);
+    }
     this.idCardPreviewCanvas = document.getElementById('idCardPreviewCanvas');
     this.idCardLoadingOverlay = document.getElementById('idCardLoadingOverlay');
     this.idCardNoSelection = document.getElementById('idCardNoSelection');
@@ -2142,7 +2196,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses', 'batches', 'idcards', 'inbox'].includes(hash)) {
+      if (['dashboard', 'students', 'courses', 'batches', 'certificates', 'idcards', 'inbox'].includes(hash)) {
         this.switchView(hash, false);
       }
     });
@@ -2452,8 +2506,14 @@ class UIController {
 
         const checkbox = row.querySelector('.student-row-checkbox');
         if (checkbox) {
-          checkbox.checked = !checkbox.checked;
           const studentId = checkbox.getAttribute('data-student-id');
+          const clickedSelectionZone = Boolean(e.target.closest('.td-checkbox-col'));
+          if (!clickedSelectionZone && !e.metaKey && !e.ctrlKey) {
+            this.viewStudentProfile(studentId);
+            return;
+          }
+          e.preventDefault();
+          checkbox.checked = !checkbox.checked;
           if (checkbox.checked) {
             this.selectedStudentIds.add(studentId);
           } else {
@@ -2543,41 +2603,64 @@ class UIController {
       });
     }
 
-    if (this.batchesGrid) {
+    this.cardGridObservers = [];
+    for (const viewName of ['batches', 'courses']) {
+      const view = document.getElementById(`view-${viewName}`);
+      const grid = view?.querySelector('.batches-grid, .courses-grid');
+      if (!grid) continue;
+      const prefix = viewName === 'batches' ? 'batch' : 'course';
+      const sortInput = document.getElementById(`${prefix}SortValue`);
+      this[`${prefix}SortInput`] = sortInput;
+      const sortDisplay = document.getElementById(`${prefix}SortDisplay`);
+      this.setupAdminDropdown(
+        document.getElementById(`${prefix}SortDropdown`),
+        document.getElementById(`${prefix}SortTrigger`),
+        document.getElementById(`${prefix}SortMenu`),
+        sortDisplay,
+        sortInput,
+        () => {
+          const option = document.querySelector(`#${prefix}SortMenu .custom-select-option.selected`);
+          sortDisplay.textContent = `Sort by :\u00a0${option?.textContent || 'Name (A → Z)'}`;
+          if (viewName === 'batches') this.renderBatchesView();
+          else this.renderCoursesView();
+        }
+      );
       const updateBatchSearchWidth = () => {
         // Include the reserved scrollbar gutter in the outer right spacing.
-        const scrollbarWidth = this.batchesGrid.offsetWidth - this.batchesGrid.clientWidth;
-        this.batchesGrid.style.setProperty('--batch-scrollbar-width', `${scrollbarWidth}px`);
-        const styles = getComputedStyle(this.batchesGrid);
+        const scrollbarWidth = grid.offsetWidth - grid.clientWidth;
+        grid.style.setProperty('--batch-scrollbar-width', `${scrollbarWidth}px`);
+        const styles = getComputedStyle(grid);
         const columns = styles.gridTemplateColumns.split(' ').map(parseFloat).filter(Number.isFinite);
         const width = columns.length > 1
           ? columns[0] + parseFloat(styles.columnGap) + columns[1] / 2
           : columns[0];
-        if (width) document.getElementById('view-batches').style.setProperty('--batch-search-width', `${width}px`);
+        if (width) view.style.setProperty('--batch-search-width', `${width}px`);
       };
-      this.batchGridResizeObserver = new ResizeObserver(updateBatchSearchWidth);
-      this.batchGridResizeObserver.observe(this.batchesGrid);
-      const batchToolbar = document.querySelector('#view-batches .view-header-bar');
+      const gridResizeObserver = new ResizeObserver(updateBatchSearchWidth);
+      gridResizeObserver.observe(grid);
+      this.cardGridObservers.push(gridResizeObserver);
+      const batchToolbar = view.querySelector('.view-header-bar');
       if (batchToolbar) {
-        this.batchToolbarResizeObserver = new ResizeObserver(() => {
+        const toolbarResizeObserver = new ResizeObserver(() => {
           const height = batchToolbar.getBoundingClientRect().height;
           if (height > 0) {
-            document.getElementById('view-batches').style.setProperty('--batch-toolbar-height', `${height}px`);
+            view.style.setProperty('--batch-toolbar-height', `${height}px`);
           }
         });
-        this.batchToolbarResizeObserver.observe(batchToolbar);
+        toolbarResizeObserver.observe(batchToolbar);
+        this.cardGridObservers.push(toolbarResizeObserver);
       }
       let batchScrollbarTimer;
       const updateBatchesHeaderScroll = () => {
-        this.batchesGrid.classList.add('is-scrolling');
+        grid.classList.add('is-scrolling');
         clearTimeout(batchScrollbarTimer);
         batchScrollbarTimer = setTimeout(() => {
-          this.batchesGrid.classList.remove('is-scrolling');
+          grid.classList.remove('is-scrolling');
         }, 900);
-        const isScrolled = this.batchesGrid.scrollTop > 2;
-        document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', isScrolled);
+        const isScrolled = grid.scrollTop > 2;
+        view.querySelector('.view-header-bar')?.classList.toggle('is-scrolled', isScrolled);
       };
-      this.batchesGrid.addEventListener('scroll', updateBatchesHeaderScroll, { passive: true });
+      grid.addEventListener('scroll', updateBatchesHeaderScroll, { passive: true });
     }
 
     // Inbox Search & Action Handlers
@@ -2659,6 +2742,17 @@ class UIController {
         if (row) {
           const messageId = row.getAttribute('data-message-id');
           if (messageId) {
+            if (e.metaKey || e.ctrlKey) {
+              e.preventDefault();
+              const selected = !this.selectedInboxMessageIds.has(messageId);
+              if (selected) this.selectedInboxMessageIds.add(messageId);
+              else this.selectedInboxMessageIds.delete(messageId);
+              const checkbox = row.querySelector('.inbox-row-checkbox');
+              if (checkbox) checkbox.checked = selected;
+              row.classList.toggle('is-selected', selected);
+              this.updateInboxBulkActionState();
+              return;
+            }
             this.openInboxMessageModal(messageId);
           }
         }
@@ -2675,26 +2769,6 @@ class UIController {
               this.openInboxMessageModal(messageId);
             }
           }
-        }
-      });
-    }
-
-    if (this.btnBulkMarkInboxRead) {
-      this.btnBulkMarkInboxRead.addEventListener('click', async () => {
-        const ids = Array.from(this.selectedInboxMessageIds);
-        if (ids.length === 0) return;
-        setButtonLoading(this.btnBulkMarkInboxRead, true);
-        try {
-          for (const id of ids) {
-            await store.markMessageRead(id);
-          }
-          this.selectedInboxMessageIds.clear();
-          this.render();
-          this.showToast('Messages Marked as Read', `${ids.length} message(s) marked as read.`, 'success');
-        } catch (e) {
-          this.showToast('Error', 'Failed to mark messages as read.', 'error');
-        } finally {
-          setButtonLoading(this.btnBulkMarkInboxRead, false);
         }
       });
     }
@@ -2780,6 +2854,11 @@ class UIController {
         if (item) {
           const studentId = item.getAttribute('data-student-id');
           if (studentId) {
+            if (e.metaKey || e.ctrlKey) {
+              e.preventDefault();
+              this.toggleIdCardStudentSelection(studentId, !this.selectedIdCardStudentIds.has(studentId));
+              return;
+            }
             // Soft selection: only update preview, do not change bulk selection
             this.softSelectIdCardStudent(studentId);
           }
@@ -3081,6 +3160,15 @@ class UIController {
       this.closeModal(this.confirmModal);
     });
 
+    // Escape closes dialogs through the shared cleanup path.
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const openDialogs = document.querySelectorAll('.modal-backdrop.open');
+      if (!openDialogs.length) return;
+      e.preventDefault();
+      openDialogs.forEach(dialog => this.closeModal(dialog));
+    });
+
     // Keyboard shortcut: Cmd+D (Mac) / Ctrl+D (Windows) to deselect all selections
     window.addEventListener('keydown', (e) => {
       const isCmdOrCtrl = (e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey;
@@ -3098,6 +3186,14 @@ class UIController {
 
         const isInboxPage = this.currentView === 'inbox' ||
           Boolean(document.getElementById('view-inbox')?.classList.contains('active'));
+
+        if (this.currentView === 'certificates') {
+          e.preventDefault();
+          this.selectedCertificateIds?.clear();
+          this.certificatePreviewId = null;
+          this.renderCertificatesView();
+          return;
+        }
 
         if (isStudentsPage) {
           e.preventDefault();
@@ -3202,6 +3298,7 @@ class UIController {
         title: 'Inbox',
         subtitle: 'Messages received from your public website'
       },
+      certificates: { icon: '<i class="fa-solid fa-certificate"></i>', theme: 'theme-dashboard', title: 'Certificates', subtitle: 'Preview and download certificates for completed students' },
       personalisation: {
         icon: '<i class="fa-solid fa-sliders"></i>',
         theme: 'theme-dashboard',
@@ -3227,9 +3324,10 @@ class UIController {
 
     this.applyViewLayout(viewName);
     this.render();
-    if (viewName === 'batches') {
-      const isScrolled = (this.batchesGrid?.scrollTop || 0) > 2;
-      document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', isScrolled);
+    if (viewName === 'batches' || viewName === 'courses') {
+      const view = document.getElementById(`view-${viewName}`);
+      const grid = view?.querySelector('.batches-grid, .courses-grid');
+      view?.querySelector('.view-header-bar')?.classList.toggle('is-scrolled', (grid?.scrollTop || 0) > 2);
     }
     store.fetchCloudData(() => {
       this.render();
@@ -3338,6 +3436,7 @@ class UIController {
     this.renderCoursesView();
     this.renderBatchesView();
     this.renderIdCardsView();
+    this.renderCertificatesView();
     this.renderInboxView();
   }
 
@@ -3525,8 +3624,8 @@ class UIController {
       }).join('');
 
       return `
-        <tr class="${isChecked ? 'is-selected' : ''}" title="Click to select student">
-          <td class="td-checkbox-col">
+        <tr class="${isChecked ? 'is-selected' : ''}" title="Click to view student details; Cmd-click or Ctrl-click to select">
+          <td class="td-checkbox-col" title="Select student ${escapeHtml(student.name)}">
             <input type="checkbox" class="student-row-checkbox custom-table-checkbox" data-student-id="${escapeHtml(student.id)}" ${isChecked ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}">
           </td>
           <td>
@@ -3543,16 +3642,6 @@ class UIController {
             <span class="badge ${getStatusBadgeClass(student.status)}">
               ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
             </span>
-          </td>
-          <td class="text-right">
-            <div class="table-actions">
-              <button class="btn-icon view" title="View Profile & Enrollments" onclick="window.app.viewStudentProfile('${student.id}')">
-                <i class="fa-regular fa-eye"></i>
-              </button>
-              <button class="btn-icon edit" title="Edit Student" onclick="window.app.openStudentModal('${student.id}')">
-                <i class="fa-regular fa-pen-to-square"></i>
-              </button>
-            </div>
           </td>
         </tr>
       `;
@@ -3583,7 +3672,7 @@ class UIController {
 
     this.coursesEmptyState.style.display = 'none';
 
-    this.coursesGrid.innerHTML = filteredCourses.map(course => {
+    this.coursesGrid.innerHTML = sortCourseOrBatchRecords(filteredCourses, this.courseSortInput?.value || 'name-asc', 'title').map(course => {
       const enrolledCount = store.getCourseEnrollmentCount(course.id);
       return `
         <div class="course-card">
@@ -3664,7 +3753,7 @@ class UIController {
     }
 
     this.batchesEmptyState.style.display = 'none';
-    this.batchesGrid.innerHTML = filteredBatches.map(batch => {
+    this.batchesGrid.innerHTML = sortCourseOrBatchRecords(filteredBatches, this.batchSortInput?.value || 'name-asc', 'name').map(batch => {
       const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
       const isCompleted = batch.status === 'Completed';
       return `<article class="batch-card">
@@ -3963,6 +4052,93 @@ class UIController {
     if (this.btnClearIdCardFilter) {
       this.btnClearIdCardFilter.disabled = !hasActiveFilterOrSelection;
     }
+  }
+
+
+  renderCertificatesView() {
+    const list = document.getElementById('certificateStudents');
+    if (!list) return;
+    const search = document.getElementById('certificateSearch');
+    const courseFilter = document.getElementById('certificateCourse');
+    const batchFilter = document.getElementById('certificateBatch');
+    const selectAll = document.getElementById('certificateSelectAll');
+    const download = document.getElementById('certificateDownloadSelected');
+    this.selectedCertificateIds ||= new Set();
+    const completed = store.getAllStudents().filter(s => s.status === 'Completed');
+    const fill = (element, items, label, prefix) => {
+      const el = suffix => document.getElementById(prefix + suffix);
+      const value = items.some(item => item.id === element.value) ? element.value : 'all';
+      el('Menu').innerHTML = `<li class="custom-select-option" data-value="all" role="option">${label}</li>` + items.map(item => `<li class="custom-select-option" data-value="${escapeHtml(item.id)}" role="option">${escapeHtml(item.title || item.name || item.id)}</li>`).join('');
+      this.setAdminDropdownValue(el('Dropdown'), el('Menu'), el('Display'), element, value, label);
+      if (!el('Dropdown').dataset.initialized) {
+        this.setupAdminDropdown(el('Dropdown'), el('Trigger'), el('Menu'), el('Display'), element, () => this.renderCertificatesView());
+        el('Dropdown').dataset.initialized = 'true';
+      }
+    };
+    fill(courseFilter, store.getAllCourses(), 'All Courses', 'certCardCourseFilter');
+    fill(batchFilter, store.getAllBatches(), 'All Batches', 'certCardBatchFilter');
+    const clear = () => { courseFilter.value = batchFilter.value = 'all'; this.renderCertificatesView(); };
+    document.getElementById('btnClearCertCardFilter').onclick = clear;
+    document.getElementById('btnClearCertCardFilter').disabled = courseFilter.value === 'all' && batchFilter.value === 'all';
+    document.getElementById('btnResetCertCardFilters').onclick = () => { search.value = ''; clear(); };
+    const clearSearch = document.getElementById('btnClearCertCardSearch');
+    clearSearch.style.display = search.value ? '' : 'none';
+    clearSearch.onclick = () => { search.value = ''; this.renderCertificatesView(); search.focus(); };
+    const batch = store.getAllBatches().find(b => b.id === batchFilter.value);
+    const query = search.value.trim().toLowerCase();
+    const students = completed.filter(s => (!query || `${s.name} ${s.id} ${s.email || ''} ${s.phone || ''}`.toLowerCase().includes(query)) && (courseFilter.value === 'all' || s.courseId === courseFilter.value || (s.enrolledCourseIds || []).includes(courseFilter.value)) && (!batch || (batch.studentIds || []).includes(s.id)));
+    const visibleIds = new Set(students.map(s => s.id));
+    this.selectedCertificateIds.forEach(id => { if (!visibleIds.has(id)) this.selectedCertificateIds.delete(id); });
+    list.innerHTML = students.map(s => `<div class="idcard-student-item ${this.selectedCertificateIds.has(s.id) ? 'is-selected' : ''}" data-id="${escapeHtml(s.id)}" tabindex="0" role="button"><label class="idcard-checkbox-hit"><input type="checkbox" class="custom-table-checkbox" aria-label="Select ${escapeHtml(s.name)}" ${this.selectedCertificateIds.has(s.id) ? 'checked' : ''}></label><span class="idcard-student-name">${escapeHtml(s.name)}</span><div class="idcard-student-status-col"><span class="badge ${getStatusBadgeClass(s.status)} idcard-student-status">${getStatusBadgeIcon(s.status)} Completed</span></div></div>`).join('');
+    document.getElementById('certificateEmpty').style.display = students.length ? 'none' : '';
+    list.closest('.idcards-list-panel').classList.toggle('is-empty', !students.length);
+    document.getElementById('certificateSelectionCount').textContent = this.selectedCertificateIds.size;
+    document.getElementById('certificateSelectionCount').hidden = !this.selectedCertificateIds.size;
+    selectAll.checked = students.length > 0 && students.every(s => this.selectedCertificateIds.has(s.id));
+    selectAll.indeterminate = this.selectedCertificateIds.size > 0 && !selectAll.checked;
+    download.disabled = !this.selectedCertificateIds.size;
+    if (!visibleIds.has(this.certificatePreviewId)) {
+      this.certificatePreviewId = null;
+      window.CertificateCanvas.clear();
+      document.getElementById('certificateCanvas').hidden = true;
+      document.getElementById('certificatePreviewEmpty').hidden = false;
+    }
+    const toggle = id => {
+      if (this.selectedCertificateIds.has(id)) this.selectedCertificateIds.delete(id);
+      else this.selectedCertificateIds.add(id);
+      this.certificatePreviewId = this.selectedCertificateIds.has(id) ? id : [...this.selectedCertificateIds].at(-1);
+      this.renderCertificatesView();
+      if (this.certificatePreviewId) this.previewCertificate(this.certificatePreviewId);
+    };
+    list.onchange = e => { const row = e.target.closest('[data-id]'); if (row) toggle(row.dataset.id); };
+    list.onclick = e => {
+      if (e.target.closest('label, input')) return;
+      const row = e.target.closest('[data-id]');
+      if (!row) return;
+      if (e.metaKey || e.ctrlKey) { e.preventDefault(); toggle(row.dataset.id); return; }
+      this.previewCertificate(row.dataset.id);
+    };
+    list.onkeydown = e => {
+      if (!['Enter', ' '].includes(e.key) || e.target.closest('input')) return;
+      e.preventDefault();
+      const row = e.target.closest('[data-id]');
+      if (row) this.previewCertificate(row.dataset.id);
+    };
+    search.oninput = courseFilter.onchange = batchFilter.onchange = () => this.renderCertificatesView();
+    selectAll.onchange = () => { this.selectedCertificateIds = new Set(selectAll.checked ? students.map(s => s.id) : []); this.certificatePreviewId = [...this.selectedCertificateIds].at(-1); this.renderCertificatesView(); if (this.certificatePreviewId) this.previewCertificate(this.certificatePreviewId); };
+    download.disabled = !this.selectedCertificateIds.size && !this.certificatePreviewId;
+    download.innerHTML = `<i class="fa-solid fa-download"></i> ${this.selectedCertificateIds.size > 1 ? 'Download Certificates' : 'Download Certificate'}`;
+    download.onclick = () => this.executeCertificateDownload(this.selectedCertificateIds.size ? [...this.selectedCertificateIds] : [this.certificatePreviewId]);
+  }
+
+  previewCertificate(id) {
+    const student = store.getStudentById(id);
+    if (!student || student.status !== 'Completed') return;
+    this.certificatePreviewId = id;
+    document.getElementById('certificateDownloadSelected').disabled = false;
+    document.getElementById('certificatePreviewEmpty').hidden = true;
+    document.getElementById('certificateCanvas').hidden = false;
+    window.CertificateCanvas.render(student, store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]));
   }
 
   renderIdCardsView() {
@@ -4924,8 +5100,8 @@ class UIController {
       this.inboxSelectionCount.hidden = !hasSelections;
     }
 
-    if (this.inboxBulkActions) {
-      this.inboxBulkActions.style.display = hasSelections ? 'inline-flex' : 'none';
+    if (this.btnBulkDeleteInbox) {
+      this.btnBulkDeleteInbox.disabled = !hasSelections;
     }
 
     if (this.inboxBulkDeleteCount) {
@@ -5707,38 +5883,19 @@ class UIController {
     }
 
     // Email format validation
-    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}$/i.test(email)) {
+    if (!/^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/.test(email)) {
       this.studentEmailInput.classList.add('input-error');
       if (this.studentEmailError) {
-        this.studentEmailError.textContent = 'Please enter a valid email address.';
+        this.studentEmailError.textContent = 'Please enter an email in the format name@domain.extension.';
         this.studentEmailError.style.display = 'block';
       }
       this.studentEmailInput.focus();
-      this.showToast('Validation Error', 'Please enter a valid email address.', 'error');
+      this.showToast('Validation Error', 'Please enter an email in the format name@domain.extension.', 'error');
       return;
     }
 
     const saveBtn = this.btnSaveStudent || this.studentForm.querySelector('button[type="submit"]');
     setButtonLoading(saveBtn, true);
-
-    // Backend Email Validation Check
-    try {
-      const emailCheckRes = await fetch(`/api/validate-email?email=${encodeURIComponent(email)}`, { cache: 'no-store' });
-      const emailCheck = await emailCheckRes.json().catch(() => null);
-      if (!emailCheckRes.ok || !emailCheck?.valid) {
-        setButtonLoading(saveBtn, false);
-        this.studentEmailInput.classList.add('input-error');
-        if (this.studentEmailError) {
-          this.studentEmailError.textContent = 'Please enter a valid email address.';
-          this.studentEmailError.style.display = 'block';
-        }
-        this.studentEmailInput.focus();
-        this.showToast('Validation Error', 'Please enter a valid email address.', 'error');
-        return;
-      }
-    } catch (err) {
-      // If validation endpoint times out or is offline, continue gracefully
-    }
 
     let photoUrl = this.studentPhotoUrl?.value || '';
     let imageKitFileId = this.studentImageKitFileId?.value || '';

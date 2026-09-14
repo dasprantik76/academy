@@ -13,7 +13,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-8.52">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-8.94">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -52,6 +52,9 @@
           <i class="fa-solid fa-layer-group"></i>
           <span>Batches</span>
           <span class="nav-badge" id="batchCountBadge">0</span>
+        </a>
+        <a href="#certificates" class="nav-item" data-view="certificates" id="nav-certificates">
+          <i class="fa-solid fa-certificate"></i><span>Certificates</span>
         </a>
         <a href="#idcards" class="nav-item" data-view="idcards" id="nav-idcards">
           <i class="fa-solid fa-id-card"></i>
@@ -297,7 +300,7 @@
           <!-- Students List Table Card -->
           <div class="dashboard-card student-table-card">
             <div class="card-body">
-              <div class="table-responsive">
+              <div class="student-table-labels" id="studentTableLabels">
                 <table class="data-table" id="studentsTable">
                   <thead>
                     <tr>
@@ -332,9 +335,13 @@
                           <input type="hidden" id="studentStatusFilter" value="all">
                         </div>
                       </th>
-                      <th class="text-right"><span class="student-actions-label">Actions</span></th>
                     </tr>
                   </thead>
+                </table>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table" id="studentsRowsTable">
+                  <colgroup><col><col><col><col><col><col></colgroup>
                   <tbody id="studentsTableBody">
                     <!-- Rendered dynamically -->
                   </tbody>
@@ -367,7 +374,7 @@
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
-              <div class="custom-select-container idcards-filter-dropdown" id="batchStatusDropdown">
+              <div class="custom-select-container toolbar-filter-dropdown" id="batchStatusDropdown">
                 <button type="button" class="custom-select-trigger" id="batchStatusTrigger" aria-label="Filter batches by status" aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-filter select-icon"></i>
                   <span id="batchStatusDisplay">All Statuses</span>
@@ -379,6 +386,20 @@
                   <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
                 </ul>
                 <input type="hidden" id="batchStatusFilter" value="all">
+              </div>
+              <div class="custom-select-container toolbar-filter-dropdown card-sort-dropdown" id="batchSortDropdown">
+                <button type="button" class="custom-select-trigger" id="batchSortTrigger" aria-label="Sort batches by" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-arrow-down-wide-short select-icon"></i>
+                  <span id="batchSortDisplay">Sort by :&nbsp;Name (A → Z)</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="batchSortMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="name-asc" role="option">Name (A → Z)</li>
+                  <li class="custom-select-option" data-value="name-desc" role="option">Name (Z → A)</li>
+                  <li class="custom-select-option" data-value="newest" role="option">New → Old</li>
+                  <li class="custom-select-option" data-value="oldest" role="option">Old → New</li>
+                </ul>
+                <input type="hidden" id="batchSortValue" value="name-asc">
               </div>
             </div>
 
@@ -404,6 +425,95 @@
             <button class="btn btn-secondary btn-sm" id="btnResetBatchFilters" style="display: none;">
               <i class="fa-solid fa-rotate-left"></i> Reset Filters
             </button>
+          </div>
+        </section>
+
+        <section class="view-section" id="view-certificates">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="certificateSearch" placeholder="Search students...">
+                <button type="button" class="btn-clear-search" id="btnClearCertCardSearch" title="Clear search" style="display:none;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+
+          </div>
+
+          <div class="idcards-split-container">
+            <!-- Left Side: Student List & Filtering -->
+            <div class="dashboard-card idcards-list-panel">
+              <div class="idcards-panel-header">
+                <div class="idcards-filter-row">
+                  <div class="custom-select-container idcards-filter-dropdown" id="certCardCourseFilterDropdown">
+                    <button type="button" class="custom-select-trigger" id="certCardCourseFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                      <i class="fa-solid fa-filter select-icon"></i>
+                      <span id="certCardCourseFilterDisplay">All Courses</span>
+                      <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="certCardCourseFilterMenu" role="listbox">
+                      <li class="custom-select-option selected" data-value="all" role="option">All Courses</li>
+                    </ul>
+                    <input type="hidden" id="certificateCourse" value="all">
+                  </div>
+                  <div class="custom-select-container idcards-filter-dropdown" id="certCardBatchFilterDropdown">
+                    <button type="button" class="custom-select-trigger" id="certCardBatchFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                      <i class="fa-solid fa-filter select-icon"></i>
+                      <span id="certCardBatchFilterDisplay">All Batches</span>
+                      <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="certCardBatchFilterMenu" role="listbox">
+                      <li class="custom-select-option selected" data-value="all" role="option">All Batches</li>
+                    </ul>
+                    <input type="hidden" id="certificateBatch" value="all">
+                  </div>
+                  <button type="button" class="idcards-btn-clear-filter" id="btnClearCertCardFilter" title="Clear filters" disabled>Clear</button>
+                </div>
+              </div>
+
+              <!-- Column Header Row / Select All -->
+              <div class="idcards-select-all-row">
+                <div class="idcards-header-col-main">
+                  <label class="idcards-select-all-label" for="certificateSelectAll" title="Select All Students">
+                    <input type="checkbox" id="certificateSelectAll" class="custom-table-checkbox" aria-label="Select All Students">
+                    <span class="idcards-name-wrap">
+                      <span class="idcards-select-all-text">Student Name</span>
+                      <span class="student-selection-count idcards-selection-count-badge" id="certificateSelectionCount" aria-live="polite" hidden>0</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="idcards-header-col-status">
+                  <span class="idcards-select-all-text">Course Status</span>
+                </div>
+              </div>
+
+              <!-- Scrollable Student List -->
+              <div class="idcards-student-list" id="certificateStudents" role="listbox" aria-label="Student Selection List">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <div class="empty-state idcards-empty-list" id="certificateEmpty" style="display:none;">
+                <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+                <h4>No Students Found</h4>
+                <p>No student records match your search or filter.</p>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnResetCertCardFilters" style="margin-top: 0.5rem;">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+
+            <div class="idcards-preview-panel certificate-preview-panel">
+              <div class="certificate-preview-stage">
+                <canvas id="certificateCanvas" width="3722" height="2480" hidden aria-label="Certificate preview"></canvas>
+                <div class="idcard-no-selection" id="certificatePreviewEmpty"><div class="no-selection-icon"><i class="fa-solid fa-certificate"></i></div><h4>No Student Selected</h4><p>Select any student from the left list to preview their certificate.</p></div>
+              </div>
+              <p id="certCanvasStatus" role="status"></p>
+              <div class="idcards-preview-actions"><button type="button" class="btn btn-secondary idcard-download-btn" id="certificateDownloadSelected" disabled><i class="fa-solid fa-download"></i> Download Certificate</button></div>
+              <button id="btnDownloadCertificate" hidden disabled>Download</button><button id="btnPrintCertificate" hidden disabled>Print</button>
+            </div>
           </div>
         </section>
 
@@ -575,12 +685,13 @@
                       </div>
                     </div>
                   </div>
+
+                </div>
+              </div>
               <div class="idcards-preview-actions" id="idCardPreviewActions">
                 <button type="button" class="btn btn-secondary idcard-download-btn" id="btnDownloadIdCard" title="Download ID Card" disabled>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download ID Card
                 </button>
-              </div>
-                </div>
               </div>
             </div>
           </div>
@@ -597,6 +708,20 @@
                 <button class="btn-clear-search" id="btnClearCourseSearch" title="Clear search">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
+              </div>
+              <div class="custom-select-container toolbar-filter-dropdown card-sort-dropdown" id="courseSortDropdown">
+                <button type="button" class="custom-select-trigger" id="courseSortTrigger" aria-label="Sort courses by" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-arrow-down-wide-short select-icon"></i>
+                  <span id="courseSortDisplay">Sort by :&nbsp;Name (A → Z)</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="courseSortMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="name-asc" role="option">Name (A → Z)</li>
+                  <li class="custom-select-option" data-value="name-desc" role="option">Name (Z → A)</li>
+                  <li class="custom-select-option" data-value="newest" role="option">New → Old</li>
+                  <li class="custom-select-option" data-value="oldest" role="option">Old → New</li>
+                </ul>
+                <input type="hidden" id="courseSortValue" value="name-asc">
               </div>
             </div>
 
@@ -640,6 +765,9 @@
             </div>
 
             <div class="view-actions">
+              <button type="button" class="btn btn-danger" id="btnBulkDeleteInbox" title="Delete selected messages" disabled>
+                <i class="fa-regular fa-trash-can"></i> <span>Delete (<span id="inboxBulkDeleteCount">0</span>)</span>
+              </button>
               <button class="btn btn-primary" id="btnMarkAllInboxRead">
                 <i class="fa-regular fa-envelope-open"></i>
                 <span>Mark All Read</span>
@@ -657,14 +785,6 @@
                 <div class="inbox-header-info-col">
                   <span class="inbox-header-label">All Messages</span>
                   <span class="inbox-selection-count" id="inboxSelectionCount" aria-live="polite" hidden>0</span>
-                </div>
-                <div class="inbox-header-actions" id="inboxBulkActions" style="display: none;">
-                  <button type="button" class="btn btn-sm btn-secondary" id="btnBulkMarkInboxRead" title="Mark selected as read">
-                    <i class="fa-regular fa-envelope-open"></i> <span>Mark Read</span>
-                  </button>
-                  <button type="button" class="btn btn-sm btn-danger" id="btnBulkDeleteInbox" title="Delete selected messages">
-                    <i class="fa-regular fa-trash-can"></i> <span>Delete (<span id="inboxBulkDeleteCount">0</span>)</span>
-                  </button>
                 </div>
               </div>
               <div class="inbox-scroll-container">
@@ -1494,20 +1614,22 @@
             </div>
           </div>
           <p id="completionDurationError" class="completion-field-error" role="alert" hidden></p>
+          <div class="completion-issue-grade-row">
           <div class="form-group">
             <label for="completionIssueDate">Certificate Issue Date <span class="required">*</span></label>
             <div class="input-icon-wrap">
               <i class="fa-regular fa-calendar"></i>
               <input type="date" id="completionIssueDate" min="0001-01-01" max="9999-12-31" aria-describedby="completionIssueDateError" required>
             </div>
+            <p id="completionIssueDateError" class="completion-field-error" role="alert" hidden></p>
           </div>
-          <p id="completionIssueDateError" class="completion-field-error" role="alert" hidden></p>
           <div class="form-group">
             <label for="completionGrade">Grade <span class="required">*</span></label>
             <div class="input-icon-wrap">
               <i class="fa-solid fa-award"></i>
-              <input type="text" id="completionGrade" autocapitalize="characters" maxlength="30" placeholder="For example: A+" required>
+              <input type="text" id="completionGrade" autocapitalize="characters" maxlength="30" placeholder="e.g. A+" required>
             </div>
+          </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -1769,6 +1891,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=8.04"></script>
+  <script src="certificate-canvas.js?v=3"></script>
+  <script src="admin-script.js?v=8.25"></script>
 </body>
 </html>

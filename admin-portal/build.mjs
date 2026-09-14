@@ -6,6 +6,7 @@ const publicFiles = [
   'admin.html',
   'admin-config.js',
   'admin-script.js',
+  'certificate-canvas.js',
   'admin-style.css',
   'assets'
 ];
