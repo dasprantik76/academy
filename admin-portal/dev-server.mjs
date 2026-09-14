@@ -1,5 +1,6 @@
 import http from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, stat, cp } from 'node:fs/promises';
+import { watch } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -8,7 +9,90 @@ try { process.loadEnvFile(path.join(root, '.env.local')); }
 catch (error) { if (error.code !== 'ENOENT') throw error; }
 
 const routes = new Set(['google-login', 'data', 'imagekit-auth', 'pincode', 'validate-email']);
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp', '.woff2': 'font/woff2' };
+const types = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
+  '.json': 'application/json; charset=utf-8'
+};
+
+const liveClients = new Set();
+function notifyLiveReload() {
+  for (const client of liveClients) {
+    try {
+      client.write('data: reload\n\n');
+    } catch {}
+  }
+}
+
+const publicFiles = [
+  'index.html',
+  'admin.html',
+  'admin-config.js',
+  'admin-script.js',
+  'certificate-canvas.js',
+  'admin-style.css',
+  'assets'
+];
+
+let syncTimer = null;
+function scheduleSync(filename) {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      const publicRoot = path.join(root, 'public');
+      if (filename && publicFiles.includes(filename)) {
+        await cp(path.join(root, filename), path.join(publicRoot, filename), { recursive: true });
+      } else {
+        await Promise.all(
+          publicFiles.map(file => cp(path.join(root, file), path.join(publicRoot, file), { recursive: true }))
+        );
+      }
+      notifyLiveReload();
+    } catch (err) {
+      console.error('Auto-sync error:', err.message);
+    }
+  }, 80);
+}
+
+try {
+  watch(root, { recursive: false }, (eventType, filename) => {
+    if (filename && publicFiles.includes(filename)) {
+      scheduleSync(filename);
+    }
+  });
+} catch (e) {
+  console.warn('Watch notice:', e.message);
+}
+
+const LIVE_RELOAD_SNIPPET = `
+<!-- Live Reload Client -->
+<script>
+(() => {
+  let retries = 0;
+  function initLiveReload() {
+    const es = new EventSource('/_live_reload');
+    es.onmessage = (e) => {
+      if (e.data === 'reload') {
+        window.location.reload();
+      }
+    };
+    es.onerror = () => {
+      es.close();
+      if (++retries < 20) setTimeout(initLiveReload, 1500);
+    };
+  }
+  initLiveReload();
+})();
+</script>
+</body>`;
 
 const server = http.createServer(async (req, res) => {
   res.status = code => { res.statusCode = code; return res; };
@@ -16,6 +100,21 @@ const server = http.createServer(async (req, res) => {
   res.json = body => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(body)); };
   try {
     const url = new URL(req.url, 'http://localhost');
+
+    // Live reload SSE endpoint
+    if (url.pathname === '/_live_reload') {
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*'
+      });
+      res.write('retry: 1500\n\ndata: connected\n\n');
+      liveClients.add(res);
+      req.on('close', () => liveClients.delete(res));
+      return;
+    }
+
     if (url.pathname.startsWith('/api/')) {
       const route = url.pathname.slice(5).replace(/\.js$/, '');
       if (!routes.has(route)) return res.status(404).end('Not found');
@@ -32,7 +131,7 @@ const server = http.createServer(async (req, res) => {
         req.body = req.headers['content-type']?.includes('application/json')
           ? (body ? JSON.parse(body) : {}) : Object.fromEntries(new URLSearchParams(body));
       } catch { return res.status(400).end('Invalid request body'); }
-      const { default: handler } = await import(`./api/${route}.js`);
+      const { default: handler } = await import(`./api/${route}.js?t=${Date.now()}`);
       return await handler(req, res);
     }
     if (!['GET', 'HEAD'].includes(req.method)) {
@@ -43,23 +142,48 @@ const server = http.createServer(async (req, res) => {
       res.setHeader('Location', '/');
       return res.status(302).end();
     }
+    if (url.pathname === '/favicon.ico') {
+      res.writeHead(204).end();
+      return;
+    }
     const relative = decodeURIComponent(url.pathname).replace(/^\/+/, '') || 'index.html';
-    const publicRoot = path.join(root, 'public');
-    const file = path.resolve(publicRoot, relative);
-    if (!file.startsWith(publicRoot + path.sep) || relative.split('/').some(part => part.startsWith('.'))) {
+    let targetRoot = path.join(root, 'public');
+    let targetRelative = relative;
+    if (relative.startsWith('public-site/') || relative === 'public-site') {
+      targetRoot = path.join(root, 'public-site');
+      targetRelative = relative.replace(/^public-site\/?/, '') || 'index.html';
+    }
+    const file = path.resolve(targetRoot, targetRelative);
+    if ((!file.startsWith(targetRoot + path.sep) && file !== targetRoot) || relative.split('/').some(part => part.startsWith('.'))) {
       return res.status(404).end('Not found');
     }
     const info = await stat(file);
     if (!info.isFile()) return res.status(404).end('Not found');
-    res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
+    
+    const ext = path.extname(file);
+    res.setHeader('Content-Type', types[ext] || 'application/octet-stream');
     res.setHeader('Cache-Control', 'no-store');
-    res.end(req.method === 'HEAD' ? undefined : await readFile(file));
+
+    if (req.method === 'HEAD') {
+      return res.end();
+    }
+
+    let fileContent = await readFile(file);
+    if (ext === '.html') {
+      const html = fileContent.toString('utf8');
+      if (html.includes('</body>')) {
+        fileContent = Buffer.from(html.replace('</body>', LIVE_RELOAD_SNIPPET));
+      }
+    }
+    res.end(fileContent);
   } catch (error) {
     console.error('Local request failed:', error.message);
     if (!res.headersSent) res.status(error.code === 'ENOENT' ? 404 : 500);
     res.end('Request failed');
   }
 });
-server.listen(Number(process.env.PORT || 4000), '127.0.0.1', () => {
-  console.log(`Academy portal: http://localhost:${server.address().port}`);
+
+const PORT = Number(process.env.PORT || 4000);
+server.listen(PORT, () => {
+  console.log(`Live Server running at http://localhost:${PORT} and http://127.0.0.1:${PORT}`);
 });

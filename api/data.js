@@ -1352,23 +1352,60 @@ export default async function handler(req, res) {
           return res.status(200).json({ success: true, batchId });
         }
 
+        case 'mark_all_messages_read': {
+          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail });
+          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[ownerEmail]) {
+            const seed = DEFAULT_MESSAGES_BY_TENANT[ownerEmail].map(m => ({
+              ...m,
+              isRead: true,
+              readAt: new Date().toISOString()
+            }));
+            await db.collection(COLLECTIONS.MESSAGES).insertMany(seed);
+          } else {
+            await db.collection(COLLECTIONS.MESSAGES).updateMany(
+              { ownerEmail, isRead: false },
+              { $set: { isRead: true, readAt: new Date().toISOString() } }
+            );
+          }
+          return res.status(200).json({ success: true });
+        }
+
         case 'mark_message_read': {
           const messageId = String(payload?.messageId || '').trim();
           if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
-          await db.collection(COLLECTIONS.MESSAGES).updateOne(
-            { id: messageId, ownerEmail },
-            { $set: { isRead: true, readAt: new Date().toISOString() } }
-          );
+          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail });
+          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[ownerEmail]) {
+            const seed = DEFAULT_MESSAGES_BY_TENANT[ownerEmail].map(m => ({
+              ...m,
+              isRead: m.id === messageId ? true : m.isRead,
+              readAt: m.id === messageId ? new Date().toISOString() : m.readAt
+            }));
+            await db.collection(COLLECTIONS.MESSAGES).insertMany(seed);
+          } else {
+            await db.collection(COLLECTIONS.MESSAGES).updateOne(
+              { id: messageId, ownerEmail },
+              { $set: { isRead: true, readAt: new Date().toISOString() } }
+            );
+          }
           return res.status(200).json({ success: true });
         }
 
         case 'mark_message_unread': {
           const messageId = String(payload?.messageId || '').trim();
           if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
-          await db.collection(COLLECTIONS.MESSAGES).updateOne(
-            { id: messageId, ownerEmail },
-            { $set: { isRead: false }, $unset: { readAt: '' } }
-          );
+          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail });
+          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[ownerEmail]) {
+            const seed = DEFAULT_MESSAGES_BY_TENANT[ownerEmail].map(m => ({
+              ...m,
+              isRead: m.id === messageId ? false : m.isRead
+            }));
+            await db.collection(COLLECTIONS.MESSAGES).insertMany(seed);
+          } else {
+            await db.collection(COLLECTIONS.MESSAGES).updateOne(
+              { id: messageId, ownerEmail },
+              { $set: { isRead: false }, $unset: { readAt: '' } }
+            );
+          }
           return res.status(200).json({ success: true });
         }
 

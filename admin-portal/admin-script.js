@@ -1300,7 +1300,7 @@ class UIController {
     // Check Authentication Session Gate
     const rawSession = localStorage.getItem(STORAGE_KEYS.SESSION);
     if (!rawSession) {
-      window.location.href = 'index.html';
+      window.location.href = 'index.html' + (window.location.hash || '');
       return;
     }
 
@@ -1309,12 +1309,12 @@ class UIController {
       const userEmail = (this.session?.email || '').toLowerCase().trim();
       if (!this.session || this.session.provider !== 'google' || !userEmail) {
         localStorage.removeItem(STORAGE_KEYS.SESSION);
-        window.location.href = 'index.html';
+        window.location.href = 'index.html' + (window.location.hash || '');
         return;
       }
     } catch (e) {
       localStorage.removeItem(STORAGE_KEYS.SESSION);
-      window.location.href = 'index.html';
+      window.location.href = 'index.html' + (window.location.hash || '');
       return;
     }
 
@@ -2205,7 +2205,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses', 'batches', 'certificates', 'idcards', 'inbox'].includes(hash)) {
+      if (['dashboard', 'students', 'courses', 'batches', 'certificates', 'idcards', 'inbox', 'personalisation'].includes(hash)) {
         this.switchView(hash, false);
       }
     });
@@ -4139,7 +4139,7 @@ class UIController {
         this.previewCertificate(students[0].id);
       } else {
         this.certificatePreviewId = null;
-        window.CertificateCanvas.clear();
+        if (window.CertificateCanvas?.clear) window.CertificateCanvas.clear();
         document.getElementById('certificateCanvas').hidden = true;
         document.getElementById('certificatePreviewEmpty').hidden = false;
       }
@@ -4179,7 +4179,9 @@ class UIController {
     this.certificatePreviewId = id;
     document.getElementById('btnClearCertCardFilter').disabled = false;
     document.getElementById('certificateDownloadSelected').disabled = false;
-    window.CertificateCanvas.render(student, store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]), this.getCertificateVerificationUrl(student));
+    if (window.CertificateCanvas?.render) {
+      window.CertificateCanvas.render(student, store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]), this.getCertificateVerificationUrl(student));
+    }
   }
 
   renderIdCardsView() {

@@ -1,6 +1,7 @@
 {
   "name": "academy-portal",
   "version": "1.0.0",
+  "type": "module",
   "description": "Universal Academy Management and Student Registration Portal with MongoDB Database",
   "main": "api/data.js",
   "scripts": {

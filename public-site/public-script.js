@@ -1299,24 +1299,9 @@ class PublicAcademyApp {
     this.populateCourseDropdown();
   }
 
-  renderHomeCourses() {
-    const courseGrids = [this.homeCoursesGrid, this.coursesPageGrid].filter(Boolean);
-    if (courseGrids.length === 0) return;
-
-    if (this.courses.length === 0) {
-      const emptyState = `
-        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem 1.5rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
-          <i class="fa-solid fa-desktop" style="font-size: 2rem; color: var(--text-subtle); margin-bottom: 0.75rem; display: block;"></i>
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Programs Coming Soon</h3>
-          <p style="font-size: 0.875rem;">Courses are currently being updated by the academy administration.</p>
-        </div>
-      `;
-      courseGrids.forEach(grid => { grid.innerHTML = emptyState; });
-      return;
-    }
-
+  renderCoursesCards(coursesList) {
     const courseIcons = ['fa-laptop-code', 'fa-code', 'fa-graduation-cap', 'fa-file-word', 'fa-calculator', 'fa-pen-nib'];
-    const courseCards = this.courses.map((course, index) => `
+    return coursesList.map((course, index) => `
       <div class="course-card">
         <div class="course-card-header">
           <span class="course-card-icon" aria-hidden="true"><i class="fa-solid ${courseIcons[index % courseIcons.length]}"></i></span>
@@ -1333,7 +1318,49 @@ class PublicAcademyApp {
         </div>
       </div>
     `).join('');
-    courseGrids.forEach(grid => { grid.innerHTML = courseCards; });
+  }
+
+  renderHomeCourses() {
+    if (!this.homeCoursesGrid && !this.coursesPageGrid) return;
+
+    if (this.courses.length === 0) {
+      const emptyState = `
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 3rem 1.5rem; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+          <i class="fa-solid fa-desktop" style="font-size: 2rem; color: var(--text-subtle); margin-bottom: 0.75rem; display: block;"></i>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Programs Coming Soon</h3>
+          <p style="font-size: 0.875rem;">Courses are currently being updated by the academy administration.</p>
+        </div>
+      `;
+      if (this.homeCoursesGrid) this.homeCoursesGrid.innerHTML = emptyState;
+      if (this.coursesPageGrid) this.coursesPageGrid.innerHTML = emptyState;
+      return;
+    }
+
+    // Sort all courses so the 6 firstly added courses (CRS-101 through CRS-106) appear first,
+    // followed by any subsequent courses.
+    const primaryEstablishedIds = ['CRS-101', 'CRS-102', 'CRS-103', 'CRS-104', 'CRS-105', 'CRS-106'];
+    const allCourses = [...this.courses].sort((a, b) => {
+      const indexA = primaryEstablishedIds.indexOf(a.id);
+      const indexB = primaryEstablishedIds.indexOf(b.id);
+      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+      const timeA = Date.parse(a.createdAt) || 0;
+      const timeB = Date.parse(b.createdAt) || 0;
+      if (timeA && timeB && timeA !== timeB) return timeA - timeB;
+      return (a.id || '').localeCompare(b.id || '', undefined, { numeric: true });
+    });
+
+    // 1. Home Page: display ONLY the 6 firstly added courses
+    if (this.homeCoursesGrid) {
+      const homeCourses = allCourses.slice(0, 6);
+      this.homeCoursesGrid.innerHTML = this.renderCoursesCards(homeCourses);
+    }
+
+    // 2. Courses Page: display ALL courses in the public website
+    if (this.coursesPageGrid) {
+      this.coursesPageGrid.innerHTML = this.renderCoursesCards(allCourses);
+    }
   }
 
   populateCourseDropdown() {

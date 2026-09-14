@@ -66,8 +66,13 @@
       </div>
 
       <!-- Google Sign In Section -->
-      <div class="login-actions" style="margin: 1.75rem 0 1rem 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <div class="login-actions" style="margin: 1.75rem 0 1rem 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
         <div id="googleSignInBtn" aria-label="Sign in with Google"></div>
+        <div id="devSignInContainer" style="display: none; margin-top: 0.85rem; width: 100%; max-width: 320px;">
+          <button type="button" class="btn-google-action" id="btnDevSignIn" style="background:#f8fafc; border:1.5px solid #cbd5e1; color:#334155; font-size:0.875rem;">
+            <i class="fa-solid fa-laptop-code"></i> Dev Sign-In (Localhost)
+          </button>
+        </div>
       </div>
 
       <!-- Footer Security Notice -->
@@ -95,12 +100,31 @@
         const session = JSON.parse(existingSession);
         const userEmail = (session?.email || '').toLowerCase().trim();
         if (session && session.provider === 'google' && userEmail) {
-          window.location.href = 'admin.html';
+          window.location.href = 'admin.html' + (window.location.hash || '');
         } else {
           localStorage.removeItem(SESSION_KEY);
         }
       } catch (e) {
         localStorage.removeItem(SESSION_KEY);
+      }
+    }
+
+    if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+      const devContainer = document.getElementById('devSignInContainer');
+      const devBtn = document.getElementById('btnDevSignIn');
+      if (devContainer && devBtn) {
+        devContainer.style.display = 'block';
+        devBtn.addEventListener('click', () => {
+          const devSession = {
+            name: 'Admin Developer',
+            email: 'admin@pixelsetu.com',
+            avatar: '',
+            provider: 'google',
+            loggedInAt: Date.now()
+          };
+          localStorage.setItem(SESSION_KEY, JSON.stringify(devSession));
+          window.location.href = 'admin.html' + (window.location.hash || '');
+        });
       }
     }
 
