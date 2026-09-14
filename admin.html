@@ -13,7 +13,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-8.08">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-8.52">
   <script src="admin-config.js?v=3.2"></script>
 </head>
 <body>
@@ -311,6 +311,7 @@
                         </span>
                       </th>
                       <th class="text-center">Student ID</th>
+                      <th class="text-center">Enrolled Courses</th>
                       <th class="text-center">Registration Date</th>
                       <th class="text-center">
                         <div class="custom-select-container th-status-header-wrap th-minimal-dropdown" id="adminStudentStatusFilterDropdown">
@@ -331,7 +332,7 @@
                           <input type="hidden" id="studentStatusFilter" value="all">
                         </div>
                       </th>
-                      <th class="text-right">Actions</th>
+                      <th class="text-right"><span class="student-actions-label">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody id="studentsTableBody">
@@ -366,6 +367,19 @@
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
+              <div class="custom-select-container idcards-filter-dropdown" id="batchStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="batchStatusTrigger" aria-label="Filter batches by status" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-filter select-icon"></i>
+                  <span id="batchStatusDisplay">All Statuses</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="batchStatusMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
+                  <li class="custom-select-option" data-value="Active" role="option">Active</li>
+                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                </ul>
+                <input type="hidden" id="batchStatusFilter" value="all">
+              </div>
             </div>
 
             <div class="view-actions">
@@ -388,7 +402,7 @@
               <i class="fa-solid fa-plus"></i> Create Batch
             </button>
             <button class="btn btn-secondary btn-sm" id="btnResetBatchFilters" style="display: none;">
-              <i class="fa-solid fa-rotate-left"></i> Reset Search
+              <i class="fa-solid fa-rotate-left"></i> Reset Filters
             </button>
           </div>
         </section>
@@ -406,13 +420,7 @@
               </div>
             </div>
 
-            <div class="view-actions">
-              <div class="idcards-preview-actions" id="idCardPreviewActions">
-                <button type="button" class="btn btn-secondary idcard-download-btn" id="btnDownloadIdCard" title="Download ID Card" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download ID Card
-                </button>
-              </div>
-            </div>
+
           </div>
 
           <div class="idcards-split-container">
@@ -567,6 +575,11 @@
                       </div>
                     </div>
                   </div>
+              <div class="idcards-preview-actions" id="idCardPreviewActions">
+                <button type="button" class="btn btn-secondary idcard-download-btn" id="btnDownloadIdCard" title="Download ID Card" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download ID Card
+                </button>
+              </div>
                 </div>
               </div>
             </div>
@@ -608,7 +621,7 @@
             <h4>No Courses Found</h4>
             <p>No courses match your search keywords.</p>
             <button class="btn btn-secondary btn-sm" id="btnResetCourseFilters">
-              <i class="fa-solid fa-rotate-left"></i> Reset Search
+              <i class="fa-solid fa-rotate-left"></i> Reset Filters
             </button>
           </div>
         </section>
@@ -666,7 +679,7 @@
                   <h4 id="inboxEmptyTitle">No Messages Yet</h4>
                   <p id="inboxEmptyDesc">Messages sent through the public website will appear here.</p>
                   <button class="btn btn-secondary btn-sm" id="btnResetInboxSearch" style="display: none;">
-                    <i class="fa-solid fa-rotate-left"></i> Reset Search
+                    <i class="fa-solid fa-rotate-left"></i> Reset Filters
                   </button>
                 </div>
               </div>
@@ -1756,6 +1769,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- JavaScript -->
-  <script src="admin-script.js?v=7.95"></script>
+  <script src="admin-script.js?v=8.04"></script>
 </body>
 </html>

@@ -1452,6 +1452,46 @@ class UIController {
     this.btnAddStudent = document.getElementById('btnAddStudent');
     this.selectAllStudentsCheckbox = document.getElementById('selectAllStudentsCheckbox');
     this.studentsTableBody = document.getElementById('studentsTableBody');
+    // Keep the edge columns anchored and space only the four middle labels.
+    const studentsTable = document.getElementById('studentsTable');
+    if (studentsTable) {
+      const alignStudentColumns = () => {
+        const tableWidth = studentsTable.getBoundingClientRect().width;
+        if (!tableWidth) return;
+        const headers = [...studentsTable.querySelectorAll('thead th')];
+        const middleHeaders = headers.slice(2, 6);
+        const labelWidths = middleHeaders.map(header => {
+          const label = header.querySelector('.th-status-header-wrap') || header;
+          const range = document.createRange();
+          range.selectNodeContents(label);
+          return range.getBoundingClientRect().width;
+        });
+        const checkboxWidth = headers[0].getBoundingClientRect().width;
+        const nameWidth = Math.max(180, Math.min(240, tableWidth * 0.18));
+        const actionsStyle = getComputedStyle(headers[6]);
+        const actionsWidth = headers[6].querySelector('.student-actions-label').getBoundingClientRect().width
+          + parseFloat(actionsStyle.paddingLeft) + parseFloat(actionsStyle.paddingRight);
+        const available = tableWidth - checkboxWidth - nameWidth - actionsWidth;
+        const gap = (available - labelWidths.reduce((sum, width) => sum + width, 0)) / middleHeaders.length;
+        if (gap < 0) return;
+        headers[1].style.width = `${nameWidth}px`;
+        headers[6].style.width = `${actionsWidth}px`;
+        middleHeaders.forEach((header, index) => {
+          header.style.width = `${labelWidths[index] + gap}px`;
+        });
+        // Move only the name/ID boundary so ID is midway between label centers.
+        const nameLabel = headers[1].querySelector('.th-student-label-wrap > span');
+        const nameLabelWidth = nameLabel.getBoundingClientRect().width;
+        const coursesWidth = labelWidths[1] + gap;
+        const adjustedNameWidth = (nameLabelWidth + coursesWidth) / 2;
+        const adjustedIdWidth = nameWidth + labelWidths[0] + gap - adjustedNameWidth;
+        headers[1].style.width = `${adjustedNameWidth}px`;
+        headers[2].style.width = `${adjustedIdWidth}px`;
+      };
+      this.studentColumnsResizeObserver = new ResizeObserver(alignStudentColumns);
+      this.studentColumnsResizeObserver.observe(studentsTable.parentElement);
+      document.fonts.ready.then(alignStudentColumns);
+    }
     this.studentsEmptyState = document.getElementById('studentsEmptyState');
     this.studentFilteredCount = document.getElementById('studentFilteredCount');
     this.studentTotalCount = document.getElementById('studentTotalCount');
@@ -2479,8 +2519,23 @@ class UIController {
       });
     }
 
+    this.batchStatusFilter = document.getElementById('batchStatusFilter');
+    this.batchStatusDropdown = document.getElementById('batchStatusDropdown');
+    this.batchStatusMenu = document.getElementById('batchStatusMenu');
+    this.batchStatusDisplay = document.getElementById('batchStatusDisplay');
+    this.setupAdminDropdown(
+      this.batchStatusDropdown,
+      document.getElementById('batchStatusTrigger'),
+      this.batchStatusMenu,
+      this.batchStatusDisplay,
+      this.batchStatusFilter,
+      () => this.renderBatchesView()
+    );
+
     if (this.btnResetBatchFilters) {
       this.btnResetBatchFilters.addEventListener('click', () => {
+        this.setAdminDropdownValue(this.batchStatusDropdown, this.batchStatusMenu,
+          this.batchStatusDisplay, this.batchStatusFilter, 'all', 'All Statuses');
         if (this.batchSearchInput) this.batchSearchInput.value = '';
         this.batchSearchQuery = '';
         if (this.btnClearBatchSearch) this.btnClearBatchSearch.style.display = 'none';
@@ -2489,7 +2544,36 @@ class UIController {
     }
 
     if (this.batchesGrid) {
+      const updateBatchSearchWidth = () => {
+        // Include the reserved scrollbar gutter in the outer right spacing.
+        const scrollbarWidth = this.batchesGrid.offsetWidth - this.batchesGrid.clientWidth;
+        this.batchesGrid.style.setProperty('--batch-scrollbar-width', `${scrollbarWidth}px`);
+        const styles = getComputedStyle(this.batchesGrid);
+        const columns = styles.gridTemplateColumns.split(' ').map(parseFloat).filter(Number.isFinite);
+        const width = columns.length > 1
+          ? columns[0] + parseFloat(styles.columnGap) + columns[1] / 2
+          : columns[0];
+        if (width) document.getElementById('view-batches').style.setProperty('--batch-search-width', `${width}px`);
+      };
+      this.batchGridResizeObserver = new ResizeObserver(updateBatchSearchWidth);
+      this.batchGridResizeObserver.observe(this.batchesGrid);
+      const batchToolbar = document.querySelector('#view-batches .view-header-bar');
+      if (batchToolbar) {
+        this.batchToolbarResizeObserver = new ResizeObserver(() => {
+          const height = batchToolbar.getBoundingClientRect().height;
+          if (height > 0) {
+            document.getElementById('view-batches').style.setProperty('--batch-toolbar-height', `${height}px`);
+          }
+        });
+        this.batchToolbarResizeObserver.observe(batchToolbar);
+      }
+      let batchScrollbarTimer;
       const updateBatchesHeaderScroll = () => {
+        this.batchesGrid.classList.add('is-scrolling');
+        clearTimeout(batchScrollbarTimer);
+        batchScrollbarTimer = setTimeout(() => {
+          this.batchesGrid.classList.remove('is-scrolling');
+        }, 900);
         const isScrolled = this.batchesGrid.scrollTop > 2;
         document.querySelector('#view-batches .view-header-bar')?.classList.toggle('is-scrolled', isScrolled);
       };
@@ -3451,6 +3535,9 @@ class UIController {
           <td class="text-center">
             <span class="student-id-cell">${escapeHtml(student.id)}</span>
           </td>
+          <td class="text-center student-courses-cell">
+            ${enrolledCoursesBadges || '<span class="text-muted">No courses</span>'}
+          </td>
           <td class="text-center">${formatDate(student.joinDate)}</td>
           <td class="text-center">
             <span class="badge ${getStatusBadgeClass(student.status)}">
@@ -3550,13 +3637,20 @@ class UIController {
       });
     }
 
+    const statusFilter = this.batchStatusFilter?.value || 'all';
+    this.batchStatusDropdown?.classList.toggle('is-filtered', statusFilter !== 'all');
+    if (statusFilter !== 'all') {
+      filteredBatches = filteredBatches.filter(batch =>
+        (batch.status === 'Completed' ? 'Completed' : 'Active') === statusFilter);
+    }
+
     if (filteredBatches.length === 0) {
       this.batchesGrid.innerHTML = '';
       this.batchesEmptyState.style.display = 'flex';
       if (this.batchesEmptyTitle && this.batchesEmptyDesc) {
-        if (this.batchSearchQuery) {
+        if (this.batchSearchQuery || statusFilter !== 'all') {
           this.batchesEmptyTitle.textContent = 'No Batches Found';
-          this.batchesEmptyDesc.textContent = 'No batches match your search keywords.';
+          this.batchesEmptyDesc.textContent = 'No batches match your search and status filter.';
           if (this.btnResetBatchFilters) this.btnResetBatchFilters.style.display = 'inline-flex';
           if (this.btnEmptyCreateBatch) this.btnEmptyCreateBatch.style.display = 'none';
         } else {

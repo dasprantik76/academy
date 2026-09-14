@@ -39,6 +39,8 @@
 
   --bg-main: #9baab8;
   --bg-main-rgb: 155, 170, 184;
+  --bg-main-scrolled: #788a9c;
+  --bg-main-scrolled-rgb: 120, 138, 156;
   --surface-card: #ffffff;
   --surface-muted: #f1f5f9;
   --surface-hover: #f8fafc;
@@ -445,6 +447,7 @@ html, body {
   flex-direction: column;
   min-width: 0;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .top-header {
@@ -576,7 +579,7 @@ html, body {
 .content-container {
   padding: 2rem;
   flex: 1;
-  max-width: 1440px;
+  max-width: none;
   width: 100%;
   margin: 0 auto;
 }
@@ -616,69 +619,93 @@ html, body {
 #view-batches .view-header-bar {
   position: relative;
   z-index: 10;
-  background-color: var(--bg-main);
-  padding-bottom: 1.5rem;
+  background-color: rgba(155, 170, 184, 0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  margin-top: -2rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
   margin-bottom: 0;
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  margin-left: -9999px;
+  margin-right: -9999px;
+  padding-left: 9999px;
+  padding-right: 9999px;
+  transition: background-color 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+#view-batches .view-header-bar.is-scrolled {
+  background-color: rgba(var(--bg-main-scrolled-rgb), 0.85);
+  box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.12);
+  transition-duration: 1s;
+  transition-timing-function: ease-in-out;
 }
 
 #view-batches .view-header-bar::after {
   content: '';
   position: absolute;
-  left: -0.5rem;
-  right: -0.5rem;
+  left: 0;
+  right: 0;
   top: calc(100% - 1px);
   height: 4px;
   background: linear-gradient(
     to bottom,
-    var(--bg-main) 0%,
-    rgba(var(--bg-main-rgb), 0) 100%
+    rgba(var(--bg-main-scrolled-rgb), 0.85) 0%,
+    rgba(var(--bg-main-scrolled-rgb), 0) 100%
   );
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition: opacity 180ms ease-out;
 }
 
 #view-batches .view-header-bar.is-scrolled::after {
   opacity: 1;
+  transition-duration: 1s;
+  transition-timing-function: ease-in-out;
 }
 
 #view-batches .batches-grid {
   flex: 1;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   min-height: 0;
-  margin-top: -1.5rem;
+  grid-auto-rows: max-content;
+  align-content: start;
+  margin-top: calc(-1 * var(--batch-toolbar-height, 106px));
   margin-left: -4px;
-  margin-right: -1rem;
-  padding: 1.5rem 1rem 2rem 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(203, 213, 225, 0.6) transparent;
+  margin-right: -2rem;
+  padding: var(--batch-toolbar-height, 106px) max(0px, calc(2rem - var(--batch-scrollbar-width, 0px))) 2rem 4px;
+  scrollbar-width: auto;
+  scrollbar-color: auto;
   transition: scrollbar-color 0.3s ease;
 }
 
-#view-batches .batches-grid:hover {
-  scrollbar-color: #cbd5e1 transparent;
-}
-
 #view-batches .batches-grid::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
+  display: block;
 }
 
 #view-batches .batches-grid::-webkit-scrollbar-track {
   background: transparent;
+  margin-top: calc(var(--batch-toolbar-height, 106px) + 16px);
+  border-radius: 9999px;
 }
 
 #view-batches .batches-grid::-webkit-scrollbar-thumb {
-  background: rgba(203, 213, 225, 0.6);
+  background: transparent;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  min-height: 40px;
   border-radius: 9999px;
   transition: background-color 0.2s ease;
 }
 
-#view-batches .batches-grid:hover::-webkit-scrollbar-thumb {
-  background: #94a3b8;
+#view-batches .batches-grid.is-scrolling::-webkit-scrollbar-thumb,
+#view-batches .batches-grid::-webkit-scrollbar-thumb:hover {
+  background-color: #dbe4ee;
+}
+
+#view-batches .batches-grid.is-scrolling::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.12);
 }
 
 #view-idcards {
@@ -769,7 +796,7 @@ html, body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .search-filter-group {
@@ -1195,15 +1222,9 @@ html, body {
   background: #fef2f2;
 }
 
-.batches-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.25rem;
-}
-
 .batch-card {
   aspect-ratio: 1 / 0.88;
-  min-height: 275px;
+  min-height: 250px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1242,7 +1263,11 @@ html, body {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-main);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -2181,12 +2206,12 @@ button:hover,
 
 .data-table th:first-child,
 .data-table td:first-child {
-  padding-left: 1.5rem;
+  padding-left: 2rem;
 }
 
 .data-table th:last-child,
 .data-table td:last-child {
-  padding-right: 2.5rem;
+  padding-right: 2rem;
 }
 
 .student-table-card {
@@ -2228,15 +2253,14 @@ button:hover,
   box-shadow: inset 0 -2px 0 #cbd5e1;
 }
 
-/* Keep the checkbox column fixed with symmetric 1.5rem (24px) padding so the
-   checkbox has equal padding on both sides, identical to ID cards. */
+/* Match the ID Cards student column's checkbox size and symmetric spacing. */
 #studentsTable th:first-child,
 #studentsTable td:first-child,
 .th-checkbox-col,
 .td-checkbox-col {
-  width: 66px;
-  min-width: 66px;
-  max-width: 66px;
+  width: calc(3rem + 18px);
+  min-width: calc(3rem + 18px);
+  max-width: calc(3rem + 18px);
   padding-left: 1.5rem !important;
   padding-right: 1.5rem !important;
   box-sizing: border-box;
@@ -2250,9 +2274,9 @@ button:hover,
   margin: 0 auto;
 }
 
-#studentsTable th:nth-child(2),
-#studentsTable td:nth-child(2) {
-  padding-left: 0 !important;
+#studentsTable tbody td {
+  padding-top: 1.15rem;
+  padding-bottom: 1.15rem;
 }
 
 .student-table-card.is-empty .table-responsive,
@@ -2416,23 +2440,58 @@ button:hover,
   width: 100%;
 }
 
-#studentsTable th:nth-child(1) { width: 66px; }
-#studentsTable th:nth-child(2) { width: calc((100% - 66px) * 0.18); min-width: 160px; }
-#studentsTable th:nth-child(3) { width: calc((100% - 66px) * 0.21); }
-#studentsTable th:nth-child(4) { width: calc((100% - 66px) * 0.23); }
-#studentsTable th:nth-child(5) { width: calc((100% - 66px) * 0.23); }
-#studentsTable th:nth-child(6) { width: calc((100% - 66px) * 0.15); }
+/* Reserve space for all seven columns and scroll on narrower screens. */
+#studentsTable { min-width: 1080px; }
+#studentsTable th:nth-child(1) { width: calc(3rem + 18px); }
+/* Fallback widths; measured header labels determine the final column widths. */
+#studentsTable th:not(:first-child) {
+  width: calc((100% - 3rem - 18px) / 6);
+}
 
-#studentsTable th:nth-child(3),
-#studentsTable td:nth-child(3),
-#studentsTable th:nth-child(4),
-#studentsTable td:nth-child(4),
-#studentsTable th:nth-child(5),
-#studentsTable td:nth-child(5) {
+#studentsTable th:not(:first-child),
+#studentsTable td:not(:first-child) {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  text-align: left;
+}
+
+#studentsTable .table-actions {
+  justify-content: flex-end;
+}
+
+#studentsTable .student-actions-label {
+  display: block;
+  width: calc(64px + 0.4rem);
+  margin-left: auto;
   text-align: center;
 }
 
-#studentsTable th:nth-child(5) .th-status-header-wrap {
+#studentsTable th:last-child,
+#studentsTable td:last-child {
+  padding-right: 1.5rem;
+}
+
+/* The checkbox cell already supplies the ID Cards 1.5rem name gap. */
+#studentsTable th:nth-child(2),
+#studentsTable td:nth-child(2) {
+  padding-left: 0;
+  text-align: left;
+}
+
+#studentsTable th:nth-child(n + 3),
+#studentsTable td:nth-child(n + 3) {
+  text-align: center;
+}
+
+#studentsTable .student-courses-cell .badge-course-tag {
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+#studentsTable th:nth-child(6) .th-status-header-wrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2490,7 +2549,8 @@ button:hover,
 /* ==========================================================================
    Courses Grid View
    ========================================================================== */
-.courses-grid {
+.courses-grid,
+.batches-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 1.25rem;
@@ -4231,6 +4291,27 @@ input[data-capitalize="true"] {
 /* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
+@media (min-width: 769px) {
+  #view-students .search-filter-group {
+    flex: 1 1 484px;
+    flex-wrap: nowrap;
+  }
+
+  #view-students .search-box {
+    flex: 1.6 1 240px;
+    min-width: 180px;
+  }
+
+  #view-students .toolbar-filter-dropdown {
+    flex: 1 1 170px;
+    min-width: 140px;
+  }
+
+  #view-students .view-actions {
+    flex: 0 0 auto;
+  }
+}
+
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -4283,10 +4364,22 @@ input[data-capitalize="true"] {
   }
 
   #view-batches .view-header-bar {
-    margin-left: -0.75rem;
-    margin-right: -0.75rem;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+    margin-top: -1.25rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    margin-left: -9999px;
+    margin-right: -9999px;
+    padding-left: 9999px;
+    padding-right: 9999px;
+  }
+
+  .view-header-bar {
+    margin-bottom: 1.25rem;
+  }
+
+  #view-batches .batches-grid {
+    margin-right: -1rem;
+    padding-right: max(0px, calc(1rem - var(--batch-scrollbar-width, 0px)));
   }
 
   .inbox-row-sender {
@@ -4362,10 +4455,20 @@ input[data-capitalize="true"] {
   #view-inbox.active { height: calc(100vh - var(--header-height) - 2rem); min-height: 380px; }
   #view-batches.active { height: calc(100vh - var(--header-height) - 1rem); margin-bottom: -1rem; min-height: 380px; }
   #view-batches .view-header-bar {
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    margin-top: -1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-left: -9999px;
+    margin-right: -9999px;
+    padding-left: 9999px;
+    padding-right: 9999px;
+  }
+  .view-header-bar {
+    margin-bottom: 1rem;
+  }
+  #view-batches .batches-grid {
+    margin-right: -0.75rem;
+    padding-right: max(0px, calc(0.75rem - var(--batch-scrollbar-width, 0px)));
   }
   .card-header,
   .card-body,
@@ -5124,7 +5227,12 @@ button.is-loading,
 .idcards-preview-actions {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.625rem;
+  margin-top: 3.5rem;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
 }
 
 .idcard-download-btn,
@@ -5385,4 +5493,19 @@ button.is-loading,
   max-width: 280px;
 }
 
+/* Size the batch search against the rendered card columns. */
+#view-batches .search-box {
+  flex: 0 1 var(--batch-search-width, 380px);
+  width: var(--batch-search-width, 380px);
+  max-width: 100%;
+}
 
+#batchStatusDropdown {
+  flex: 0 0 180px;
+  min-width: 170px;
+}
+
+@media (max-width: 768px) {
+  #view-batches .search-box { flex: none; width: 100%; }
+  #batchStatusDropdown { flex: none; width: 100%; }
+}
