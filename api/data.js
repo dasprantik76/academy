@@ -137,7 +137,32 @@ const DEFAULT_COURSES_BY_TENANT = {
       duration: '6 Months',
       description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.',
       ownerEmail: 'dasprantik76@gmail.com'
-    }
+    },
+    {"id": "CRS-DEMO-001", "title": "Advanced Excel & MIS Reporting", "duration": "3 Months", "description": "Build spreadsheet models using lookup functions, PivotTables, data validation, Power Query, and interactive dashboards. Complete a monthly sales reporting project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-002", "title": "Python Programming", "duration": "4 Months", "description": "Learn variables, control flow, functions, collections, file handling, exceptions, and object-oriented programming. Build command-line utilities and automate routine tasks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-003", "title": "Data Analysis with Python", "duration": "6 Months", "description": "Clean and explore datasets with pandas and NumPy, visualize results with Matplotlib, and summarize findings using descriptive statistics and reproducible notebooks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-004", "title": "SQL & Database Design", "duration": "3 Months", "description": "Write queries with joins, subqueries, aggregate functions, and window functions. Design relational schemas, apply normalization, and practice transactions and indexing.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-005", "title": "Power BI Dashboard Development", "duration": "3 Months", "description": "Import and transform data with Power Query, build relationships and DAX measures, and create interactive reports with filters, drill-through pages, and business metrics.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-006", "title": "Web Design with HTML & CSS", "duration": "3 Months", "description": "Create responsive websites with semantic HTML, CSS Grid, Flexbox, accessible forms, and media queries. Publish a portfolio website with layouts for mobile and desktop.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-007", "title": "JavaScript Programming", "duration": "4 Months", "description": "Practice functions, arrays, objects, DOM manipulation, events, promises, and asynchronous requests. Build interactive browser applications with validation and error handling.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-008", "title": "React Frontend Development", "duration": "4 Months", "description": "Build reusable components with props, state, hooks, routing, and forms. Connect a frontend to an API and complete an accessible multi-page application.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-009", "title": "Node.js & Express Backend Development", "duration": "4 Months", "description": "Create REST APIs with routing, middleware, validation, authentication, and database integration. Practice automated tests, error handling, and application deployment.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-010", "title": "Django Web Development", "duration": "4 Months", "description": "Develop database-backed websites using models, views, templates, forms, authentication, and the Django admin. Build and deploy a complete student project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-011", "title": "Java Programming", "duration": "6 Months", "description": "Learn Java syntax, classes, inheritance, interfaces, collections, exceptions, and JDBC. Develop a database-connected application using structured object-oriented design.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-012", "title": "C Programming Fundamentals", "duration": "3 Months", "description": "Understand data types, loops, functions, arrays, pointers, structures, and file operations. Practice debugging and implement small programs for common computing problems.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-013", "title": "C++ & Data Structures", "duration": "6 Months", "description": "Study classes, templates, the standard library, linked lists, stacks, queues, trees, and graphs. Compare sorting and searching algorithms using time and space complexity.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-014", "title": "Computer Hardware & Troubleshooting", "duration": "4 Months", "description": "Identify desktop components, assemble systems, install operating systems and drivers, diagnose common faults, and practice backups and preventive maintenance.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-015", "title": "Computer Networking Fundamentals", "duration": "4 Months", "description": "Learn network devices, Ethernet, IP addressing, subnetting, DNS, DHCP, routing, and wireless networks. Configure a small office network and troubleshoot connectivity.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-016", "title": "Linux Administration", "duration": "4 Months", "description": "Use the Linux shell, manage users and permissions, configure services, inspect logs, schedule jobs, and write shell scripts for routine administration tasks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-017", "title": "Cybersecurity Fundamentals", "duration": "4 Months", "description": "Study access control, secure configuration, phishing awareness, network security, backups, and incident response. Practice defensive analysis in isolated training labs.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-018", "title": "Cloud Computing Fundamentals", "duration": "3 Months", "description": "Understand virtual machines, storage, networking, identity management, monitoring, and shared responsibility. Design a small cloud-hosted application and estimate resource usage.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-019", "title": "Git, Docker & CI/CD Fundamentals", "duration": "4 Months", "description": "Manage branches and code reviews with Git, package applications in Docker containers, and build automated pipelines for testing and deployment.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-020", "title": "UI & UX Design with Figma", "duration": "4 Months", "description": "Practice user interviews, information architecture, wireframes, component libraries, responsive layouts, and interactive prototypes. Conduct usability testing on a design project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-021", "title": "Adobe Photoshop & Image Editing", "duration": "3 Months", "description": "Edit photographs using layers, masks, selections, retouching, color correction, and nondestructive adjustments. Prepare images for print, websites, and social media.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-022", "title": "Vector Illustration with Adobe Illustrator", "duration": "3 Months", "description": "Create vector artwork with shapes, paths, the Pen tool, typography, and reusable graphic assets. Design logos, icons, packaging layouts, and print-ready illustrations.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-023", "title": "Video Editing with Adobe Premiere Pro", "duration": "4 Months", "description": "Organize footage, edit sequences, synchronize audio, add titles and transitions, correct color, and export video. Complete a short promotional film from raw footage.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-024", "title": "WordPress Website Development", "duration": "3 Months", "description": "Build websites using themes, blocks, menus, forms, and plugins. Practice backups, security updates, performance optimization, and basic search-friendly site structure.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"},
+    {"id": "CRS-DEMO-025", "title": "AutoCAD 2D Drafting", "duration": "4 Months", "description": "Create technical drawings with precise dimensions, layers, blocks, annotations, layouts, and plotting. Produce a complete set of 2D plans for a drafting project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "dasprantik76@gmail.com"}
   ],
   'poulami.13thmay@gmail.com': [
     {
@@ -1001,7 +1026,8 @@ export default async function handler(req, res) {
 
       // Seed the six starter courses once. The profile marker prevents courses
       // intentionally deleted in the Admin Portal from being recreated later.
-      if (DEFAULT_COURSES_BY_TENANT[ownerEmail] && profileDoc?.courseSeedVersion !== COURSE_SEED_VERSION) {
+      const courseSeedVersion = ownerEmail === 'dasprantik76@gmail.com' ? 3 : COURSE_SEED_VERSION;
+      if (DEFAULT_COURSES_BY_TENANT[ownerEmail] && profileDoc?.courseSeedVersion !== courseSeedVersion) {
         const starterCourses = DEFAULT_COURSES_BY_TENANT[ownerEmail];
         const existingIds = new Set((coursesList || []).map(course => course.id));
         const missingCourses = starterCourses.filter(course => !existingIds.has(course.id));
@@ -1015,10 +1041,10 @@ export default async function handler(req, res) {
 
         await db.collection(COLLECTIONS.PROFILE).updateOne(
           { ownerEmail },
-          { $set: { courseSeedVersion: COURSE_SEED_VERSION } },
+          { $set: { courseSeedVersion: courseSeedVersion } },
           { upsert: true }
         );
-        profileDoc = { ...(profileDoc || {}), courseSeedVersion: COURSE_SEED_VERSION };
+        profileDoc = { ...(profileDoc || {}), courseSeedVersion: courseSeedVersion };
       }
 
       return res.status(200).json({
@@ -1072,7 +1098,10 @@ export default async function handler(req, res) {
           const name = String(payload?.name || '').trim().slice(0, 120);
           const phone = String(payload?.phone || '').replace(/\D/g, '').slice(0, 10);
           const course = String(payload?.course || '').trim().slice(0, 160);
-          const messageText = String(payload?.message || '').trim().slice(0, 2000);
+          const messageText = String(payload?.message || '').replace(/\r\n?/g, '\n').replace(/\n(?:[^\S\n]*\n)+/g, '\n').trim();
+          if ((messageText.match(/\S+/g)?.length || 0) > 250) {
+            return res.status(400).json({ success: false, error: 'Please keep your message to 250 words or fewer.' });
+          }
           const messageOwnerEmail = await resolveOwnerEmail('', academySlug);
 
           if (!academySlug || !messageOwnerEmail) {

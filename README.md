@@ -25,3 +25,7 @@ uses it to sign uploads.
 
 The repository root also preserves the existing central Admin Portal deployment.
 Its files match `admin-portal/` so the current root-based deployment continues to work.
+
+## Local development
+
+Run `npm run dev` with Node.js 22 or newer, then open `http://localhost:4000`. The local server loads `.env.local` and runs the API handlers, including Google login. A static file server cannot process the login POST callback. Stop any existing server on port 4000 first.

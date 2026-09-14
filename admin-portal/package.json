@@ -5,7 +5,8 @@
   "main": "api/data.js",
   "scripts": {
     "build": "node build.mjs",
-    "start": "node -v"
+    "start": "node build.mjs && node dev-server.mjs",
+    "dev": "node build.mjs && node dev-server.mjs"
   },
   "dependencies": {
     "mongodb": "^6.5.0"

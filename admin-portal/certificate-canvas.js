@@ -51,7 +51,7 @@
     status.textContent = '';
     status.removeAttribute('data-state');
   }
-  async function render(student, course) {
+  async function render(student, course, publicVerificationUrl) {
     const current = ++revision;
     print.disabled = download.disabled = true;
     status.textContent = '';
@@ -116,7 +116,7 @@
         const qrCanvas = document.createElement('canvas');
         new window.QRious({
           element: qrCanvas,
-          value: verificationUrl.href,
+          value: publicVerificationUrl || verificationUrl.href,
           size: 512,
           level: 'H',
           foreground: '#111111',
@@ -131,6 +131,9 @@
       visibleContext.setTransform(1, 0, 0, 1, 0, 0);
       visibleContext.clearRect(0, 0, canvas.width, canvas.height);
       visibleContext.drawImage(buffer, 0, 0);
+      canvas.hidden = false;
+      const emptyState = document.getElementById('certificatePreviewEmpty');
+      if (emptyState) emptyState.hidden = true;
       canvas.setAttribute('aria-busy', 'false');
       canvas.setAttribute('aria-label', `Completion certificate for ${student.name || student.fullName}, ${course?.title || ''}, student ID ${student.id || ''}`);
       filename = `certificate-${String(student.id || 'student').replace(/[^a-z0-9_-]/gi, '-')}`;

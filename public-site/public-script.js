@@ -670,6 +670,11 @@ class PublicAcademyApp {
     }
 
     if (this.homeContactForm) {
+      this.homeContactForm.elements.message.addEventListener('input', (event) => {
+        const field = event.target;
+        const count = field.value.trim().match(/\S+/g)?.length || 0;
+        field.setCustomValidity(count > 250 ? 'Please keep your message to 250 words or fewer.' : '');
+      });
       this.homeContactForm.addEventListener('submit', (e) => this.handleContactMessage(e));
     }
 
@@ -2025,7 +2030,11 @@ class PublicAcademyApp {
     const name = form.elements.name.value.trim();
     const phone = form.elements.phone.value.replace(/\D/g, '');
     const course = form.elements.course.value.trim();
-    const message = form.elements.message.value.trim();
+    const message = form.elements.message.value.replace(/\r\n?/g, '\n').replace(/\n(?:[^\S\n]*\n)+/g, '\n').trim();
+    if (!message || (message.match(/\S+/g)?.length || 0) > 250) {
+      this.showToast('Please enter a message of 250 words or fewer.', 'error');
+      return;
+    }
 
     if (phone.length !== 10) {
       this.showToast('Please enter a valid 10-digit mobile number.', 'error');

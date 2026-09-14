@@ -1349,6 +1349,7 @@ class UIController {
     }
     this.render();
     this.startAuthCountdownTimer();
+    this.dashboardGreetingTimer = setInterval(() => this.updateDashboardGreeting(), 60000);
     this.updatePublicSiteLink();
 
     // Synchronize with Multi-Tenant MongoDB cloud storage in background
@@ -1377,6 +1378,15 @@ class UIController {
     return configuredSites[slug]
       || window.ADMIN_PORTAL_CONFIG?.defaultPublicSiteUrl
       || 'https://diganta.pixelsetu.com';
+  }
+
+  getCertificateVerificationUrl(student) {
+    const slug = student.academySlug || store.getAcademyProfile()?.slug || store.ownerEmail;
+    const url = new URL(this.getPublicUrlForSlug(slug));
+    url.searchParams.set('certificate', student.id);
+    url.searchParams.set('academy', slug);
+    url.hash = 'certificate';
+    return url.href;
   }
 
   updatePublicSiteLink() {
@@ -1561,7 +1571,6 @@ class UIController {
     this.selectAllInboxCheckbox = document.getElementById('selectAllInboxCheckbox');
     this.inboxSelectionCount = document.getElementById('inboxSelectionCount');
     this.btnBulkDeleteInbox = document.getElementById('btnBulkDeleteInbox');
-    this.inboxBulkDeleteCount = document.getElementById('inboxBulkDeleteCount');
     this.inboxSearchQuery = '';
     this.batchCountBadge = document.getElementById('batchCountBadge');
     this.batchesGrid = document.getElementById('batchesGrid');
@@ -1742,7 +1751,6 @@ class UIController {
     this.studentDetailsModal = document.getElementById('studentDetailsModal');
     this.studentDetailsContent = document.getElementById('studentDetailsContent');
     this.btnCloseDetailsModal = document.getElementById('btnCloseDetailsModal');
-    this.btnCloseDetailsBtn = document.getElementById('btnCloseDetailsBtn');
     this.btnEditFromDetails = document.getElementById('btnEditFromDetails');
     this.btnDeleteStudentFromDetails = document.getElementById('btnDeleteStudentFromDetails');
     this.currentViewingStudentId = null;
@@ -1778,6 +1786,7 @@ class UIController {
     this.editBatchModal = document.getElementById('editBatchModal');
     this.editBatchForm = document.getElementById('editBatchForm');
     this.editBatchName = document.getElementById('editBatchName');
+    this.editBatchNameInput = document.getElementById('editBatchNameInput');
     this.editBatchStudentSearch = document.getElementById('editBatchStudentSearch');
     this.editBatchSelectionCount = document.getElementById('editBatchSelectionCount');
     this.editBatchStudentList = document.getElementById('editBatchStudentList');
@@ -2703,6 +2712,7 @@ class UIController {
           this.showToast('Error', 'Failed to mark messages as read.', 'error');
         } finally {
           setButtonLoading(this.btnMarkAllInboxRead, false);
+          this.btnMarkAllInboxRead.disabled = !store.getAllMessages().some(message => !message.isRead);
         }
       });
     }
@@ -3069,7 +3079,6 @@ class UIController {
     this.btnCancelCourseModal.addEventListener('click', () => this.closeModal(this.courseModal));
 
     this.btnCloseDetailsModal.addEventListener('click', () => this.closeModal(this.studentDetailsModal));
-    this.btnCloseDetailsBtn.addEventListener('click', () => this.closeModal(this.studentDetailsModal));
     this.btnEditFromDetails.addEventListener('click', () => {
       this.closeModal(this.studentDetailsModal);
       if (this.currentViewingStudentId) {
@@ -3190,6 +3199,7 @@ class UIController {
         if (this.currentView === 'certificates') {
           e.preventDefault();
           this.selectedCertificateIds?.clear();
+          this.certificatePreviewCleared = true;
           this.certificatePreviewId = null;
           this.renderCertificatesView();
           return;
@@ -3201,6 +3211,7 @@ class UIController {
         } else if (isIdCardsPage) {
           e.preventDefault();
           this.selectedIdCardStudentIds.clear();
+          this.idCardPreviewCleared = true;
           this.lastSelectedIdCardStudentId = null;
           this.updateIdCardSelectionUI();
         } else if (isInboxPage) {
@@ -3298,7 +3309,7 @@ class UIController {
         title: 'Inbox',
         subtitle: 'Messages received from your public website'
       },
-      certificates: { icon: '<i class="fa-solid fa-certificate"></i>', theme: 'theme-dashboard', title: 'Certificates', subtitle: 'Preview and download certificates for completed students' },
+      certificates: { icon: '<i class="fa-solid fa-certificate"></i>', theme: 'theme-dashboard', title: 'Student Certificates', subtitle: 'Preview and download certificates for completed students' },
       personalisation: {
         icon: '<i class="fa-solid fa-sliders"></i>',
         theme: 'theme-dashboard',
@@ -3534,7 +3545,19 @@ class UIController {
   // ==========================================================================
   // Render Dashboard
   // ==========================================================================
+  updateDashboardGreeting() {
+    const greeting = document.getElementById('dashboardGreeting');
+    if (!greeting) return;
+    const hour = new Date().getHours();
+    const message = hour >= 5 && hour < 12 ? '☀️\u00a0\u00a0Good Morning.'
+      : hour >= 12 && hour < 17 ? '🌤️\u00a0\u00a0Good Afternoon.'
+      : hour >= 17 && hour < 21 ? '🌅\u00a0\u00a0Good Evening.'
+      : '🌙\u00a0\u00a0Good Night.';
+    if (greeting.textContent !== message) greeting.textContent = message;
+  }
+
   renderDashboardView() {
+    this.updateDashboardGreeting();
     const messages = store.getAllMessages().slice(0, 3);
     if (this.dashboardInboxList) {
       this.dashboardInboxList.innerHTML = messages.length ? messages.map(item => `
@@ -3799,6 +3822,7 @@ class UIController {
     this.editBatchSearchQuery = '';
     this.editBatchStudentSearch.value = '';
     this.editBatchName.textContent = batch.name;
+    this.editBatchNameInput.value = batch.name || '';
     this.setAdminDropdownValue(
       this.editBatchStatusDropdown,
       this.editBatchStatusMenu,
@@ -3835,6 +3859,12 @@ class UIController {
     e.preventDefault();
     const batch = store.getAllBatches().find(item => item.id === this.editingBatchId);
     if (!batch) return this.closeModal(this.editBatchModal);
+    const name = this.editBatchNameInput.value.trim();
+    if (!name) {
+      this.showToast('Batch Name Required', 'Enter a batch name.', 'error');
+      this.editBatchNameInput.focus();
+      return;
+    }
     const studentIds = Array.from(this.editingBatchStudentIds);
     if (!studentIds.length) {
       this.showToast('Students Required', 'Keep at least one student in the batch.', 'error');
@@ -3844,7 +3874,7 @@ class UIController {
     setButtonLoading(submitBtn, true);
     try {
       const shouldComplete = this.editBatchStatus.value === 'Completed' && batch.status !== 'Completed';
-      await store.saveBatch({ ...batch, studentIds, status: shouldComplete ? 'Active' : this.editBatchStatus.value });
+      await store.saveBatch({ ...batch, name, studentIds, status: shouldComplete ? 'Active' : this.editBatchStatus.value });
       this.closeModal(this.editBatchModal);
       this.editingBatchId = null;
       this.editingBatchStudentIds.clear();
@@ -3854,7 +3884,7 @@ class UIController {
         return;
       }
       this.renderBatchesView();
-      this.showToast('Batch Updated', `${batch.name} now has ${studentIds.length} student${studentIds.length === 1 ? '' : 's'}.`, 'success');
+      this.showToast('Batch Updated', `${name} now has ${studentIds.length} student${studentIds.length === 1 ? '' : 's'}.`, 'success');
     } catch (error) {
       this.showToast('Batch Not Updated', error.message, 'error');
     } finally {
@@ -3995,6 +4025,7 @@ class UIController {
   // Render & Manage ID Cards View
   // ==========================================================================
   resetIdCardFilters() {
+    this.idCardPreviewCleared = true;
     if (this.idCardStudentSearchInput) this.idCardStudentSearchInput.value = '';
     this.idCardSearchQuery = '';
     if (this.btnClearIdCardSearch) this.btnClearIdCardSearch.style.display = 'none';
@@ -4077,10 +4108,16 @@ class UIController {
     };
     fill(courseFilter, store.getAllCourses(), 'All Courses', 'certCardCourseFilter');
     fill(batchFilter, store.getAllBatches(), 'All Batches', 'certCardBatchFilter');
-    const clear = () => { courseFilter.value = batchFilter.value = 'all'; this.renderCertificatesView(); };
+    const clear = () => {
+      this.certificatePreviewCleared = true;
+      search.value = '';
+      courseFilter.value = batchFilter.value = 'all';
+      this.selectedCertificateIds.clear();
+      this.certificatePreviewId = null;
+      this.renderCertificatesView();
+    };
     document.getElementById('btnClearCertCardFilter').onclick = clear;
-    document.getElementById('btnClearCertCardFilter').disabled = courseFilter.value === 'all' && batchFilter.value === 'all';
-    document.getElementById('btnResetCertCardFilters').onclick = () => { search.value = ''; clear(); };
+    document.getElementById('btnResetCertCardFilters').onclick = clear;
     const clearSearch = document.getElementById('btnClearCertCardSearch');
     clearSearch.style.display = search.value ? '' : 'none';
     clearSearch.onclick = () => { search.value = ''; this.renderCertificatesView(); search.focus(); };
@@ -4098,10 +4135,14 @@ class UIController {
     selectAll.indeterminate = this.selectedCertificateIds.size > 0 && !selectAll.checked;
     download.disabled = !this.selectedCertificateIds.size;
     if (!visibleIds.has(this.certificatePreviewId)) {
-      this.certificatePreviewId = null;
-      window.CertificateCanvas.clear();
-      document.getElementById('certificateCanvas').hidden = true;
-      document.getElementById('certificatePreviewEmpty').hidden = false;
+      if (students.length && !this.certificatePreviewCleared) {
+        this.previewCertificate(students[0].id);
+      } else {
+        this.certificatePreviewId = null;
+        window.CertificateCanvas.clear();
+        document.getElementById('certificateCanvas').hidden = true;
+        document.getElementById('certificatePreviewEmpty').hidden = false;
+      }
     }
     const toggle = id => {
       if (this.selectedCertificateIds.has(id)) this.selectedCertificateIds.delete(id);
@@ -4129,16 +4170,16 @@ class UIController {
     download.disabled = !this.selectedCertificateIds.size && !this.certificatePreviewId;
     download.innerHTML = `<i class="fa-solid fa-download"></i> ${this.selectedCertificateIds.size > 1 ? 'Download Certificates' : 'Download Certificate'}`;
     download.onclick = () => this.executeCertificateDownload(this.selectedCertificateIds.size ? [...this.selectedCertificateIds] : [this.certificatePreviewId]);
+    document.getElementById('btnClearCertCardFilter').disabled = !(search.value || courseFilter.value !== 'all' || batchFilter.value !== 'all' || this.selectedCertificateIds.size || this.certificatePreviewId);
   }
 
   previewCertificate(id) {
     const student = store.getStudentById(id);
     if (!student || student.status !== 'Completed') return;
     this.certificatePreviewId = id;
+    document.getElementById('btnClearCertCardFilter').disabled = false;
     document.getElementById('certificateDownloadSelected').disabled = false;
-    document.getElementById('certificatePreviewEmpty').hidden = true;
-    document.getElementById('certificateCanvas').hidden = false;
-    window.CertificateCanvas.render(student, store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]));
+    window.CertificateCanvas.render(student, store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]), this.getCertificateVerificationUrl(student));
   }
 
   renderIdCardsView() {
@@ -4266,7 +4307,7 @@ class UIController {
     if (this.idCardListEmptyState) this.idCardListEmptyState.style.display = 'none';
 
     const validFilteredIds = new Set(filteredStudents.map(s => s.id));
-    // No student selected from the beginning; retain previous selection only if still present in filtered list
+    // Retain selections that are still present in the filtered list.
     if (this.selectedIdCardStudentIds.size > 0) {
       for (const id of this.selectedIdCardStudentIds) {
         if (!validFilteredIds.has(id)) {
@@ -4279,6 +4320,10 @@ class UIController {
       }
     } else if (this.lastSelectedIdCardStudentId && !validFilteredIds.has(this.lastSelectedIdCardStudentId)) {
       this.lastSelectedIdCardStudentId = null;
+    }
+
+    if (!this.lastSelectedIdCardStudentId && !this.idCardPreviewCleared) {
+      this.lastSelectedIdCardStudentId = filteredStudents[0].id;
     }
 
     this.idCardStudentList.innerHTML = filteredStudents.map(student => {
@@ -4486,10 +4531,17 @@ class UIController {
   }
 
   async renderIdCardBlankTemplate() {
+    const revision = this.idCardRenderRevision = (this.idCardRenderRevision || 0) + 1;
+    this.currentRenderingIdCardStudentId = null;
+    if (this.idCardLoadingOverlay) this.idCardLoadingOverlay.style.display = 'none';
     this.currentRenderedIdCardStudentId = null;
+    const renderToken = this.idCardPreviewRenderToken = {};
+    if (this.idCardLoadingOverlay) this.idCardLoadingOverlay.style.display = 'none';
     if (!this.idCardPreviewCanvas) return;
     try {
       const templateImg = await this.loadIdCardTemplateImage();
+      if (this.idCardPreviewRenderToken !== renderToken) return;
+      if (revision !== this.idCardRenderRevision) return;
       const ctx = this.idCardPreviewCanvas.getContext('2d');
       ctx.drawImage(templateImg, 0, 0, 1250, 2000);
     } catch (e) {
@@ -4514,9 +4566,6 @@ class UIController {
     }
     if (this.idCardPreviewActions) {
       this.idCardPreviewActions.style.display = 'flex';
-    }
-    if (this.idCardNoSelection) {
-      this.idCardNoSelection.style.display = 'none';
     }
     if (this.idCardMockupWrapper) {
       this.idCardMockupWrapper.style.display = 'flex';
@@ -4558,15 +4607,21 @@ class UIController {
   }
 
   async renderIdCardToCanvas(student, targetCanvas = null) {
-    const canvas = targetCanvas || this.idCardPreviewCanvas;
-    if (!canvas || !student) return;
-
-    if (canvas === this.idCardPreviewCanvas) {
+    const destination = targetCanvas || this.idCardPreviewCanvas;
+    if (!destination || !student) return;
+    const isPreview = destination === this.idCardPreviewCanvas;
+    const renderToken = isPreview ? (this.idCardPreviewRenderToken = {}) : null;
+    // Compose away from the visible canvas so image loads cannot expose partial cards.
+    const canvas = isPreview ? document.createElement('canvas') : destination;
+    if (isPreview) {
+      canvas.width = destination.width;
+      canvas.height = destination.height;
       this.currentRenderingIdCardStudentId = student.id;
     }
 
-    if (this.idCardLoadingOverlay && canvas === this.idCardPreviewCanvas) {
-      this.idCardLoadingOverlay.style.display = 'flex';
+    if (this.idCardLoadingOverlay && isPreview) {
+      const showingEmptyState = this.idCardNoSelection && this.idCardNoSelection.style.display !== 'none';
+      this.idCardLoadingOverlay.style.display = showingEmptyState ? 'none' : 'flex';
     }
 
     try {
@@ -4746,18 +4801,17 @@ class UIController {
         ctx.restore();
       }
 
-      if (canvas === this.idCardPreviewCanvas && this.currentRenderingIdCardStudentId !== student.id) {
-        return;
-      }
-
-      if (canvas === this.idCardPreviewCanvas) {
+      if (isPreview) {
+        if (this.idCardPreviewRenderToken !== renderToken) return;
+        destination.getContext('2d').drawImage(canvas, 0, 0);
         this.currentRenderedIdCardStudentId = student.id;
+        if (this.idCardNoSelection) this.idCardNoSelection.style.display = 'none';
       }
 
     } catch (err) {
       console.error('[Render ID Card Error]:', err);
     } finally {
-      if (this.idCardLoadingOverlay && canvas === this.idCardPreviewCanvas && this.currentRenderingIdCardStudentId === student.id) {
+      if (this.idCardLoadingOverlay && isPreview && this.idCardPreviewRenderToken === renderToken) {
         this.idCardLoadingOverlay.style.display = 'none';
       }
     }
@@ -5104,10 +5158,6 @@ class UIController {
       this.btnBulkDeleteInbox.disabled = !hasSelections;
     }
 
-    if (this.inboxBulkDeleteCount) {
-      this.inboxBulkDeleteCount.textContent = count;
-    }
-
     if (this.selectAllInboxCheckbox) {
       const allSelected = filteredMessages.length > 0 && filteredMessages.every(m => this.selectedInboxMessageIds.has(m.id));
       const someSelected = filteredMessages.some(m => this.selectedInboxMessageIds.has(m.id));
@@ -5124,7 +5174,7 @@ class UIController {
     this.currentViewingMessageId = messageId;
 
     if (this.inboxModalReceivedTime) {
-      this.inboxModalReceivedTime.textContent = formatMessageDate(message.createdAt);
+      this.inboxModalReceivedTime.textContent = formatMessageDate(message.createdAt, true);
     }
     if (this.inboxModalSenderName) {
       this.inboxModalSenderName.textContent = message.name || 'Website Visitor';
@@ -5136,7 +5186,6 @@ class UIController {
     if (this.inboxModalPhone && this.inboxModalPhoneText) {
       const phone = message.phone || '';
       if (phone) {
-        this.inboxModalPhone.href = `tel:${phone}`;
         this.inboxModalPhoneText.textContent = phone;
         this.inboxModalPhone.style.display = 'inline-flex';
       } else {
@@ -5176,7 +5225,7 @@ class UIController {
     }
 
     if (this.inboxModalMessageText) {
-      this.inboxModalMessageText.textContent = message.message || 'No message content.';
+      this.inboxModalMessageText.textContent = String(message.message || '').replace(/\r\n?/g, '\n').replace(/\n(?:[^\S\n]*\n)+/g, '\n').trim() || 'No message content.';
     }
 
     // Bind footer action buttons
@@ -5983,16 +6032,7 @@ class UIController {
     const enrolledCourses = (student.enrolledCourseIds || []).map(cid => {
       const c = courses.find(item => item.id === cid);
       if (!c) return null;
-      return `
-        <div class="enrolled-course-chip">
-          <div>
-            <strong>${escapeHtml(c.title)}</strong>
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">
-              <span><i class="fa-regular fa-clock"></i> Duration: ${escapeHtml(c.duration)}</span>
-            </div>
-          </div>
-        </div>
-      `;
+      return `<span class="value">${escapeHtml(c.title)}${c.duration ? ` (${escapeHtml(c.duration)})` : ''}</span>`;
     }).filter(Boolean).join('');
 
     this.studentDetailsContent.innerHTML = `
@@ -6008,6 +6048,11 @@ class UIController {
             ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
           </span>
         </div>
+      </div>
+
+      <div class="profile-meta-card">
+        <span class="label"><i class="fa-solid fa-book-open"></i> ENROLLED COURSE</span>
+        ${enrolledCourses || '<span class="value">No courses currently enrolled.</span>'}
       </div>
 
       <div class="profile-meta-grid">
@@ -6090,10 +6135,6 @@ class UIController {
         </div>
       ` : ''}
 
-      <div class="enrolled-courses-section" style="margin-top: 1rem;">
-        <h4>Enrolled Courses (${(student.enrolledCourseIds || []).length})</h4>
-        ${enrolledCourses || '<p style="color: var(--text-muted); font-size: 0.875rem;">No courses currently enrolled.</p>'}
-      </div>
     `;
 
     this.openModal(this.studentDetailsModal);
@@ -6606,7 +6647,7 @@ class UIController {
 
       if (students.length === 1) {
         const student = students[0];
-        const course = store.getCourseById(student.courseId);
+        const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
         const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id)) || {};
         const pngBlob = await this.generateStudentCertificatePng(student, course, batch, templateImg);
         if (!pngBlob) throw new Error('Failed to generate PNG blob');
@@ -6630,7 +6671,7 @@ class UIController {
         let successCount = 0;
 
         for (const student of students) {
-          const course = store.getCourseById(student.courseId);
+          const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
           const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id)) || {};
           const pngBlob = await this.generateStudentCertificatePng(student, course, batch, templateImg);
           if (pngBlob) {
@@ -6836,13 +6877,10 @@ class UIController {
     if (window.QRious && student.id) {
       try {
         const qrCanvas = document.createElement('canvas');
-        const verificationUrl = new URL(window.location.origin);
-        verificationUrl.searchParams.set('certificate', student.id);
-        verificationUrl.searchParams.set('academy', student.academySlug || window.ADMIN_CONFIG?.academySlug || 'prantik');
-        verificationUrl.hash = 'certificate';
+        const verificationUrl = this.getCertificateVerificationUrl(student);
         new window.QRious({
           element: qrCanvas,
-          value: verificationUrl.href,
+          value: verificationUrl,
           size: 512,
           level: 'H',
           foreground: '#111111',
@@ -6900,7 +6938,7 @@ class UIController {
 
       for (const student of members) {
         completedCount++;
-        const course = store.getCourseById(student.courseId);
+        const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
         const pngBlob = await this.generateStudentCertificatePng(student, course, batch, templateImg);
         if (pngBlob) {
           const safeName = (student.name || student.fullName || 'student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
@@ -7184,7 +7222,7 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.quadraticCurveTo(x, y, x + radius, y);
 }
 
-function formatMessageDate(dateString) {
+function formatMessageDate(dateString, timeFirst = false) {
   if (!dateString) return '';
   const date = new Date(dateString);
   if (Number.isNaN(date.getTime())) return '';
@@ -7193,7 +7231,8 @@ function formatMessageDate(dateString) {
     minute: '2-digit',
     hour12: true
   });
-  return `${date.getDate()} ${DISPLAY_MONTHS[date.getMonth()]}, ${date.getFullYear()}, ${time}`;
+  const dateText = `${date.getDate()} ${DISPLAY_MONTHS[date.getMonth()]}, ${date.getFullYear()}`;
+  return timeFirst ? `${time} • ${dateText}` : `${dateText}, ${time}`;
 }
 
 const INBOX_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];

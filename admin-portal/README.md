@@ -62,3 +62,7 @@ The slug in this mapping must match the slug configured in that public site's `s
 Import the repository into Vercel and select `admin-portal` as the Root Directory. Keep this as one central deployment; new academies only require another deployment of `public-site`.
 
 Also add the final Admin Portal domain to the authorized JavaScript origins/redirect configuration of the Google OAuth client used in `index.html`.
+
+## Local development
+
+Run `npm run dev` with Node.js 22 or newer, then open `http://localhost:4000`. The local server loads `.env.local` and runs the API handlers, including Google login. A static file server cannot process the login POST callback. Stop any existing server on port 4000 first.
