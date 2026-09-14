@@ -68,6 +68,10 @@ try {
       scheduleSync(filename);
     }
   });
+  const publicSiteDir = path.join(root, 'public-site');
+  watch(publicSiteDir, { recursive: true }, () => {
+    notifyLiveReload();
+  });
 } catch (e) {
   console.warn('Watch notice:', e.message);
 }
