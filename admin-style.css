@@ -1313,7 +1313,14 @@ html, body {
   font-size: 2.75rem;
   font-weight: 700;
   line-height: 1;
-  color: var(--text-main);
+  color: #9299a5;
+  background: transparent;
+  border: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--transition-fast);
   letter-spacing: -0.03em;
 }
 
@@ -1709,9 +1716,9 @@ button:hover,
 }
 
 .badge-completed {
-  background-color: var(--primary-light);
-  color: var(--primary-dark, #4338ca);
-  border: 1px solid #818cf8;
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
 }
 
 .badge-draft {
@@ -1952,7 +1959,7 @@ button:hover,
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #dce3ed;
   border: 1.5px solid #e2e8f0;
   border-radius: var(--radius-lg);
   padding: 1rem 1.25rem;
@@ -1963,8 +1970,8 @@ button:hover,
 .auth-digits {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.4rem;
-  flex: 1 1 auto;
+  gap: 1rem;
+  flex: 1 1 0;
   min-width: 0;
 }
 
@@ -1974,12 +1981,13 @@ button:hover,
   justify-content: center;
   width: 100%;
   min-width: 0;
-  height: 48px;
+  height: auto;
+  aspect-ratio: 1 / 1;
   background-color: #ffffff;
   border: 1.5px solid #cbd5e1;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
   font-family: 'SF Mono', 'Fira Code', 'Roboto Mono', monospace;
-  font-size: 1.45rem;
+  font-size: clamp(1.5rem, 2.6vw, 2.6rem);
   font-weight: 700;
   color: var(--primary);
   box-shadow: var(--shadow-sm);
@@ -4501,8 +4509,8 @@ input[data-capitalize="true"] {
   .card-body,
   .auth-code-card .card-body { padding: 1rem; }
   .auth-code-box { gap: 0.4rem; padding: 0.75rem; }
-  .auth-digits { gap: 0.25rem; }
-  .auth-digits span { height: 42px; border-radius: 9px; font-size: 1.1rem; }
+  .auth-digits { gap: 0.55rem; }
+  .auth-digits span { font-size: clamp(1.2rem, 4vw, 1.75rem); }
   .btn-copy-code { width: 38px; height: 38px; }
   .dashboard-inbox-item { grid-template-columns: auto minmax(0, 1fr); }
   .dashboard-inbox-meta { grid-column: 2; justify-items: start; }
@@ -5658,15 +5666,15 @@ button.is-loading,
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 42px;
+  min-height: 42px;
   margin: 0;
   color: #ffffff;
   font-size: clamp(1.25rem, 2.5vw, 1.65rem);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.2;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 #view-dashboard .dashboard-greeting-toolbar {
@@ -5757,3 +5765,83 @@ button.is-loading,
   height: 100%;
   border-radius: 0;
 }
+
+/* Dashboard card actions */
+#btnViewInbox,
+#btnGenerateNewAuthCode {
+  background: #eef2ff;
+  border: 1.5px solid #a5b4fc;
+  color: #4338ca;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(67, 56, 202, 0.12);
+}
+
+#btnViewInbox:hover,
+#btnGenerateNewAuthCode:hover {
+  background: #e0e7ff;
+  border-color: #818cf8;
+}
+
+#btnViewInbox:focus-visible,
+#btnGenerateNewAuthCode:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 3px;
+}
+
+.batch-stat-number:hover,
+.batch-stat-number:focus-visible { color: #000000; }
+.batch-stat-number:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+#batchStudentsModal .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.batch-students-view-list { list-style: none; margin: 0; padding: 0; }
+.batch-students-view-list li { display: grid; gap: 0.25rem; padding: 0.85rem 0; border-bottom: 1px solid var(--border-color); }
+.batch-students-view-list li:last-child { border-bottom: 0; }
+.batch-students-view-list small { color: var(--text-muted); }
+
+/* Separate inbox-style rows in the dashboard card. */
+.dashboard-inbox-list { gap: 0.65rem; border: 0; border-radius: 0; }
+.dashboard-inbox-item.inbox-row {
+  display: grid;
+  grid-template-columns: 1.2rem minmax(0, 0.85fr) minmax(0, 1.3fr) auto;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+}
+.dashboard-inbox-item.inbox-row:last-child { border-bottom: 1px solid var(--border-subtle); }
+.dashboard-inbox-item .inbox-row-icon { grid-column: 1; grid-row: 1; }
+.dashboard-inbox-item .inbox-row-sender { grid-column: 2; grid-row: 1; width: auto; min-width: 0; max-width: none; }
+.dashboard-inbox-item .inbox-row-snippet { grid-column: 3; grid-row: 1; text-align: left; }
+.dashboard-inbox-item .inbox-row-time { grid-column: 4; grid-row: 1; margin-left: 0; min-width: 0; font-size: 0.75rem; }
+.dashboard-inbox-item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+@media (max-width: 600px) {
+  .dashboard-inbox-item.inbox-row { gap: 0.5rem; padding: 0.75rem; grid-template-columns: 1rem minmax(0, 1fr) minmax(0, 1fr) auto; }
+  .dashboard-inbox-item .inbox-row-sender,
+  .dashboard-inbox-item .inbox-row-snippet { font-size: 0.8rem; }
+  .dashboard-inbox-item .inbox-row-time { font-size: 0.65rem; }
+}
+
+.dashboard-inbox-item.inbox-row.is-read { background-color: #f1f5f9; }
+.dashboard-inbox-item.inbox-row.is-unread { background-color: #eceff6; }
+.dashboard-inbox-item.inbox-row:hover { background-color: #e2e8f0; }
+
+.batch-stat-center.is-completed .batch-stat-number,
+.batch-stat-center.is-completed .batch-stat-label { color: #9299a5; }
+.batch-stat-center.is-active .batch-stat-number,
+.batch-stat-center.is-active .batch-stat-label { color: #000000; }
+.batch-stat-center:hover .batch-stat-number,
+.batch-stat-center:hover .batch-stat-label,
+.batch-stat-center:focus-within .batch-stat-number,
+.batch-stat-center:focus-within .batch-stat-label { color: #7c3aed; }
+
+button.batch-stat-label {
+  background: transparent;
+  border: 0;
+  padding: 0.2rem 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+}
+button.batch-stat-label:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+#inboxMessageModal .modal-title-box { gap: 1.25rem; }

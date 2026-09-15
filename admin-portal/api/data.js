@@ -2,7 +2,7 @@
 // Multi-Tenant MongoDB Partitioned SaaS API for Academy Platform
 
 import { getDatabase } from './lib/mongodb.js';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, randomInt } from 'node:crypto';
 
 const COLLECTIONS = {
   PROFILE: 'profile',
@@ -1445,17 +1445,28 @@ export default async function handler(req, res) {
 
         // 10. Save Authentication Token (6-Digit OTP)
         case 'save_auth_token': {
-          const token = payload?.token;
-          if (!token || !token.code) {
-            return res.status(400).json({ success: false, error: 'Invalid token payload' });
-          }
-          const taggedToken = { ...token, ownerEmail };
-          await db.collection(COLLECTIONS.AUTH_TOKEN).updateOne(
+          const now = Date.now();
+          const token = {
+            code: String(randomInt(100000, 1000000)),
+            createdAt: now,
+            expiresAt: now + 5 * 60 * 60 * 1000,
+            ownerEmail
+          };
+          // Atomically preserve an active code across browsers and simultaneous requests.
+          const keepExisting = payload?.forceNew === true ? false : {
+            $and: [
+              { $gt: ['$expiresAt', now] },
+              { $regexMatch: { input: { $ifNull: ['$code', ''] }, regex: '^[0-9]{6}$' } }
+            ]
+          };
+          const savedToken = await db.collection(COLLECTIONS.AUTH_TOKEN).findOneAndUpdate(
             { ownerEmail },
-            { $set: taggedToken },
-            { upsert: true }
+            [{ $set: Object.fromEntries(Object.entries(token).map(([key, value]) => [
+              key, { $cond: [keepExisting, `$${key}`, { $literal: value }] }
+            ])) }],
+            { upsert: true, returnDocument: 'after', includeResultMetadata: false }
           );
-          return res.status(200).json({ success: true, token: taggedToken });
+          return res.status(200).json({ success: true, token: savedToken });
         }
 
         // 11. Clear All Data (For specific owner only)

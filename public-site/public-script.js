@@ -1185,7 +1185,7 @@ class PublicAcademyApp {
 
     // 2. Hero Tagline & Subtitle
     if (this.heroTaglineText) {
-      this.heroTaglineText.textContent = profile.tagline || 'Admissions & Registrations Open';
+      this.heroTaglineText.textContent = 'Student Registration';
     }
     if (this.heroDescText) {
       this.heroDescText.textContent = profile.heroDesc || profile.about || 'Empowering learners with industry-standard courses and certified training.';

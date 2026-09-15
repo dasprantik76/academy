@@ -804,6 +804,8 @@ textarea {
   grid-row: 2 / 3;
   display: flex;
   align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .hero-badge {
@@ -811,18 +813,42 @@ textarea {
   align-items: center;
   gap: 0.5rem;
   background: #ffffff;
-  border: 1.5px solid #cbd5e1;
-  padding: 0.45rem 1.1rem;
-  border-radius: var(--radius-full);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: #00017c;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #d1d5db;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #292920;
+  box-shadow: none;
   margin: 0;
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
 }
 
 .hero-badge i {
-  color: #2563eb;
+  color: inherit;
+}
+
+.hero-badge:hover {
+  background: #f1f1ed;
+}
+
+.hero-badge-download {
+  color: #ffffff;
+  background: #292920;
+  border-color: #292920;
+}
+
+.hero-badge-download:hover {
+  color: #ffffff;
+  background: #6b7280;
+  border-color: #6b7280;
+}
+
+.hero-download-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
 }
 
 .hero-title {
@@ -1533,14 +1559,19 @@ textarea {
 }
 
 #studentRegForm .student-photo-upload input[type="file"] {
+  display: flex;
+  align-items: center;
   width: 100%;
+  height: 54px;
   min-height: 54px;
-  padding: 0.42rem;
+  padding: 5px 0.75rem 5px 5px;
+  line-height: 1;
   color: #334155;
   background: #ffffff;
   border: 2px solid #94a3b8;
   border-radius: var(--radius-md);
   cursor: pointer;
+  overflow: hidden;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -1585,8 +1616,10 @@ textarea {
 }
 
 #studentRegForm .student-photo-upload input[type="file"]::file-selector-button {
-  margin-right: 0.75rem;
-  padding: 0.65rem 0.9rem;
+  height: 40px;
+  margin: 0 0.75rem 0 0;
+  padding: 0 0.95rem;
+  line-height: 40px;
   color: #ffffff;
   background: #2e5579;
   border: 0;
@@ -1594,6 +1627,22 @@ textarea {
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  appearance: none;
+}
+
+#studentRegForm .student-photo-upload input[type="file"]::-webkit-file-upload-button {
+  height: 40px;
+  margin: 0 0.75rem 0 0;
+  padding: 0 0.95rem;
+  line-height: 40px;
+  color: #ffffff;
+  background: #2e5579;
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
 }
 
 .student-photo-help {
@@ -3127,9 +3176,9 @@ input[data-capitalize="true"] {
 }
 
 .certificate-preview-box {
-  margin-top: 2rem;
-  border-top: 1px solid var(--border-color);
-  padding-top: 2rem;
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
   animation: fadeIn 0.4s ease;
 }
 
@@ -3137,7 +3186,8 @@ input[data-capitalize="true"] {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  /* Match the open space above the action row before the status message. */
+  margin-bottom: 3.75rem;
   flex-wrap: wrap;
 }
 
@@ -3192,19 +3242,20 @@ button:hover,
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #f1f5f9;
+  background: transparent;
   color: var(--text-muted);
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 0;
   border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
-  border: 1px solid var(--border-color);
+  border: 0;
+  box-shadow: none;
   transition: all var(--transition-fast);
 }
 
 .btn-cert-reset:hover {
-  background: #e2e8f0;
+  background: transparent;
   color: var(--text-main);
 }
 
@@ -3408,8 +3459,8 @@ button:hover,
   background: white;
 }
 #certPrintArea {
-  width: 90%;
-  max-width: 1200px;
+  width: min(85%, calc(100% - 40px));
+  aspect-ratio: 3722 / 2480;
   margin-right: auto;
   margin-left: auto;
   padding: 0;
@@ -3417,7 +3468,7 @@ button:hover,
   position: relative;
   border: 20px solid #352218;
   box-shadow: 0 2px 3px rgba(40, 20, 8, 0.5), 0 12px 24px rgba(40, 20, 8, 0.3);
-  box-sizing: border-box;
+  box-sizing: content-box;
 }
 #certPrintArea::after {
   content: '';

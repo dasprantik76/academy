@@ -942,9 +942,9 @@ class AcademyStore {
           if (localProfile) this.syncToCloud('save_profile', { profile: localProfile });
         }
 
-        if (authToken && authToken.code && authToken.expiresAt && Date.now() < authToken.expiresAt) {
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(authToken));
-          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(authToken));
+        if (!this.authTokenRequest && authToken && authToken.code && authToken.expiresAt && Date.now() < authToken.expiresAt) {
+          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify({ ...authToken, academySlug: this.ownerEmail }));
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify({ ...authToken, academySlug: this.ownerEmail }));
         }
 
         if (typeof onLoadedCallback === 'function') {
@@ -1118,31 +1118,36 @@ class AcademyStore {
   }
 
   // Authentication Token (6-Digit OTP, 5-Hour Expiry)
-  getOrGenerateAuthToken(forceNew = false) {
-    const AUTH_DURATION = 5 * 60 * 60 * 1000; // 5 hours in milliseconds
-    if (!forceNew) {
-      const raw = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN)) || localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-      if (raw) {
-        try {
-          const token = JSON.parse(raw);
-          if (token && token.code && String(token.code).length === 6 && !isNaN(Number(token.code)) && token.expiresAt && Date.now() < token.expiresAt) {
-            return token;
-          }
-        } catch (e) {}
-      }
-    }
+  getCachedAuthToken() {
+    try {
+      const token = JSON.parse(localStorage.getItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN)) || 'null');
+      return token && token.academySlug === this.ownerEmail && /^\d{6}$/.test(String(token.code))
+        && Number(token.expiresAt) > Date.now() ? token : null;
+    } catch { return null; }
+  }
 
-    const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const token = {
-      code: randomCode,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + AUTH_DURATION,
-      ownerEmail: this.ownerEmail
-    };
-    localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(token));
-    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(token));
-    this.syncToCloud('save_auth_token', { token }).catch(() => {});
-    return token;
+  async getOrGenerateAuthToken(forceNew = false) {
+    if (this.authTokenRequest) return this.authTokenRequest;
+    const academySlug = this.ownerEmail;
+    this.authTokenRequest = (async () => {
+      const response = await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_auth_token', payload: { forceNew, academySlug } }),
+        signal: AbortSignal.timeout(15000)
+      });
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result?.success || !result.token) {
+        throw new Error('Authentication server unavailable');
+      }
+      if (this.ownerEmail !== academySlug) throw new Error('Academy changed during code request');
+      const token = { ...result.token, academySlug };
+      localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify(token));
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify(token));
+      return token;
+    })();
+    try { return await this.authTokenRequest; }
+    finally { this.authTokenRequest = null; }
   }
 
   // Student Operations
@@ -2243,7 +2248,8 @@ class UIController {
 
     if (this.btnCopyAuthCode) {
       this.btnCopyAuthCode.addEventListener('click', () => {
-        const token = store.getOrGenerateAuthToken();
+        const token = store.getCachedAuthToken();
+        if (!token) return;
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(token.code).then(() => {
             this.btnCopyAuthCode.classList.add('copied');
@@ -2454,11 +2460,19 @@ class UIController {
       });
     }
 
+    this.dashboardInboxList?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-dashboard-message-id]');
+      if (button) this.openInboxMessageModal(button.dataset.dashboardMessageId);
+    });
+
     this.batchesGrid?.addEventListener('click', (e) => {
       const button = e.target.closest('[data-batch-action]');
       if (!button) return;
       const batch = store.getAllBatches().find(item => item.id === button.dataset.batchId);
       if (!batch) return;
+      if (button.dataset.batchAction === 'view-students') {
+        this.openBatchStudentsModal(batch.id);
+      }
       if (button.dataset.batchAction === 'edit') {
         this.openEditBatchModal(batch.id);
       }
@@ -3549,10 +3563,10 @@ class UIController {
     const greeting = document.getElementById('dashboardGreeting');
     if (!greeting) return;
     const hour = new Date().getHours();
-    const message = hour >= 5 && hour < 12 ? '☀️\u00a0\u00a0Good Morning.'
-      : hour >= 12 && hour < 17 ? '🌤️\u00a0\u00a0Good Afternoon.'
-      : hour >= 17 && hour < 21 ? '🌅\u00a0\u00a0Good Evening.'
-      : '🌙\u00a0\u00a0Good Night.';
+    const message = hour >= 5 && hour < 12 ? '☀️\u00a0\u00a0Good Morning! Welcome to your dashboard.'
+      : hour >= 12 && hour < 17 ? '🌤️\u00a0\u00a0Good Afternoon! Welcome to your dashboard.'
+      : hour >= 17 && hour < 21 ? '🌅\u00a0\u00a0Good Evening! Welcome to your dashboard.'
+      : '🌙\u00a0\u00a0Good Night! Welcome to your dashboard.';
     if (greeting.textContent !== message) greeting.textContent = message;
   }
 
@@ -3561,16 +3575,11 @@ class UIController {
     const messages = store.getAllMessages().slice(0, 3);
     if (this.dashboardInboxList) {
       this.dashboardInboxList.innerHTML = messages.length ? messages.map(item => `
-        <button type="button" class="dashboard-inbox-item${item.isRead ? '' : ' unread'}" onclick="window.app.switchView('inbox')">
-          <span class="inbox-sender-avatar">${getInboxIconSvg()}</span>
-          <span class="dashboard-inbox-content">
-            <strong>${escapeHtml(item.name || 'Website Visitor')}</strong>
-            <span>${escapeHtml(item.message || '')}</span>
-          </span>
-          <span class="dashboard-inbox-meta">
-            ${item.isRead ? '' : '<b>New</b>'}
-            <time>${escapeHtml(formatMessageDate(item.createdAt))}</time>
-          </span>
+        <button type="button" class="dashboard-inbox-item inbox-row ${item.isRead ? 'is-read' : 'is-unread'}" data-dashboard-message-id="${escapeHtml(item.id)}" title="View message from ${escapeHtml(item.name || 'Website Visitor')}">
+          <span class="inbox-row-icon" aria-hidden="true"><i class="${item.isRead ? 'fa-solid fa-envelope-open' : 'fa-solid fa-envelope'}"></i></span>
+          <span class="inbox-row-sender">${escapeHtml(item.name || 'Website Visitor')}</span>
+          <span class="inbox-row-snippet">${escapeHtml(item.message || 'No message content.')}</span>
+          <time class="inbox-row-time">${escapeHtml(formatInboxRowTime(item.createdAt))}</time>
         </button>
       `).join('') : `
         <div class="dashboard-inbox-empty">
@@ -3663,7 +3672,7 @@ class UIController {
           <td class="text-center">${formatDate(student.joinDate)}</td>
           <td class="text-center">
             <span class="badge ${getStatusBadgeClass(student.status)}">
-              ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
+              ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status === 'Active' ? 'On going' : student.status)}
             </span>
           </td>
         </tr>
@@ -3792,10 +3801,10 @@ class UIController {
           </div>
         </div>
         <div class="batch-card-body">
-          <div class="batch-stat-center">
-            <div class="batch-stat-number">${members.length}</div>
-            <div class="batch-stat-label">Student${members.length === 1 ? '' : 's'}</div>
-            <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')} batch-stat-badge">${getStatusBadgeIcon(isCompleted ? 'Completed' : 'Active')} ${isCompleted ? 'Completed' : 'Active'}</span>
+          <div class="batch-stat-center ${isCompleted ? 'is-completed' : 'is-active'}">
+            <button type="button" class="batch-stat-number" data-batch-action="view-students" data-batch-id="${escapeHtml(batch.id)}" aria-label="View ${members.length} students in ${escapeHtml(batch.name)}">${members.length}</button>
+            <button type="button" class="batch-stat-label" data-batch-action="view-students" data-batch-id="${escapeHtml(batch.id)}">Student${members.length === 1 ? '' : 's'}</button>
+            <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')} batch-stat-badge">${getStatusBadgeIcon(isCompleted ? 'Completed' : 'Active')} ${isCompleted ? 'Completed' : 'On going'}</span>
           </div>
         </div>
         <div class="batch-card-footer">
@@ -3811,6 +3820,36 @@ class UIController {
         </div>
       </article>`;
     }).join('');
+  }
+
+  openBatchStudentsModal(batchId) {
+    const batch = store.getAllBatches().find(item => item.id === batchId);
+    if (!batch) return;
+    let modal = document.getElementById('batchStudentsModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'batchStudentsModal';
+      modal.className = 'modal-backdrop';
+      modal.innerHTML = `<div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="batchStudentsTitle">
+        <div class="modal-header">
+          <div class="modal-title-box"><i class="fa-solid fa-users modal-icon"></i><div>
+            <h3 id="batchStudentsTitle">Batch Students</h3><p class="modal-title-caption"></p>
+          </div></div>
+          <button type="button" class="btn-close-modal" aria-label="Close student list"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body"><ul class="batch-students-view-list"></ul></div>
+      </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', event => {
+        if (event.target === modal || event.target.closest('.btn-close-modal')) this.closeModal(modal);
+      });
+    }
+    const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
+    modal.querySelector('.modal-title-caption').textContent = batch.name;
+    modal.querySelector('ul').innerHTML = members.length ? members.map(student =>
+      `<li><strong>${escapeHtml(student.name || student.fullName || 'Unnamed Student')}</strong><small>${escapeHtml(student.id)}</small></li>`
+    ).join('') : '<li>No students in this batch.</li>';
+    this.openModal(modal);
   }
 
   openEditBatchModal(batchId) {
@@ -3957,7 +3996,7 @@ class UIController {
     const studentIds = Array.from(this.selectedStudentIds);
     const batches = store.getAllBatches().filter(batch => String(batch.status || 'Active').toLowerCase() !== 'completed');
     if (!studentIds.length) return this.showToast('Select Students', 'Select one or more students to add.', 'error');
-    if (!batches.length) return this.showToast('No Active Batch', 'Create a new batch first.', 'error');
+    if (!batches.length) return this.showToast('No On going Batch', 'Create a new batch first.', 'error');
     this.batchModalMode = 'existing';
     this.batchForm.reset();
     this.batchModalTitle.textContent = 'Add to Existing Batch';
@@ -4339,7 +4378,7 @@ class UIController {
           <span class="idcard-student-name">${escapeHtml(student.name)}</span>
           <div class="idcard-student-status-col">
             <span class="badge ${getStatusBadgeClass(statusText)} idcard-student-status">
-              ${getStatusBadgeIcon(statusText)} ${escapeHtml(statusText)}
+              ${getStatusBadgeIcon(statusText)} ${escapeHtml(statusText === 'Active' ? 'On going' : statusText)}
             </span>
           </div>
         </div>
@@ -6047,7 +6086,7 @@ class UIController {
           <h3>${escapeHtml(student.name)}</h3>
           <p>Student ID: <strong>${escapeHtml(student.id)}</strong></p>
           <span class="badge ${getStatusBadgeClass(student.status)}">
-            ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status)}
+            ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status === 'Active' ? 'On going' : student.status)}
           </span>
         </div>
       </div>
@@ -7024,9 +7063,22 @@ class UIController {
   // ==========================================================================
   renderAuthCode() {
     if (!this.authCodeDigits || !this.authCountdownTimer) return;
-    let token = store.getOrGenerateAuthToken();
-    if (!token || !token.code || !token.expiresAt || String(token.code).length !== 6 || isNaN(Number(token.code))) {
-      token = store.getOrGenerateAuthToken(true);
+    const token = store.getCachedAuthToken();
+    if (!token) {
+      this.authCodeDigits.textContent = '------';
+      this.authCountdownTimer.textContent = this.authCodeError || 'Connecting…';
+      if (this.authProgressFill) this.authProgressFill.style.width = '0%';
+      if (!this.authCodeRefresh && Date.now() >= (this.authCodeRetryAt || 0)) {
+        this.authCodeRefresh = store.getOrGenerateAuthToken()
+          .then(() => { this.authCodeError = ''; this.authCodeRetryAt = 0; this.renderAuthCode(); })
+          .catch(() => {
+            this.authCodeRetryAt = Date.now() + 10000;
+            this.authCodeError = 'Connection unavailable';
+            this.authCountdownTimer.textContent = this.authCodeError;
+          })
+          .finally(() => { this.authCodeRefresh = null; });
+      }
+      return;
     }
     const now = Date.now();
     const remainingMs = Math.max(0, token.expiresAt - now);
@@ -7052,11 +7104,7 @@ class UIController {
       this.authProgressFill.parentElement?.setAttribute('aria-valuenow', String(Math.round(remainingPercent)));
     }
 
-    // When 5-hour countdown expires, automatically generate new 6-digit code
-    if (remainingMs <= 0) {
-      store.getOrGenerateAuthToken(true);
-      this.renderAuthCode();
-    }
+
   }
 
   startAuthCountdownTimer() {
