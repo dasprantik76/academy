@@ -1272,6 +1272,10 @@ html, body {
   text-overflow: ellipsis;
 }
 
+.batch-card.is-completed .batch-card-title-group h3 {
+  color: #9299a5;
+}
+
 .batch-card-submeta {
   display: flex;
   align-items: center;

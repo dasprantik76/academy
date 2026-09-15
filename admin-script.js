@@ -3788,7 +3788,7 @@ class UIController {
     this.batchesGrid.innerHTML = sortCourseOrBatchRecords(filteredBatches, this.batchSortInput?.value || 'name-asc', 'name').map(batch => {
       const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
       const isCompleted = batch.status === 'Completed';
-      return `<article class="batch-card">
+      return `<article class="batch-card${isCompleted ? ' is-completed' : ''}">
         <div class="batch-card-header">
           <div class="batch-card-title-group">
             <h3 title="${escapeHtml(batch.name)}">${escapeHtml(batch.name)}</h3>
