@@ -3832,14 +3832,12 @@ class UIController {
       modal = document.createElement('div');
       modal.id = 'batchStudentsModal';
       modal.className = 'modal-backdrop';
-      modal.innerHTML = `<div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="batchStudentsTitle">
+      modal.innerHTML = `<div class="modal-window batch-students-modal-window" role="dialog" aria-modal="true" aria-labelledby="batchStudentsTitle">
         <div class="modal-header">
-          <div class="modal-title-box"><i class="fa-solid fa-users modal-icon"></i><div>
-            <h3 id="batchStudentsTitle">Batch Students</h3><p class="modal-title-caption"></p>
-          </div></div>
+          <div class="modal-title-box"><i class="fa-solid fa-users modal-icon"></i><h3 id="batchStudentsTitle">Batch</h3></div>
           <button type="button" class="btn-close-modal" aria-label="Close student list"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div class="modal-body"><ul class="batch-students-view-list"></ul></div>
+        <div class="modal-body batch-students-modal-body"><ul class="batch-students-view-list"></ul></div>
       </div>`;
       document.body.appendChild(modal);
       modal.addEventListener('click', event => {
@@ -3847,10 +3845,10 @@ class UIController {
       });
     }
     const members = (batch.studentIds || []).map(id => store.getStudentById(id)).filter(Boolean);
-    modal.querySelector('.modal-title-caption').textContent = batch.name;
+    modal.querySelector('#batchStudentsTitle').textContent = `Batch : ${batch.name}`;
     modal.querySelector('ul').innerHTML = members.length ? members.map(student =>
-      `<li><strong>${escapeHtml(student.name || student.fullName || 'Unnamed Student')}</strong><small>${escapeHtml(student.id)}</small></li>`
-    ).join('') : '<li>No students in this batch.</li>';
+      `<li><strong>${escapeHtml(student.name || student.fullName || 'Unnamed Student')}</strong><span>${escapeHtml(student.id)}</span></li>`
+    ).join('') : '<li class="batch-students-empty">No students in this batch.</li>';
     this.openModal(modal);
   }
 
