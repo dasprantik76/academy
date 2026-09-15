@@ -5829,10 +5829,15 @@ button.is-loading,
 .batch-stat-center.is-completed .batch-stat-label { color: #9299a5; }
 .batch-stat-center.is-active .batch-stat-number,
 .batch-stat-center.is-active .batch-stat-label { color: #000000; }
-.batch-stat-center:hover .batch-stat-number,
-.batch-stat-center:hover .batch-stat-label,
-.batch-stat-center:focus-within .batch-stat-number,
-.batch-stat-center:focus-within .batch-stat-label { color: #7c3aed; }
+.batch-stat-students-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.batch-stat-students-action:hover .batch-stat-number,
+.batch-stat-students-action:hover .batch-stat-label,
+.batch-stat-students-action:focus-within .batch-stat-number,
+.batch-stat-students-action:focus-within .batch-stat-label { color: #7c3aed; }
 
 button.batch-stat-label {
   background: transparent;

@@ -3802,8 +3802,10 @@ class UIController {
         </div>
         <div class="batch-card-body">
           <div class="batch-stat-center ${isCompleted ? 'is-completed' : 'is-active'}">
-            <button type="button" class="batch-stat-number" data-batch-action="view-students" data-batch-id="${escapeHtml(batch.id)}" aria-label="View ${members.length} students in ${escapeHtml(batch.name)}">${members.length}</button>
-            <button type="button" class="batch-stat-label" data-batch-action="view-students" data-batch-id="${escapeHtml(batch.id)}">Student${members.length === 1 ? '' : 's'}</button>
+            <div class="batch-stat-students-action">
+              <button type="button" class="batch-stat-number" data-batch-action="view-students" data-batch-id="${escapeHtml(batch.id)}" aria-label="View ${members.length} students in ${escapeHtml(batch.name)}">${members.length}</button>
+              <button type="button" class="batch-stat-label" data-batch-action="view-students" data-batch-id="${escapeHtml(batch.id)}">Student${members.length === 1 ? '' : 's'}</button>
+            </div>
             <span class="badge ${getStatusBadgeClass(isCompleted ? 'Completed' : 'Active')} batch-stat-badge">${getStatusBadgeIcon(isCompleted ? 'Completed' : 'Active')} ${isCompleted ? 'Completed' : 'On going'}</span>
           </div>
         </div>
