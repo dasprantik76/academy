@@ -1128,6 +1128,7 @@ textarea {
   align-items: center;
   gap: 0.35rem;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .course-card-desc {
