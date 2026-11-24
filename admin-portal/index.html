@@ -68,6 +68,19 @@
       <!-- Google Sign In Section -->
       <div class="login-actions" style="margin: 1.75rem 0 1rem 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
         <div id="googleSignInBtn" aria-label="Sign in with Google"></div>
+        <div id="localDevSection" style="display: none; margin-top: 1.25rem; width: 100%; max-width: 320px; flex-direction: column; gap: 0.6rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: #94a3b8; font-size: 0.75rem; justify-content: center; margin-bottom: 0.25rem;">
+            <span style="flex: 1; height: 1px; background: #e2e8f0;"></span>
+            <span>LOCAL DEV QUICK ACCESS</span>
+            <span style="flex: 1; height: 1px; background: #e2e8f0;"></span>
+          </div>
+          <a href="admin.html?dev=rcavirup" class="btn-google-action" style="text-decoration: none; font-size: 0.85rem; height: 42px; background: #f1f5f9; color: #0f172a; justify-content: center;">
+            <i class="fa-solid fa-user-shield"></i> Continue as Admin (Diganta)
+          </a>
+          <a href="superadmin.html?dev=superadmin" class="btn-google-action" style="text-decoration: none; font-size: 0.85rem; height: 42px; background: #f8fafc; color: #475569; justify-content: center;">
+            <i class="fa-solid fa-crown"></i> Continue as Super Admin
+          </a>
+        </div>
       </div>
 
       <!-- Footer Security Notice -->
@@ -157,6 +170,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocalhost) {
+        const devSec = document.getElementById('localDevSection');
+        if (devSec) devSec.style.display = 'flex';
+      }
       initGoogleAuth();
     });
 

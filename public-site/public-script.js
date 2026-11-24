@@ -525,7 +525,8 @@ class PublicAcademyApp {
 
   async openCertificateFromVerificationLink(students) {
     if (this._verificationLinkHandled) return;
-    const certificateId = new URLSearchParams(window.location.search).get('certificate');
+    const params = new URLSearchParams(window.location.search);
+    const certificateId = params.get('c') || params.get('cert') || params.get('certificate');
     if (!certificateId) return;
     this._verificationLinkHandled = true;
     this.switchView('certificate', false);

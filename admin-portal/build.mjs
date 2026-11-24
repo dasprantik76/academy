@@ -10,6 +10,7 @@ const publicFiles = [
   'admin-config.js',
   'admin-script.js',
   'certificate-canvas.js',
+  'marksheet-canvas.js',
   'admin-style.css',
   'assets',
   'public-site'

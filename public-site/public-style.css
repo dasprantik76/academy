@@ -3458,6 +3458,8 @@ button:hover,
   width: 100%;
   height: auto;
   background: white;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
 }
 #certPrintArea {
   width: min(85%, calc(100% - 40px));

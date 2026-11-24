@@ -1128,6 +1128,7 @@ textarea {
   align-items: center;
   gap: 0.35rem;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .course-card-desc {
@@ -3457,6 +3458,8 @@ button:hover,
   width: 100%;
   height: auto;
   background: white;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
 }
 #certPrintArea {
   width: min(85%, calc(100% - 40px));

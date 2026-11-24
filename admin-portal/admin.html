@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,14 +9,16 @@
   <!-- Google Fonts: Plus Jakarta Sans & SF Pro -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-9.71">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.1">
   <script src="admin-config.js?v=3.4"></script>
 </head>
+
 <body>
   <div class="app-container">
     <!-- Sidebar -->
@@ -53,6 +56,10 @@
           <span>Batches</span>
           <span class="nav-badge" id="batchCountBadge">0</span>
         </a>
+        <a href="#marksheets" class="nav-item" data-view="marksheets" id="nav-marksheets">
+          <i class="fa-solid fa-file-lines"></i>
+          <span>Marksheets</span>
+        </a>
         <a href="#certificates" class="nav-item" data-view="certificates" id="nav-certificates">
           <i class="fa-solid fa-certificate"></i><span>Certificates</span>
         </a>
@@ -61,17 +68,13 @@
           <span>ID Cards</span>
         </a>
         <a href="#inbox" class="nav-item" data-view="inbox" id="nav-inbox">
-          <i class="nav-custom-icon" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z"/></svg></i>
+          <i class="nav-custom-icon" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor"
+              fill-rule="evenodd" aria-hidden="true">
+              <path
+                d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z" />
+            </svg></i>
           <span>Inbox</span>
           <span class="nav-badge" id="inboxUnreadBadge">0</span>
-        </a>
-        <a href="#branding" class="nav-item" data-view="branding" id="nav-branding">
-          <i class="fa-solid fa-palette"></i>
-          <span>Branding</span>
-        </a>
-        <a href="#personalisation" class="nav-item" data-view="personalisation" id="nav-personalisation">
-          <i class="fa-solid fa-sliders"></i>
-          <span>Personalisation</span>
         </a>
       </nav>
 
@@ -121,7 +124,8 @@
         </div>
 
         <div class="header-right">
-          <a href="#" class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer" title="View Public Academy Website" id="btnViewPublicSite">
+          <a href="#" class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer"
+            title="View Public Academy Website" id="btnViewPublicSite">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
             <span>View Public Site</span>
           </a>
@@ -138,14 +142,16 @@
               <span class="pulse-dot-amber"></span>
               <span>Registration Received — Pending Review</span>
             </div>
-            
+
             <div class="on-hold-icon-wrap">
               <i class="fa-solid fa-hourglass-half"></i>
             </div>
-            
+
             <h2 class="on-hold-title">Your Academy Portal is on Hold</h2>
             <p class="on-hold-desc">
-              Thank you for registering with <strong>PixelSetu Academy</strong>! Your academy configuration has been safely received. To ensure security and quality, our platform team reviews new tenant accounts before enabling full administration features. Your slug-based public admissions website has been reserved.
+              Thank you for registering with <strong>PixelSetu Academy</strong>! Your academy configuration has been
+              safely received. To ensure security and quality, our platform team reviews new tenant accounts before
+              enabling full administration features. Your slug-based public admissions website has been reserved.
             </p>
 
             <div class="on-hold-details-box">
@@ -173,14 +179,16 @@
 
             <div class="on-hold-notice">
               <i class="fa-solid fa-circle-info"></i>
-              <span>Need your subdomain activated urgently? Contact platform support on WhatsApp with your requested subdomain to expedite setup.</span>
+              <span>Need your subdomain activated urgently? Contact platform support on WhatsApp with your requested
+                subdomain to expedite setup.</span>
             </div>
 
             <div class="on-hold-actions">
               <button type="button" class="btn btn-primary" id="btnRefreshHoldStatus">
                 <i class="fa-solid fa-rotate"></i> Refresh Status
               </button>
-              <a href="https://wa.me/919733894742?text=Hello%20Prantik,%20I%20have%20registered%20my%20academy%20on%20PixelSetu%20Academy%20and%20request%20subdomain%20approval." target="_blank" rel="noopener" class="btn btn-whatsapp" id="btnHoldWhatsApp">
+              <a href="https://wa.me/919733894742?text=Hello%20Prantik,%20I%20have%20registered%20my%20academy%20on%20PixelSetu%20Academy%20and%20request%20subdomain%20approval."
+                target="_blank" rel="noopener" class="btn btn-whatsapp" id="btnHoldWhatsApp">
                 <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
               </a>
               <button type="button" class="btn btn-outline" id="btnHoldLogout">
@@ -229,7 +237,10 @@
               <div class="card-header">
                 <div class="card-header-title-wrap">
                   <div class="stat-icon card-header-stat-icon icon-primary">
-                    <svg viewBox="0 0 512 512" fill="currentColor" fill-rule="evenodd" aria-hidden="true"><path d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z"/></svg>
+                    <svg viewBox="0 0 512 512" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
+                      <path
+                        d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z" />
+                    </svg>
                   </div>
                   <div>
                     <h3 class="card-title">Recent Messages</h3>
@@ -255,7 +266,8 @@
                     <h3 class="card-title">Authentication Code</h3>
                   </div>
                 </div>
-                <button class="btn btn-sm btn-outline" id="btnGenerateNewAuthCode" title="Generate a fresh authentication code">
+                <button class="btn btn-sm btn-outline" id="btnGenerateNewAuthCode"
+                  title="Generate a fresh authentication code">
                   <i class="fa-solid fa-rotate"></i> Generate New
                 </button>
               </div>
@@ -276,7 +288,8 @@
                     </span>
                     <strong class="countdown-timer" id="authCountdownTimer">05:00:00</strong>
                   </div>
-                  <div class="auth-progress-bar" role="progressbar" aria-label="Authentication code validity remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+                  <div class="auth-progress-bar" role="progressbar" aria-label="Authentication code validity remaining"
+                    aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
                     <div class="auth-progress-fill" id="authProgressFill" style="width: 100%;"></div>
                   </div>
                 </div>
@@ -300,7 +313,8 @@
 
               <!-- Course Filter (Custom Dropdown opens right below) -->
               <div class="custom-select-container toolbar-filter-dropdown" id="adminStudentCourseFilterDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentCourseFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentCourseFilterTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-filter select-icon"></i>
                   <span id="adminStudentCourseFilterDisplay">All Courses</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -313,7 +327,8 @@
 
               <!-- Batch Filter (Custom Dropdown opens right below) -->
               <div class="custom-select-container toolbar-filter-dropdown" id="adminStudentBatchFilterDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentBatchFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentBatchFilterTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-filter select-icon"></i>
                   <span id="adminStudentBatchFilterDisplay">All Batches</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -327,7 +342,8 @@
 
             <div class="view-actions">
               <div class="batch-action-menu" id="batchActionMenu">
-                <button class="btn btn-primary" type="button" id="btnCreateBatch" aria-haspopup="menu" aria-expanded="false" disabled>
+                <button class="btn btn-primary" type="button" id="btnCreateBatch" aria-haspopup="menu"
+                  aria-expanded="false" disabled>
                   <i class="fa-solid fa-layer-group"></i>
                   <span>Create Batch</span>
                   <i class="fa-solid fa-chevron-down batch-action-chevron"></i>
@@ -343,12 +359,14 @@
                   </button>
                 </div>
               </div>
-              <button class="btn btn-success" id="btnBulkMarkCompleted" disabled title="Mark selected students as Course Completed">
+              <button class="btn btn-success" id="btnBulkMarkCompleted" disabled
+                title="Mark selected students as Course Completed">
                 <i class="fa-solid fa-check"></i>
                 <span id="bulkMarkCompletedLabel">Mark as Completed</span>
               </button>
               <div class="student-more-actions-menu" id="studentMoreActionsMenu">
-                <button class="btn btn-secondary btn-more-actions" type="button" id="btnStudentMoreActions" aria-haspopup="menu" aria-expanded="false" disabled title="More Options">
+                <button class="btn btn-secondary btn-more-actions" type="button" id="btnStudentMoreActions"
+                  aria-haspopup="menu" aria-expanded="false" disabled title="More Options">
                   <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
                 <div class="student-more-dropdown" id="studentMoreDropdown" role="menu">
@@ -377,28 +395,40 @@
                   <thead>
                     <tr>
                       <th class="th-checkbox-col">
-                        <input type="checkbox" id="selectAllStudentsCheckbox" aria-label="Select All Students" class="custom-table-checkbox">
+                        <input type="checkbox" id="selectAllStudentsCheckbox" aria-label="Select All Students"
+                          class="custom-table-checkbox">
+                      </th>
+                      <th class="th-serial-col text-center" title="Serial Number">
+                        <span>#</span>
                       </th>
                       <th>
                         <span class="th-student-label-wrap">
                           <span>Student Name</span>
-                          <span class="student-selection-count" id="studentSelectionCount" aria-live="polite" hidden>0</span>
+                          <span class="student-selection-count" id="studentSelectionCount" aria-live="polite"
+                            hidden>0</span>
                         </span>
                       </th>
                       <th class="text-center">Student ID</th>
                       <th class="text-center">Enrolled Courses</th>
                       <th class="text-center">Registration Date</th>
                       <th class="text-center">
-                        <div class="custom-select-container th-status-header-wrap th-minimal-dropdown" id="adminStudentStatusFilterDropdown">
-                          <button type="button" class="btn-th-filter btn-th-status-filter" id="adminStudentStatusFilterTrigger" title="Filter by Status" aria-label="Filter by Status" aria-haspopup="listbox" aria-expanded="false">
+                        <div class="custom-select-container th-status-header-wrap th-minimal-dropdown"
+                          id="adminStudentStatusFilterDropdown">
+                          <button type="button" class="btn-th-filter btn-th-status-filter"
+                            id="adminStudentStatusFilterTrigger" title="Filter by Status" aria-label="Filter by Status"
+                            aria-haspopup="listbox" aria-expanded="false">
                             <span>Course Status</span>
-                            <svg width="7" height="12" viewBox="0 0 217 383" fill="currentColor" aria-hidden="true" style="display: block;">
-                              <path d="M 98 10 C 103 2 114 2 119 10 L 213 148 C 219 157 213 169 202 169 L 15 169 C 4 169 -2 157 4 148 Z"/>
-                              <path d="M 98 373 C 103 381 114 381 119 373 L 213 235 C 219 226 213 214 202 214 L 15 214 C 4 214 -2 226 4 235 Z"/>
+                            <svg width="7" height="12" viewBox="0 0 217 383" fill="currentColor" aria-hidden="true"
+                              style="display: block;">
+                              <path
+                                d="M 98 10 C 103 2 114 2 119 10 L 213 148 C 219 157 213 169 202 169 L 15 169 C 4 169 -2 157 4 148 Z" />
+                              <path
+                                d="M 98 373 C 103 381 114 381 119 373 L 213 235 C 219 226 213 214 202 214 L 15 214 C 4 214 -2 226 4 235 Z" />
                             </svg>
                           </button>
                           <span id="adminStudentStatusFilterDisplay" style="display: none;">All Statuses</span>
-                          <ul class="custom-select-menu th-filter-menu" id="adminStudentStatusFilterMenu" role="listbox">
+                          <ul class="custom-select-menu th-filter-menu" id="adminStudentStatusFilterMenu"
+                            role="listbox">
                             <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
                             <li class="custom-select-option" data-value="Active" role="option">On going</li>
                             <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
@@ -413,7 +443,15 @@
               </div>
               <div class="table-responsive">
                 <table class="data-table" id="studentsRowsTable">
-                  <colgroup><col><col><col><col><col><col></colgroup>
+                  <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                  </colgroup>
                   <tbody id="studentsTableBody">
                     <!-- Rendered dynamically -->
                   </tbody>
@@ -447,7 +485,8 @@
                 </button>
               </div>
               <div class="custom-select-container toolbar-filter-dropdown" id="batchStatusDropdown">
-                <button type="button" class="custom-select-trigger" id="batchStatusTrigger" aria-label="Filter batches by status" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="batchStatusTrigger"
+                  aria-label="Filter batches by status" aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-filter select-icon"></i>
                   <span id="batchStatusDisplay">All Statuses</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -460,7 +499,8 @@
                 <input type="hidden" id="batchStatusFilter" value="all">
               </div>
               <div class="custom-select-container toolbar-filter-dropdown card-sort-dropdown" id="batchSortDropdown">
-                <button type="button" class="custom-select-trigger" id="batchSortTrigger" aria-label="Sort batches by" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="batchSortTrigger" aria-label="Sort batches by"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-arrow-down-wide-short select-icon"></i>
                   <span id="batchSortDisplay">Sort by :&nbsp;Name (A → Z)</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -500,13 +540,124 @@
           </div>
         </section>
 
+        <section class="view-section" id="view-marksheets">
+          <div class="idcards-split-container marksheet-split-container">
+            <!-- Left Side: Search Bar & Student List Panel -->
+            <div class="marksheet-left-column">
+              <div class="marksheet-search-bar">
+                <div class="search-box">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" id="marksheetSearch" placeholder="Search students...">
+                  <button type="button" class="btn-clear-search" id="btnClearMarksheetSearch" title="Clear search"
+                    style="display:none;">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="dashboard-card idcards-list-panel marksheet-list-panel">
+                <div class="idcards-panel-header">
+                  <div class="idcards-filter-row">
+                    <div class="custom-select-container idcards-filter-dropdown" id="marksheetCourseFilterDropdown">
+                      <button type="button" class="custom-select-trigger" id="marksheetCourseFilterTrigger"
+                        aria-haspopup="listbox" aria-expanded="false">
+                        <i class="fa-solid fa-filter select-icon"></i>
+                        <span id="marksheetCourseFilterDisplay">All Courses</span>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                      </button>
+                      <ul class="custom-select-menu" id="marksheetCourseFilterMenu" role="listbox">
+                        <li class="custom-select-option selected" data-value="all" role="option">All Courses</li>
+                      </ul>
+                      <input type="hidden" id="marksheetCourse" value="all">
+                    </div>
+                    <div class="custom-select-container idcards-filter-dropdown" id="marksheetBatchFilterDropdown">
+                      <button type="button" class="custom-select-trigger" id="marksheetBatchFilterTrigger"
+                        aria-haspopup="listbox" aria-expanded="false">
+                        <i class="fa-solid fa-filter select-icon"></i>
+                        <span id="marksheetBatchFilterDisplay">All Batches</span>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                      </button>
+                      <ul class="custom-select-menu" id="marksheetBatchFilterMenu" role="listbox">
+                        <li class="custom-select-option selected" data-value="all" role="option">All Batches</li>
+                      </ul>
+                      <input type="hidden" id="marksheetBatch" value="all">
+                    </div>
+                    <button type="button" class="idcards-btn-clear-filter" id="btnClearMarksheetFilter"
+                      title="Clear filters" disabled>Clear</button>
+                  </div>
+                </div>
+
+                <!-- Column Header Row / Select All -->
+                <div class="idcards-select-all-row">
+                  <div class="idcards-header-col-main">
+                    <label class="idcards-select-all-label" for="marksheetSelectAll" title="Select All Students">
+                      <input type="checkbox" id="marksheetSelectAll" class="custom-table-checkbox"
+                        aria-label="Select All Students">
+                      <span class="idcards-name-wrap">
+                        <span class="idcards-select-all-text">Student Name</span>
+                        <span class="student-selection-count idcards-selection-count-badge" id="marksheetSelectionCount"
+                          aria-live="polite" hidden>0</span>
+                      </span>
+                    </label>
+                  </div>
+                  <div class="idcards-header-col-status">
+                    <span class="idcards-select-all-text">Course Status</span>
+                  </div>
+                </div>
+
+                <!-- Scrollable Student List -->
+                <div class="idcards-student-list" id="marksheetStudents" role="listbox"
+                  aria-label="Student Selection List">
+                  <!-- Rendered dynamically -->
+                </div>
+
+                <div class="empty-state idcards-empty-list" id="marksheetEmpty" style="display:none;">
+                  <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+                  <h4>No Students Found</h4>
+                  <p>No student records match your search or filter.</p>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnResetMarksheetFilters"
+                    style="margin-top: 0.5rem;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Marksheet Preview Panel -->
+            <div class="idcards-preview-panel marksheet-preview-panel">
+              <div class="dashboard-card marksheet-preview-stage" id="marksheetPreviewStage">
+                <canvas id="marksheetCanvas" width="2550" height="3606" aria-label="Marksheet Preview Canvas"
+                  hidden></canvas>
+                <div class="idcard-no-selection" id="marksheetPreviewEmpty">
+                  <div class="no-selection-icon"><i class="fa-solid fa-file-lines"></i></div>
+                  <h4>No Student Selected</h4>
+                  <p>Select any student from the left list to preview their marksheet.</p>
+                </div>
+              </div>
+              <p id="marksheetStatus" role="status"></p>
+              <div class="idcards-preview-actions">
+                <button type="button" class="btn btn-secondary idcard-download-btn" id="marksheetDownloadSelected"
+                  title="Download Marksheet" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                    <polyline points="6 10 12 16 18 10"></polyline>
+                    <line x1="4" y1="21" x2="20" y2="21"></line>
+                  </svg> Download Marksheet
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="view-section" id="view-certificates">
           <div class="view-header-bar">
             <div class="search-filter-group">
               <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="certificateSearch" placeholder="Search students...">
-                <button type="button" class="btn-clear-search" id="btnClearCertCardSearch" title="Clear search" style="display:none;">
+                <button type="button" class="btn-clear-search" id="btnClearCertCardSearch" title="Clear search"
+                  style="display:none;">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
@@ -521,7 +672,8 @@
               <div class="idcards-panel-header">
                 <div class="idcards-filter-row">
                   <div class="custom-select-container idcards-filter-dropdown" id="certCardCourseFilterDropdown">
-                    <button type="button" class="custom-select-trigger" id="certCardCourseFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                    <button type="button" class="custom-select-trigger" id="certCardCourseFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
                       <i class="fa-solid fa-filter select-icon"></i>
                       <span id="certCardCourseFilterDisplay">All Courses</span>
                       <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -532,7 +684,8 @@
                     <input type="hidden" id="certificateCourse" value="all">
                   </div>
                   <div class="custom-select-container idcards-filter-dropdown" id="certCardBatchFilterDropdown">
-                    <button type="button" class="custom-select-trigger" id="certCardBatchFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                    <button type="button" class="custom-select-trigger" id="certCardBatchFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
                       <i class="fa-solid fa-filter select-icon"></i>
                       <span id="certCardBatchFilterDisplay">All Batches</span>
                       <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -542,7 +695,8 @@
                     </ul>
                     <input type="hidden" id="certificateBatch" value="all">
                   </div>
-                  <button type="button" class="idcards-btn-clear-filter" id="btnClearCertCardFilter" title="Clear filters" disabled>Clear</button>
+                  <button type="button" class="idcards-btn-clear-filter" id="btnClearCertCardFilter"
+                    title="Clear filters" disabled>Clear</button>
                 </div>
               </div>
 
@@ -550,10 +704,12 @@
               <div class="idcards-select-all-row">
                 <div class="idcards-header-col-main">
                   <label class="idcards-select-all-label" for="certificateSelectAll" title="Select All Students">
-                    <input type="checkbox" id="certificateSelectAll" class="custom-table-checkbox" aria-label="Select All Students">
+                    <input type="checkbox" id="certificateSelectAll" class="custom-table-checkbox"
+                      aria-label="Select All Students">
                     <span class="idcards-name-wrap">
                       <span class="idcards-select-all-text">Student Name</span>
-                      <span class="student-selection-count idcards-selection-count-badge" id="certificateSelectionCount" aria-live="polite" hidden>0</span>
+                      <span class="student-selection-count idcards-selection-count-badge" id="certificateSelectionCount"
+                        aria-live="polite" hidden>0</span>
                     </span>
                   </label>
                 </div>
@@ -563,7 +719,8 @@
               </div>
 
               <!-- Scrollable Student List -->
-              <div class="idcards-student-list" id="certificateStudents" role="listbox" aria-label="Student Selection List">
+              <div class="idcards-student-list" id="certificateStudents" role="listbox"
+                aria-label="Student Selection List">
                 <!-- Rendered dynamically -->
               </div>
 
@@ -571,7 +728,8 @@
                 <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
                 <h4>No Students Found</h4>
                 <p>No student records match your search or filter.</p>
-                <button type="button" class="btn btn-secondary btn-sm" id="btnResetCertCardFilters" style="margin-top: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnResetCertCardFilters"
+                  style="margin-top: 0.5rem;">
                   <i class="fa-solid fa-rotate-left"></i> Reset Filters
                 </button>
               </div>
@@ -579,12 +737,20 @@
 
             <div class="idcards-preview-panel certificate-preview-panel">
               <div class="certificate-preview-stage">
-                <canvas id="certificateCanvas" width="3722" height="2480" hidden aria-label="Certificate preview"></canvas>
-                <div class="idcard-no-selection" id="certificatePreviewEmpty"><div class="no-selection-icon"><i class="fa-solid fa-certificate"></i></div><h4>No Student Selected</h4><p>Select any student from the left list to preview their certificate.</p></div>
+                <canvas id="certificateCanvas" width="3722" height="2480" hidden
+                  aria-label="Certificate preview"></canvas>
+                <div class="idcard-no-selection" id="certificatePreviewEmpty">
+                  <div class="no-selection-icon"><i class="fa-solid fa-certificate"></i></div>
+                  <h4>No Student Selected</h4>
+                  <p>Select any student from the left list to preview their certificate.</p>
+                </div>
               </div>
               <p id="certCanvasStatus" role="status"></p>
-              <div class="idcards-preview-actions"><button type="button" class="btn btn-secondary idcard-download-btn" id="certificateDownloadSelected" disabled><i class="fa-solid fa-download"></i> Download Certificate</button></div>
-              <button id="btnDownloadCertificate" hidden disabled>Download</button><button id="btnPrintCertificate" hidden disabled>Print</button>
+              <div class="idcards-preview-actions"><button type="button" class="btn btn-secondary idcard-download-btn"
+                  id="certificateDownloadSelected" disabled><i class="fa-solid fa-download"></i> Download
+                  Certificate</button></div>
+              <button id="btnDownloadCertificate" hidden disabled>Download</button><button id="btnPrintCertificate"
+                hidden disabled>Print</button>
             </div>
           </div>
         </section>
@@ -596,7 +762,8 @@
               <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="idCardStudentSearchInput" placeholder="Search students...">
-                <button type="button" class="btn-clear-search" id="btnClearIdCardSearch" title="Clear search" style="display:none;">
+                <button type="button" class="btn-clear-search" id="btnClearIdCardSearch" title="Clear search"
+                  style="display:none;">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
@@ -611,7 +778,8 @@
               <div class="idcards-panel-header">
                 <div class="idcards-filter-row">
                   <div class="custom-select-container idcards-filter-dropdown" id="idCardCourseFilterDropdown">
-                    <button type="button" class="custom-select-trigger" id="idCardCourseFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                    <button type="button" class="custom-select-trigger" id="idCardCourseFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
                       <i class="fa-solid fa-filter select-icon"></i>
                       <span id="idCardCourseFilterDisplay">All Courses</span>
                       <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -622,7 +790,8 @@
                     <input type="hidden" id="idCardCourseFilterVal" value="all">
                   </div>
                   <div class="custom-select-container idcards-filter-dropdown" id="idCardBatchFilterDropdown">
-                    <button type="button" class="custom-select-trigger" id="idCardBatchFilterTrigger" aria-haspopup="listbox" aria-expanded="false">
+                    <button type="button" class="custom-select-trigger" id="idCardBatchFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
                       <i class="fa-solid fa-filter select-icon"></i>
                       <span id="idCardBatchFilterDisplay">All Batches</span>
                       <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -632,7 +801,8 @@
                     </ul>
                     <input type="hidden" id="idCardBatchFilterVal" value="all">
                   </div>
-                  <button type="button" class="idcards-btn-clear-filter" id="btnClearIdCardFilter" title="Clear filters" disabled>Clear</button>
+                  <button type="button" class="idcards-btn-clear-filter" id="btnClearIdCardFilter" title="Clear filters"
+                    disabled>Clear</button>
                 </div>
               </div>
 
@@ -640,20 +810,28 @@
               <div class="idcards-select-all-row">
                 <div class="idcards-header-col-main">
                   <label class="idcards-select-all-label" for="idCardSelectAllCheckbox" title="Select All Students">
-                    <input type="checkbox" id="idCardSelectAllCheckbox" class="custom-table-checkbox" aria-label="Select All Students">
+                    <input type="checkbox" id="idCardSelectAllCheckbox" class="custom-table-checkbox"
+                      aria-label="Select All Students">
                     <span class="idcards-name-wrap">
                       <span class="idcards-select-all-text">Student Name</span>
-                      <span class="student-selection-count idcards-selection-count-badge" id="idCardSelectionCountBadge" aria-live="polite" hidden>0</span>
+                      <span class="student-selection-count idcards-selection-count-badge" id="idCardSelectionCountBadge"
+                        aria-live="polite" hidden>0</span>
                     </span>
                   </label>
                 </div>
                 <div class="idcards-header-col-status">
-                  <div class="custom-select-container th-status-header-wrap th-minimal-dropdown" id="idCardStatusFilterDropdown">
-                    <button type="button" class="btn-th-filter btn-th-status-filter" id="idCardStatusFilterTrigger" title="Filter by Status" aria-label="Filter by Status" aria-haspopup="listbox" aria-expanded="false">
+                  <div class="custom-select-container th-status-header-wrap th-minimal-dropdown"
+                    id="idCardStatusFilterDropdown">
+                    <button type="button" class="btn-th-filter btn-th-status-filter" id="idCardStatusFilterTrigger"
+                      title="Filter by Status" aria-label="Filter by Status" aria-haspopup="listbox"
+                      aria-expanded="false">
                       <span>Course Status</span>
-                      <svg width="7" height="12" viewBox="0 0 217 383" fill="currentColor" aria-hidden="true" style="display: block;">
-                        <path d="M 98 10 C 103 2 114 2 119 10 L 213 148 C 219 157 213 169 202 169 L 15 169 C 4 169 -2 157 4 148 Z"/>
-                        <path d="M 98 373 C 103 381 114 381 119 373 L 213 235 C 219 226 213 214 202 214 L 15 214 C 4 214 -2 226 4 235 Z"/>
+                      <svg width="7" height="12" viewBox="0 0 217 383" fill="currentColor" aria-hidden="true"
+                        style="display: block;">
+                        <path
+                          d="M 98 10 C 103 2 114 2 119 10 L 213 148 C 219 157 213 169 202 169 L 15 169 C 4 169 -2 157 4 148 Z" />
+                        <path
+                          d="M 98 373 C 103 381 114 381 119 373 L 213 235 C 219 226 213 214 202 214 L 15 214 C 4 214 -2 226 4 235 Z" />
                       </svg>
                     </button>
                     <span id="idCardStatusFilterDisplay" style="display: none;">All Statuses</span>
@@ -669,7 +847,8 @@
               </div>
 
               <!-- Scrollable Student List -->
-              <div class="idcards-student-list" id="idCardStudentList" role="listbox" aria-label="Student Selection List">
+              <div class="idcards-student-list" id="idCardStudentList" role="listbox"
+                aria-label="Student Selection List">
                 <!-- Rendered dynamically -->
               </div>
 
@@ -677,7 +856,8 @@
                 <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
                 <h4>No Students Found</h4>
                 <p>No student records match your search or filter.</p>
-                <button type="button" class="btn btn-secondary btn-sm" id="btnResetIdCardFilters" style="margin-top: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnResetIdCardFilters"
+                  style="margin-top: 0.5rem;">
                   <i class="fa-solid fa-rotate-left"></i> Reset Filters
                 </button>
               </div>
@@ -698,7 +878,8 @@
                         </filter>
 
                         <!-- Cylindrical satin fabric gradients -->
-                        <linearGradient id="frontStrapGrad" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(64)">
+                        <linearGradient id="frontStrapGrad" x1="0%" y1="0%" x2="100%" y2="0%"
+                          gradientTransform="rotate(64)">
                           <stop offset="0%" stop-color="#005ea6" />
                           <stop offset="12%" stop-color="#006ec7" />
                           <stop offset="42%" stop-color="#007fe8" />
@@ -707,7 +888,8 @@
                           <stop offset="100%" stop-color="#005ea6" />
                         </linearGradient>
 
-                        <linearGradient id="backStrapGrad" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(-64)">
+                        <linearGradient id="backStrapGrad" x1="0%" y1="0%" x2="100%" y2="0%"
+                          gradientTransform="rotate(-64)">
                           <stop offset="0%" stop-color="#04325a" />
                           <stop offset="15%" stop-color="#064478" />
                           <stop offset="50%" stop-color="#095596" />
@@ -717,24 +899,29 @@
                         </linearGradient>
 
                         <!-- Transverse woven polyester ribbing texture patterns -->
-                        <pattern id="ribbonTextureLeft" width="20" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(-26)">
+                        <pattern id="ribbonTextureLeft" width="20" height="3.5" patternUnits="userSpaceOnUse"
+                          patternTransform="rotate(-26)">
                           <line x1="0" y1="0.8" x2="20" y2="0.8" stroke="rgba(255,255,255,0.13)" stroke-width="1.1" />
                           <line x1="0" y1="2.4" x2="20" y2="2.4" stroke="rgba(0,0,0,0.12)" stroke-width="1.1" />
                         </pattern>
 
-                        <pattern id="ribbonTextureRight" width="20" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(26)">
+                        <pattern id="ribbonTextureRight" width="20" height="3.5" patternUnits="userSpaceOnUse"
+                          patternTransform="rotate(26)">
                           <line x1="0" y1="0.8" x2="20" y2="0.8" stroke="rgba(255,255,255,0.13)" stroke-width="1.1" />
                           <line x1="0" y1="2.4" x2="20" y2="2.4" stroke="rgba(0,0,0,0.12)" stroke-width="1.1" />
                         </pattern>
                       </defs>
 
                       <!-- Back strap base gradient -->
-                      <polygon class="lanyard-strap-back" points="-18,0 17.6,0 700.4,-1400 664.8,-1400" fill="url(#backStrapGrad)" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
+                      <polygon class="lanyard-strap-back" points="-18,0 17.6,0 700.4,-1400 664.8,-1400"
+                        fill="url(#backStrapGrad)" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
                       <!-- Back strap woven ribbing texture overlay -->
                       <polygon points="-18,0 17.6,0 700.4,-1400 664.8,-1400" fill="url(#ribbonTextureRight)" />
 
                       <!-- Front strap base gradient with crossover drop shadow -->
-                      <polygon class="lanyard-strap-front" points="-17.6,0 18,0 -664.8,-1400 -700.4,-1400" fill="url(#frontStrapGrad)" filter="url(#lanyardStrapShadow)" stroke="rgba(0,0,0,0.12)" stroke-width="0.8" />
+                      <polygon class="lanyard-strap-front" points="-17.6,0 18,0 -664.8,-1400 -700.4,-1400"
+                        fill="url(#frontStrapGrad)" filter="url(#lanyardStrapShadow)" stroke="rgba(0,0,0,0.12)"
+                        stroke-width="0.8" />
                       <!-- Front strap woven ribbing texture overlay -->
                       <polygon points="-17.6,0 18,0 -664.8,-1400 -700.4,-1400" fill="url(#ribbonTextureLeft)" />
                     </svg>
@@ -753,7 +940,8 @@
                           <i class="fa-solid fa-id-badge"></i>
                         </div>
                         <h4>No Student Selected</h4>
-                        <p>Select any student from the left list to instantly generate and preview their dynamic ID card.</p>
+                        <p>Select any student from the left list to instantly generate and preview their dynamic ID
+                          card.</p>
                       </div>
                     </div>
                   </div>
@@ -761,8 +949,14 @@
                 </div>
               </div>
               <div class="idcards-preview-actions" id="idCardPreviewActions">
-                <button type="button" class="btn btn-secondary idcard-download-btn" id="btnDownloadIdCard" title="Download ID Card" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg> Download ID Card
+                <button type="button" class="btn btn-secondary idcard-download-btn" id="btnDownloadIdCard"
+                  title="Download ID Card" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                    <polyline points="6 10 12 16 18 10"></polyline>
+                    <line x1="4" y1="21" x2="20" y2="21"></line>
+                  </svg> Download ID Card
                 </button>
               </div>
             </div>
@@ -782,7 +976,8 @@
                 </button>
               </div>
               <div class="custom-select-container toolbar-filter-dropdown card-sort-dropdown" id="courseSortDropdown">
-                <button type="button" class="custom-select-trigger" id="courseSortTrigger" aria-label="Sort courses by" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="courseSortTrigger" aria-label="Sort courses by"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-arrow-down-wide-short select-icon"></i>
                   <span id="courseSortDisplay">Sort by :&nbsp;Name (A → Z)</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -841,7 +1036,8 @@
                 <i class="fa-regular fa-envelope-open"></i>
                 <span>Mark All as Read</span>
               </button>
-              <button type="button" class="btn btn-danger" id="btnBulkDeleteInbox" title="Delete selected messages" disabled>
+              <button type="button" class="btn btn-danger" id="btnBulkDeleteInbox" title="Delete selected messages"
+                disabled>
                 <i class="fa-regular fa-trash-can"></i> <span>Delete</span>
               </button>
             </div>
@@ -852,7 +1048,8 @@
             <div class="card-body">
               <div class="inbox-table-header">
                 <label class="inbox-header-checkbox-col" for="selectAllInboxCheckbox" title="Select All Messages">
-                  <input type="checkbox" id="selectAllInboxCheckbox" aria-label="Select All Messages" class="custom-table-checkbox">
+                  <input type="checkbox" id="selectAllInboxCheckbox" aria-label="Select All Messages"
+                    class="custom-table-checkbox">
                 </label>
                 <div class="inbox-header-info-col">
                   <span class="inbox-header-label">All Messages</span>
@@ -879,834 +1076,7 @@
           </div>
         </section>
 
-        <!-- ================= BRANDING VIEW ================= -->
-        <section class="view-section" id="view-branding">
-          <!-- Main Container Card -->
-          <div class="dashboard-card branding-card">
-            <div class="card-body" style="padding: 0; flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;">
-              <div class="branding-scroll-container">
-                <form id="brandingForm">
-                  
-                  <div class="personalisation-section-header">
-                    <div class="personalisation-section-icon">
-                      <i class="fa-solid fa-palette"></i>
-                    </div>
-                    <div class="personalisation-section-meta">
-                      <h3 class="personalisation-section-title">Academy Identity &amp; Branding</h3>
-                      <p class="personalisation-section-subtitle">Manage your official academy brand name, primary logo, and contact details used across your academy portal and public website.</p>
-                    </div>
-                  </div>
 
-                  <div class="form-row">
-                    <!-- Academy Name -->
-                    <div class="form-group flex-1">
-                      <label for="brandingAcademyName">Academy Name <span class="required">*</span></label>
-                      <div class="input-icon-wrap">
-                        <i class="fa-solid fa-school"></i>
-                        <input type="text" id="brandingAcademyName" class="name-input-capitalized" data-capitalize="true" placeholder="e.g. Diganta Computer Centre" required>
-                      </div>
-                      <small class="form-help-text">Displayed on the admin sidebar, certificates, ID cards, and public website.</small>
-                    </div>
-
-                    <!-- Phone Number -->
-                    <div class="form-group flex-1">
-                      <label for="brandingPhone">Primary Phone Number <span class="required">*</span></label>
-                      <div class="input-icon-wrap">
-                        <i class="fa-solid fa-phone"></i>
-                        <input type="tel" id="brandingPhone" placeholder="e.g. 9733894742 or +91 98765 43210" required>
-                      </div>
-                      <small class="form-help-text">Helpline contact number for students and website visitors.</small>
-                    </div>
-                  </div>
-
-                  <div class="form-row">
-                    <!-- Email Address -->
-                    <div class="form-group flex-1">
-                      <label for="brandingEmail">Official Email Address <span class="required">*</span></label>
-                      <div class="input-icon-wrap">
-                        <i class="fa-solid fa-envelope"></i>
-                        <input type="email" id="brandingEmail" placeholder="e.g. contact@academy.com" required>
-                      </div>
-                      <small class="form-help-text">Primary contact email for general inquiries and official communications.</small>
-                    </div>
-                  </div>
-
-                  <!-- Logo Uploader Component -->
-                  <div class="form-group" style="margin-top: 1.25rem;">
-                    <label>Academy Logo</label>
-                    <div class="branding-logo-uploader-card" id="brandingLogoDropZone">
-                      
-                      <!-- Logo Preview Box -->
-                      <div class="branding-logo-preview-area">
-                        <div class="branding-logo-preview-inner" id="brandingLogoPreviewBox">
-                          <img id="brandingLogoImg" src="" alt="Academy Logo" style="display: none;">
-                          <div class="branding-logo-empty" id="brandingLogoPlaceholder">
-                            <div class="empty-icon" style="width: 50px; height: 50px; font-size: 1.35rem; margin-bottom: 0.5rem; background: var(--surface-muted); color: var(--text-subtle);">
-                              <i class="fa-regular fa-image"></i>
-                            </div>
-                            <strong style="font-size: 0.95rem; color: var(--text-main);">Upload Academy Logo</strong>
-                            <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">PNG, JPG, SVG or WebP image files (max 5 MB)</span>
-                          </div>
-                        </div>
-
-                        <!-- Controls -->
-                        <div class="branding-logo-actions">
-                          <input type="file" id="brandingLogoFileInput" accept="image/*" style="display: none;">
-                          <button type="button" class="btn btn-secondary btn-sm" id="btnUploadBrandingLogo">
-                            <i class="fa-solid fa-arrow-up-from-bracket"></i>
-                            <span>Upload Logo</span>
-                          </button>
-                          <button type="button" class="btn btn-outline btn-sm" id="btnRemoveBrandingLogo" style="display: none; color: var(--rose);">
-                            <i class="fa-regular fa-trash-can"></i>
-                            <span>Remove</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- URL Input fallback -->
-                      <div class="branding-logo-url-toggle" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                        <label for="brandingLogoUrl" style="font-size: 0.825rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem; display: block;">Or direct Image URL</label>
-                        <div class="input-icon-wrap">
-                          <i class="fa-solid fa-link"></i>
-                          <input type="url" id="brandingLogoUrl" placeholder="https://.../logo.png">
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                </form>
-              </div>
-            </div>
-
-            <!-- Footer Action Button Bar -->
-            <div class="personalisation-actions-bar">
-              <button type="button" class="btn btn-primary btn-pers-action" id="btnSaveBranding">
-                <i class="fa-solid fa-floppy-disk"></i>
-                <span>Save Changes</span>
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- ================= PERSONALISATION VIEW ================= -->
-        <section class="view-section" id="view-personalisation">
-          <!-- Main Container Card (as student lists are in a container) -->
-          <div class="dashboard-card personalisation-card">
-            
-            <!-- Section-wise Tabs Navigation Bar (Matching Public Site Sections) -->
-            <div class="personalisation-tabs-nav" role="tablist" aria-label="Personalisation Sections">
-              <button type="button" class="pers-tab-btn active" data-tab="hero" role="tab" aria-selected="true">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span>Hero Section</span>
-              </button>
-              <button type="button" class="pers-tab-btn" data-tab="banner" role="tab" aria-selected="false">
-                <i class="fa-solid fa-bullhorn"></i>
-                <span>Top Banner</span>
-              </button>
-              <button type="button" class="pers-tab-btn" data-tab="about" role="tab" aria-selected="false">
-                <i class="fa-solid fa-circle-info"></i>
-                <span>About Us</span>
-              </button>
-              <button type="button" class="pers-tab-btn" data-tab="accreditations" role="tab" aria-selected="false">
-                <i class="fa-solid fa-certificate"></i>
-                <span>Accreditations &amp; Logos</span>
-              </button>
-              <button type="button" class="pers-tab-btn" data-tab="gallery" role="tab" aria-selected="false">
-                <i class="fa-regular fa-images"></i>
-                <span>Gallery</span>
-              </button>
-              <button type="button" class="pers-tab-btn" data-tab="contact" role="tab" aria-selected="false">
-                <i class="fa-solid fa-location-dot"></i>
-                <span>Contact &amp; Location</span>
-              </button>
-              <button type="button" class="pers-tab-btn" data-tab="socials" role="tab" aria-selected="false">
-                <i class="fa-solid fa-share-nodes"></i>
-                <span>Connect &amp; Socials</span>
-              </button>
-              <button type="button" class="pers-tab-btn" data-tab="footer" role="tab" aria-selected="false">
-                <i class="fa-solid fa-bars-staggered"></i>
-                <span>Footer</span>
-              </button>
-            </div>
-
-            <div class="card-body">
-              <div class="personalisation-scroll-container">
-                <form id="personalisationForm">
-                  
-                  <!-- Tab 1: Hero Section -->
-                  <div class="pers-tab-pane active" id="tab-pane-hero">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persHeroTitle1">Hero Title Line 1 (Main Name)</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persHeroTitle1">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persHeroTitle2">Hero Title Line 2 (Subtitle Accent)</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persHeroTitle2">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-group">
-                          <label for="persHeroDesc">Hero Subtitle / Description</label>
-                          <textarea id="persHeroDesc" rows="3" class="form-textarea"></textarea>
-                        </div>
-
-                        <!-- Hero Section Photos: Single Multi-Photo Upload Field (Up to 5 Photos) -->
-                        <div class="form-group">
-                          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
-                            <label style="font-weight: 600; font-size: 0.8125rem; color: var(--text-main); margin-bottom: 0;">
-                              Hero Banner Photos (Up to 5 Slideshow Photos)
-                            </label>
-                            <span id="heroPhotosCountBadge" style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 9999px; background: #e0f2fe; color: #0369a1;">
-                              0 / 5 Photos
-                            </span>
-                          </div>
-
-                          <div class="hero-multi-uploader-card" id="heroPhotosDropZone">
-                            <input type="file" id="persHeroPhotosFile" accept="image/*" multiple style="display: none;">
-                            
-                            <!-- Photos Thumbnail Grid (5 Photo Upload Slots) -->
-                            <div class="hero-photos-grid" id="heroPhotosGrid">
-                              <div class="hero-photo-add-slot" data-slot-index="0" title="Click to add photo">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Add Photo</span>
-                              </div>
-                              <div class="hero-photo-add-slot" data-slot-index="1" title="Click to add photo">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Add Photo</span>
-                              </div>
-                              <div class="hero-photo-add-slot" data-slot-index="2" title="Click to add photo">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Add Photo</span>
-                              </div>
-                              <div class="hero-photo-add-slot" data-slot-index="3" title="Click to add photo">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Add Photo</span>
-                              </div>
-                              <div class="hero-photo-add-slot" data-slot-index="4" title="Click to add photo">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Add Photo</span>
-                              </div>
-                            </div>
-
-                            <!-- Hidden inputs for backward compatibility -->
-                            <input type="hidden" id="persHeroImg1" value="">
-                            <input type="hidden" id="persHeroImg2" value="">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilityHero" class="section-visibility-checkbox" data-section="hero" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tab 2: Top Banner & Notices -->
-                  <div class="pers-tab-pane" id="tab-pane-banner">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persNotice1">Marquee Notice 1 (Admissions Announcement)</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persNotice1" placeholder="e.g. Notice: Admissions Open for 2026 Academic Batches">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persNotice2">Marquee Notice 2 (Verification Announcement)</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persNotice2" placeholder="e.g. Fast-track Certificate Verification Portal is Live">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persNotice3">Marquee Notice 3 (Support Helpline)</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persNotice3" placeholder="e.g. Contact Admissions Helpline for Registration Assistance">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persBannerPhone">Admissions Call Banner Phone</label>
-                            <div class="input-icon-wrap">
-                              <input type="tel" id="persBannerPhone" maxlength="10" placeholder="e.g. 9733894742">
-                            </div>
-                            <small class="form-help-text">Displayed on the top white badge banner "For admission".</small>
-                          </div>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-2">
-                            <label for="persBannerTagline">Top Badge Banner Tagline</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persBannerTagline" placeholder="e.g. Building Skills. Creating Futures.">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persEstYear">Established Year</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persEstYear" placeholder="e.g. 2005" maxlength="4">
-                            </div>
-                            <small class="form-help-text">Appears in EST. badge banner.</small>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilityBanner" class="section-visibility-checkbox" data-section="banner" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tab 3: About Us -->
-                  <div class="pers-tab-pane" id="tab-pane-about">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-row">
-                          <div class="form-group flex-2">
-                            <label for="persAboutHeadline">About Page Title / Mission Statement</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persAboutHeadline" placeholder="e.g. Quality technical education, practical skills, and trusted training since 2005.">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persAboutDirector">Director Supervision Heading</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persAboutDirector" placeholder="e.g. Supervised & Directed by Diganta">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-group">
-                          <label for="persAboutStory">Academy Story / About Description <span class="required">*</span></label>
-                          <textarea id="persAboutStory" rows="5" class="form-textarea" placeholder="Detail your academy's history, mission, vision, and teaching methodology..." required></textarea>
-                        </div>
-
-                        <div class="form-group" style="margin-top: 0.75rem;">
-                          <label style="font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 0.35rem; display: block;">
-                            About Story Photo
-                          </label>
-                          <small class="form-help-text" style="margin-bottom: 0.65rem; display: block;">
-                            Image displayed beside the story text on the About page.
-                          </small>
-                          <div class="single-photo-uploader-card" id="aboutStoryDropZone">
-                            <input type="file" id="persAboutStoryImgFile" accept="image/*" style="display: none;">
-                            <input type="hidden" id="persAboutStoryImg" value="">
-                            <div class="single-photo-preview-area">
-                              <div class="single-photo-preview-inner" id="aboutStoryPreviewBox" style="min-height: 120px;">
-                                <img id="persAboutStoryPreviewImg" src="" alt="About Story Photo" style="max-height: 140px; max-width: 100%; display: none;">
-                                <div class="single-photo-empty" id="persAboutStoryPlaceholder">
-                                  <div class="empty-icon" style="width: 44px; height: 44px; font-size: 1.25rem; margin-bottom: 0.35rem; background: var(--surface-muted); color: var(--text-subtle);">
-                                    <i class="fa-regular fa-image"></i>
-                                  </div>
-                                  <div class="single-photo-empty-title">Upload About Story Photo</div>
-                                  <div class="single-photo-empty-subtitle">PNG, JPG, WebP up to 5MB</div>
-                                </div>
-                              </div>
-                              <div class="single-photo-actions" style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center;">
-                                <button type="button" class="btn btn-secondary btn-sm" id="btnUploadAboutStoryImg">
-                                  <i class="fa-solid fa-cloud-arrow-up"></i>
-                                  <span>Upload Photo</span>
-                                </button>
-                                <button type="button" class="btn btn-outline btn-sm text-danger" id="btnRemoveAboutStoryImg" style="display: none;">
-                                  <i class="fa-regular fa-trash-can"></i>
-                                  <span>Remove</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <label style="font-weight: 600; font-size: 0.9rem; margin-top: 1.25rem; margin-bottom: 0.5rem; display: block; color: var(--text-main);">
-                          Key Highlights (Featured on About Us Section &amp; Page)
-                        </label>
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persHighlight1">Highlight 1</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persHighlight1" placeholder="e.g. Certified Expert Faculty">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persHighlight2">Highlight 2</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persHighlight2" placeholder="e.g. 100% Practical Hands-on Labs">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persHighlight3">Highlight 3</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persHighlight3" placeholder="e.g. Recognized Government &amp; Industry Certifications">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persHighlight4">Highlight 4</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persHighlight4" placeholder="e.g. Career Guidance &amp; Placement Support">
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilityAbout" class="section-visibility-checkbox" data-section="about" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tab 4: Accreditations & Logos -->
-                  <div class="pers-tab-pane" id="tab-pane-accreditations">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-row">
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label style="font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 0.35rem; display: block;">
-                              Academy Main Logo
-                            </label>
-                            <small class="form-help-text" style="margin-bottom: 0.65rem; display: block;">
-                              Displayed in navbar &amp; footer. Upload PNG, SVG, JPG or WebP.
-                            </small>
-                            <div class="single-photo-uploader-card" id="logoDropZone">
-                              <input type="file" id="persLogoFile" accept="image/*" style="display: none;">
-                              <input type="hidden" id="persLogoUrl" value="">
-                              <div class="single-photo-preview-area">
-                                <div class="single-photo-preview-inner" id="persLogoPreviewBox" style="min-height: 90px;">
-                                  <img id="persLogoPreviewImg" src="" alt="Logo Preview" style="max-height: 70px; max-width: 100%; display: none;">
-                                  <div class="single-photo-empty" id="persLogoPreviewPlaceholder">
-                                    <div class="empty-icon" style="width: 40px; height: 40px; font-size: 1.15rem; margin-bottom: 0.25rem; background: var(--surface-muted); color: var(--text-subtle);">
-                                      <i class="fa-regular fa-image"></i>
-                                    </div>
-                                    <div class="single-photo-empty-title">Upload Main Logo</div>
-                                    <div class="single-photo-empty-subtitle">PNG, SVG, JPG, WebP</div>
-                                  </div>
-                                </div>
-                                <div class="single-photo-actions" style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center;">
-                                  <button type="button" class="btn btn-secondary btn-sm" id="btnUploadLogo">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                                    <span>Upload Logo</span>
-                                  </button>
-                                  <button type="button" class="btn btn-outline btn-sm text-danger" id="btnRemoveLogo" style="display: none;">
-                                    <i class="fa-regular fa-trash-can"></i>
-                                    <span>Remove</span>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="form-group flex-1">
-                            <label style="font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 0.35rem; display: block;">
-                              Browser Favicon Icon
-                            </label>
-                            <small class="form-help-text" style="margin-bottom: 0.65rem; display: block;">
-                              Square icon (32x32 or 64x64) displayed on browser tabs.
-                            </small>
-                            <div class="single-photo-uploader-card" id="faviconDropZone">
-                              <input type="file" id="persFaviconFile" accept="image/*" style="display: none;">
-                              <input type="hidden" id="persFaviconUrl" value="">
-                              <div class="single-photo-preview-area">
-                                <div class="single-photo-preview-inner" id="persFaviconPreviewBox" style="min-height: 90px;">
-                                  <img id="persFaviconPreviewImg" src="" alt="Favicon Preview" style="max-height: 48px; max-width: 48px; display: none;">
-                                  <div class="single-photo-empty" id="persFaviconPreviewPlaceholder">
-                                    <div class="empty-icon" style="width: 40px; height: 40px; font-size: 1.15rem; margin-bottom: 0.25rem; background: var(--surface-muted); color: var(--text-subtle);">
-                                      <i class="fa-solid fa-icons"></i>
-                                    </div>
-                                    <div class="single-photo-empty-title">Upload Favicon</div>
-                                    <div class="single-photo-empty-subtitle">Square PNG or ICO (32x32)</div>
-                                  </div>
-                                </div>
-                                <div class="single-photo-actions" style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center;">
-                                  <button type="button" class="btn btn-secondary btn-sm" id="btnUploadFavicon">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                                    <span>Upload Favicon</span>
-                                  </button>
-                                  <button type="button" class="btn btn-outline btn-sm text-danger" id="btnRemoveFavicon" style="display: none;">
-                                    <i class="fa-regular fa-trash-can"></i>
-                                    <span>Remove</span>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-row" style="margin-top: 0.5rem;">
-                          <div class="form-group flex-1">
-                            <label style="font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 0.35rem; display: block;">
-                              Director Signature / Stamp Seal
-                            </label>
-                            <small class="form-help-text" style="margin-bottom: 0.65rem; display: block;">
-                              Transparent PNG signature printed on student certificates.
-                            </small>
-                            <div class="single-photo-uploader-card" id="signatureDropZone">
-                              <input type="file" id="persSignatureFile" accept="image/*" style="display: none;">
-                              <input type="hidden" id="persSignatureUrl" value="">
-                              <div class="single-photo-preview-area">
-                                <div class="single-photo-preview-inner" id="persSignaturePreviewBox" style="min-height: 80px;">
-                                  <img id="persSignaturePreviewImg" src="" alt="Signature Preview" style="max-height: 60px; max-width: 100%; display: none;">
-                                  <div class="single-photo-empty" id="persSignaturePreviewPlaceholder">
-                                    <div class="empty-icon" style="width: 40px; height: 40px; font-size: 1.15rem; margin-bottom: 0.25rem; background: var(--surface-muted); color: var(--text-subtle);">
-                                      <i class="fa-solid fa-signature"></i>
-                                    </div>
-                                    <div class="single-photo-empty-title">Upload Signature / Seal</div>
-                                    <div class="single-photo-empty-subtitle">Transparent PNG recommended</div>
-                                  </div>
-                                </div>
-                                <div class="single-photo-actions" style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center;">
-                                  <button type="button" class="btn btn-secondary btn-sm" id="btnUploadSignature">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                                    <span>Upload Signature</span>
-                                  </button>
-                                  <button type="button" class="btn btn-outline btn-sm text-danger" id="btnRemoveSignature" style="display: none;">
-                                    <i class="fa-regular fa-trash-can"></i>
-                                    <span>Remove</span>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Registered Under / Accreditation Logos Multi-Uploader -->
-                        <div class="form-group" style="margin-top: 1rem;">
-                          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                            <label style="font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 0;">
-                              Registered Under / Accreditation Logos
-                            </label>
-                            <span id="accreditationsCountBadge" style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 9999px; background: var(--surface-muted); color: var(--text-secondary);">
-                              0 Logos Uploaded
-                            </span>
-                          </div>
-                          <small class="form-help-text" style="margin-bottom: 0.75rem; display: block;">
-                            Logos displayed under "REGISTERED UNDER" on the home page (e.g. WB Govt, MSME, ISO, NSDC).
-                          </small>
-
-                          <div class="hero-multi-uploader-card" id="accreditationsDropZone">
-                            <input type="file" id="persAccreditationsFile" accept="image/*" multiple style="display: none;">
-                            <input type="hidden" id="persAccreditationUrls" value="">
-                            
-                            <div class="hero-photos-grid" id="persAccreditationsGrid">
-                              <!-- Populated dynamically -->
-                            </div>
-
-                            <div class="hero-multi-actions">
-                              <div class="hero-multi-drop-prompt">
-                                <div class="empty-icon" style="width: 44px; height: 44px; font-size: 1.25rem; margin-bottom: 0.35rem; background: var(--surface-muted); color: var(--text-subtle);">
-                                  <i class="fa-solid fa-certificate"></i>
-                                </div>
-                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Click or Drag &amp; Drop accreditation logos</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">PNG, SVG, JPG up to 5MB each</div>
-                              </div>
-                              <div style="display: flex; gap: 0.65rem; align-items: center; justify-content: center; margin-top: 0.5rem;">
-                                <button type="button" class="btn btn-secondary btn-sm" id="btnUploadAccreditations">
-                                  <i class="fa-solid fa-cloud-arrow-up"></i>
-                                  <span>Upload Logos</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilityAccreditations" class="section-visibility-checkbox" data-section="accreditations" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tab 5: Gallery -->
-                  <div class="pers-tab-pane" id="tab-pane-gallery">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persGalleryHeading">Gallery Section Heading</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persGalleryHeading" placeholder="e.g. Our Students">
-                            </div>
-                          </div>
-                          <div class="form-group flex-2">
-                            <label for="persGallerySubtitle">Gallery Subtitle</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persGallerySubtitle" placeholder="e.g. A glimpse into our classrooms, practical sessions, and student learning experiences.">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-group" style="margin-top: 0.75rem;">
-                          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-                            <label style="font-weight: 600; font-size: 0.875rem; color: var(--text-main); margin-bottom: 0;">
-                              Gallery Photos
-                            </label>
-                            <span id="galleryCountBadge" style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.65rem; border-radius: 9999px; background: var(--surface-muted); color: var(--text-secondary);">
-                              0 Photos Uploaded
-                            </span>
-                          </div>
-                          <small class="form-help-text" style="margin-bottom: 0.75rem; display: block;">
-                            Upload student photos, classrooms, and activities to showcase in the student gallery grid.
-                          </small>
-
-                          <div class="hero-multi-uploader-card" id="galleryDropZone">
-                            <input type="file" id="persGalleryFiles" accept="image/*" multiple style="display: none;">
-                            <input type="hidden" id="persGalleryUrls" value="">
-
-                            <div class="hero-photos-grid" id="persGalleryGrid">
-                              <!-- Populated dynamically -->
-                            </div>
-
-                            <div class="hero-multi-actions">
-                              <div class="hero-multi-drop-prompt">
-                                <div class="empty-icon" style="width: 44px; height: 44px; font-size: 1.25rem; margin-bottom: 0.35rem; background: var(--surface-muted); color: var(--text-subtle);">
-                                  <i class="fa-regular fa-images"></i>
-                                </div>
-                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Click or Drag &amp; Drop gallery photos</div>
-                                <div style="font-size: 0.75rem; color: var(--text-muted);">PNG, JPG, WebP up to 5MB each</div>
-                              </div>
-                              <div style="display: flex; gap: 0.65rem; align-items: center; justify-content: center; margin-top: 0.5rem;">
-                                <button type="button" class="btn btn-secondary btn-sm" id="btnUploadGalleryPhotos">
-                                  <i class="fa-solid fa-cloud-arrow-up"></i>
-                                  <span>Upload Gallery Photos</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilityGallery" class="section-visibility-checkbox" data-section="gallery" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tab 6: Contact & Location -->
-                  <div class="pers-tab-pane" id="tab-pane-contact">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persPhone">Primary Mobile / Helpline <span class="required">*</span></label>
-                            <div class="input-icon-wrap">
-                              <input type="tel" id="persPhone" maxlength="10" placeholder="10-digit primary phone" required>
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persSecondaryPhone">Secondary Phone / Alternative</label>
-                            <div class="input-icon-wrap">
-                              <input type="tel" id="persSecondaryPhone" maxlength="10" placeholder="Alternative contact number">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persEmail">Public Inquiry Email <span class="required">*</span></label>
-                            <div class="input-icon-wrap">
-                              <input type="email" id="persEmail" placeholder="admissions@academy.com" required>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persBranch1">Branch 1 / Main Campus (Name &amp; Landmark)</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persBranch1" placeholder="e.g. Shyampur — Opposite to SBI Branch">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persBranch2">Branch 2 / Extension (Optional)</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persBranch2" placeholder="e.g. Gujarpur — Near Pichhaldaha Hospital">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-2">
-                            <label for="persAddress">Campus Street Address / City</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persAddress" placeholder="e.g. HOWRAH, WEST BENGAL">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persPinCode">PIN Code</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persPinCode" maxlength="6" placeholder="e.g. 711314">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-group">
-                          <label for="persMapUrl">Google Maps Directions / Embed Link</label>
-                          <div class="input-icon-wrap">
-                            <input type="url" id="persMapUrl" placeholder="https://maps.google.com/maps?q=...">
-                          </div>
-                          <small class="form-help-text">Direct Google Maps embed or coordinates link displayed in the interactive map card.</small>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilityContact" class="section-visibility-checkbox" data-section="contact" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tab 7: Connect & Socials -->
-                  <div class="pers-tab-pane" id="tab-pane-socials">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persSocialWhatsapp">WhatsApp Direct Chat Link / Number</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persSocialWhatsapp" placeholder="https://wa.me/91... or 10-digit number">
-                            </div>
-                            <small class="form-help-text">Powers the quick "WhatsApp Chat with us" button.</small>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persSocialFacebook">Facebook Page URL</label>
-                            <div class="input-icon-wrap">
-                              <input type="url" id="persSocialFacebook" placeholder="https://facebook.com/your-academy">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persSocialInstagram">Instagram Profile URL</label>
-                            <div class="input-icon-wrap">
-                              <input type="url" id="persSocialInstagram" placeholder="https://instagram.com/your-academy">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persSocialYoutube">YouTube Channel URL</label>
-                            <div class="input-icon-wrap">
-                              <input type="url" id="persSocialYoutube" placeholder="https://youtube.com/@your-academy">
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persSocialLinkedin">LinkedIn Page URL</label>
-                            <div class="input-icon-wrap">
-                              <input type="url" id="persSocialLinkedin" placeholder="https://linkedin.com/company/your-academy">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persSocialTwitter">X / Twitter Profile URL</label>
-                            <div class="input-icon-wrap">
-                              <input type="url" id="persSocialTwitter" placeholder="https://x.com/your-academy">
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilitySocials" class="section-visibility-checkbox" data-section="socials" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tab 8: Footer -->
-                  <div class="pers-tab-pane" id="tab-pane-footer">
-                    <div class="pers-pane-layout">
-                      <div class="pers-pane-fields">
-                        <div class="form-group">
-                          <label for="persFooterBio">Footer Brand Bio / Statement</label>
-                          <textarea id="persFooterBio" rows="3" class="form-textarea" placeholder="Practical computer education, professional guidance and certified skills for a brighter digital future."></textarea>
-                          <small class="form-help-text">Paragraph shown directly beneath your academy logo in the footer brand column.</small>
-                        </div>
-
-                        <div class="form-row">
-                          <div class="form-group flex-1">
-                            <label for="persFooterProof">Social Proof / Trust Badge Text</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persFooterProof" placeholder="e.g. Trusted learning since 2005">
-                            </div>
-                          </div>
-                          <div class="form-group flex-1">
-                            <label for="persFooterCopyright">Copyright Line</label>
-                            <div class="input-icon-wrap">
-                              <input type="text" id="persFooterCopyright" placeholder="e.g. © 2026 Diganta Computer Centre. All rights reserved.">
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="pers-pane-sidebar">
-                        <div class="section-visibility-toggle-wrap">
-                          <span class="visibility-single-label">VISIBILITY</span>
-                          <label class="apple-switch" title="Toggle section visibility on public site">
-                            <input type="checkbox" id="toggleVisibilityFooter" class="section-visibility-checkbox" data-section="footer" checked>
-                            <span class="apple-switch-slider"></span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <!-- Footer Action Buttons Bar (Matching Top Tabs Nav Panel) -->
-            <div class="personalisation-actions-bar">
-              <button type="button" class="btn btn-secondary btn-pers-action" id="btnSavePersonalisation">
-                <i class="fa-solid fa-floppy-disk"></i>
-                <span>Save Changes</span>
-              </button>
-              <button type="button" class="btn btn-primary btn-pers-action" id="btnPublishPersonalisation">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span>Publish Now</span>
-              </button>
-            </div>
-          </div>
-        </section>
 
       </main>
     </div>
@@ -1747,12 +1117,13 @@
                 <input type="file" id="studentPhotoInput" name="studentPhoto"
                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                   aria-describedby="studentPhotoHelp studentPhotoError">
-                <button type="button" class="student-photo-clear" id="btnClearStudentPhoto"
-                  aria-label="Remove photo" title="Remove photo" hidden>
+                <button type="button" class="student-photo-clear" id="btnClearStudentPhoto" aria-label="Remove photo"
+                  title="Remove photo" hidden>
                   <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                 </button>
               </div>
-              <span class="student-photo-help" id="studentPhotoHelp"><i class="fa-solid fa-circle-info"></i><span>This photo will be printed on the student's ID card and certificate.</span></span>
+              <span class="student-photo-help" id="studentPhotoHelp"><i class="fa-solid fa-circle-info"></i><span>This
+                  photo will be printed on the student's ID card and certificate.</span></span>
               <span class="input-error-msg" id="studentPhotoError" role="alert" style="display: none;"></span>
             </div>
           </div>
@@ -1763,7 +1134,8 @@
               <label for="studentName">Full Name <span class="required">*</span></label>
               <div class="input-icon-wrap">
                 <i class="fa-solid fa-user"></i>
-                <input type="text" id="studentName" class="name-input-capitalized" data-capitalize="true" placeholder="Full name" required>
+                <input type="text" id="studentName" class="name-input-capitalized" data-capitalize="true"
+                  placeholder="Full name" required>
               </div>
             </div>
 
@@ -1783,7 +1155,8 @@
               <label for="studentFatherName">Father's Name <span class="required">*</span></label>
               <div class="input-icon-wrap">
                 <i class="fa-solid fa-user-tie"></i>
-                <input type="text" id="studentFatherName" class="name-input-capitalized" data-capitalize="true" placeholder="Father's name" required>
+                <input type="text" id="studentFatherName" class="name-input-capitalized" data-capitalize="true"
+                  placeholder="Father's name" required>
               </div>
             </div>
 
@@ -1792,7 +1165,8 @@
               <label for="studentMotherName">Mother's Name <span class="required">*</span></label>
               <div class="input-icon-wrap">
                 <i class="fa-solid fa-user"></i>
-                <input type="text" id="studentMotherName" class="name-input-capitalized" data-capitalize="true" placeholder="Mother's name" required>
+                <input type="text" id="studentMotherName" class="name-input-capitalized" data-capitalize="true"
+                  placeholder="Mother's name" required>
               </div>
             </div>
           </div>
@@ -1803,7 +1177,8 @@
               <label for="studentAadhar">Aadhar Number <span class="required">*</span></label>
               <div class="input-icon-wrap">
                 <i class="fa-solid fa-id-card"></i>
-                <input type="text" id="studentAadhar" maxlength="12" pattern="[0-9]{12}" inputmode="numeric" placeholder="12-digit Aadhar" required>
+                <input type="text" id="studentAadhar" maxlength="12" pattern="[0-9]{12}" inputmode="numeric"
+                  placeholder="12-digit Aadhar" required>
               </div>
               <span class="input-error-msg" id="studentAadharError">Please enter a valid 12-digit Aadhar number.</span>
             </div>
@@ -1812,7 +1187,8 @@
             <div class="form-group flex-1">
               <label>Gender <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentGenderDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentGenderTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentGenderTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-venus-mars select-icon"></i>
                   <span id="adminStudentGenderDisplay">Select Gender</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -1832,7 +1208,8 @@
             <div class="form-group flex-1">
               <label>Marital Status <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentMaritalStatusDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentMaritalStatusTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentMaritalStatusTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-ring select-icon"></i>
                   <span id="adminStudentMaritalStatusDisplay">Select Marital Status</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -1852,7 +1229,8 @@
             <div class="form-group flex-1">
               <label>Category <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentCategoryDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentCategoryTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentCategoryTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-layer-group select-icon"></i>
                   <span id="adminStudentCategoryDisplay">Select Category</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -1874,7 +1252,8 @@
             <div class="form-group flex-1">
               <label>Religion <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentReligionDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentReligionTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentReligionTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-hands-praying select-icon"></i>
                   <span id="adminStudentReligionDisplay">Select Religion</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -1897,7 +1276,8 @@
               <label for="studentPhone">Mobile Number <span class="required">*</span></label>
               <div class="input-icon-wrap">
                 <i class="fa-solid fa-phone"></i>
-                <input type="tel" id="studentPhone" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" placeholder="10-digit mobile" required>
+                <input type="tel" id="studentPhone" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                  placeholder="10-digit mobile" required>
               </div>
               <span class="input-error-msg" id="studentPhoneError">Please enter a valid 10-digit mobile number.</span>
             </div>
@@ -1917,7 +1297,8 @@
             <div class="form-group flex-1">
               <label>State <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentStateDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentStateTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentStateTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-map-location-dot select-icon"></i>
                   <span id="adminStudentStateDisplay">Select State</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -1935,7 +1316,8 @@
             <div class="form-group flex-1">
               <label>District <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentDistrictDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentDistrictTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentDistrictTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-city select-icon"></i>
                   <span id="adminStudentDistrictDisplay">Select District</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -1952,7 +1334,8 @@
               <label for="studentPinCode">Pin Code <span class="required">*</span></label>
               <div class="input-icon-wrap">
                 <i class="fa-solid fa-location-dot"></i>
-                <input type="text" id="studentPinCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" placeholder="6-digit pin code" required>
+                <input type="text" id="studentPinCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric"
+                  placeholder="6-digit pin code" required>
               </div>
               <span class="input-error-msg" id="studentPinCodeError">Please enter a valid 6-digit pin code.</span>
             </div>
@@ -1963,7 +1346,8 @@
             <div class="form-group flex-1">
               <label>Highest Qualification <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentQualificationDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentQualificationTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentQualificationTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-award select-icon"></i>
                   <span id="adminStudentQualificationDisplay">Select Qualification</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -1971,7 +1355,8 @@
                 <ul class="custom-select-menu" id="adminStudentQualificationMenu" role="listbox">
                   <li class="custom-select-option" data-value="Below Madhyamik" role="option">Below Madhyamik</li>
                   <li class="custom-select-option" data-value="Madhyamik / 10th" role="option">Madhyamik / 10th</li>
-                  <li class="custom-select-option" data-value="Higher Secondary / 12th" role="option">Higher Secondary / 12th</li>
+                  <li class="custom-select-option" data-value="Higher Secondary / 12th" role="option">Higher Secondary /
+                    12th</li>
                   <li class="custom-select-option" data-value="Diploma" role="option">Diploma</li>
                   <li class="custom-select-option" data-value="Bachelor's Degree" role="option">Bachelor's Degree</li>
                   <li class="custom-select-option" data-value="Master's Degree" role="option">Master's Degree</li>
@@ -1986,7 +1371,8 @@
             <div class="form-group flex-1">
               <label>Enrolled Course <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentCourseDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentCourseTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentCourseTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-desktop select-icon"></i>
                   <span id="adminStudentCourseDisplay">Select Course</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -2004,7 +1390,8 @@
             <div class="form-group flex-1" style="max-width: calc(50% - 0.5rem);">
               <label for="studentStatus">Course Status <span class="required">*</span></label>
               <div class="custom-select-container" id="adminStudentStatusDropdown">
-                <button type="button" class="custom-select-trigger" id="adminStudentStatusTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger" id="adminStudentStatusTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <i class="fa-solid fa-circle-check select-icon"></i>
                   <span id="adminStudentStatusDisplay">On going</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -2022,12 +1409,14 @@
           <!-- 18. Full Address -->
           <div class="form-group">
             <label for="studentAddress">Full Address <span class="required">*</span></label>
-            <textarea id="studentAddress" rows="2" placeholder="House/Flat No., Street, Landmark, Area..." required></textarea>
+            <textarea id="studentAddress" rows="2" placeholder="House/Flat No., Street, Landmark, Area..."
+              required></textarea>
           </div>
         </div>
 
         <div class="modal-footer" id="studentModalFooter" style="justify-content:space-between;">
-          <button type="button" class="btn btn-danger" id="btnDeleteStudentModal" style="display: none;">Delete Student</button>
+          <button type="button" class="btn btn-danger" id="btnDeleteStudentModal" style="display: none;">Delete
+            Student</button>
           <div style="display:flex;gap:0.75rem;margin-left:auto;">
             <button type="button" class="btn btn-secondary" id="btnCancelStudentModal">Cancel</button>
             <button type="submit" class="btn btn-primary" id="btnSaveStudent">
@@ -2071,12 +1460,14 @@
                 <input type="number" id="courseDurationValue" min="1" step="1" required>
               </div>
               <div class="custom-select-container has-value" id="durationUnitDropdown">
-                <button type="button" class="custom-select-trigger has-value" id="durationUnitTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="custom-select-trigger has-value" id="durationUnitTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
                   <span id="durationUnitDisplay">Months</span>
                   <i class="fa-solid fa-chevron-down select-chevron"></i>
                 </button>
                 <ul class="custom-select-menu" id="durationUnitMenu" role="listbox">
-                  <li class="custom-select-option selected" data-value="Months" role="option" aria-selected="true">Months</li>
+                  <li class="custom-select-option selected" data-value="Months" role="option" aria-selected="true">
+                    Months</li>
                   <li class="custom-select-option" data-value="Years" role="option" aria-selected="false">Years</li>
                 </ul>
                 <input type="hidden" id="courseDurationUnit" value="Months" required>
@@ -2087,6 +1478,21 @@
           <div class="form-group">
             <label for="courseDescription">Description <span class="required">*</span></label>
             <textarea id="courseDescription" rows="4" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+              <span>Course Subjects</span>
+              <span style="font-size: 0.75rem; font-weight: 500; color: #64748b;">For marksheets & grading</span>
+            </label>
+            <div id="courseSubjectsContainer" class="course-subjects-container">
+              <!-- Rendered dynamically -->
+            </div>
+            <div style="display: flex;">
+              <button type="button" class="btn-add-subject" id="btnAddSubject">
+                <i class="fa-solid fa-plus"></i> Add more subject
+              </button>
+            </div>
           </div>
         </div>
 
@@ -2153,7 +1559,8 @@
           <div class="form-group" id="existingBatchGroup" hidden>
             <label for="existingBatchTrigger">Select Batch <span class="required">*</span></label>
             <div class="custom-select-container batch-select-dropdown" id="existingBatchDropdown">
-              <button type="button" class="custom-select-trigger" id="existingBatchTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <button type="button" class="custom-select-trigger" id="existingBatchTrigger" aria-haspopup="listbox"
+                aria-expanded="false">
                 <i class="fa-solid fa-list select-icon"></i>
                 <span class="select-label" id="existingBatchDisplay">Choose an active batch</span>
                 <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -2164,13 +1571,15 @@
           </div>
           <div class="form-group" id="batchStudentSelectionGroup">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-              <label style="margin-bottom: 0;">Select Students <span style="color: var(--text-muted); font-weight: normal; font-size: 0.8125rem;">(Optional)</span></label>
+              <label style="margin-bottom: 0;">Select Students <span
+                  style="color: var(--text-muted); font-weight: normal; font-size: 0.8125rem;">(Optional)</span></label>
               <span id="createBatchSelectionCount" class="batch-edit-selection-count">0 selected</span>
             </div>
             <div class="batch-edit-toolbar">
               <div class="search-box batch-edit-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" id="createBatchStudentSearch" placeholder="Search students by name or ID" autocomplete="off">
+                <input type="search" id="createBatchStudentSearch" placeholder="Search students by name or ID"
+                  autocomplete="off">
               </div>
             </div>
             <div class="batch-edit-student-list" id="createBatchStudentList" style="max-height: 240px;"></div>
@@ -2208,33 +1617,35 @@
       <form id="editBatchForm">
         <div class="modal-body">
           <div class="batch-edit-details-row">
-          <div class="form-group">
-            <label for="editBatchNameInput">Batch Name <span class="required">*</span></label>
-            <div class="input-icon-wrap">
-              <i class="fa-solid fa-layer-group"></i>
-              <input type="text" id="editBatchNameInput" maxlength="100" required placeholder="Enter batch name">
+            <div class="form-group">
+              <label for="editBatchNameInput">Batch Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-layer-group"></i>
+                <input type="text" id="editBatchNameInput" maxlength="100" required placeholder="Enter batch name">
+              </div>
             </div>
-          </div>
             <div class="form-group">
               <label for="editBatchStatusTrigger">Batch Status</label>
-        <div class="custom-select-container" id="editBatchStatusDropdown">
-          <button type="button" class="custom-select-trigger" id="editBatchStatusTrigger" aria-label="Batch status" aria-haspopup="listbox" aria-expanded="false">
-            <i class="fa-solid fa-circle-half-stroke select-icon"></i>
-            <span class="select-label" id="editBatchStatusDisplay">On going</span>
-            <i class="fa-solid fa-chevron-down select-chevron"></i>
-          </button>
-          <ul class="custom-select-menu" id="editBatchStatusMenu" role="listbox">
-            <li class="custom-select-option" data-value="Active" role="option">On going</li>
-            <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
-          </ul>
-          <input type="hidden" id="editBatchStatus" value="Active">
-        </div>
+              <div class="custom-select-container" id="editBatchStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="editBatchStatusTrigger"
+                  aria-label="Batch status" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-circle-half-stroke select-icon"></i>
+                  <span class="select-label" id="editBatchStatusDisplay">On going</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="editBatchStatusMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Active" role="option">On going</li>
+                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                </ul>
+                <input type="hidden" id="editBatchStatus" value="Active">
+              </div>
             </div>
           </div>
           <div class="batch-edit-toolbar">
             <div class="search-box batch-edit-search">
               <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="search" id="editBatchStudentSearch" placeholder="Search students by name or ID" autocomplete="off">
+              <input type="search" id="editBatchStudentSearch" placeholder="Search students by name or ID"
+                autocomplete="off">
             </div>
             <span id="editBatchSelectionCount" class="batch-edit-selection-count">0 selected</span>
           </div>
@@ -2274,15 +1685,20 @@
                 <label for="completionStartMonth">Start month</label>
                 <div class="completion-date-selects">
                   <div class="custom-select-container completion-select-dropdown" id="completionStartMonthDropdown">
-                    <button type="button" class="custom-select-trigger" id="completionStartMonthTrigger" aria-haspopup="listbox" aria-expanded="false">
-                      <span class="select-label" id="completionStartMonthDisplay">Month</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                    <button type="button" class="custom-select-trigger" id="completionStartMonthTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionStartMonthDisplay">Month</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
                     </button>
                     <ul class="custom-select-menu" id="completionStartMonthMenu" role="listbox"></ul>
                     <input type="hidden" id="completionStartMonth">
                   </div>
-                  <div class="custom-select-container completion-select-dropdown completion-year-select" id="completionStartYearDropdown">
-                    <button type="button" class="custom-select-trigger" id="completionStartYearTrigger" aria-haspopup="listbox" aria-expanded="false">
-                      <span class="select-label" id="completionStartYearDisplay">Year</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                  <div class="custom-select-container completion-select-dropdown completion-year-select"
+                    id="completionStartYearDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionStartYearTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionStartYearDisplay">Year</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
                     </button>
                     <ul class="custom-select-menu" id="completionStartYearMenu" role="listbox"></ul>
                     <input type="hidden" id="completionStartYear">
@@ -2294,15 +1710,20 @@
                 <label for="completionEndMonth">End month</label>
                 <div class="completion-date-selects">
                   <div class="custom-select-container completion-select-dropdown" id="completionEndMonthDropdown">
-                    <button type="button" class="custom-select-trigger" id="completionEndMonthTrigger" aria-haspopup="listbox" aria-expanded="false">
-                      <span class="select-label" id="completionEndMonthDisplay">Month</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                    <button type="button" class="custom-select-trigger" id="completionEndMonthTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionEndMonthDisplay">Month</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
                     </button>
                     <ul class="custom-select-menu" id="completionEndMonthMenu" role="listbox"></ul>
                     <input type="hidden" id="completionEndMonth">
                   </div>
-                  <div class="custom-select-container completion-select-dropdown completion-year-select" id="completionEndYearDropdown">
-                    <button type="button" class="custom-select-trigger" id="completionEndYearTrigger" aria-haspopup="listbox" aria-expanded="false">
-                      <span class="select-label" id="completionEndYearDisplay">Year</span><i class="fa-solid fa-chevron-down select-chevron"></i>
+                  <div class="custom-select-container completion-select-dropdown completion-year-select"
+                    id="completionEndYearDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionEndYearTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionEndYearDisplay">Year</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
                     </button>
                     <ul class="custom-select-menu" id="completionEndYearMenu" role="listbox"></ul>
                     <input type="hidden" id="completionEndYear">
@@ -2313,21 +1734,23 @@
           </div>
           <p id="completionDurationError" class="completion-field-error" role="alert" hidden></p>
           <div class="completion-issue-grade-row">
-          <div class="form-group">
-            <label for="completionIssueDate">Certificate Issue Date <span class="required">*</span></label>
-            <div class="input-icon-wrap">
-              <i class="fa-regular fa-calendar"></i>
-              <input type="date" id="completionIssueDate" min="0001-01-01" max="9999-12-31" aria-describedby="completionIssueDateError" required>
+            <div class="form-group">
+              <label for="completionIssueDate">Certificate Issue Date <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="completionIssueDate" min="0001-01-01" max="9999-12-31"
+                  aria-describedby="completionIssueDateError" required>
+              </div>
+              <p id="completionIssueDateError" class="completion-field-error" role="alert" hidden></p>
             </div>
-            <p id="completionIssueDateError" class="completion-field-error" role="alert" hidden></p>
-          </div>
-          <div class="form-group">
-            <label for="completionGrade">Grade <span class="required">*</span></label>
-            <div class="input-icon-wrap">
-              <i class="fa-solid fa-award"></i>
-              <input type="text" id="completionGrade" autocapitalize="characters" maxlength="30" placeholder="e.g. A+" required>
+            <div class="form-group">
+              <label for="completionGrade">Grade <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-award"></i>
+                <input type="text" id="completionGrade" autocapitalize="characters" maxlength="30" placeholder="e.g. A+"
+                  required>
+              </div>
             </div>
-          </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -2361,7 +1784,8 @@
           <div class="form-group">
             <label>New Status <span class="required">*</span></label>
             <div class="custom-select-container" id="bulkStatusDropdown">
-              <button type="button" class="custom-select-trigger" id="bulkStatusTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <button type="button" class="custom-select-trigger" id="bulkStatusTrigger" aria-haspopup="listbox"
+                aria-expanded="false">
                 <i class="fa-solid fa-circle-check select-icon"></i>
                 <span id="bulkStatusDisplay">On going</span>
                 <i class="fa-solid fa-chevron-down select-chevron"></i>
@@ -2472,7 +1896,8 @@
             <label for="settingsAcademyName">Academy Name <span class="required-star">*</span></label>
             <div class="input-icon-wrap">
               <i class="fa-solid fa-school"></i>
-              <input type="text" id="settingsAcademyName" class="name-input-capitalized" data-capitalize="true" required>
+              <input type="text" id="settingsAcademyName" class="name-input-capitalized" data-capitalize="true"
+                required>
             </div>
           </div>
 
@@ -2486,9 +1911,13 @@
 
           <div class="form-group">
             <label for="settingsSubdomainSlug">Public Website Slug <span class="required-star">*</span></label>
-            <div class="subdomain-input-wrap" style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
-              <span id="settingsSlugPrefix" style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">academy.pixelsetu.com/a/</span>
-              <input type="text" id="settingsSubdomainSlug" placeholder="your-slug" style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;" required>
+            <div class="subdomain-input-wrap"
+              style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+              <span id="settingsSlugPrefix"
+                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">academy.pixelsetu.com/a/</span>
+              <input type="text" id="settingsSubdomainSlug" placeholder="your-slug"
+                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;"
+                required>
             </div>
             <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
               Letters, numbers, and hyphens (e.g. <code>dance-academy</code>).
@@ -2518,7 +1947,8 @@
       </div>
       <form id="onboardingForm" autocomplete="off">
         <div class="modal-body">
-          <p class="onboarding-intro" style="margin-bottom: 1.25rem; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+          <p class="onboarding-intro"
+            style="margin-bottom: 1.25rem; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
             Please complete your one-time academy setup to personalize your administration workspace.
           </p>
 
@@ -2526,7 +1956,8 @@
             <label for="onboardingAcademyName">Academy Name <span class="required-star">*</span></label>
             <div class="input-icon-wrap">
               <i class="fa-solid fa-school"></i>
-              <input type="text" id="onboardingAcademyName" class="name-input-capitalized" data-capitalize="true" required>
+              <input type="text" id="onboardingAcademyName" class="name-input-capitalized" data-capitalize="true"
+                required>
             </div>
           </div>
 
@@ -2534,24 +1965,31 @@
             <label for="onboardingOwnerName">Owner Name <span class="required-star">*</span></label>
             <div class="input-icon-wrap">
               <i class="fa-solid fa-user-tie"></i>
-              <input type="text" id="onboardingOwnerName" class="name-input-capitalized" data-capitalize="true" required>
+              <input type="text" id="onboardingOwnerName" class="name-input-capitalized" data-capitalize="true"
+                required>
             </div>
           </div>
 
           <div class="form-group">
             <label for="onboardingSubdomainSlug">Public Website Slug <span class="required-star">*</span></label>
-            <div class="subdomain-input-wrap" style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
-              <span id="onboardingSlugPrefix" style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">academy.pixelsetu.com/a/</span>
-              <input type="text" id="onboardingSubdomainSlug" placeholder="your-slug" style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;" required>
+            <div class="subdomain-input-wrap"
+              style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+              <span id="onboardingSlugPrefix"
+                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">academy.pixelsetu.com/a/</span>
+              <input type="text" id="onboardingSubdomainSlug" placeholder="your-slug"
+                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;"
+                required>
             </div>
             <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
-              Your public admissions website will firstly be accessible at <code>academy.pixelsetu.com/a/your-slug</code>.
+              Your public admissions website will firstly be accessible at
+              <code>academy.pixelsetu.com/a/your-slug</code>.
             </p>
           </div>
         </div>
 
         <div class="modal-footer" style="justify-content: flex-end;">
-          <button type="submit" class="btn btn-primary" id="btnSaveOnboarding" style="width: 100%; justify-content: center; height: 44px; font-weight: 600;">
+          <button type="submit" class="btn btn-primary" id="btnSaveOnboarding"
+            style="width: 100%; justify-content: center; height: 44px; font-weight: 600;">
             <i class="fa-solid fa-check"></i> Complete Setup & Launch Portal
           </button>
         </div>
@@ -2566,9 +2004,15 @@
   <!-- QR Code & Zip Utilities -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Print Container for Marksheets -->
+  <div id="marksheetPrintContainer" class="marksheet-print-container" aria-hidden="true"></div>
 
   <!-- JavaScript -->
-  <script src="certificate-canvas.js?v=5"></script>
-  <script src="admin-script.js?v=8.97"></script>
+  <script src="certificate-canvas.js?v=9"></script>
+  <script src="marksheet-canvas.js?v=9"></script>
+  <script src="admin-script.js?v=idcards-10.3"></script>
 </body>
+
 </html>

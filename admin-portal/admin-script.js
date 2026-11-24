@@ -35,31 +35,31 @@ const DEFAULT_COMPUTER_COURSES = [
   { id: 'CRS-104', title: 'Certificate in Office Automation', duration: '3 Months', description: 'Practical training in Word, Excel, PowerPoint, email, document formatting, and everyday office productivity.', createdAt: '2026-01-03T09:00:00.000Z' },
   { id: 'CRS-105', title: 'Tally Prime with GST', duration: '4 Months', description: 'Learn computerized accounting, inventory management, GST invoicing, taxation reports, and payroll using Tally Prime.', createdAt: '2026-01-02T09:00:00.000Z' },
   { id: 'CRS-106', title: 'Graphic Design Fundamentals', duration: '6 Months', description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.', createdAt: '2026-01-01T09:00:00.000Z' },
-  {"id": "CRS-DEMO-001", "title": "Advanced Excel & MIS Reporting", "duration": "3 Months", "description": "Build spreadsheet models using lookup functions, PivotTables, data validation, Power Query, and interactive dashboards. Complete a monthly sales reporting project.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-002", "title": "Python Programming", "duration": "4 Months", "description": "Learn variables, control flow, functions, collections, file handling, exceptions, and object-oriented programming. Build command-line utilities and automate routine tasks.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-003", "title": "Data Analysis with Python", "duration": "6 Months", "description": "Clean and explore datasets with pandas and NumPy, visualize results with Matplotlib, and summarize findings using descriptive statistics and reproducible notebooks.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-004", "title": "SQL & Database Design", "duration": "3 Months", "description": "Write queries with joins, subqueries, aggregate functions, and window functions. Design relational schemas, apply normalization, and practice transactions and indexing.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-005", "title": "Power BI Dashboard Development", "duration": "3 Months", "description": "Import and transform data with Power Query, build relationships and DAX measures, and create interactive reports with filters, drill-through pages, and business metrics.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-006", "title": "Web Design with HTML & CSS", "duration": "3 Months", "description": "Create responsive websites with semantic HTML, CSS Grid, Flexbox, accessible forms, and media queries. Publish a portfolio website with layouts for mobile and desktop.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-007", "title": "JavaScript Programming", "duration": "4 Months", "description": "Practice functions, arrays, objects, DOM manipulation, events, promises, and asynchronous requests. Build interactive browser applications with validation and error handling.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-008", "title": "React Frontend Development", "duration": "4 Months", "description": "Build reusable components with props, state, hooks, routing, and forms. Connect a frontend to an API and complete an accessible multi-page application.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-009", "title": "Node.js & Express Backend Development", "duration": "4 Months", "description": "Create REST APIs with routing, middleware, validation, authentication, and database integration. Practice automated tests, error handling, and application deployment.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-010", "title": "Django Web Development", "duration": "4 Months", "description": "Develop database-backed websites using models, views, templates, forms, authentication, and the Django admin. Build and deploy a complete student project.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-011", "title": "Java Programming", "duration": "6 Months", "description": "Learn Java syntax, classes, inheritance, interfaces, collections, exceptions, and JDBC. Develop a database-connected application using structured object-oriented design.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-012", "title": "C Programming Fundamentals", "duration": "3 Months", "description": "Understand data types, loops, functions, arrays, pointers, structures, and file operations. Practice debugging and implement small programs for common computing problems.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-013", "title": "C++ & Data Structures", "duration": "6 Months", "description": "Study classes, templates, the standard library, linked lists, stacks, queues, trees, and graphs. Compare sorting and searching algorithms using time and space complexity.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-014", "title": "Computer Hardware & Troubleshooting", "duration": "4 Months", "description": "Identify desktop components, assemble systems, install operating systems and drivers, diagnose common faults, and practice backups and preventive maintenance.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-015", "title": "Computer Networking Fundamentals", "duration": "4 Months", "description": "Learn network devices, Ethernet, IP addressing, subnetting, DNS, DHCP, routing, and wireless networks. Configure a small office network and troubleshoot connectivity.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-016", "title": "Linux Administration", "duration": "4 Months", "description": "Use the Linux shell, manage users and permissions, configure services, inspect logs, schedule jobs, and write shell scripts for routine administration tasks.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-017", "title": "Cybersecurity Fundamentals", "duration": "4 Months", "description": "Study access control, secure configuration, phishing awareness, network security, backups, and incident response. Practice defensive analysis in isolated training labs.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-018", "title": "Cloud Computing Fundamentals", "duration": "3 Months", "description": "Understand virtual machines, storage, networking, identity management, monitoring, and shared responsibility. Design a small cloud-hosted application and estimate resource usage.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-019", "title": "Git, Docker & CI/CD Fundamentals", "duration": "4 Months", "description": "Manage branches and code reviews with Git, package applications in Docker containers, and build automated pipelines for testing and deployment.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-020", "title": "UI & UX Design with Figma", "duration": "4 Months", "description": "Practice user interviews, information architecture, wireframes, component libraries, responsive layouts, and interactive prototypes. Conduct usability testing on a design project.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-021", "title": "Adobe Photoshop & Image Editing", "duration": "3 Months", "description": "Edit photographs using layers, masks, selections, retouching, color correction, and nondestructive adjustments. Prepare images for print, websites, and social media.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-022", "title": "Vector Illustration with Adobe Illustrator", "duration": "3 Months", "description": "Create vector artwork with shapes, paths, the Pen tool, typography, and reusable graphic assets. Design logos, icons, packaging layouts, and print-ready illustrations.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-023", "title": "Video Editing with Adobe Premiere Pro", "duration": "4 Months", "description": "Organize footage, edit sequences, synchronize audio, add titles and transitions, correct color, and export video. Complete a short promotional film from raw footage.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-024", "title": "WordPress Website Development", "duration": "3 Months", "description": "Build websites using themes, blocks, menus, forms, and plugins. Practice backups, security updates, performance optimization, and basic search-friendly site structure.", "createdAt": "2026-09-01T09:00:00.000Z"},
-  {"id": "CRS-DEMO-025", "title": "AutoCAD 2D Drafting", "duration": "4 Months", "description": "Create technical drawings with precise dimensions, layers, blocks, annotations, layouts, and plotting. Produce a complete set of 2D plans for a drafting project.", "createdAt": "2026-09-01T09:00:00.000Z"}
+  { "id": "CRS-DEMO-001", "title": "Advanced Excel & MIS Reporting", "duration": "3 Months", "description": "Build spreadsheet models using lookup functions, PivotTables, data validation, Power Query, and interactive dashboards. Complete a monthly sales reporting project.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-002", "title": "Python Programming", "duration": "4 Months", "description": "Learn variables, control flow, functions, collections, file handling, exceptions, and object-oriented programming. Build command-line utilities and automate routine tasks.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-003", "title": "Data Analysis with Python", "duration": "6 Months", "description": "Clean and explore datasets with pandas and NumPy, visualize results with Matplotlib, and summarize findings using descriptive statistics and reproducible notebooks.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-004", "title": "SQL & Database Design", "duration": "3 Months", "description": "Write queries with joins, subqueries, aggregate functions, and window functions. Design relational schemas, apply normalization, and practice transactions and indexing.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-005", "title": "Power BI Dashboard Development", "duration": "3 Months", "description": "Import and transform data with Power Query, build relationships and DAX measures, and create interactive reports with filters, drill-through pages, and business metrics.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-006", "title": "Web Design with HTML & CSS", "duration": "3 Months", "description": "Create responsive websites with semantic HTML, CSS Grid, Flexbox, accessible forms, and media queries. Publish a portfolio website with layouts for mobile and desktop.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-007", "title": "JavaScript Programming", "duration": "4 Months", "description": "Practice functions, arrays, objects, DOM manipulation, events, promises, and asynchronous requests. Build interactive browser applications with validation and error handling.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-008", "title": "React Frontend Development", "duration": "4 Months", "description": "Build reusable components with props, state, hooks, routing, and forms. Connect a frontend to an API and complete an accessible multi-page application.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-009", "title": "Node.js & Express Backend Development", "duration": "4 Months", "description": "Create REST APIs with routing, middleware, validation, authentication, and database integration. Practice automated tests, error handling, and application deployment.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-010", "title": "Django Web Development", "duration": "4 Months", "description": "Develop database-backed websites using models, views, templates, forms, authentication, and the Django admin. Build and deploy a complete student project.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-011", "title": "Java Programming", "duration": "6 Months", "description": "Learn Java syntax, classes, inheritance, interfaces, collections, exceptions, and JDBC. Develop a database-connected application using structured object-oriented design.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-012", "title": "C Programming Fundamentals", "duration": "3 Months", "description": "Understand data types, loops, functions, arrays, pointers, structures, and file operations. Practice debugging and implement small programs for common computing problems.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-013", "title": "C++ & Data Structures", "duration": "6 Months", "description": "Study classes, templates, the standard library, linked lists, stacks, queues, trees, and graphs. Compare sorting and searching algorithms using time and space complexity.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-014", "title": "Computer Hardware & Troubleshooting", "duration": "4 Months", "description": "Identify desktop components, assemble systems, install operating systems and drivers, diagnose common faults, and practice backups and preventive maintenance.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-015", "title": "Computer Networking Fundamentals", "duration": "4 Months", "description": "Learn network devices, Ethernet, IP addressing, subnetting, DNS, DHCP, routing, and wireless networks. Configure a small office network and troubleshoot connectivity.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-016", "title": "Linux Administration", "duration": "4 Months", "description": "Use the Linux shell, manage users and permissions, configure services, inspect logs, schedule jobs, and write shell scripts for routine administration tasks.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-017", "title": "Cybersecurity Fundamentals", "duration": "4 Months", "description": "Study access control, secure configuration, phishing awareness, network security, backups, and incident response. Practice defensive analysis in isolated training labs.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-018", "title": "Cloud Computing Fundamentals", "duration": "3 Months", "description": "Understand virtual machines, storage, networking, identity management, monitoring, and shared responsibility. Design a small cloud-hosted application and estimate resource usage.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-019", "title": "Git, Docker & CI/CD Fundamentals", "duration": "4 Months", "description": "Manage branches and code reviews with Git, package applications in Docker containers, and build automated pipelines for testing and deployment.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-020", "title": "UI & UX Design with Figma", "duration": "4 Months", "description": "Practice user interviews, information architecture, wireframes, component libraries, responsive layouts, and interactive prototypes. Conduct usability testing on a design project.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-021", "title": "Adobe Photoshop & Image Editing", "duration": "3 Months", "description": "Edit photographs using layers, masks, selections, retouching, color correction, and nondestructive adjustments. Prepare images for print, websites, and social media.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-022", "title": "Vector Illustration with Adobe Illustrator", "duration": "3 Months", "description": "Create vector artwork with shapes, paths, the Pen tool, typography, and reusable graphic assets. Design logos, icons, packaging layouts, and print-ready illustrations.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-023", "title": "Video Editing with Adobe Premiere Pro", "duration": "4 Months", "description": "Organize footage, edit sequences, synchronize audio, add titles and transitions, correct color, and export video. Complete a short promotional film from raw footage.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-024", "title": "WordPress Website Development", "duration": "3 Months", "description": "Build websites using themes, blocks, menus, forms, and plugins. Practice backups, security updates, performance optimization, and basic search-friendly site structure.", "createdAt": "2026-09-01T09:00:00.000Z" },
+  { "id": "CRS-DEMO-025", "title": "AutoCAD 2D Drafting", "duration": "4 Months", "description": "Create technical drawings with precise dimensions, layers, blocks, annotations, layouts, and plotting. Produce a complete set of 2D plans for a drafting project.", "createdAt": "2026-09-01T09:00:00.000Z" }
 ];
 const COURSE_SEED_VERSION = '2';
 
@@ -939,49 +939,49 @@ class AcademyStore {
         if (json.data) {
           const { profile, courses, students, messages, batches, authToken } = json.data;
 
-        if (Array.isArray(courses)) {
-          this.courses = courses;
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
-        }
+          if (Array.isArray(courses)) {
+            this.courses = courses;
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
+          }
 
-        if (Array.isArray(students)) {
-          this.students = students;
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(this.students));
-          localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this.students));
-        } else if (this.students.length > 0) {
-          this.syncToCloud('save_students', { students: this.students });
-        }
+          if (Array.isArray(students)) {
+            this.students = students;
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(this.students));
+            localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this.students));
+          } else if (this.students.length > 0) {
+            this.syncToCloud('save_students', { students: this.students });
+          }
 
-        if (Array.isArray(messages)) {
-          this.messages = messages;
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
-        }
-        if (Array.isArray(batches)) {
-          this.batches = batches;
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
-        }
+          if (Array.isArray(messages)) {
+            this.messages = messages;
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.MESSAGES), JSON.stringify(this.messages));
+          }
+          if (Array.isArray(batches)) {
+            this.batches = batches;
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.BATCHES), JSON.stringify(this.batches));
+          }
 
-        if (profile) {
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE), JSON.stringify(profile));
-        } else {
-          const localProfile = this.getAcademyProfile();
-          if (localProfile) this.syncToCloud('save_profile', { profile: localProfile });
-        }
+          if (profile) {
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE), JSON.stringify(profile));
+          } else {
+            const localProfile = this.getAcademyProfile();
+            if (localProfile) this.syncToCloud('save_profile', { profile: localProfile });
+          }
 
-        if (!this.authTokenRequest && authToken && authToken.code && authToken.expiresAt && Date.now() < authToken.expiresAt) {
-          localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify({ ...authToken, academySlug: this.ownerEmail }));
-          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify({ ...authToken, academySlug: this.ownerEmail }));
-        }
+          if (!this.authTokenRequest && authToken && authToken.code && authToken.expiresAt && Date.now() < authToken.expiresAt) {
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.AUTH_TOKEN), JSON.stringify({ ...authToken, academySlug: this.ownerEmail }));
+            localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, JSON.stringify({ ...authToken, academySlug: this.ownerEmail }));
+          }
 
-        if (typeof onLoadedCallback === 'function') {
-          onLoadedCallback();
+          if (typeof onLoadedCallback === 'function') {
+            onLoadedCallback();
+          }
+          return true;
         }
-        return true;
       }
+    } catch (e) {
+      console.info('[AcademyStore] Operating in local storage caching for', this.ownerEmail);
     }
-  } catch (e) {
-    console.info('[AcademyStore] Operating in local storage caching for', this.ownerEmail);
-  }
     return false;
   }
 
@@ -1293,6 +1293,7 @@ class AcademyStore {
       title: courseData.title,
       duration: courseData.duration,
       description: courseData.description,
+      subjects: Array.isArray(courseData.subjects) ? courseData.subjects : [],
       createdAt: new Date().toISOString()
     };
     this.courses.unshift(newCourse);
@@ -1379,7 +1380,17 @@ class UIController {
     }
 
     // Check Authentication Session Gate
-    const rawSession = localStorage.getItem(STORAGE_KEYS.SESSION);
+    let rawSession = localStorage.getItem(STORAGE_KEYS.SESSION);
+    if (!rawSession && isLocalhost) {
+      const defaultDevSession = {
+        name: 'Diganta',
+        email: 'rcavirup@gmail.com',
+        provider: 'google',
+        loggedInAt: Date.now()
+      };
+      localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(defaultDevSession));
+      rawSession = JSON.stringify(defaultDevSession);
+    }
     if (!rawSession) {
       window.location.href = 'index.html' + (window.location.hash || '');
       return;
@@ -1428,7 +1439,7 @@ class UIController {
       window.location.replace('superadmin.html');
       return;
     }
-    const validViews = ['dashboard', 'students', 'courses', 'batches', 'certificates', 'idcards', 'inbox', 'branding', 'personalisation'];
+    const validViews = ['dashboard', 'students', 'courses', 'batches', 'marksheets', 'certificates', 'idcards', 'inbox'];
     let targetView = validViews.includes(initialHash) ? initialHash : 'dashboard';
     this.currentView = targetView;
     this.confirmCallback = null;
@@ -1441,6 +1452,9 @@ class UIController {
     this.studentStatusFilterVal = 'all';
     this.courseSearchQuery = '';
     this.selectedStudentIds = new Set();
+    this.selectedMarksheetIds = new Set();
+    this.marksheetPreviewId = null;
+    this.marksheetPreviewCleared = false;
     this.selectedInboxMessageIds = new Set();
     this.completionStudentIds = new Set();
     this.editingBatchId = null;
@@ -1453,12 +1467,7 @@ class UIController {
     this.bindEvents();
     if (targetView !== 'dashboard') {
       this.applyViewLayout(targetView);
-      if (targetView === 'personalisation') {
-        this.populatePersonalisationForm();
-      }
-      if (targetView === 'branding') {
-        this.populateBrandingForm();
-      }
+
     }
     this.render();
     this.startAuthCountdownTimer();
@@ -1470,12 +1479,7 @@ class UIController {
       this.populateCourseFilterDropdown();
       this.populateBatchFilterDropdown();
       this.populateCourseDropdownInStudentModal();
-      if (this.currentView === 'personalisation') {
-        this.populatePersonalisationForm();
-      }
-      if (this.currentView === 'branding') {
-        this.populateBrandingForm();
-      }
+
       this.render();
       this.updatePublicSiteLink();
       this.checkAccountStatus();
@@ -1484,12 +1488,7 @@ class UIController {
     // Auto-refresh data when switching back to this browser tab
     window.addEventListener('focus', () => {
       store.fetchCloudData(() => {
-        if (this.currentView === 'personalisation') {
-          this.populatePersonalisationForm();
-        }
-        if (this.currentView === 'branding') {
-          this.populateBrandingForm();
-        }
+
         this.render();
       });
     });
@@ -1525,12 +1524,8 @@ class UIController {
   }
 
   getCertificateVerificationUrl(student) {
-    const slug = student.academySlug || store.getAcademyProfile()?.slug || store.ownerEmail;
-    const url = new URL(this.getPublicUrlForSlug(slug));
-    url.searchParams.set('certificate', student.id);
-    url.searchParams.set('academy', slug);
-    url.hash = 'certificate';
-    return url.href;
+    const slug = (student.academySlug || store.getAcademyProfile()?.slug || store.ownerEmail || 'diganta').toLowerCase().trim();
+    return `https://${slug}.pixelsetu.com/?c=${encodeURIComponent(student.id || student.regNo || '')}`;
   }
 
   updatePublicSiteLink() {
@@ -1679,7 +1674,7 @@ class UIController {
         const tableWidth = studentsTable.getBoundingClientRect().width;
         if (!tableWidth) return;
         const headers = [...studentsTable.querySelectorAll('thead th')];
-        const middleHeaders = headers.slice(2, 6);
+        const middleHeaders = headers.slice(3, 7);
         const labelWidths = middleHeaders.map(header => {
           const label = header.querySelector('.th-status-header-wrap') || header;
           const range = document.createRange();
@@ -1687,24 +1682,28 @@ class UIController {
           return range.getBoundingClientRect().width;
         });
         const checkboxWidth = headers[0].getBoundingClientRect().width;
+        const serialWidth = 44;
+        headers[1].style.width = `${serialWidth}px`;
         const nameWidth = Math.max(180, Math.min(240, tableWidth * 0.18));
-        const available = tableWidth - checkboxWidth - nameWidth;
+        const available = tableWidth - checkboxWidth - serialWidth - nameWidth;
         const gap = (available - labelWidths.reduce((sum, width) => sum + width, 0)) / middleHeaders.length;
         if (gap < 0) return;
-        headers[1].style.width = `${nameWidth}px`;
+        headers[2].style.width = `${nameWidth}px`;
         middleHeaders.forEach((header, index) => {
           header.style.width = `${labelWidths[index] + gap}px`;
         });
         // Move only the name/ID boundary so ID is midway between label centers.
-        const nameLabel = headers[1].querySelector('.th-student-label-wrap > span');
-        const nameLabelWidth = nameLabel.getBoundingClientRect().width;
+        const nameLabel = headers[2].querySelector('.th-student-label-wrap > span');
+        const nameLabelWidth = nameLabel ? nameLabel.getBoundingClientRect().width : 100;
         const coursesWidth = labelWidths[1] + gap;
         const adjustedNameWidth = (nameLabelWidth + coursesWidth) / 2;
         const adjustedIdWidth = nameWidth + labelWidths[0] + gap - adjustedNameWidth;
-        headers[1].style.width = `${adjustedNameWidth}px`;
-        headers[2].style.width = `${adjustedIdWidth}px`;
+        headers[2].style.width = `${adjustedNameWidth}px`;
+        headers[3].style.width = `${adjustedIdWidth}px`;
         rowsTable.querySelectorAll('col').forEach((column, index) => {
-          column.style.width = `${headers[index].getBoundingClientRect().width}px`;
+          if (headers[index]) {
+            column.style.width = `${headers[index].getBoundingClientRect().width}px`;
+          }
         });
       };
       this.studentColumnsResizeObserver = new ResizeObserver(alignStudentColumns);
@@ -1790,6 +1789,9 @@ class UIController {
         const naturalHeight = frame.offsetHeight + 19;
         const scale = desktop ? Math.min(1, width / 320, height / naturalHeight) : 1;
         this.idCardMockupWrapper.style.setProperty('--idcard-preview-scale', String(scale));
+        if (this.lastRenderedMasterIdCardCanvas) {
+          this.refreshIdCardPreviewCanvas();
+        }
       });
       this.idCardPreviewResizeObserver.observe(idCardStage);
     }
@@ -1909,6 +1911,8 @@ class UIController {
     this.durationUnitMenu = document.getElementById('durationUnitMenu');
     this.courseDurationUnitInput = document.getElementById('courseDurationUnit');
     this.courseDescriptionInput = document.getElementById('courseDescription');
+    this.courseSubjectsContainer = document.getElementById('courseSubjectsContainer');
+    this.btnAddSubject = document.getElementById('btnAddSubject');
     this.btnCloseCourseModal = document.getElementById('btnCloseCourseModal');
     this.btnCancelCourseModal = document.getElementById('btnCancelCourseModal');
     this.btnSaveCourse = document.getElementById('btnSaveCourse');
@@ -2050,138 +2054,6 @@ class UIController {
     this.onboardingSubdomainSlug = document.getElementById('onboardingSubdomainSlug');
     this.onboardingSubdomainSuffix = document.getElementById('onboardingSubdomainSuffix');
     this.onboardingSlugPrefix = document.getElementById('onboardingSlugPrefix');
-    // Personalisation View Elements
-    this.navPersonalisation = document.getElementById('nav-personalisation');
-    this.viewPersonalisation = document.getElementById('view-personalisation');
-    this.btnPersonalisationPreviewLive = document.getElementById('btnPersonalisationPreviewLive');
-    this.btnSavePersonalisationTop = document.getElementById('btnSavePersonalisationTop');
-    this.personalisationForm = document.getElementById('personalisationForm');
-    this.persTabBtns = document.querySelectorAll('.pers-tab-btn');
-    this.persTabPanes = document.querySelectorAll('.pers-tab-pane');
-    this.persSubdomainSlug = document.getElementById('persSubdomainSlug');
-    this.persFullUrlPreview = document.getElementById('persFullUrlPreview');
-    this.btnPersCopyLink = document.getElementById('btnPersCopyLink');
-    this.persAcademyName = document.getElementById('persAcademyName');
-    this.persCategory = document.getElementById('persCategory');
-    this.persHeroTitle1 = document.getElementById('persHeroTitle1');
-    this.persHeroTitle2 = document.getElementById('persHeroTitle2');
-    this.persHeroTagline = document.getElementById('persHeroTagline');
-    this.persOwnerName = document.getElementById('persOwnerName');
-    this.persHeroDesc = document.getElementById('persHeroDesc');
-    this.heroPhotos = [];
-    this.persHeroPhotosFile = document.getElementById('persHeroPhotosFile');
-    this.btnUploadHeroPhotos = document.getElementById('btnUploadHeroPhotos');
-    this.heroPhotosDropZone = document.getElementById('heroPhotosDropZone');
-    this.heroPhotosGrid = document.getElementById('heroPhotosGrid');
-    this.heroPhotosCountBadge = document.getElementById('heroPhotosCountBadge');
-    this.heroMultiActions = document.getElementById('heroMultiActions');
-    this.heroUploadPromptText = document.getElementById('heroUploadPromptText');
-    this.persHeroImg1 = document.getElementById('persHeroImg1');
-    this.persHeroImg2 = document.getElementById('persHeroImg2');
-    this.persNotice1 = document.getElementById('persNotice1');
-    this.persNotice2 = document.getElementById('persNotice2');
-    this.persNotice3 = document.getElementById('persNotice3');
-    this.persBannerPhone = document.getElementById('persBannerPhone');
-    this.persBannerTagline = document.getElementById('persBannerTagline');
-    this.persEstYear = document.getElementById('persEstYear');
-    this.persAboutHeadline = document.getElementById('persAboutHeadline');
-    this.persAboutDirector = document.getElementById('persAboutDirector');
-    this.persAboutStory = document.getElementById('persAboutStory');
-    this.persAboutStoryImg = document.getElementById('persAboutStoryImg');
-    this.persAboutStoryImgFile = document.getElementById('persAboutStoryImgFile');
-    this.btnUploadAboutStoryImg = document.getElementById('btnUploadAboutStoryImg');
-    this.btnRemoveAboutStoryImg = document.getElementById('btnRemoveAboutStoryImg');
-    this.aboutStoryDropZone = document.getElementById('aboutStoryDropZone');
-    this.persAboutStoryPreviewImg = document.getElementById('persAboutStoryPreviewImg');
-    this.persAboutStoryPlaceholder = document.getElementById('persAboutStoryPlaceholder');
-    this.persHighlight1 = document.getElementById('persHighlight1');
-    this.persHighlight2 = document.getElementById('persHighlight2');
-    this.persHighlight3 = document.getElementById('persHighlight3');
-    this.persHighlight4 = document.getElementById('persHighlight4');
-    this.persLogoUrl = document.getElementById('persLogoUrl');
-    this.persLogoFile = document.getElementById('persLogoFile');
-    this.btnUploadLogo = document.getElementById('btnUploadLogo');
-    this.btnRemoveLogo = document.getElementById('btnRemoveLogo');
-    this.logoDropZone = document.getElementById('logoDropZone');
-    this.persLogoPreviewImg = document.getElementById('persLogoPreviewImg');
-    this.persLogoPreviewPlaceholder = document.getElementById('persLogoPreviewPlaceholder');
-    this.persFaviconUrl = document.getElementById('persFaviconUrl');
-    this.persFaviconFile = document.getElementById('persFaviconFile');
-    this.btnUploadFavicon = document.getElementById('btnUploadFavicon');
-    this.btnRemoveFavicon = document.getElementById('btnRemoveFavicon');
-    this.faviconDropZone = document.getElementById('faviconDropZone');
-    this.persFaviconPreviewImg = document.getElementById('persFaviconPreviewImg');
-    this.persFaviconPreviewPlaceholder = document.getElementById('persFaviconPreviewPlaceholder');
-    this.persSignatureUrl = document.getElementById('persSignatureUrl');
-    this.persSignatureFile = document.getElementById('persSignatureFile');
-    this.btnUploadSignature = document.getElementById('btnUploadSignature');
-    this.btnRemoveSignature = document.getElementById('btnRemoveSignature');
-    this.signatureDropZone = document.getElementById('signatureDropZone');
-    this.persSignaturePreviewImg = document.getElementById('persSignaturePreviewImg');
-    this.persSignaturePreviewPlaceholder = document.getElementById('persSignaturePreviewPlaceholder');
-    this.accreditationLogos = [];
-    this.persAccreditationUrls = document.getElementById('persAccreditationUrls');
-    this.persAccreditationsFile = document.getElementById('persAccreditationsFile');
-    this.btnUploadAccreditations = document.getElementById('btnUploadAccreditations');
-    this.accreditationsDropZone = document.getElementById('accreditationsDropZone');
-    this.persAccreditationsGrid = document.getElementById('persAccreditationsGrid');
-    this.accreditationsCountBadge = document.getElementById('accreditationsCountBadge');
-    this.persGalleryHeading = document.getElementById('persGalleryHeading');
-    this.persGallerySubtitle = document.getElementById('persGallerySubtitle');
-    this.galleryPhotos = [];
-    this.persGalleryUrls = document.getElementById('persGalleryUrls');
-    this.persGalleryFiles = document.getElementById('persGalleryFiles');
-    this.btnUploadGalleryPhotos = document.getElementById('btnUploadGalleryPhotos');
-    this.galleryDropZone = document.getElementById('galleryDropZone');
-    this.persGalleryGrid = document.getElementById('persGalleryGrid');
-    this.galleryCountBadge = document.getElementById('galleryCountBadge');
-    this.persPhone = document.getElementById('persPhone');
-    this.persSecondaryPhone = document.getElementById('persSecondaryPhone');
-    this.persEmail = document.getElementById('persEmail');
-    this.persBranch1 = document.getElementById('persBranch1');
-    this.persBranch2 = document.getElementById('persBranch2');
-    this.persAddress = document.getElementById('persAddress');
-    this.persPinCode = document.getElementById('persPinCode');
-    this.persMapUrl = document.getElementById('persMapUrl');
-    this.persSocialWhatsapp = document.getElementById('persSocialWhatsapp');
-    this.persSocialFacebook = document.getElementById('persSocialFacebook');
-    this.persSocialInstagram = document.getElementById('persSocialInstagram');
-    this.persSocialYoutube = document.getElementById('persSocialYoutube');
-    this.persSocialLinkedin = document.getElementById('persSocialLinkedin');
-    this.persSocialTwitter = document.getElementById('persSocialTwitter');
-    this.persFooterBio = document.getElementById('persFooterBio');
-    this.persFooterProof = document.getElementById('persFooterProof');
-    this.persFooterCopyright = document.getElementById('persFooterCopyright');
-    this.btnSavePersonalisation = document.getElementById('btnSavePersonalisation');
-    this.btnPublishPersonalisation = document.getElementById('btnPublishPersonalisation');
-
-    // Section Visibility Toggles
-    this.sectionVisibilityCheckboxes = document.querySelectorAll('.section-visibility-checkbox');
-    this.toggleVisibilityHero = document.getElementById('toggleVisibilityHero');
-    this.toggleVisibilityBanner = document.getElementById('toggleVisibilityBanner');
-    this.toggleVisibilityAbout = document.getElementById('toggleVisibilityAbout');
-    this.toggleVisibilityAccreditations = document.getElementById('toggleVisibilityAccreditations');
-    this.toggleVisibilityGallery = document.getElementById('toggleVisibilityGallery');
-    this.toggleVisibilityContact = document.getElementById('toggleVisibilityContact');
-    this.toggleVisibilitySocials = document.getElementById('toggleVisibilitySocials');
-    this.toggleVisibilityFooter = document.getElementById('toggleVisibilityFooter');
-
-    // Branding View Elements
-    this.navBranding = document.getElementById('nav-branding');
-    this.viewBranding = document.getElementById('view-branding');
-    this.brandingForm = document.getElementById('brandingForm');
-    this.brandingAcademyName = document.getElementById('brandingAcademyName');
-    this.brandingPhone = document.getElementById('brandingPhone');
-    this.brandingEmail = document.getElementById('brandingEmail');
-    this.brandingLogoDropZone = document.getElementById('brandingLogoDropZone');
-    this.brandingLogoPreviewBox = document.getElementById('brandingLogoPreviewBox');
-    this.brandingLogoImg = document.getElementById('brandingLogoImg');
-    this.brandingLogoPlaceholder = document.getElementById('brandingLogoPlaceholder');
-    this.brandingLogoFileInput = document.getElementById('brandingLogoFileInput');
-    this.btnUploadBrandingLogo = document.getElementById('btnUploadBrandingLogo');
-    this.btnRemoveBrandingLogo = document.getElementById('btnRemoveBrandingLogo');
-    this.brandingLogoUrl = document.getElementById('brandingLogoUrl');
-    this.btnSaveBranding = document.getElementById('btnSaveBranding');
 
     this.toastContainer = document.getElementById('toastContainer');
   }
@@ -2315,195 +2187,6 @@ class UIController {
       });
     }
 
-    // Personalisation Subdomain Slug Auto-Cleaner & Live URL Update
-    if (this.persSubdomainSlug) {
-      this.persSubdomainSlug.addEventListener('input', (e) => {
-        const clean = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-        e.target.value = clean;
-        if (this.persFullUrlPreview) {
-          this.persFullUrlPreview.textContent = this.getPublicUrlForSlug(clean || 'slug');
-        }
-        if (this.btnPersonalisationPreviewLive) {
-          this.btnPersonalisationPreviewLive.href = this.getPublicUrlForSlug(clean || 'slug');
-        }
-      });
-    }
-
-    if (this.btnPersCopyLink) {
-      this.btnPersCopyLink.addEventListener('click', () => {
-        const rawSlug = (this.persSubdomainSlug?.value || '').trim() || 'slug';
-        const url = this.getPublicUrlForSlug(rawSlug);
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(() => {
-            this.showToast('Link Copied!', 'Your public admissions link has been copied to clipboard.', 'success');
-          }).catch(() => {
-            prompt('Copy your public website link:', url);
-          });
-        } else {
-          prompt('Copy your public website link:', url);
-        }
-      });
-    }
-
-    // Personalisation Section Tabs Switching
-    if (this.persTabBtns) {
-      this.persTabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tabKey = btn.getAttribute('data-tab');
-          this.switchPersonalisationTab(tabKey);
-        });
-      });
-    }
-
-    // Section Visibility Toggle Switches (Instant toggle & auto-save)
-    if (this.sectionVisibilityCheckboxes) {
-      this.sectionVisibilityCheckboxes.forEach(chk => {
-        chk.addEventListener('change', async () => {
-          const sectionKey = chk.getAttribute('data-section');
-          const isVisible = chk.checked;
-          this.updateSectionVisibilityPill(sectionKey, isVisible);
-
-          const currentProfile = store.getAcademyProfile() || {};
-          const secVis = { ...(currentProfile.sectionVisibility || {}) };
-          secVis[sectionKey] = isVisible;
-          const updatedProfile = {
-            ...currentProfile,
-            sectionVisibility: secVis,
-            updatedAt: Date.now()
-          };
-          try {
-            await store.saveAcademyProfile(updatedProfile);
-            const secName = sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1);
-            this.showToast(
-              isVisible ? `${secName} Section Visible` : `${secName} Section Hidden`,
-              `${secName} section is now ${isVisible ? 'visible on' : 'hidden from'} your public website.`,
-              'info'
-            );
-          } catch (err) {
-            console.error('[Admin] Failed saving section visibility:', err);
-          }
-        });
-      });
-    }
-
-    // Initialize Personalisation Image Uploaders
-    this.initPersonalisationUploaders();
-
-    if (this.btnSavePersonalisation) {
-      this.btnSavePersonalisation.addEventListener('click', (e) => this.handleSavePersonalisation(e, { publish: false }));
-    }
-
-    if (this.btnPublishPersonalisation) {
-      this.btnPublishPersonalisation.addEventListener('click', (e) => this.handleSavePersonalisation(e, { publish: true }));
-    }
-
-    if (this.personalisationForm) {
-      this.personalisationForm.addEventListener('submit', (e) => this.handleSavePersonalisation(e, { publish: false }));
-    }
-
-    // Branding Form & Logo Uploader Handlers
-    if (this.btnUploadBrandingLogo && this.brandingLogoFileInput) {
-      this.btnUploadBrandingLogo.addEventListener('click', () => {
-        this.brandingLogoFileInput.click();
-      });
-    }
-
-    if (this.brandingLogoFileInput) {
-      this.brandingLogoFileInput.addEventListener('change', (e) => {
-        const file = e.target.files?.[0];
-        if (file) this.handleBrandingLogoSelection(file);
-      });
-    }
-
-    if (this.btnRemoveBrandingLogo) {
-      this.btnRemoveBrandingLogo.addEventListener('click', () => {
-        this.updateBrandingLogoPreview('');
-        this.showToast('Logo Removed', 'Click "Save Changes" to save this change.', 'info');
-      });
-    }
-
-    if (this.brandingLogoUrl) {
-      this.brandingLogoUrl.addEventListener('input', () => {
-        this.updateBrandingLogoPreview(this.brandingLogoUrl.value);
-      });
-    }
-
-    if (this.brandingLogoDropZone) {
-      ['dragenter', 'dragover'].forEach(eventName => {
-        this.brandingLogoDropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.brandingLogoDropZone.classList.add('is-dragover');
-        });
-      });
-
-      ['dragleave', 'drop'].forEach(eventName => {
-        this.brandingLogoDropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.brandingLogoDropZone.classList.remove('is-dragover');
-        });
-      });
-
-      this.brandingLogoDropZone.addEventListener('drop', (e) => {
-        const file = e.dataTransfer?.files?.[0];
-        if (file) {
-          this.handleBrandingLogoSelection(file);
-        }
-      });
-    }
-
-    // Hero Photos Multi-Uploader Handlers (Up to 5 Photos)
-    if (this.btnUploadHeroPhotos && this.persHeroPhotosFile) {
-      this.btnUploadHeroPhotos.addEventListener('click', () => {
-        if (this.heroPhotos.length >= 5) {
-          this.showToast('Limit Reached', 'Maximum 5 hero banner photos can be added. Remove one to replace.', 'info');
-          return;
-        }
-        this.persHeroPhotosFile.click();
-      });
-    }
-
-    if (this.persHeroPhotosFile) {
-      this.persHeroPhotosFile.addEventListener('change', (e) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length > 0) {
-          this.handleHeroPhotosSelection(files);
-        }
-        this.persHeroPhotosFile.value = '';
-      });
-    }
-
-    if (this.heroPhotosDropZone) {
-      ['dragenter', 'dragover'].forEach(name => {
-        this.heroPhotosDropZone.addEventListener(name, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.heroPhotosDropZone.classList.add('is-dragover');
-        });
-      });
-      ['dragleave', 'drop'].forEach(name => {
-        this.heroPhotosDropZone.addEventListener(name, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.heroPhotosDropZone.classList.remove('is-dragover');
-        });
-      });
-      this.heroPhotosDropZone.addEventListener('drop', (e) => {
-        const files = Array.from(e.dataTransfer?.files || []);
-        if (files.length > 0) {
-          this.handleHeroPhotosSelection(files);
-        }
-      });
-    }
-
-    if (this.btnSaveBranding) {
-      this.btnSaveBranding.addEventListener('click', (e) => this.handleSaveBranding(e));
-    }
-
-    if (this.brandingForm) {
-      this.brandingForm.addEventListener('submit', (e) => this.handleSaveBranding(e));
-    }
 
     if (this.btnOpenSubdomainSettings) {
       this.btnOpenSubdomainSettings.addEventListener('click', () => this.openAcademySettingsModal());
@@ -2643,7 +2326,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses', 'batches', 'certificates', 'idcards', 'inbox', 'branding', 'personalisation', 'tenants'].includes(hash)) {
+      if (['dashboard', 'students', 'courses', 'batches', 'marksheets', 'certificates', 'idcards', 'inbox', 'tenants'].includes(hash)) {
         if (hash === 'tenants' && (!store.isSuperAdmin || store.ownerEmail !== 'dasprantik76@gmail.com')) {
           this.switchView('dashboard', true);
           return;
@@ -2666,7 +2349,7 @@ class UIController {
         this.btnRefreshInbox.disabled = false;
       });
     }
-    
+
     // Authentication Code Actions
     if (this.btnGenerateNewAuthCode) {
       this.btnGenerateNewAuthCode.addEventListener('click', async () => {
@@ -2801,6 +2484,7 @@ class UIController {
       this.btnAddStudent.addEventListener('click', () => this.openStudentModal());
     }
     this.btnAddCourse.addEventListener('click', () => this.openCourseModal());
+    this.btnAddSubject?.addEventListener('click', () => this.addSubjectInputField('', true));
 
     // Student Filter & Search Handlers
     this.studentSearchInput.addEventListener('input', (e) => {
@@ -3549,6 +3233,7 @@ class UIController {
 
     window.addEventListener('resize', () => {
       if (this.portaledMenu) this.closeAllAdminDropdowns();
+      if (this.currentView === 'marksheets') this.scaleMarksheetPreview();
     }, { passive: true });
 
     window.addEventListener('scroll', () => {
@@ -3708,6 +3393,15 @@ class UIController {
         const isInboxPage = this.currentView === 'inbox' ||
           Boolean(document.getElementById('view-inbox')?.classList.contains('active'));
 
+        if (this.currentView === 'marksheets') {
+          e.preventDefault();
+          this.selectedMarksheetIds?.clear();
+          this.marksheetPreviewCleared = true;
+          this.marksheetPreviewId = null;
+          this.renderMarksheetsView();
+          return;
+        }
+
         if (this.currentView === 'certificates') {
           e.preventDefault();
           this.selectedCertificateIds?.clear();
@@ -3827,19 +3521,13 @@ class UIController {
         title: 'Inbox',
         subtitle: 'Messages received from your public website'
       },
-      branding: {
-        icon: '<i class="fa-solid fa-palette"></i>',
+      marksheets: {
+        icon: '<i class="fa-solid fa-file-lines"></i>',
         theme: 'theme-dashboard',
-        title: 'Academy Branding',
-        subtitle: 'Update your official academy brand name, logo, phone, and email address'
+        title: 'Student Marksheets',
+        subtitle: 'Manage and issue academic marksheets and grading records'
       },
       certificates: { icon: '<i class="fa-solid fa-certificate"></i>', theme: 'theme-dashboard', title: 'Student Certificates', subtitle: 'Preview and download certificates for completed students' },
-      personalisation: {
-        icon: '<i class="fa-solid fa-sliders"></i>',
-        theme: 'theme-dashboard',
-        title: 'Personalisation',
-        subtitle: 'Customize your public website branding and settings'
-      },
       tenants: {
         icon: '<i class="fa-solid fa-shield-halved"></i>',
         theme: 'theme-dashboard',
@@ -3858,6 +3546,9 @@ class UIController {
   }
 
   switchView(viewName, updateHash = true) {
+    if (viewName === 'branding' || viewName === 'personalisation') {
+      viewName = 'dashboard';
+    }
     if (viewName === 'tenants' && (!store.isSuperAdmin || store.ownerEmail !== 'dasprantik76@gmail.com')) {
       viewName = 'dashboard';
     }
@@ -3873,1195 +3564,18 @@ class UIController {
       const grid = view?.querySelector('.batches-grid, .courses-grid');
       view?.querySelector('.view-header-bar')?.classList.toggle('is-scrolled', (grid?.scrollTop || 0) > 2);
     }
-    if (viewName === 'branding') {
-      this.populateBrandingForm();
-    }
-    if (viewName === 'personalisation') {
-      this.populatePersonalisationForm();
+    if (viewName === 'marksheets') {
+      setTimeout(() => this.scaleMarksheetPreview(), 50);
     }
     if (viewName === 'tenants' && store.isSuperAdmin && store.ownerEmail === 'dasprantik76@gmail.com') {
       this.loadPlatformTenants();
     }
     store.fetchCloudData(() => {
       this.render();
-      if (this.currentView === 'branding') {
-        this.populateBrandingForm();
-      }
-      if (this.currentView === 'personalisation') {
-        this.populatePersonalisationForm();
-      }
       if (viewName === 'tenants' && store.isSuperAdmin && store.ownerEmail === 'dasprantik76@gmail.com') {
         this.loadPlatformTenants();
       }
     });
-  }
-
-  switchPersonalisationTab(tabKey) {
-    if (!this.persTabBtns || !this.persTabPanes) return;
-    this.persTabBtns.forEach(btn => {
-      const match = btn.getAttribute('data-tab') === tabKey;
-      btn.classList.toggle('active', match);
-      btn.setAttribute('aria-selected', match ? 'true' : 'false');
-    });
-    this.persTabPanes.forEach(pane => {
-      const paneId = `tab-pane-${tabKey}`;
-      pane.classList.toggle('active', pane.id === paneId);
-    });
-  }
-
-  updateImgPreview(input, imgElem, placeholderElem) {
-    if (!input || !imgElem) return;
-    const url = (input.value || '').trim();
-    if (url) {
-      imgElem.src = url;
-      imgElem.onload = () => {
-        imgElem.style.display = 'block';
-        if (placeholderElem) placeholderElem.style.display = 'none';
-      };
-      imgElem.onerror = () => {
-        imgElem.style.display = 'none';
-        if (placeholderElem) {
-          placeholderElem.style.display = 'block';
-          placeholderElem.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Image failed to load</span>';
-        }
-      };
-    } else {
-      imgElem.style.display = 'none';
-      if (placeholderElem) {
-        placeholderElem.style.display = 'block';
-      }
-    }
-  }
-
-  renderGalleryPreview() {
-    this.renderGalleryPhotosGrid();
-  }
-
-  updateSectionVisibilityPill(sectionKey, isVisible) {
-    const capitalized = sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1);
-    const pill = document.getElementById(`pillVisibility${capitalized}`);
-    if (!pill) return;
-    if (isVisible) {
-      pill.className = 'visibility-pill is-visible';
-      pill.innerHTML = '<span class="visibility-dot"></span><span class="visibility-state-text">Visible</span>';
-    } else {
-      pill.className = 'visibility-pill is-hidden';
-      pill.innerHTML = '<span class="visibility-dot"></span><span class="visibility-state-text">Hidden</span>';
-    }
-  }
-
-  populatePersonalisationForm() {
-    const profile = store.getAcademyProfile() || {};
-    const defaultSlug = this.session?.email?.includes('poulami')
-      ? 'poulami'
-      : (this.session?.email?.includes('diganta') ? 'diganta' : (this.session?.email?.includes('prantik') ? 'diganta' : (this.session?.email ? this.session.email.split('@')[0].replace(/[^a-z0-9]/g, '') : 'diganta')));
-    const slug = profile.slug || defaultSlug;
-
-    // Tab 1: Hero Section & Public Address
-    if (this.persSubdomainSlug) this.persSubdomainSlug.value = slug;
-    if (this.persFullUrlPreview) this.persFullUrlPreview.textContent = this.getPublicUrlForSlug(slug);
-    if (this.btnPersonalisationPreviewLive) this.btnPersonalisationPreviewLive.href = this.getPublicUrlForSlug(slug);
-
-    if (this.persAcademyName) this.persAcademyName.value = profile.academyName || '';
-    if (this.persCategory) this.persCategory.value = profile.category || '';
-    if (this.persHeroTitle1) this.persHeroTitle1.value = profile.heroTitleLine1 || '';
-    if (this.persHeroTitle2) this.persHeroTitle2.value = profile.heroTitleLine2 || '';
-    if (this.persHeroTagline) this.persHeroTagline.value = profile.tagline || 'Student Registration';
-    if (this.persOwnerName) this.persOwnerName.value = profile.ownerName || this.session?.name || '';
-    if (this.persHeroDesc) this.persHeroDesc.value = (profile.heroDesc !== undefined && profile.heroDesc !== null) ? profile.heroDesc : '';
-    if (Array.isArray(profile.heroPhotos)) {
-      this.heroPhotos = profile.heroPhotos.filter(Boolean).slice(0, 5);
-    } else {
-      const legacy = [profile.heroImg1, profile.heroImg2].filter(Boolean);
-      this.heroPhotos = legacy.slice(0, 5);
-    }
-    this.renderHeroPhotosGrid();
-
-    // Tab 2: Top Notice Bar & Badge Banner
-    if (this.persNotice1) this.persNotice1.value = profile.notice1Text || '';
-    if (this.persNotice2) this.persNotice2.value = profile.notice2Text || '';
-    if (this.persNotice3) this.persNotice3.value = profile.notice3Text || '';
-    if (this.persBannerPhone) this.persBannerPhone.value = profile.bannerPhone || profile.phone || '';
-    if (this.persBannerTagline) this.persBannerTagline.value = profile.bannerTagline || 'Building Skills. Creating Futures.';
-    if (this.persEstYear) this.persEstYear.value = profile.estYear || '2005';
-
-    // Tab 3: About Us & Academy Story
-    if (this.persAboutHeadline) this.persAboutHeadline.value = profile.aboutHeadline || `Quality technical education, practical skills, and trusted training since ${profile.estYear || '2005'}.`;
-    if (this.persAboutDirector) this.persAboutDirector.value = profile.aboutDirector || (profile.ownerName ? `Supervised & Directed by ${profile.ownerName}` : '');
-    if (this.persAboutStory) this.persAboutStory.value = profile.aboutStory || profile.about || 'Premier professional training academy offering certified courses with modern practical laboratory sessions.';
-    if (this.persAboutStoryImg) {
-      this.persAboutStoryImg.value = profile.aboutStoryImg || '';
-      this.updateAboutStoryPreview(this.persAboutStoryImg.value);
-    }
-
-    // Highlights
-    const highlights = Array.isArray(profile.aboutHighlights) ? profile.aboutHighlights : [];
-    if (this.persHighlight1) this.persHighlight1.value = highlights[0] || 'ISO 9001:2015 Certified Institute';
-    if (this.persHighlight2) this.persHighlight2.value = highlights[1] || '100% Practical Hands-on Labs';
-    if (this.persHighlight3) this.persHighlight3.value = highlights[2] || 'Recognized Government & Industry Certifications';
-    if (this.persHighlight4) this.persHighlight4.value = highlights[3] || 'Comprehensive Career Guidance & Placement Assistance';
-
-    // Tab 4: Accreditations & Brand Logos
-    if (this.persLogoUrl) {
-      this.persLogoUrl.value = profile.logoUrl || '';
-      this.updatePersLogoPreview(this.persLogoUrl.value);
-    }
-    if (this.persFaviconUrl) {
-      this.persFaviconUrl.value = profile.faviconUrl || '';
-      this.updatePersFaviconPreview(this.persFaviconUrl.value);
-    }
-    if (this.persSignatureUrl) {
-      this.persSignatureUrl.value = profile.signatureUrl || '';
-      this.updatePersSignaturePreview(this.persSignatureUrl.value);
-    }
-    const accr = Array.isArray(profile.accreditationUrls)
-      ? profile.accreditationUrls
-      : (typeof profile.accreditationUrls === 'string' && profile.accreditationUrls ? profile.accreditationUrls.split('\n').map(u => u.trim()).filter(Boolean) : []);
-    this.accreditationLogos = [...accr];
-    if (this.persAccreditationUrls) {
-      this.persAccreditationUrls.value = this.accreditationLogos.join('\n');
-    }
-    this.renderAccreditationLogosGrid();
-
-    // Tab 5: Gallery Photos
-    if (this.persGalleryHeading) this.persGalleryHeading.value = profile.galleryHeading || 'Our Students';
-    if (this.persGallerySubtitle) this.persGallerySubtitle.value = profile.gallerySubtitle || 'A glimpse into our classrooms, practical sessions, and student learning experiences.';
-    const gallery = Array.isArray(profile.galleryUrls)
-      ? profile.galleryUrls
-      : (typeof profile.galleryUrls === 'string' && profile.galleryUrls ? profile.galleryUrls.split('\n').map(u => u.trim()).filter(Boolean) : []);
-    this.galleryPhotos = [...gallery];
-    if (this.persGalleryUrls) {
-      this.persGalleryUrls.value = this.galleryPhotos.join('\n');
-    }
-    this.renderGalleryPhotosGrid();
-
-    // Tab 6: Contact & Location
-    if (this.persPhone) this.persPhone.value = profile.phone || '';
-    if (this.persSecondaryPhone) this.persSecondaryPhone.value = profile.secondaryPhone || profile.whatsapp || '';
-    if (this.persEmail) this.persEmail.value = profile.email || this.session?.email || '';
-    if (this.persBranch1) this.persBranch1.value = profile.branch1 || '';
-    if (this.persBranch2) this.persBranch2.value = profile.branch2 || '';
-    if (this.persAddress) this.persAddress.value = profile.address || '';
-    if (this.persPinCode) this.persPinCode.value = profile.pincode || '';
-    if (this.persMapUrl) this.persMapUrl.value = profile.mapUrl || '';
-
-    // Tab 7: Connect & Social Channels
-    const socials = profile.socials || {};
-    if (this.persSocialWhatsapp) this.persSocialWhatsapp.value = socials.whatsapp || profile.whatsapp || profile.secondaryPhone || '';
-    if (this.persSocialFacebook) this.persSocialFacebook.value = socials.facebook || profile.facebook || '';
-    if (this.persSocialInstagram) this.persSocialInstagram.value = socials.instagram || profile.instagram || '';
-    if (this.persSocialYoutube) this.persSocialYoutube.value = socials.youtube || profile.youtube || '';
-    if (this.persSocialLinkedin) this.persSocialLinkedin.value = socials.linkedin || profile.linkedin || '';
-    if (this.persSocialTwitter) this.persSocialTwitter.value = socials.twitter || profile.twitter || '';
-
-    // Tab 8: Footer & Copyright
-    if (this.persFooterBio) this.persFooterBio.value = profile.footerBio || 'Practical computer education, professional guidance and certified skills for a brighter digital future.';
-    if (this.persFooterProof) this.persFooterProof.value = profile.footerProof || 'Trusted learning since 2005';
-    if (this.persFooterCopyright) this.persFooterCopyright.value = profile.footerCopyright || `© 2026 ${profile.academyName || 'Academy'}. All rights reserved.`;
-
-    // Populate Section Visibility Toggles (default true)
-    const visibility = profile.sectionVisibility || {};
-    const sectionKeys = ['hero', 'banner', 'about', 'accreditations', 'gallery', 'contact', 'socials', 'footer'];
-    sectionKeys.forEach(sec => {
-      const isVisible = visibility[sec] !== false;
-      const capitalized = sec.charAt(0).toUpperCase() + sec.slice(1);
-      const checkbox = document.getElementById(`toggleVisibility${capitalized}`);
-      if (checkbox) {
-        checkbox.checked = isVisible;
-      }
-      this.updateSectionVisibilityPill(sec, isVisible);
-    });
-  }
-
-  async handleSavePersonalisation(e, options = { publish: false }) {
-    if (e) e.preventDefault();
-
-    const isPublish = !!(options && options.publish);
-    const activeBtn = isPublish ? this.btnPublishPersonalisation : this.btnSavePersonalisation;
-
-    const existingProfile = store.getAcademyProfile() || {};
-    const rawSlug = this.persSubdomainSlug 
-      ? (this.persSubdomainSlug.value || '').trim() 
-      : (existingProfile.slug || '');
-    const sanitizedSlug = rawSlug 
-      ? (rawSlug.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || existingProfile.slug || 'nyce')
-      : (existingProfile.slug || 'nyce');
-    if (this.persSubdomainSlug && !sanitizedSlug) {
-      this.showToast('Invalid Subdomain', 'Please provide a valid subdomain (e.g. prantik, my-academy).', 'error');
-      this.switchPersonalisationTab('hero');
-      this.persSubdomainSlug?.focus();
-      return;
-    }
-
-    const academyName = this.persAcademyName 
-      ? this.persAcademyName.value.trim() 
-      : (existingProfile.academyName || '');
-    if (this.persAcademyName && !academyName) {
-      this.showToast('Required Field', 'Please enter your Academy Brand Name.', 'error');
-      this.switchPersonalisationTab('hero');
-      this.persAcademyName?.focus();
-      return;
-    }
-
-    const highlights = [
-      this.persHighlight1?.value.trim(),
-      this.persHighlight2?.value.trim(),
-      this.persHighlight3?.value.trim(),
-      this.persHighlight4?.value.trim()
-    ].filter(Boolean);
-
-    const galleryUrls = Array.isArray(this.galleryPhotos)
-      ? this.galleryPhotos
-      : (this.persGalleryUrls?.value || '')
-          .split('\n')
-          .map(u => u.trim())
-          .filter(Boolean);
-
-    const accreditationUrls = Array.isArray(this.accreditationLogos)
-      ? this.accreditationLogos
-      : (this.persAccreditationUrls?.value || '')
-          .split('\n')
-          .map(u => u.trim())
-          .filter(Boolean);
-
-    const socials = {
-      facebook: this.persSocialFacebook?.value.trim() || '',
-      instagram: this.persSocialInstagram?.value.trim() || '',
-      youtube: this.persSocialYoutube?.value.trim() || '',
-      whatsapp: this.persSocialWhatsapp?.value.trim() || '',
-      linkedin: this.persSocialLinkedin?.value.trim() || '',
-      twitter: this.persSocialTwitter?.value.trim() || ''
-    };
-
-    if (activeBtn) setButtonLoading(activeBtn, true);
-    if (this.btnSavePersonalisation && this.btnSavePersonalisation !== activeBtn) {
-      this.btnSavePersonalisation.disabled = true;
-    }
-    if (this.btnPublishPersonalisation && this.btnPublishPersonalisation !== activeBtn) {
-      this.btnPublishPersonalisation.disabled = true;
-    }
-
-    const updatedProfile = {
-      ...existingProfile,
-      slug: sanitizedSlug,
-      academyName: academyName || existingProfile.academyName || '',
-      category: this.persCategory ? this.persCategory.value.trim() : (existingProfile.category || ''),
-      heroTitleLine1: this.persHeroTitle1?.value.trim() || '',
-      heroTitleLine2: this.persHeroTitle2?.value.trim() || '',
-      tagline: this.persHeroTagline ? (this.persHeroTagline.value.trim() || 'Student Registration') : (existingProfile.tagline || 'Student Registration'),
-      ownerName: this.persOwnerName?.value.trim() || existingProfile.ownerName || this.tenantProfile?.ownerName || this.session?.name || '',
-      heroDesc: this.persHeroDesc?.value.trim() || '',
-      heroPhotos: Array.isArray(this.heroPhotos) ? this.heroPhotos.slice(0, 5) : [],
-      heroImg1: (this.heroPhotos && this.heroPhotos[0]) || this.persHeroImg1?.value.trim() || '',
-      heroImg2: (this.heroPhotos && this.heroPhotos[1]) || this.persHeroImg2?.value.trim() || '',
-      notice1Text: this.persNotice1?.value.trim() || '',
-      notice2Text: this.persNotice2?.value.trim() || '',
-      notice3Text: this.persNotice3?.value.trim() || '',
-      bannerPhone: this.persBannerPhone?.value.trim() || '',
-      bannerTagline: this.persBannerTagline?.value.trim() || '',
-      estYear: this.persEstYear?.value.trim() || '',
-      aboutHeadline: this.persAboutHeadline?.value.trim() || '',
-      aboutDirector: this.persAboutDirector?.value.trim() || '',
-      aboutStory: this.persAboutStory?.value.trim() || '',
-      aboutStoryImg: this.persAboutStoryImg?.value.trim() || '',
-      about: this.persAboutStory?.value.trim() || '',
-      aboutHighlights: highlights,
-      logoUrl: this.persLogoUrl?.value.trim() || '',
-      faviconUrl: this.persFaviconUrl?.value.trim() || '',
-      signatureUrl: this.persSignatureUrl?.value.trim() || '',
-      accreditationUrls: accreditationUrls,
-      galleryHeading: this.persGalleryHeading?.value.trim() || '',
-      gallerySubtitle: this.persGallerySubtitle?.value.trim() || '',
-      galleryUrls: galleryUrls,
-      phone: this.persPhone?.value.trim() || '',
-      secondaryPhone: this.persSecondaryPhone?.value.trim() || '',
-      whatsapp: this.persSocialWhatsapp?.value.trim() || this.persSecondaryPhone?.value.trim() || '',
-      email: this.persEmail?.value.trim() || '',
-      branch1: this.persBranch1?.value.trim() || '',
-      branch2: this.persBranch2?.value.trim() || '',
-      address: this.persAddress?.value.trim() || '',
-      pincode: this.persPinCode?.value.trim() || '',
-      mapUrl: this.persMapUrl?.value.trim() || '',
-      socials: socials,
-      footerBio: this.persFooterBio?.value.trim() || '',
-      footerProof: this.persFooterProof?.value.trim() || '',
-      footerCopyright: this.persFooterCopyright?.value.trim() || '',
-      sectionVisibility: {
-        hero: this.toggleVisibilityHero ? this.toggleVisibilityHero.checked : (store.getAcademyProfile()?.sectionVisibility?.hero !== false),
-        banner: this.toggleVisibilityBanner ? this.toggleVisibilityBanner.checked : (store.getAcademyProfile()?.sectionVisibility?.banner !== false),
-        about: this.toggleVisibilityAbout ? this.toggleVisibilityAbout.checked : (store.getAcademyProfile()?.sectionVisibility?.about !== false),
-        accreditations: this.toggleVisibilityAccreditations ? this.toggleVisibilityAccreditations.checked : (store.getAcademyProfile()?.sectionVisibility?.accreditations !== false),
-        gallery: this.toggleVisibilityGallery ? this.toggleVisibilityGallery.checked : (store.getAcademyProfile()?.sectionVisibility?.gallery !== false),
-        contact: this.toggleVisibilityContact ? this.toggleVisibilityContact.checked : (store.getAcademyProfile()?.sectionVisibility?.contact !== false),
-        socials: this.toggleVisibilitySocials ? this.toggleVisibilitySocials.checked : (store.getAcademyProfile()?.sectionVisibility?.socials !== false),
-        footer: this.toggleVisibilityFooter ? this.toggleVisibilityFooter.checked : (store.getAcademyProfile()?.sectionVisibility?.footer !== false)
-      },
-      isPublished: isPublish ? true : (store.getAcademyProfile()?.isPublished ?? true),
-      publishedAt: isPublish ? Date.now() : (store.getAcademyProfile()?.publishedAt || null),
-      updatedAt: Date.now()
-    };
-
-    try {
-      await store.saveAcademyProfile(updatedProfile);
-      this.updatePublicSiteLink();
-      this.populatePersonalisationForm();
-      if (this.populateBrandingForm) {
-        this.populateBrandingForm();
-      }
-      this.render();
-
-      if (isPublish) {
-        const publicUrl = this.getPublicUrlForSlug(sanitizedSlug);
-        this.showToast('Published Live!', `Your academy website is now live at ${sanitizedSlug}.`, 'success');
-        try {
-          window.open(publicUrl, '_blank');
-        } catch (_) {}
-      } else {
-        this.showToast('Changes Saved', 'Your personalisation details have been saved.', 'success');
-      }
-    } catch (err) {
-      this.showToast('Save Failed', err.message || 'Could not update academy profile.', 'error');
-    } finally {
-      if (activeBtn) setButtonLoading(activeBtn, false);
-      if (this.btnSavePersonalisation) this.btnSavePersonalisation.disabled = false;
-      if (this.btnPublishPersonalisation) this.btnPublishPersonalisation.disabled = false;
-    }
-  }
-
-  populateBrandingForm() {
-    const profile = store.getAcademyProfile() || {};
-    if (this.brandingAcademyName) this.brandingAcademyName.value = profile.academyName || '';
-    if (this.brandingPhone) this.brandingPhone.value = profile.phone || profile.bannerPhone || '';
-    if (this.brandingEmail) this.brandingEmail.value = profile.email || this.session?.email || '';
-    const logo = profile.logoUrl || '';
-    if (this.brandingLogoUrl) this.brandingLogoUrl.value = logo;
-    this.updateBrandingLogoPreview(logo);
-  }
-
-  updateBrandingLogoPreview(url) {
-    const cleanUrl = (url || '').trim();
-    if (this.brandingLogoImg && this.brandingLogoPlaceholder) {
-      if (cleanUrl) {
-        this.brandingLogoImg.src = cleanUrl;
-        this.brandingLogoImg.style.display = 'block';
-        this.brandingLogoPlaceholder.style.display = 'none';
-        if (this.btnRemoveBrandingLogo) this.btnRemoveBrandingLogo.style.display = 'inline-flex';
-      } else {
-        this.brandingLogoImg.src = '';
-        this.brandingLogoImg.style.display = 'none';
-        this.brandingLogoPlaceholder.style.display = 'block';
-        if (this.btnRemoveBrandingLogo) this.btnRemoveBrandingLogo.style.display = 'none';
-        if (this.brandingLogoFileInput) this.brandingLogoFileInput.value = '';
-        if (this.brandingLogoUrl) this.brandingLogoUrl.value = '';
-      }
-    }
-  }
-
-  handleBrandingLogoSelection(file) {
-    if (!file) return;
-    if (!file.type || !file.type.startsWith('image/')) {
-      this.showToast('Invalid File', 'Please select a valid image file (PNG, JPG, SVG, WebP).', 'error');
-      if (this.brandingLogoFileInput) this.brandingLogoFileInput.value = '';
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      this.showToast('File Too Large', 'Logo image must be smaller than 5 MB.', 'error');
-      if (this.brandingLogoFileInput) this.brandingLogoFileInput.value = '';
-      return;
-    }
-
-    // Direct read for SVG or small images (under 250 KB) to preserve original crisp vector/transparency quality
-    if (file.type === 'image/svg+xml' || file.size <= 250 * 1024) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result;
-        if (this.brandingLogoUrl) this.brandingLogoUrl.value = dataUrl;
-        this.updateBrandingLogoPreview(dataUrl);
-        this.showToast('Logo Selected', 'Logo preview updated. Click "Save Changes" to save.', 'info');
-      };
-      reader.onerror = () => {
-        this.showToast('Error', 'Could not read the selected image file.', 'error');
-      };
-      reader.readAsDataURL(file);
-      return;
-    }
-
-    // For larger images, resize and optimize via canvas to keep data URL compact and responsive
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      const maxDim = 512;
-      let width = img.naturalWidth || img.width;
-      let height = img.naturalHeight || img.height;
-      if (width > maxDim || height > maxDim) {
-        if (width > height) {
-          height = Math.round((height * maxDim) / width);
-          width = maxDim;
-        } else {
-          width = Math.round((width * maxDim) / height);
-          height = maxDim;
-        }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, width, height);
-      ctx.drawImage(img, 0, 0, width, height);
-
-      let dataUrl = '';
-      try {
-        dataUrl = canvas.toDataURL('image/webp', 0.88);
-        if (!dataUrl || dataUrl.indexOf('data:image/webp') !== 0) {
-          dataUrl = canvas.toDataURL('image/png');
-        }
-      } catch (_) {
-        dataUrl = canvas.toDataURL('image/png');
-      }
-
-      if (this.brandingLogoUrl) this.brandingLogoUrl.value = dataUrl;
-      this.updateBrandingLogoPreview(dataUrl);
-      this.showToast('Logo Selected', 'Logo preview updated. Click "Save Changes" to save.', 'info');
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      this.showToast('Error', 'Failed to load image preview.', 'error');
-    };
-    img.src = objectUrl;
-  }
-
-  renderHeroPhotosGrid() {
-    if (!this.heroPhotosGrid) return;
-    const count = this.heroPhotos.length;
-
-    // Update count badge
-    if (this.heroPhotosCountBadge) {
-      if (count === 0) {
-        this.heroPhotosCountBadge.textContent = '0 / 5 Photos';
-        this.heroPhotosCountBadge.style.background = 'var(--surface-muted)';
-        this.heroPhotosCountBadge.style.color = 'var(--text-secondary)';
-      } else if (count === 1) {
-        this.heroPhotosCountBadge.textContent = '1 / 5 Photo (Static)';
-        this.heroPhotosCountBadge.style.background = '#e0f2fe';
-        this.heroPhotosCountBadge.style.color = '#0369a1';
-      } else {
-        this.heroPhotosCountBadge.textContent = `${count} / 5 Photos (${count} Loop Dissolve)`;
-        this.heroPhotosCountBadge.style.background = '#dcfce7';
-        this.heroPhotosCountBadge.style.color = '#15803d';
-      }
-    }
-
-    // Update prompt text
-    if (this.heroUploadPromptText) {
-      if (count >= 5) {
-        this.heroUploadPromptText.textContent = 'Maximum 5 photos added (slideshow loop ready)';
-      } else {
-        this.heroUploadPromptText.textContent = `Click or Drag & Drop to add photos (Max 5, ${5 - count} remaining)`;
-      }
-    }
-
-    // Update disable state on upload button
-    if (this.btnUploadHeroPhotos) {
-      this.btnUploadHeroPhotos.disabled = count >= 5;
-    }
-    if (this.btnAddHeroPhotoUrl) {
-      this.btnAddHeroPhotoUrl.disabled = count >= 5;
-    }
-
-    // Render cards HTML
-    let html = '';
-    this.heroPhotos.forEach((url, idx) => {
-      html += `
-        <div class="hero-photo-card" data-index="${idx}">
-          <img src="${escapeHtml(url)}" alt="Hero Photo ${idx + 1}" onerror="this.src=''; this.alt='Failed to load';">
-          <span class="hero-photo-badge">Slide ${idx + 1}</span>
-          <button type="button" class="hero-photo-replace-btn" title="Replace photo ${idx + 1}" data-replace-index="${idx}">
-            <i class="fa-solid fa-arrows-rotate"></i>
-          </button>
-          <button type="button" class="hero-photo-remove-btn" title="Remove photo ${idx + 1}" data-remove-index="${idx}">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </div>
-      `;
-    });
-
-    const remainingSlots = 5 - count;
-    for (let i = 0; i < remainingSlots; i++) {
-      const slotNum = count + i + 1;
-      html += `
-        <div class="hero-photo-add-slot" data-slot-index="${count + i}" title="Click to add photo ${slotNum}">
-          <i class="fa-solid fa-plus"></i>
-          <span>Add Photo</span>
-        </div>
-      `;
-    }
-
-    this.heroPhotosGrid.innerHTML = html;
-
-    // Attach click to add slots
-    this.heroPhotosGrid.querySelectorAll('.hero-photo-add-slot').forEach(slot => {
-      slot.addEventListener('click', () => {
-        if (this.heroPhotos.length >= 5) {
-          this.showToast('Limit Reached', 'Maximum 5 photos allowed.', 'info');
-          return;
-        }
-        if (this.persHeroPhotosFile) {
-          this.persHeroPhotosFile.click();
-        }
-      });
-    });
-
-    // Attach click to replace buttons
-    this.heroPhotosGrid.querySelectorAll('.hero-photo-replace-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const replaceIdx = parseInt(btn.getAttribute('data-replace-index'), 10);
-        if (!isNaN(replaceIdx)) {
-          this.replaceHeroPhoto(replaceIdx);
-        }
-      });
-    });
-
-    // Attach click to remove buttons
-    this.heroPhotosGrid.querySelectorAll('.hero-photo-remove-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const removeIdx = parseInt(btn.getAttribute('data-remove-index'), 10);
-        if (!isNaN(removeIdx)) {
-          this.removeHeroPhoto(removeIdx);
-        }
-      });
-    });
-
-    // Sync legacy hidden inputs
-    if (this.persHeroImg1) this.persHeroImg1.value = this.heroPhotos[0] || '';
-    if (this.persHeroImg2) this.persHeroImg2.value = this.heroPhotos[1] || '';
-  }
-
-  replaceHeroPhoto(index) {
-    const tempInput = document.createElement('input');
-    tempInput.type = 'file';
-    tempInput.accept = 'image/*';
-    tempInput.onchange = async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      if (!file.type || !file.type.startsWith('image/')) {
-        this.showToast('Invalid File', `${file.name} is not a valid image.`, 'error');
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToast('File Too Large', `${file.name} exceeds the 5MB size limit.`, 'error');
-        return;
-      }
-      try {
-        const dataUrl = await this.readAndCompressImage(file);
-        if (dataUrl) {
-          this.heroPhotos[index] = dataUrl;
-          this.renderHeroPhotosGrid();
-          this.showToast('Photo Replaced', `Replaced slide photo ${index + 1}. Remember to save changes.`, 'success');
-        }
-      } catch (err) {
-        console.error('Failed replacing photo:', err);
-      }
-    };
-    tempInput.click();
-  }
-
-  removeHeroPhoto(index) {
-    if (index >= 0 && index < this.heroPhotos.length) {
-      this.heroPhotos.splice(index, 1);
-      this.renderHeroPhotosGrid();
-      this.showToast('Photo Removed', `Removed slide photo ${index + 1}. Remember to save changes.`, 'info');
-    }
-  }
-
-  async handleHeroPhotosSelection(files) {
-    if (!files || files.length === 0) return;
-    const availableSlots = 5 - this.heroPhotos.length;
-    if (availableSlots <= 0) {
-      this.showToast('Limit Reached', 'Maximum 5 hero banner photos reached. Remove one before adding more.', 'info');
-      return;
-    }
-
-    const filesToProcess = files.slice(0, availableSlots);
-    if (files.length > availableSlots) {
-      this.showToast('Limit Notice', `Only ${availableSlots} more photo(s) can be added (max 5). Processing first ${availableSlots}.`, 'info');
-    }
-
-    let addedCount = 0;
-    for (const file of filesToProcess) {
-      if (!file.type || !file.type.startsWith('image/')) {
-        this.showToast('Invalid File', `${file.name} is not a valid image.`, 'error');
-        continue;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToast('File Too Large', `${file.name} exceeds the 5MB size limit.`, 'error');
-        continue;
-      }
-
-      try {
-        const dataUrl = await this.readAndCompressImage(file);
-        if (dataUrl && this.heroPhotos.length < 5) {
-          this.heroPhotos.push(dataUrl);
-          addedCount++;
-        }
-      } catch (err) {
-        console.error('Failed to read image:', err);
-        this.showToast('Upload Error', `Could not process image ${file.name}.`, 'error');
-      }
-    }
-
-    if (addedCount > 0) {
-      this.renderHeroPhotosGrid();
-      this.showToast('Photos Added', `Hero photos updated (${this.heroPhotos.length}/5). Remember to save changes.`, 'success');
-    }
-  }
-
-  readAndCompressImage(file) {
-    return new Promise((resolve, reject) => {
-      if (file.type === 'image/svg+xml' || file.size <= 250 * 1024) {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target?.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-        return;
-      }
-
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        const maxDim = 1280;
-        let width = img.naturalWidth || img.width;
-        let height = img.naturalHeight || img.height;
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-
-        let dataUrl = '';
-        try {
-          dataUrl = canvas.toDataURL('image/webp', 0.85);
-          if (!dataUrl || dataUrl.indexOf('data:image/webp') !== 0) {
-            dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          }
-        } catch (_) {
-          dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        }
-        resolve(dataUrl);
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error('Failed to load image into element'));
-      };
-      img.src = objectUrl;
-    });
-  }
-
-  updateHeroPhotoPreview(index, url) {
-    // Stub kept for compatibility
-  }
-
-  setupSinglePhotoUploader({ dropZone, fileInput, uploadBtn, removeBtn, hiddenInput, updatePreviewFn, labelName }) {
-    if (uploadBtn && fileInput) {
-      uploadBtn.addEventListener('click', () => fileInput.click());
-    }
-    if (fileInput) {
-      fileInput.addEventListener('change', async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        fileInput.value = '';
-        if (!file.type || !file.type.startsWith('image/')) {
-          this.showToast('Invalid File', `${file.name} is not a valid image.`, 'error');
-          return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-          this.showToast('File Too Large', `${file.name} exceeds the 5MB limit.`, 'error');
-          return;
-        }
-        try {
-          const dataUrl = await this.readAndCompressImage(file);
-          if (dataUrl) {
-            if (hiddenInput) hiddenInput.value = dataUrl;
-            if (updatePreviewFn) updatePreviewFn(dataUrl);
-            this.showToast('Photo Uploaded', `${labelName} uploaded. Click "Save Changes" to save.`, 'info');
-          }
-        } catch (err) {
-          console.error(`Failed uploading ${labelName}:`, err);
-          this.showToast('Upload Failed', `Could not process ${file.name}.`, 'error');
-        }
-      });
-    }
-    if (removeBtn) {
-      removeBtn.addEventListener('click', () => {
-        if (hiddenInput) hiddenInput.value = '';
-        if (updatePreviewFn) updatePreviewFn('');
-        this.showToast('Photo Removed', `${labelName} removed. Click "Save Changes" to save.`, 'info');
-      });
-    }
-    if (dropZone && fileInput) {
-      ['dragenter', 'dragover'].forEach(name => {
-        dropZone.addEventListener(name, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropZone.classList.add('is-dragover');
-        });
-      });
-      ['dragleave', 'drop'].forEach(name => {
-        dropZone.addEventListener(name, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dropZone.classList.remove('is-dragover');
-        });
-      });
-      dropZone.addEventListener('drop', async (e) => {
-        const file = e.dataTransfer?.files?.[0];
-        if (!file) return;
-        if (!file.type || !file.type.startsWith('image/')) {
-          this.showToast('Invalid File', `${file.name} is not an image.`, 'error');
-          return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-          this.showToast('File Too Large', `${file.name} exceeds the 5MB limit.`, 'error');
-          return;
-        }
-        try {
-          const dataUrl = await this.readAndCompressImage(file);
-          if (dataUrl) {
-            if (hiddenInput) hiddenInput.value = dataUrl;
-            if (updatePreviewFn) updatePreviewFn(dataUrl);
-            this.showToast('Photo Uploaded', `${labelName} uploaded. Click "Save Changes" to save.`, 'info');
-          }
-        } catch (err) {
-          console.error(`Failed uploading ${labelName}:`, err);
-          this.showToast('Upload Failed', `Could not process ${file.name}.`, 'error');
-        }
-      });
-    }
-  }
-
-  setupMultiPhotoDropZone(dropZone, fileInput, handlerFn) {
-    if (!dropZone) return;
-    ['dragenter', 'dragover'].forEach(name => {
-      dropZone.addEventListener(name, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.add('is-dragover');
-      });
-    });
-    ['dragleave', 'drop'].forEach(name => {
-      dropZone.addEventListener(name, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.classList.remove('is-dragover');
-      });
-    });
-    dropZone.addEventListener('drop', (e) => {
-      const files = Array.from(e.dataTransfer?.files || []);
-      if (files.length > 0 && handlerFn) {
-        handlerFn(files);
-      }
-    });
-  }
-
-  initPersonalisationUploaders() {
-    // 1. About Story Photo Uploader
-    this.setupSinglePhotoUploader({
-      dropZone: this.aboutStoryDropZone,
-      fileInput: this.persAboutStoryImgFile,
-      uploadBtn: this.btnUploadAboutStoryImg,
-      removeBtn: this.btnRemoveAboutStoryImg,
-      hiddenInput: this.persAboutStoryImg,
-      updatePreviewFn: (url) => this.updateAboutStoryPreview(url),
-      labelName: 'About Story Photo'
-    });
-
-    // 2. Main Logo Uploader
-    this.setupSinglePhotoUploader({
-      dropZone: this.logoDropZone,
-      fileInput: this.persLogoFile,
-      uploadBtn: this.btnUploadLogo,
-      removeBtn: this.btnRemoveLogo,
-      hiddenInput: this.persLogoUrl,
-      updatePreviewFn: (url) => this.updatePersLogoPreview(url),
-      labelName: 'Academy Logo'
-    });
-
-    // 3. Favicon Uploader
-    this.setupSinglePhotoUploader({
-      dropZone: this.faviconDropZone,
-      fileInput: this.persFaviconFile,
-      uploadBtn: this.btnUploadFavicon,
-      removeBtn: this.btnRemoveFavicon,
-      hiddenInput: this.persFaviconUrl,
-      updatePreviewFn: (url) => this.updatePersFaviconPreview(url),
-      labelName: 'Browser Favicon'
-    });
-
-    // 4. Signature Uploader
-    this.setupSinglePhotoUploader({
-      dropZone: this.signatureDropZone,
-      fileInput: this.persSignatureFile,
-      uploadBtn: this.btnUploadSignature,
-      removeBtn: this.btnRemoveSignature,
-      hiddenInput: this.persSignatureUrl,
-      updatePreviewFn: (url) => this.updatePersSignaturePreview(url),
-      labelName: 'Director Signature'
-    });
-
-    // 5. Accreditation Logos Multi-Uploader
-    if (this.btnUploadAccreditations && this.persAccreditationsFile) {
-      this.btnUploadAccreditations.addEventListener('click', () => {
-        this.persAccreditationsFile.click();
-      });
-    }
-    if (this.persAccreditationsFile) {
-      this.persAccreditationsFile.addEventListener('change', (e) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length > 0) this.handleAccreditationFilesSelection(files);
-        this.persAccreditationsFile.value = '';
-      });
-    }
-    this.setupMultiPhotoDropZone(this.accreditationsDropZone, this.persAccreditationsFile, (files) => {
-      this.handleAccreditationFilesSelection(files);
-    });
-
-    // 6. Gallery Photos Multi-Uploader
-    if (this.btnUploadGalleryPhotos && this.persGalleryFiles) {
-      this.btnUploadGalleryPhotos.addEventListener('click', () => {
-        this.persGalleryFiles.click();
-      });
-    }
-    if (this.persGalleryFiles) {
-      this.persGalleryFiles.addEventListener('change', (e) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length > 0) this.handleGalleryFilesSelection(files);
-        this.persGalleryFiles.value = '';
-      });
-    }
-    this.setupMultiPhotoDropZone(this.galleryDropZone, this.persGalleryFiles, (files) => {
-      this.handleGalleryFilesSelection(files);
-    });
-
-    // Initial render of Hero Photo Slots (5 slots)
-    this.renderHeroPhotosGrid();
-  }
-
-  updateAboutStoryPreview(url) {
-    const clean = (url || '').trim();
-    if (this.persAboutStoryPreviewImg && this.persAboutStoryPlaceholder) {
-      if (clean) {
-        this.persAboutStoryPreviewImg.src = clean;
-        this.persAboutStoryPreviewImg.style.display = 'block';
-        this.persAboutStoryPlaceholder.style.display = 'none';
-        if (this.btnRemoveAboutStoryImg) this.btnRemoveAboutStoryImg.style.display = 'inline-flex';
-      } else {
-        this.persAboutStoryPreviewImg.src = '';
-        this.persAboutStoryPreviewImg.style.display = 'none';
-        this.persAboutStoryPlaceholder.style.display = 'flex';
-        if (this.btnRemoveAboutStoryImg) this.btnRemoveAboutStoryImg.style.display = 'none';
-      }
-    }
-  }
-
-  updatePersLogoPreview(url) {
-    const clean = (url || '').trim();
-    if (this.persLogoPreviewImg && this.persLogoPreviewPlaceholder) {
-      if (clean) {
-        this.persLogoPreviewImg.src = clean;
-        this.persLogoPreviewImg.style.display = 'block';
-        this.persLogoPreviewPlaceholder.style.display = 'none';
-        if (this.btnRemoveLogo) this.btnRemoveLogo.style.display = 'inline-flex';
-      } else {
-        this.persLogoPreviewImg.src = '';
-        this.persLogoPreviewImg.style.display = 'none';
-        this.persLogoPreviewPlaceholder.style.display = 'flex';
-        if (this.btnRemoveLogo) this.btnRemoveLogo.style.display = 'none';
-      }
-    }
-  }
-
-  updatePersFaviconPreview(url) {
-    const clean = (url || '').trim();
-    if (this.persFaviconPreviewImg && this.persFaviconPreviewPlaceholder) {
-      if (clean) {
-        this.persFaviconPreviewImg.src = clean;
-        this.persFaviconPreviewImg.style.display = 'block';
-        this.persFaviconPreviewPlaceholder.style.display = 'none';
-        if (this.btnRemoveFavicon) this.btnRemoveFavicon.style.display = 'inline-flex';
-      } else {
-        this.persFaviconPreviewImg.src = '';
-        this.persFaviconPreviewImg.style.display = 'none';
-        this.persFaviconPreviewPlaceholder.style.display = 'flex';
-        if (this.btnRemoveFavicon) this.btnRemoveFavicon.style.display = 'none';
-      }
-    }
-  }
-
-  updatePersSignaturePreview(url) {
-    const clean = (url || '').trim();
-    if (this.persSignaturePreviewImg && this.persSignaturePreviewPlaceholder) {
-      if (clean) {
-        this.persSignaturePreviewImg.src = clean;
-        this.persSignaturePreviewImg.style.display = 'block';
-        this.persSignaturePreviewPlaceholder.style.display = 'none';
-        if (this.btnRemoveSignature) this.btnRemoveSignature.style.display = 'inline-flex';
-      } else {
-        this.persSignaturePreviewImg.src = '';
-        this.persSignaturePreviewImg.style.display = 'none';
-        this.persSignaturePreviewPlaceholder.style.display = 'flex';
-        if (this.btnRemoveSignature) this.btnRemoveSignature.style.display = 'none';
-      }
-    }
-  }
-
-  renderAccreditationLogosGrid() {
-    if (!this.persAccreditationsGrid) return;
-    const count = this.accreditationLogos.length;
-    if (this.accreditationsCountBadge) {
-      this.accreditationsCountBadge.textContent = `${count} Logo${count === 1 ? '' : 's'} Uploaded`;
-      if (count > 0) {
-        this.accreditationsCountBadge.style.background = '#e0f2fe';
-        this.accreditationsCountBadge.style.color = '#0369a1';
-      } else {
-        this.accreditationsCountBadge.style.background = 'var(--surface-muted)';
-        this.accreditationsCountBadge.style.color = 'var(--text-secondary)';
-      }
-    }
-
-    let html = '';
-    this.accreditationLogos.forEach((url, idx) => {
-      html += `
-        <div class="accreditation-logo-card" data-index="${idx}">
-          <img src="${escapeHtml(url)}" alt="Accreditation Logo ${idx + 1}" onerror="this.src=''; this.alt='Failed to load';">
-          <button type="button" class="grid-photo-remove-btn" title="Remove logo ${idx + 1}" data-remove-accreditation="${idx}">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </div>
-      `;
-    });
-
-    html += `
-      <div class="grid-photo-add-slot" id="accreditationAddSlot" title="Click to add another accreditation logo">
-        <i class="fa-solid fa-plus"></i>
-        <span>Add Logo</span>
-      </div>
-    `;
-
-    this.persAccreditationsGrid.innerHTML = html;
-
-    const addSlot = this.persAccreditationsGrid.querySelector('#accreditationAddSlot');
-    if (addSlot && this.persAccreditationsFile) {
-      addSlot.addEventListener('click', () => {
-        this.persAccreditationsFile.click();
-      });
-    }
-
-    this.persAccreditationsGrid.querySelectorAll('[data-remove-accreditation]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = parseInt(btn.getAttribute('data-remove-accreditation'), 10);
-        if (!isNaN(idx)) this.removeAccreditationLogo(idx);
-      });
-    });
-
-    if (this.persAccreditationUrls) {
-      this.persAccreditationUrls.value = this.accreditationLogos.join('\n');
-    }
-  }
-
-  removeAccreditationLogo(index) {
-    if (index >= 0 && index < this.accreditationLogos.length) {
-      this.accreditationLogos.splice(index, 1);
-      this.renderAccreditationLogosGrid();
-      this.showToast('Logo Removed', `Accreditation logo ${index + 1} removed. Click "Save Changes" to save.`, 'info');
-    }
-  }
-
-  async handleAccreditationFilesSelection(files) {
-    if (!files || files.length === 0) return;
-    let added = 0;
-    for (const file of files) {
-      if (!file.type || !file.type.startsWith('image/')) {
-        this.showToast('Invalid File', `${file.name} is not a valid image.`, 'error');
-        continue;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToast('File Too Large', `${file.name} exceeds 5MB size limit.`, 'error');
-        continue;
-      }
-      try {
-        const dataUrl = await this.readAndCompressImage(file);
-        if (dataUrl) {
-          this.accreditationLogos.push(dataUrl);
-          added++;
-        }
-      } catch (err) {
-        console.error('Failed to read logo image:', err);
-        this.showToast('Upload Error', `Could not process ${file.name}.`, 'error');
-      }
-    }
-    if (added > 0) {
-      this.renderAccreditationLogosGrid();
-      this.showToast('Logos Added', `Added ${added} accreditation logo(s). Click "Save Changes" to save.`, 'success');
-    }
-  }
-
-  renderGalleryPhotosGrid() {
-    if (!this.persGalleryGrid) return;
-    const count = this.galleryPhotos.length;
-    if (this.galleryCountBadge) {
-      this.galleryCountBadge.textContent = `${count} Photo${count === 1 ? '' : 's'} Uploaded`;
-      if (count > 0) {
-        this.galleryCountBadge.style.background = '#e0f2fe';
-        this.galleryCountBadge.style.color = '#0369a1';
-      } else {
-        this.galleryCountBadge.style.background = 'var(--surface-muted)';
-        this.galleryCountBadge.style.color = 'var(--text-secondary)';
-      }
-    }
-
-    let html = '';
-    this.galleryPhotos.forEach((url, idx) => {
-      html += `
-        <div class="gallery-photo-card" data-index="${idx}">
-          <img src="${escapeHtml(url)}" alt="Gallery Photo ${idx + 1}" onerror="this.src=''; this.alt='Failed to load';">
-          <button type="button" class="grid-photo-remove-btn" title="Remove photo ${idx + 1}" data-remove-gallery="${idx}">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </div>
-      `;
-    });
-
-    html += `
-      <div class="grid-photo-add-slot" id="galleryAddSlot" title="Click to add another gallery photo">
-        <i class="fa-solid fa-plus"></i>
-        <span>Add Photo</span>
-      </div>
-    `;
-
-    this.persGalleryGrid.innerHTML = html;
-
-    const addSlot = this.persGalleryGrid.querySelector('#galleryAddSlot');
-    if (addSlot && this.persGalleryFiles) {
-      addSlot.addEventListener('click', () => {
-        this.persGalleryFiles.click();
-      });
-    }
-
-    this.persGalleryGrid.querySelectorAll('[data-remove-gallery]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = parseInt(btn.getAttribute('data-remove-gallery'), 10);
-        if (!isNaN(idx)) this.removeGalleryPhoto(idx);
-      });
-    });
-
-    if (this.persGalleryUrls) {
-      this.persGalleryUrls.value = this.galleryPhotos.join('\n');
-    }
-  }
-
-  removeGalleryPhoto(index) {
-    if (index >= 0 && index < this.galleryPhotos.length) {
-      this.galleryPhotos.splice(index, 1);
-      this.renderGalleryPhotosGrid();
-      this.showToast('Photo Removed', `Gallery photo ${index + 1} removed. Click "Save Changes" to save.`, 'info');
-    }
-  }
-
-  async handleGalleryFilesSelection(files) {
-    if (!files || files.length === 0) return;
-    let added = 0;
-    for (const file of files) {
-      if (!file.type || !file.type.startsWith('image/')) {
-        this.showToast('Invalid File', `${file.name} is not a valid image.`, 'error');
-        continue;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        this.showToast('File Too Large', `${file.name} exceeds 5MB size limit.`, 'error');
-        continue;
-      }
-      try {
-        const dataUrl = await this.readAndCompressImage(file);
-        if (dataUrl) {
-          this.galleryPhotos.push(dataUrl);
-          added++;
-        }
-      } catch (err) {
-        console.error('Failed to read gallery photo:', err);
-        this.showToast('Upload Error', `Could not process ${file.name}.`, 'error');
-      }
-    }
-    if (added > 0) {
-      this.renderGalleryPhotosGrid();
-      this.showToast('Photos Added', `Added ${added} gallery photo(s). Click "Save Changes" to save.`, 'success');
-    }
-  }
-
-  async handleSaveBranding(e) {
-    if (e) e.preventDefault();
-    const academyName = (this.brandingAcademyName?.value || '').trim();
-    if (!academyName) {
-      this.showToast('Required Field', 'Please enter your Academy Brand Name.', 'error');
-      this.brandingAcademyName?.focus();
-      return;
-    }
-    const phone = (this.brandingPhone?.value || '').trim();
-    if (!phone) {
-      this.showToast('Required Field', 'Please enter a Primary Phone Number.', 'error');
-      this.brandingPhone?.focus();
-      return;
-    }
-    const email = (this.brandingEmail?.value || '').trim();
-    if (!email) {
-      this.showToast('Required Field', 'Please enter an Official Email Address.', 'error');
-      this.brandingEmail?.focus();
-      return;
-    }
-
-    const logoUrl = (this.brandingLogoUrl?.value || '').trim();
-    const existing = store.getAcademyProfile() || {};
-
-    const updatedProfile = {
-      ...existing,
-      academyName,
-      phone,
-      email,
-      logoUrl,
-      bannerPhone: existing.bannerPhone && existing.bannerPhone !== existing.phone ? existing.bannerPhone : phone,
-      updatedAt: Date.now()
-    };
-
-    if (this.btnSaveBranding) setButtonLoading(this.btnSaveBranding, true);
-
-    try {
-      await store.saveAcademyProfile(updatedProfile);
-      this.renderUserProfile();
-      this.populateBrandingForm();
-      if (this.populatePersonalisationForm) {
-        this.populatePersonalisationForm();
-      }
-      this.updatePublicSiteLink();
-      this.render();
-      this.showToast('Branding Saved', 'Academy branding details have been saved successfully.', 'success');
-    } catch (err) {
-      this.showToast('Save Failed', err.message || 'Could not update branding details.', 'error');
-    } finally {
-      if (this.btnSaveBranding) setButtonLoading(this.btnSaveBranding, false);
-    }
   }
 
   render() {
@@ -5075,6 +3589,7 @@ class UIController {
     this.renderCoursesView();
     this.renderBatchesView();
     this.renderIdCardsView();
+    this.renderMarksheetsView();
     this.renderCertificatesView();
     this.renderInboxView();
   }
@@ -5105,14 +3620,14 @@ class UIController {
   populateCourseFilterDropdown() {
     const currentVal = this.studentCourseFilter ? this.studentCourseFilter.value : 'all';
     const courses = store.getAllCourses();
-    
+
     if (this.adminStudentCourseFilterMenu) {
       let html = '<li class="custom-select-option" data-value="all" role="option">All Courses</li>';
       courses.forEach(course => {
         html += `<li class="custom-select-option" data-value="${escapeHtml(course.id)}" role="option">${escapeHtml(course.title)} (${escapeHtml(course.duration)})</li>`;
       });
       this.adminStudentCourseFilterMenu.innerHTML = html;
-      
+
       const selectedCourse = courses.find(c => c.id === currentVal);
       const label = selectedCourse ? `${selectedCourse.title} (${selectedCourse.duration})` : 'All Courses';
       this.setAdminDropdownValue(
@@ -5152,7 +3667,7 @@ class UIController {
 
   renderBadgesAndStats() {
     const stats = store.getStats();
-    
+
     // Sidebar Badges
     this.studentCountBadge.textContent = stats.totalStudents;
     this.courseCountBadge.textContent = stats.totalCourses;
@@ -5179,8 +3694,8 @@ class UIController {
     const hour = new Date().getHours();
     const message = hour >= 5 && hour < 12 ? '☀️\u00a0\u00a0Good Morning! Welcome to your dashboard.'
       : hour >= 12 && hour < 17 ? '🌤️\u00a0\u00a0Good Afternoon! Welcome to your dashboard.'
-      : hour >= 17 && hour < 21 ? '🌅\u00a0\u00a0Good Evening! Welcome to your dashboard.'
-      : '🌙\u00a0\u00a0Good Night! Welcome to your dashboard.';
+        : hour >= 17 && hour < 21 ? '🌅\u00a0\u00a0Good Evening! Welcome to your dashboard.'
+          : '🌙\u00a0\u00a0Good Night! Welcome to your dashboard.';
     if (greeting.textContent !== message) greeting.textContent = message;
   }
 
@@ -5217,6 +3732,13 @@ class UIController {
     const activeBatchObj = this.studentBatchFilterVal !== 'all' ? batches.find(b => b.id === this.studentBatchFilterVal) : null;
 
     if (this.studentTotalCount) this.studentTotalCount.textContent = allStudents.length;
+
+    // Build serial number map based on addition order (firstly added student is 1, newest is N)
+    const totalStudents = allStudents.length;
+    const studentSerialMap = new Map();
+    allStudents.forEach((student, idx) => {
+      studentSerialMap.set(student.id, totalStudents - idx);
+    });
 
     // Filter Logic
     const filteredStudents = allStudents.filter(student => {
@@ -5263,9 +3785,10 @@ class UIController {
     this.studentsEmptyState.closest('.student-table-card')?.classList.remove('is-empty');
     this.studentsEmptyState.style.display = 'none';
 
-    this.studentsTableBody.innerHTML = filteredStudents.map(student => {
+    this.studentsTableBody.innerHTML = filteredStudents.map((student, index) => {
       const isChecked = this.selectedStudentIds.has(student.id);
-      
+      const serialNumber = studentSerialMap.get(student.id) || (totalStudents - index);
+
       const enrolledCoursesBadges = (student.enrolledCourseIds || []).map(cid => {
         const c = allCourses.find(item => item.id === cid);
         return c ? `<span class="badge-course-tag" title="${escapeHtml(c.title)}">${escapeHtml(c.title)}</span>` : '';
@@ -5275,6 +3798,9 @@ class UIController {
         <tr class="${isChecked ? 'is-selected' : ''}" title="Click to view student details; Cmd-click or Ctrl-click to select">
           <td class="td-checkbox-col" title="Select student ${escapeHtml(student.name)}">
             <input type="checkbox" class="student-row-checkbox custom-table-checkbox" data-student-id="${escapeHtml(student.id)}" ${isChecked ? 'checked' : ''} aria-label="Select student ${escapeHtml(student.name)}">
+          </td>
+          <td class="td-serial-col text-center">
+            <span class="student-serial-text">${serialNumber}</span>
           </td>
           <td>
             <span class="student-name-text">${escapeHtml(student.name)}</span>
@@ -5332,6 +3858,12 @@ class UIController {
           </div>
           <div class="course-card-body">
             <p class="course-desc" title="${escapeHtml(course.description || '')}">${escapeHtml(course.description || 'No description provided.')}</p>
+            ${Array.isArray(course.subjects) && course.subjects.length > 0 ? `
+              <div class="course-subjects-chips" style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.65rem;">
+                ${course.subjects.slice(0, 3).map(s => `<span class="badge-course-tag" style="font-size: 0.75rem;" title="${escapeHtml(s)}">${escapeHtml(s)}</span>`).join('')}
+                ${course.subjects.length > 3 ? `<span class="badge-course-tag" style="font-size: 0.75rem; background: #f1f5f9; color: #64748b;">+${course.subjects.length - 3} more</span>` : ''}
+              </div>
+            ` : ''}
           </div>
           <div class="course-card-footer">
             <div class="enrolled-stat">
@@ -5740,6 +4272,630 @@ class UIController {
     }
   }
 
+
+  // ==========================================================================
+  // Render Marksheets View
+  // ==========================================================================
+  renderMarksheetsView() {
+    const list = document.getElementById('marksheetStudents');
+    if (!list) return;
+    const search = document.getElementById('marksheetSearch');
+    const courseFilter = document.getElementById('marksheetCourse');
+    const batchFilter = document.getElementById('marksheetBatch');
+    const selectAll = document.getElementById('marksheetSelectAll');
+    const download = document.getElementById('marksheetDownloadSelected');
+    const clearBtn = document.getElementById('btnClearMarksheetFilter');
+    const clearSearch = document.getElementById('btnClearMarksheetSearch');
+
+    this.selectedMarksheetIds ||= new Set();
+    const completed = store.getAllStudents().filter(s => s.status === 'Completed');
+
+    const fill = (element, items, label, prefix) => {
+      const el = suffix => document.getElementById(prefix + suffix);
+      if (!el('Menu')) return;
+      const value = items.some(item => item.id === element.value) ? element.value : 'all';
+      el('Menu').innerHTML = `<li class="custom-select-option" data-value="all" role="option">${label}</li>` + items.map(item => `<li class="custom-select-option" data-value="${escapeHtml(item.id)}" role="option">${escapeHtml(item.title || item.name || item.id)}</li>`).join('');
+      this.setAdminDropdownValue(el('Dropdown'), el('Menu'), el('Display'), element, value, label);
+      if (!el('Dropdown').dataset.initialized) {
+        this.setupAdminDropdown(el('Dropdown'), el('Trigger'), el('Menu'), el('Display'), element, () => this.renderMarksheetsView());
+        el('Dropdown').dataset.initialized = 'true';
+      }
+    };
+
+    fill(courseFilter, store.getAllCourses(), 'All Courses', 'marksheetCourseFilter');
+    fill(batchFilter, store.getAllBatches(), 'All Batches', 'marksheetBatchFilter');
+
+    const clear = () => {
+      this.marksheetPreviewCleared = true;
+      search.value = '';
+      courseFilter.value = batchFilter.value = 'all';
+      this.selectedMarksheetIds.clear();
+      this.marksheetPreviewId = null;
+      if (window.MarksheetCanvas?.clear) window.MarksheetCanvas.clear();
+      this.renderMarksheetsView();
+    };
+
+    if (clearBtn) clearBtn.onclick = clear;
+    const resetBtn = document.getElementById('btnResetMarksheetFilters');
+    if (resetBtn) resetBtn.onclick = clear;
+
+    if (clearSearch) {
+      clearSearch.style.display = search.value ? 'block' : 'none';
+      clearSearch.onclick = () => {
+        search.value = '';
+        clearSearch.style.display = 'none';
+        this.renderMarksheetsView();
+      };
+    }
+
+    const query = search.value.trim().toLowerCase();
+    const activeBatchObj = batchFilter.value !== 'all' ? store.getAllBatches().find(b => b.id === batchFilter.value) : null;
+
+    const students = completed.filter(s => {
+      const matchSearch = !query ||
+        s.name.toLowerCase().includes(query) ||
+        s.id.toLowerCase().includes(query) ||
+        (s.phone && s.phone.includes(query));
+      const matchCourse = courseFilter.value === 'all' ||
+        (s.courseId === courseFilter.value || (Array.isArray(s.enrolledCourseIds) && s.enrolledCourseIds.includes(courseFilter.value)));
+      const matchBatch = batchFilter.value === 'all' ||
+        (activeBatchObj && Array.isArray(activeBatchObj.studentIds) && activeBatchObj.studentIds.includes(s.id)) ||
+        s.batchId === batchFilter.value;
+      return matchSearch && matchCourse && matchBatch;
+    });
+
+    const visibleIds = new Set(students.map(s => s.id));
+    this.selectedMarksheetIds.forEach(id => {
+      if (!visibleIds.has(id)) this.selectedMarksheetIds.delete(id);
+    });
+
+    list.innerHTML = students.map(s => `
+      <div class="idcard-student-item ${this.selectedMarksheetIds.has(s.id) ? 'is-selected' : ''} ${this.marksheetPreviewId === s.id ? 'active' : ''}" data-id="${escapeHtml(s.id)}" tabindex="0" role="button">
+        <label class="idcard-checkbox-hit">
+          <input type="checkbox" class="custom-table-checkbox" aria-label="Select ${escapeHtml(s.name)}" ${this.selectedMarksheetIds.has(s.id) ? 'checked' : ''}>
+        </label>
+        <span class="idcard-student-name">${escapeHtml(s.name)}</span>
+        <div class="idcard-student-status-col">
+          <span class="badge ${getStatusBadgeClass(s.status)} idcard-student-status">
+            ${getStatusBadgeIcon(s.status)} Completed
+          </span>
+        </div>
+      </div>
+    `).join('');
+
+    const emptyBox = document.getElementById('marksheetEmpty');
+    if (emptyBox) emptyBox.style.display = students.length ? 'none' : '';
+    list.closest('.idcards-list-panel')?.classList.toggle('is-empty', !students.length);
+
+    const countBadge = document.getElementById('marksheetSelectionCount');
+    if (countBadge) {
+      countBadge.textContent = this.selectedMarksheetIds.size;
+      countBadge.hidden = !this.selectedMarksheetIds.size;
+    }
+
+    if (selectAll) {
+      selectAll.checked = students.length > 0 && students.every(s => this.selectedMarksheetIds.has(s.id));
+      selectAll.indeterminate = this.selectedMarksheetIds.size > 0 && !selectAll.checked;
+      selectAll.onchange = () => {
+        this.selectedMarksheetIds = new Set(selectAll.checked ? students.map(s => s.id) : []);
+        this.marksheetPreviewId = [...this.selectedMarksheetIds].at(-1);
+        this.renderMarksheetsView();
+        if (this.marksheetPreviewId) this.previewMarksheet(this.marksheetPreviewId);
+      };
+    }
+
+    const downloadSvgIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><line x1="12" y1="3" x2="12" y2="15"></line><polyline points="6 10 12 16 18 10"></polyline><line x1="4" y1="21" x2="20" y2="21"></line></svg>`;
+
+    if (download) {
+      download.disabled = !this.selectedMarksheetIds.size && !this.marksheetPreviewId;
+      download.innerHTML = `${downloadSvgIcon} ${this.selectedMarksheetIds.size > 1 ? 'Download Marksheets' : 'Download Marksheet'}`;
+      download.onclick = () => this.executeMarksheetDownload(this.selectedMarksheetIds.size ? [...this.selectedMarksheetIds] : [this.marksheetPreviewId]);
+    }
+
+    if (!visibleIds.has(this.marksheetPreviewId)) {
+      if (students.length && !this.marksheetPreviewCleared) {
+        this.previewMarksheet(students[0].id);
+      } else {
+        this.marksheetPreviewId = null;
+        if (window.MarksheetCanvas?.clear) window.MarksheetCanvas.clear();
+        const canvas = document.getElementById('marksheetCanvas');
+        const previewEmpty = document.getElementById('marksheetPreviewEmpty');
+        if (canvas) canvas.hidden = true;
+        if (previewEmpty) previewEmpty.hidden = false;
+      }
+    }
+
+    const toggle = id => {
+      if (this.selectedMarksheetIds.has(id)) this.selectedMarksheetIds.delete(id);
+      else this.selectedMarksheetIds.add(id);
+      this.marksheetPreviewId = this.selectedMarksheetIds.has(id) ? id : [...this.selectedMarksheetIds].at(-1);
+      this.renderMarksheetsView();
+      if (this.marksheetPreviewId) this.previewMarksheet(this.marksheetPreviewId);
+    };
+
+    list.onchange = e => {
+      const row = e.target.closest('[data-id]');
+      if (row) toggle(row.dataset.id);
+    };
+
+    list.onclick = e => {
+      if (e.target.closest('label, input')) return;
+      const row = e.target.closest('[data-id]');
+      if (!row) return;
+      if (e.metaKey || e.ctrlKey) {
+        e.preventDefault();
+        toggle(row.dataset.id);
+        return;
+      }
+      this.previewMarksheet(row.dataset.id);
+    };
+
+    list.onkeydown = e => {
+      if (!['Enter', ' '].includes(e.key) || e.target.closest('input')) return;
+      e.preventDefault();
+      const row = e.target.closest('[data-id]');
+      if (row) this.previewMarksheet(row.dataset.id);
+    };
+
+    search.oninput = () => this.renderMarksheetsView();
+
+    if (clearBtn) {
+      clearBtn.disabled = !(search.value || courseFilter.value !== 'all' || batchFilter.value !== 'all' || this.selectedMarksheetIds.size || this.marksheetPreviewId);
+    }
+  }
+
+  previewMarksheet(id) {
+    const student = store.getStudentById(id);
+    if (!student || student.status !== 'Completed') return;
+    this.marksheetPreviewId = id;
+
+    const list = document.getElementById('marksheetStudents');
+    if (list) {
+      list.querySelectorAll('.idcard-student-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.id === id);
+      });
+    }
+
+    const clearBtn = document.getElementById('btnClearMarksheetFilter');
+    if (clearBtn) clearBtn.disabled = false;
+    const downloadBtn = document.getElementById('marksheetDownloadSelected');
+    if (downloadBtn) downloadBtn.disabled = false;
+
+    if (window.MarksheetCanvas?.render) {
+      const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
+      const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id) || b.id === student.batchId) || {};
+      const verificationUrl = this.getCertificateVerificationUrl(student);
+      window.MarksheetCanvas.render(student, course, batch, verificationUrl);
+    }
+  }
+
+  scaleMarksheetPreview() {
+    // Canvas automatically auto-sizes with CSS max-width/max-height and aspect-ratio: 210/297
+  }
+
+  async awaitMarksheetImages(container) {
+    if (!container) return;
+    const imgs = Array.from(container.querySelectorAll('img'));
+    if (!imgs.length) return;
+    await Promise.all(imgs.map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise(resolve => {
+        img.onload = resolve;
+        img.onerror = resolve;
+      });
+    }));
+  }
+
+  buildMarksheetHtml(student, course, batch) {
+    const profile = store.getAcademyProfile();
+    const academyName = profile?.academyName || 'DIGANTA COMPUTER CENTRE';
+    const regNo = student.id || student.regNo || 'DCC/SMP/00000';
+    const studentName = student.name || 'Student Name';
+    const fatherName = student.fatherName || '—';
+    const courseTitle = course?.title || 'Diploma in Computer Application (DCA)';
+    const duration = course?.duration || '12 Months';
+    const centre = `M/s. ${academyName}, Gujarpur, Shyampur, Howrah`;
+
+    const certIssueDate =
+      student.certificateIssueDate ||
+      batch?.certificateIssueDate ||
+      student.certIssueDate ||
+      student.certificate_issue_date ||
+      student.certificateDate ||
+      student.issueDate ||
+      batch?.certIssueDate ||
+      batch?.certificate_issue_date ||
+      student.completionDate ||
+      student.completedAt ||
+      batch?.completedAt ||
+      new Date();
+
+    const formatDateStr = (raw) => {
+      if (!raw) return new Date().toLocaleDateString('en-GB');
+      if (typeof raw === 'string') {
+        const trimmed = raw.trim();
+        if (/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/.test(trimmed)) {
+          const parts = trimmed.split(/[/-]/);
+          return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+        }
+        if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
+          const [year, month, day] = trimmed.slice(0, 10).split('-');
+          return `${day}/${month}/${year}`;
+        }
+      }
+      const parsed = new Date(raw);
+      if (isNaN(parsed.getTime())) return String(raw);
+      return `${String(parsed.getDate()).padStart(2, '0')}/${String(parsed.getMonth() + 1).padStart(2, '0')}/${parsed.getFullYear()}`;
+    };
+    const issueDate = formatDateStr(certIssueDate);
+
+    // Course subjects & marks
+    const courseSubjects = Array.isArray(course?.subjects) && course.subjects.length > 0
+      ? course.subjects
+      : [
+          '1st Terminal — Computer Fundamentals',
+          '2nd Terminal — Windows, MS-Office (Word, Excel, Power Point, Internet)',
+          '3rd Terminal — MS-Access, FoxPro Programming, Internet & E-Mail',
+          'Course Final — Comprehensive Viva & Project'
+        ];
+
+    // Seeded pseudo-random marks generator based on student id
+    let hash = 0;
+    for (let i = 0; i < (student.id || '').length; i++) {
+      hash = ((hash << 5) - hash) + (student.id || '').charCodeAt(i) | 0;
+    }
+    const seed = Math.abs(hash);
+
+    const targetGrade = student.grade || batch?.grade || 'A+';
+    let baseScore = 88;
+    if (targetGrade === 'A+') baseScore = 88;
+    else if (targetGrade === 'A') baseScore = 75;
+    else if (targetGrade === 'B') baseScore = 62;
+    else if (targetGrade === 'C') baseScore = 45;
+    else if (targetGrade === 'D') baseScore = 38;
+
+    let totalMax = 0;
+    let totalObtained = 0;
+
+    const rowsHtml = courseSubjects.map((subj, idx) => {
+      const isFinal = idx === courseSubjects.length - 1 && courseSubjects.length > 2;
+      const maxMarks = isFinal ? 200 : 100;
+      const variance = ((seed + idx * 17) % 9) - 4;
+      let obtainedPct = Math.max(35, Math.min(98, baseScore + variance));
+      const obtained = Math.round((obtainedPct / 100) * maxMarks);
+
+      totalMax += maxMarks;
+      totalObtained += obtained;
+
+      let subjectFormatted = escapeHtml(subj);
+      if (subj.includes('—') || subj.includes('-')) {
+        const parts = subj.split(/[—-]/);
+        subjectFormatted = `<b>${escapeHtml(parts[0].trim())}</b><br><span style="font-size: 0.9em; color: #475569;">Modules: ${escapeHtml(parts.slice(1).join(' - ').trim())}</span>`;
+      } else {
+        subjectFormatted = `<b>${escapeHtml(subj)}</b>`;
+      }
+
+      return `
+        <tr>
+          <td>${idx + 1}</td>
+          <td class="subject">${subjectFormatted}</td>
+          <td>${maxMarks}</td>
+          <td>${obtained}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(1) : '85.0';
+    let finalGrade = 'A+';
+    const pctNum = parseFloat(percentage);
+    if (pctNum >= 80) finalGrade = 'A+';
+    else if (pctNum >= 70) finalGrade = 'A';
+    else if (pctNum >= 50) finalGrade = 'B';
+    else if (pctNum >= 40) finalGrade = 'C';
+    else finalGrade = 'D';
+
+    return `
+      <div class="marksheet" data-student-id="${escapeHtml(student.id)}">
+        <!-- INSTITUTE HEADER -->
+        <div class="header">
+          <div class="logo">
+            <img src="https://ik.imagekit.io/d3ycnoiwd/academy/logo%20digu%20h.png" alt="Diganta Logo" crossorigin="anonymous">
+            <div class="marksheet-tm-badge" aria-label="Trade Mark">TM</div>
+          </div>
+
+          <div class="iso">
+            <img src="https://ik.imagekit.io/d3ycnoiwd/academy/certificate-logos/iso.jpg" alt="ISO Certified" crossorigin="anonymous">
+          </div>
+
+          <h1>${escapeHtml(academyName.toUpperCase())}</h1>
+
+          <p>has been independently assessed by PQC and found to comply with the requirement of</p>
+          <p style="font-size:16px; margin: 2px 0;">(Quality Management System)</p>
+          <p style="font-family:Georgia,serif;font-size:16px; margin: 2px 0;">ISO 9001:2015</p>
+
+          <p>Government Registration Certificate No. - QW-48825/1124</p>
+
+          <p class="location">
+            Gujarpur <span style="color:#1684d5;">●</span>
+            Shyampur <span style="color:#1684d5;">●</span>
+            Howrah
+          </p>
+        </div>
+
+        <div class="section-title">STATEMENT OF MARKS</div>
+
+        <!-- STUDENT INFORMATION -->
+        <div class="details">
+          <div class="detail-row">
+            <span>Registration Number</span>
+            <span class="colon">:</span>
+            <span class="value">${escapeHtml(regNo)}</span>
+          </div>
+
+          <div class="detail-row">
+            <span>The statement of Mr./Ms.</span>
+            <span class="colon">:</span>
+            <span class="value">${escapeHtml(studentName)}</span>
+          </div>
+
+          <div class="detail-row">
+            <span>Son / Daughter / Wife of</span>
+            <span class="colon">:</span>
+            <span class="value">${escapeHtml(fatherName)}</span>
+          </div>
+
+          <div class="detail-row">
+            <span>On Successful Completion of</span>
+            <span class="colon">:</span>
+            <span class="value">${escapeHtml(courseTitle)}</span>
+          </div>
+
+          <div class="detail-row">
+            <span>Duration</span>
+            <span class="colon">:</span>
+            <span class="value">${escapeHtml(duration)}</span>
+          </div>
+
+          <div class="detail-row">
+            <span>At Authorised Training Centre</span>
+            <span class="colon">:</span>
+            <span class="value">${escapeHtml(centre)}</span>
+          </div>
+        </div>
+
+        <!-- MARKS DETAILS -->
+        <table class="marks-table">
+          <thead>
+            <tr>
+              <th>Sl. No.</th>
+              <th>Examination / Subjects / Modules</th>
+              <th>Max. Marks</th>
+              <th>Marks Obtained</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+            <tr class="total">
+              <td colspan="2" style="text-align:right;">TOTAL</td>
+              <td>${totalMax}</td>
+              <td>${totalObtained}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- OVERALL RESULT -->
+        <div class="result-details">
+          <div class="result-row">
+            <span>Overall Percentage</span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <p class="formula">
+            (50% of Terminal average + 50% of Final Exam):
+          </p>
+
+          <div class="result-row highlight">
+            <span>Overall Performance / Grade</span>
+            <span>:</span>
+            <span class="value">${percentage}% (Approx.)</span>
+          </div>
+
+          <div class="result-row highlight">
+            <span>Grade Bar for Overall Performance</span>
+            <span>:</span>
+            <span class="value">${finalGrade}</span>
+          </div>
+        </div>
+
+        <!-- GRADING, QR AND SIGNATURE -->
+        <div class="bottom-section">
+          <div>
+            <table class="grade-table">
+              <thead>
+                <tr>
+                  <th>Grade</th>
+                  <th>Percentage of Marks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>A+</td><td>80% & Above</td></tr>
+                <tr><td>A</td><td>70% to 79%</td></tr>
+                <tr><td>B</td><td>50% to 69%</td></tr>
+                <tr><td>C</td><td>40% to 49%</td></tr>
+                <tr><td>D</td><td>Below 40%</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="official-area">
+            <div class="qr-area">
+              <div class="qr-placeholder">
+                QR CODE
+              </div>
+              <div class="date-line">
+                ${issueDate}
+                <br>Date of Issue
+              </div>
+            </div>
+
+            <div class="stamp-area">
+              <div class="stamp">
+                <img src="https://ik.imagekit.io/d3ycnoiwd/academy/certificate-logos/Stamp-diganta.png" alt="Official Stamp" class="stamp-img" crossorigin="anonymous">
+              </div>
+              <div class="signature-line">
+                Secretary / Director
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+          New Authorized Computer Training Centre at Shyampur<br>
+          <span class="address">
+            Shyampur National Youth Computer Literacy Drive oppo.State Bank of India, Pin-711314
+          </span>
+        </div>
+      </div>
+    `;
+  }
+
+  async executeMarksheetDownload(studentIds) {
+    const students = studentIds.map(id => store.getStudentById(id)).filter(Boolean);
+    if (!students.length) return;
+
+    const downloadBtn = document.getElementById('marksheetDownloadSelected');
+    if (downloadBtn) setButtonLoading(downloadBtn, true);
+
+    try {
+      this.showToast('Generating Marksheets', `Preparing ${students.length} marksheet(s)...`, 'info');
+
+      if (!window.MarksheetCanvas) {
+        this.printMarksheets(studentIds);
+        return;
+      }
+
+      if (students.length === 1) {
+        const student = students[0];
+        if (this.marksheetPreviewId === student.id) {
+          window.MarksheetCanvas.downloadActiveMarksheet();
+          this.showToast('Download Complete', `Marksheet downloaded for ${student.name}.`, 'success');
+          return;
+        }
+
+        const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
+        const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id) || b.id === student.batchId) || {};
+        const verificationUrl = this.getCertificateVerificationUrl(student);
+        const blob = await window.MarksheetCanvas.generateStudentMarksheetPng(student, course, batch, verificationUrl);
+        if (!blob) throw new Error('Failed to generate PNG blob');
+
+        const safeName = (student.name || student.fullName || 'student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+        const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+        const filename = `Marksheet-${safeId}-${safeName}.png`;
+
+        const downloadUrl = URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = downloadUrl;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadUrl);
+        this.showToast('Download Complete', `Marksheet downloaded for ${student.name}.`, 'success');
+      } else {
+        if (typeof window.JSZip === 'undefined') {
+          this.showToast('ZIP Library Loading', 'Compression library is loading. Please try again in a few seconds.', 'info');
+          return;
+        }
+
+        const zip = new window.JSZip();
+        let successCount = 0;
+
+        for (const student of students) {
+          const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
+          const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id) || b.id === student.batchId) || {};
+          const verificationUrl = this.getCertificateVerificationUrl(student);
+          const blob = await window.MarksheetCanvas.generateStudentMarksheetPng(student, course, batch, verificationUrl);
+          if (blob) {
+            successCount++;
+            const safeName = (student.name || student.fullName || 'student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
+            const safeId = String(student.id || '').replace(/[^a-zA-Z0-9_-]/g, '-');
+            zip.file(`Marksheet-${safeId}-${safeName}.png`, blob);
+          }
+        }
+
+        if (successCount === 0) throw new Error('No marksheets generated');
+        const zipBlob = await zip.generateAsync({
+          type: 'blob',
+          compression: 'DEFLATE',
+          compressionOptions: { level: 6 }
+        });
+
+        const filename = `Marksheets-${students.length}-Students.zip`;
+        const downloadUrl = URL.createObjectURL(zipBlob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = downloadUrl;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadUrl);
+
+        this.showToast('Download Complete', `Downloaded ${successCount} marksheets in ZIP format.`, 'success');
+      }
+    } catch (err) {
+      console.error('Marksheet download error:', err);
+      this.showToast('Download Error', 'Could not generate marksheets. You can use Print instead.', 'error');
+    } finally {
+      if (downloadBtn) setButtonLoading(downloadBtn, false);
+    }
+  }
+
+  printMarksheets(studentIds) {
+    const students = studentIds.map(id => store.getStudentById(id)).filter(Boolean);
+    if (!students.length) return;
+
+    let printContainer = document.getElementById('marksheetPrintContainer');
+    if (!printContainer) {
+      printContainer = document.createElement('div');
+      printContainer.id = 'marksheetPrintContainer';
+      document.body.appendChild(printContainer);
+    }
+
+    printContainer.innerHTML = students.map(student => {
+      const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
+      const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id));
+      return this.buildMarksheetHtml(student, course, batch);
+    }).join('');
+
+    const qrBoxes = printContainer.querySelectorAll('.qr-placeholder');
+    students.forEach((student, index) => {
+      const qrBox = qrBoxes[index];
+      if (qrBox && window.QRious) {
+        const qrCanvas = document.createElement('canvas');
+        new window.QRious({
+          element: qrCanvas,
+          value: this.getCertificateVerificationUrl(student),
+          size: 160,
+          level: 'L',
+          padding: 4
+        });
+        qrBox.innerHTML = '';
+        qrBox.appendChild(qrCanvas);
+      }
+    });
+
+    document.body.classList.add('printing-marksheet');
+    const cleanup = () => {
+      document.body.classList.remove('printing-marksheet');
+      printContainer.innerHTML = '';
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+    setTimeout(cleanup, 2000);
+  }
 
   renderCertificatesView() {
     const list = document.getElementById('certificateStudents');
@@ -6193,17 +5349,43 @@ class UIController {
     if (this.idCardLoadingOverlay) this.idCardLoadingOverlay.style.display = 'none';
     this.currentRenderedIdCardStudentId = null;
     const renderToken = this.idCardPreviewRenderToken = {};
-    if (this.idCardLoadingOverlay) this.idCardLoadingOverlay.style.display = 'none';
     if (!this.idCardPreviewCanvas) return;
     try {
       const templateImg = await this.loadIdCardTemplateImage();
       if (this.idCardPreviewRenderToken !== renderToken) return;
       if (revision !== this.idCardRenderRevision) return;
-      const ctx = this.idCardPreviewCanvas.getContext('2d');
+      const masterCanvas = document.createElement('canvas');
+      masterCanvas.width = 1250;
+      masterCanvas.height = 2000;
+      const ctx = masterCanvas.getContext('2d');
       ctx.drawImage(templateImg, 0, 0, 1250, 2000);
+      this.lastRenderedMasterIdCardCanvas = masterCanvas;
+      this.refreshIdCardPreviewCanvas();
     } catch (e) {
       console.warn('Could not render blank ID card template:', e);
     }
+  }
+
+  refreshIdCardPreviewCanvas() {
+    if (!this.lastRenderedMasterIdCardCanvas || !this.idCardPreviewCanvas) return;
+    const destination = this.idCardPreviewCanvas;
+    const rect = destination.getBoundingClientRect();
+    const displayWidth = rect.width || destination.clientWidth || 300;
+    const dpr = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
+    const targetWidth = Math.max(300, Math.round(displayWidth * dpr));
+    const targetHeight = Math.round(targetWidth * (2000 / 1250));
+
+    if (destination.width !== targetWidth || destination.height !== targetHeight) {
+      destination.width = targetWidth;
+      destination.height = targetHeight;
+    }
+
+    const destCtx = destination.getContext('2d');
+    destCtx.setTransform(1, 0, 0, 1, 0, 0);
+    destCtx.imageSmoothingEnabled = true;
+    destCtx.imageSmoothingQuality = 'high';
+    destCtx.clearRect(0, 0, destination.width, destination.height);
+    destCtx.drawImage(this.lastRenderedMasterIdCardCanvas, 0, 0, 1250, 2000, 0, 0, destination.width, destination.height);
   }
 
   async updateIdCardPreview(student) {
@@ -6266,13 +5448,13 @@ class UIController {
   async renderIdCardToCanvas(student, targetCanvas = null) {
     const destination = targetCanvas || this.idCardPreviewCanvas;
     if (!destination || !student) return;
-    const isPreview = destination === this.idCardPreviewCanvas;
+    const isPreview = !targetCanvas;
     const renderToken = isPreview ? (this.idCardPreviewRenderToken = {}) : null;
-    // Compose away from the visible canvas so image loads cannot expose partial cards.
+    // Compose on an offscreen 1250 x 2000 canvas away from the visible preview
     const canvas = isPreview ? document.createElement('canvas') : destination;
+    canvas.width = 1250;
+    canvas.height = 2000;
     if (isPreview) {
-      canvas.width = destination.width;
-      canvas.height = destination.height;
       this.currentRenderingIdCardStudentId = student.id;
     }
 
@@ -6369,7 +5551,7 @@ class UIController {
             document.fonts.load(`${tuning.weight} ${tuning.detSize}px "SF Pro Text"`)
           ]);
         }
-      } catch {}
+      } catch { }
 
       // 3. Draw Student Name in SF Pro (Bold and large, centered uppercase)
       const studentName = (student.name || student.fullName || '').toUpperCase();
@@ -6460,7 +5642,8 @@ class UIController {
 
       if (isPreview) {
         if (this.idCardPreviewRenderToken !== renderToken) return;
-        destination.getContext('2d').drawImage(canvas, 0, 0);
+        this.lastRenderedMasterIdCardCanvas = canvas;
+        this.refreshIdCardPreviewCanvas();
         this.currentRenderedIdCardStudentId = student.id;
         if (this.idCardNoSelection) this.idCardNoSelection.style.display = 'none';
       }
@@ -6502,12 +5685,7 @@ class UIController {
         const student = store.getStudentById(studentIds[0]);
         if (!student) throw new Error('Student data not found.');
 
-        let blob;
-        if (student.id === this.lastSelectedIdCardStudentId && this.idCardPreviewCanvas) {
-          blob = await new Promise(resolve => this.idCardPreviewCanvas.toBlob(resolve, 'image/png'));
-        } else {
-          blob = await this.generateStudentIdCardBlob(student);
-        }
+        const blob = await this.generateStudentIdCardBlob(student);
         if (!blob) throw new Error('Could not export ID card image.');
 
         const safeName = (student.name || student.fullName || 'Student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
@@ -6538,12 +5716,7 @@ class UIController {
         let renderedCount = 0;
 
         for (const student of students) {
-          let blob;
-          if (student.id === this.lastSelectedIdCardStudentId && this.idCardPreviewCanvas) {
-            blob = await new Promise(resolve => this.idCardPreviewCanvas.toBlob(resolve, 'image/png'));
-          } else {
-            blob = await this.generateStudentIdCardBlob(student);
-          }
+          const blob = await this.generateStudentIdCardBlob(student);
 
           if (blob) {
             const safeName = (student.name || student.fullName || 'Student').replace(/[^a-zA-Z0-9_\-\s]/g, '').trim().replace(/\s+/g, '_');
@@ -6600,16 +5773,11 @@ class UIController {
     try {
       const cardImages = [];
       for (const student of students) {
-        let dataUrl;
-        if (student.id === this.lastSelectedIdCardStudentId && this.idCardPreviewCanvas) {
-          dataUrl = this.idCardPreviewCanvas.toDataURL('image/png');
-        } else {
-          const canvas = document.createElement('canvas');
-          canvas.width = 1250;
-          canvas.height = 2000;
-          await this.renderIdCardToCanvas(student, canvas);
-          dataUrl = canvas.toDataURL('image/png');
-        }
+        const canvas = document.createElement('canvas');
+        canvas.width = 1250;
+        canvas.height = 2000;
+        await this.renderIdCardToCanvas(student, canvas);
+        const dataUrl = canvas.toDataURL('image/png');
         cardImages.push({
           dataUrl,
           student
@@ -6726,9 +5894,9 @@ class UIController {
         const course = (item.course || '').toLowerCase();
         const message = (item.message || '').toLowerCase();
         return name.includes(this.inboxSearchQuery) ||
-               phone.includes(this.inboxSearchQuery) ||
-               course.includes(this.inboxSearchQuery) ||
-               message.includes(this.inboxSearchQuery);
+          phone.includes(this.inboxSearchQuery) ||
+          course.includes(this.inboxSearchQuery) ||
+          message.includes(this.inboxSearchQuery);
       });
     }
 
@@ -6795,9 +5963,9 @@ class UIController {
       const course = (item.course || '').toLowerCase();
       const message = (item.message || '').toLowerCase();
       return name.includes(this.inboxSearchQuery) ||
-             phone.includes(this.inboxSearchQuery) ||
-             course.includes(this.inboxSearchQuery) ||
-             message.includes(this.inboxSearchQuery);
+        phone.includes(this.inboxSearchQuery) ||
+        course.includes(this.inboxSearchQuery) ||
+        message.includes(this.inboxSearchQuery);
     });
   }
 
@@ -7830,20 +6998,60 @@ class UIController {
       this.courseModalTitle.textContent = 'Edit Course';
       this.courseIdInput.value = course.id;
       this.courseTitleInput.value = course.title;
-      
+
       const parsed = parseDuration(course.duration);
       this.courseDurationValueInput.value = parsed.value;
       this.setDurationUnit(parsed.unit);
 
       this.courseDescriptionInput.value = course.description || '';
+      this.renderCourseSubjectInputs(course.subjects || []);
     } else {
       this.courseModalTitle.textContent = 'Add New Course';
       this.courseIdInput.value = '';
       this.courseDurationValueInput.value = '';
       this.setDurationUnit('Months');
+      this.courseDescriptionInput.value = '';
+      this.renderCourseSubjectInputs([]);
     }
 
     this.openModal(this.courseModal);
+  }
+
+  renderCourseSubjectInputs(subjects = []) {
+    if (!this.courseSubjectsContainer) return;
+    this.courseSubjectsContainer.innerHTML = '';
+    const list = Array.isArray(subjects) && subjects.length > 0 ? subjects : [''];
+    list.forEach(subj => this.addSubjectInputField(subj, false));
+  }
+
+  addSubjectInputField(value = '', shouldFocus = true) {
+    if (!this.courseSubjectsContainer) return;
+    const row = document.createElement('div');
+    row.className = 'course-subject-row';
+    row.innerHTML = `
+      <div class="input-icon-wrap flex-1">
+        <i class="fa-solid fa-book-open"></i>
+        <input type="text" class="course-subject-input name-input-capitalized" placeholder="Subject name" value="${escapeHtml(value)}">
+      </div>
+      <button type="button" class="btn-remove-subject" title="Remove Subject" aria-label="Remove Subject">
+        <i class="fa-regular fa-trash-can"></i>
+      </button>
+    `;
+    const removeBtn = row.querySelector('.btn-remove-subject');
+    removeBtn.addEventListener('click', () => {
+      const allRows = this.courseSubjectsContainer.querySelectorAll('.course-subject-row');
+      if (allRows.length <= 1) {
+        const input = row.querySelector('.course-subject-input');
+        if (input) input.value = '';
+      } else {
+        row.remove();
+      }
+    });
+    this.courseSubjectsContainer.appendChild(row);
+    if (shouldFocus) {
+      const input = row.querySelector('.course-subject-input');
+      input?.focus();
+    }
   }
 
   async handleCourseFormSubmit(e) {
@@ -7869,13 +7077,21 @@ class UIController {
     }
     const duration = `${durationVal} ${unitText}`;
 
+    const subjectInputs = this.courseSubjectsContainer
+      ? this.courseSubjectsContainer.querySelectorAll('.course-subject-input')
+      : [];
+    const subjects = [...subjectInputs]
+      .map(input => input.value.trim())
+      .filter(name => Boolean(name));
+
     const saveBtn = this.btnSaveCourse || this.courseForm.querySelector('button[type="submit"]');
     setButtonLoading(saveBtn, true);
 
     const payload = {
       title,
       duration,
-      description
+      description,
+      subjects
     };
 
     try {
@@ -7900,8 +7116,8 @@ class UIController {
     if (!course) return;
 
     const enrolledCount = store.getCourseEnrollmentCount(courseId);
-    const extraMsg = enrolledCount > 0 
-      ? ` Note: ${enrolledCount} student(s) currently enrolled in this course will be automatically un-enrolled.` 
+    const extraMsg = enrolledCount > 0
+      ? ` Note: ${enrolledCount} student(s) currently enrolled in this course will be automatically un-enrolled.`
       : '';
 
     this.promptConfirmation({
@@ -8297,9 +7513,9 @@ class UIController {
 
       let templateImg;
       try {
-        templateImg = await loadCertificateImage('assets/diganta-certificate-template.jpg');
+        templateImg = await loadCertificateImage('assets/diganta-certificate-template.jpg?v=4');
       } catch (e) {
-        templateImg = await loadCertificateImage('https://ik.imagekit.io/d3ycnoiwd/academy/student-certificate/diganta-certificate-template.jpg');
+        templateImg = await loadCertificateImage('https://ik.imagekit.io/d3ycnoiwd/academy/student-certificate/diganta-certificate-template.jpg?v=4');
       }
 
       if (students.length === 1) {
@@ -8538,14 +7754,18 @@ class UIController {
         new window.QRious({
           element: qrCanvas,
           value: verificationUrl,
-          size: 512,
-          level: 'H',
+          size: 256,
+          level: 'L',
+          padding: 8,
           foreground: '#111111',
           background: '#ffffff'
         });
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(QR_BOX.x - 5, QR_BOX.y - 5, QR_BOX.size + 10, QR_BOX.size + 10);
+        ctx.fillRect(QR_BOX.x - 4, QR_BOX.y - 4, QR_BOX.size + 8, QR_BOX.size + 8);
         ctx.drawImage(qrCanvas, QR_BOX.x, QR_BOX.y, QR_BOX.size, QR_BOX.size);
+        ctx.restore();
       } catch (err) {
         console.warn('Could not render QR code on certificate:', err);
       }
@@ -8585,9 +7805,9 @@ class UIController {
     try {
       let templateImg;
       try {
-        templateImg = await loadCertificateImage('assets/diganta-certificate-template.jpg');
+        templateImg = await loadCertificateImage('assets/diganta-certificate-template.jpg?v=4');
       } catch (e) {
-        templateImg = await loadCertificateImage('https://ik.imagekit.io/d3ycnoiwd/academy/student-certificate/diganta-certificate-template.jpg');
+        templateImg = await loadCertificateImage('https://ik.imagekit.io/d3ycnoiwd/academy/student-certificate/diganta-certificate-template.jpg?v=4');
       }
 
       const zip = new window.JSZip();
@@ -9131,8 +8351,8 @@ function formatInboxRowTime(dateString) {
 
   const now = new Date();
   const isToday = now.getFullYear() === date.getFullYear() &&
-                  now.getMonth() === date.getMonth() &&
-                  now.getDate() === date.getDate();
+    now.getMonth() === date.getMonth() &&
+    now.getDate() === date.getDate();
   const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
   if (isToday && diffHours < 24 && diffHours >= 0) {
