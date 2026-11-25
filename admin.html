@@ -15,7 +15,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-10.3">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.4">
   <script src="admin-config.js?v=3.5"></script>
 </head>
 
@@ -626,6 +626,17 @@
             <!-- Right Side: Marksheet Preview Panel -->
             <div class="idcards-preview-panel marksheet-preview-panel">
               <div class="dashboard-card marksheet-preview-stage" id="marksheetPreviewStage">
+                <div class="marksheet-zoom-controls" id="marksheetZoomControls" aria-label="Marksheet Zoom Controls" hidden>
+                  <button type="button" class="btn-marksheet-zoom" id="btnMarksheetZoomIn" title="Zoom In (+)" aria-label="Zoom In">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                  </button>
+                  <button type="button" class="btn-marksheet-zoom btn-marksheet-zoom-reset" id="btnMarksheetZoomReset" title="Reset Zoom (100%)" aria-label="Reset Zoom">
+                    <span id="marksheetZoomLevel">100%</span>
+                  </button>
+                  <button type="button" class="btn-marksheet-zoom" id="btnMarksheetZoomOut" title="Zoom Out (-)" aria-label="Zoom Out">
+                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                  </button>
+                </div>
                 <canvas id="marksheetCanvas" width="2550" height="3606" aria-label="Marksheet Preview Canvas"
                   hidden></canvas>
                 <div class="idcard-no-selection" id="marksheetPreviewEmpty">
@@ -2002,7 +2013,7 @@
 
   <!-- JavaScript -->
   <script src="certificate-canvas.js?v=12"></script>
-  <script src="marksheet-canvas.js?v=15"></script>
+  <script src="marksheet-canvas.js?v=16"></script>
   <script src="admin-script.js?v=idcards-10.9"></script>
 </body>
 
