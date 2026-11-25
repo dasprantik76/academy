@@ -860,6 +860,9 @@ class PublicAcademyApp {
       this.navStudentDropdownItem.addEventListener('mouseleave', () => {
         this.navStudentDropdownItem.classList.remove('collapsed');
       });
+      this.navStudentDropdownItem.addEventListener('mouseenter', () => {
+        this.navStudentDropdownItem.classList.remove('collapsed');
+      });
     }
 
     if (this.navStudentLink) {
@@ -867,16 +870,19 @@ class PublicAcademyApp {
         this.navStudentDropdownItem?.classList.remove('collapsed');
       });
       this.navStudentLink.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-          e.preventDefault();
-          this.navStudentDropdownItem?.classList.toggle('open');
-        } else {
-          e.preventDefault();
-          collapseStudentDropdown();
-          this.switchView('student');
+        e.preventDefault();
+        if (this.navStudentDropdownItem) {
+          this.navStudentDropdownItem.classList.remove('collapsed');
+          this.navStudentDropdownItem.classList.toggle('open');
         }
       });
     }
+
+    document.addEventListener('click', (e) => {
+      if (this.navStudentDropdownItem && !this.navStudentDropdownItem.contains(e.target)) {
+        this.navStudentDropdownItem.classList.remove('open');
+      }
+    });
 
     if (this.navSubStudentReg) {
       this.navSubStudentReg.addEventListener('click', (e) => {
@@ -1573,7 +1579,7 @@ class PublicAcademyApp {
     // Collapse Student Dropdown
     if (this.navStudentDropdownItem) {
       this.navStudentDropdownItem.classList.remove('open');
-      this.navStudentDropdownItem.classList.add('collapsed');
+      this.navStudentDropdownItem.classList.remove('collapsed');
     }
 
     if (updateHash) {

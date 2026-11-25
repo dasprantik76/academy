@@ -445,13 +445,14 @@ textarea {
 .public-navbar {
   position: sticky;
   top: 0;
-  z-index: 500;
+  z-index: 1000;
   background: #00017c;
   border-bottom: 0;
 }
 
 .nav-container {
   position: relative;
+  z-index: 20;
   max-width: 100%;
   width: 100%;
   margin: 0;
@@ -594,9 +595,9 @@ textarea {
   margin: 0;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-32px);
+  transform: translateY(-20px);
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, visibility 0.28s;
-  z-index: -1;
+  z-index: 10;
   pointer-events: none;
 }
 
@@ -607,18 +608,19 @@ textarea {
   visibility: visible;
   transform: translateY(0);
   pointer-events: auto;
+  z-index: 100;
 }
 
 /* Force collapse on selection even if hovered/focused */
-.nav-item-dropdown.collapsed .nav-dropdown-menu {
+.nav-item-dropdown.collapsed:not(:hover):not(.open) .nav-dropdown-menu {
   opacity: 0 !important;
   visibility: hidden !important;
-  transform: translateY(-32px) !important;
+  transform: translateY(-20px) !important;
   pointer-events: none !important;
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, visibility 0.22s !important;
 }
 
-.nav-item-dropdown.collapsed .nav-dropdown-arrow {
+.nav-item-dropdown.collapsed:not(:hover):not(.open) .nav-dropdown-arrow {
   transform: rotate(0deg) !important;
 }
 
@@ -706,17 +708,23 @@ textarea {
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
     padding: 0.4rem 0.5rem;
     margin: 0.4rem 0 0.6rem 0;
-    opacity: 1;
-    visibility: visible;
+    opacity: 0;
+    visibility: hidden;
     transform: none !important;
     z-index: auto !important;
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 0.35rem;
     pointer-events: auto;
   }
 
-  .nav-item-dropdown.collapsed .nav-dropdown-menu {
+  .nav-item-dropdown.open .nav-dropdown-menu {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .nav-item-dropdown.collapsed:not(.open) .nav-dropdown-menu {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
