@@ -7793,11 +7793,27 @@ body.is-superadmin #nav-tenants {
 
 #marksheetCanvas.is-zoomed {
   cursor: grab;
+  touch-action: none;
 }
 
 #marksheetCanvas.is-dragging {
-  cursor: grabbing;
+  cursor: grabbing !important;
   transition: none !important;
+  user-select: none !important;
+}
+
+.marksheet-preview-stage.is-zoomed {
+  cursor: grab;
+  touch-action: none;
+}
+
+.marksheet-preview-stage.is-dragging {
+  cursor: grabbing !important;
+  user-select: none !important;
+}
+
+.marksheet-preview-stage.is-dragging #marksheetCanvas {
+  cursor: grabbing !important;
 }
 
 /* Marksheet Magnifying Zoom Controls */
