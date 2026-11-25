@@ -8144,12 +8144,12 @@ body.is-superadmin #nav-tenants {
   width: 85px;
   height: 85px;
   margin: auto;
-  border: 3px solid #222222;
+  border: 3px solid #1784d6;
   border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #111111;
+  color: #173b69;
   font-size: 12px;
   font-weight: bold;
   background: #ffffff;

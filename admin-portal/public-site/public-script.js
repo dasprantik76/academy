@@ -114,9 +114,27 @@ class PublicAcademyApp {
     // Asynchronously synchronize courses and profile for this specific academy from MongoDB
     this.fetchCloudData();
 
-    // Check initial hash
-    const hash = window.location.hash.replace('#', '');
-    if (hash === 'courses') {
+    // Check initial hash or query params
+    let searchStr = window.location.search;
+    if (!searchStr && window.location.hash.includes('?')) {
+      searchStr = window.location.hash.slice(window.location.hash.indexOf('?'));
+    }
+    const params = new URLSearchParams(searchStr || window.location.search);
+    const hasCertParam = Boolean(params.get('c') || params.get('cert') || params.get('certificate'));
+    const hasMarksheetParam = Boolean(params.get('m') || params.get('mark') || params.get('marksheet'));
+
+    const hash = window.location.hash.replace('#', '').split('?')[0];
+    if (hasCertParam) {
+      this.switchView('certificate', false);
+      if (!window.location.hash.includes('certificate')) {
+        window.history.replaceState(null, '', `#certificate${searchStr ? (searchStr.startsWith('?') ? searchStr : '?' + searchStr) : ''}`);
+      }
+    } else if (hasMarksheetParam) {
+      this.switchView('marksheet', false);
+      if (!window.location.hash.includes('marksheet')) {
+        window.history.replaceState(null, '', `#marksheet${searchStr ? (searchStr.startsWith('?') ? searchStr : '?' + searchStr) : ''}`);
+      }
+    } else if (hash === 'courses') {
       this.switchView('courses');
     } else if (hash === 'student' || hash === 'student-registration' || hash === 'registration') {
       this.switchView('student');
@@ -130,6 +148,19 @@ class PublicAcademyApp {
       this.switchView('about');
     } else {
       this.switchView('home');
+    }
+
+    if (hasCertParam || hasMarksheetParam) {
+      const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+      if (rawStudents) {
+        try {
+          const cachedStudents = JSON.parse(rawStudents);
+          if (Array.isArray(cachedStudents) && cachedStudents.length > 0) {
+            if (hasCertParam) this.openCertificateFromVerificationLink(cachedStudents, false);
+            if (hasMarksheetParam) this.openMarksheetFromVerificationLink(cachedStudents, false);
+          }
+        } catch (e) {}
+      }
     }
   }
 
@@ -190,11 +221,11 @@ class PublicAcademyApp {
         slug: 'poulami'
       };
     }
-    if (this.currentAcademySlug === 'diganta' || this.currentAcademySlug === 'prantik' || this.currentOwnerEmail === 'rcavirup@gmail.com') {
+    if (this.currentAcademySlug === 'diganta' || this.currentAcademySlug === 'prantik' || this.currentOwnerEmail === 'rcavirup@gmail.com' || this.currentOwnerEmail === 'digantacomputercentre@gmail.com') {
       return {
         academyName: 'Diganta Computer Centre',
         ownerName: 'Diganta',
-        email: 'rcavirup@gmail.com',
+        email: 'digantacomputercentre@gmail.com',
         phone: '9733894742',
         secondaryPhone: '9733894742',
         whatsapp: '9733894742',
@@ -540,7 +571,8 @@ class PublicAcademyApp {
 
         if (Array.isArray(students)) {
           localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(students));
-          await this.openCertificateFromVerificationLink(students);
+          await this.openCertificateFromVerificationLink(students, true);
+          await this.openMarksheetFromVerificationLink(students, true);
         }
 
         // Remove tenantGuard if it was an unverified custom subdomain
@@ -553,30 +585,59 @@ class PublicAcademyApp {
       }
     } catch (e) {
       console.error('[PublicApp] fetchCloudData error:', e);
+      if (!this._verificationLinkHandled) {
+        await this.openCertificateFromVerificationLink([], true);
+      }
+      if (!this._marksheetVerificationLinkHandled) {
+        await this.openMarksheetFromVerificationLink([], true);
+      }
     }
     return false;
   }
 
-  async openCertificateFromVerificationLink(students) {
+  async openCertificateFromVerificationLink(students, isFinal = false) {
     if (this._verificationLinkHandled) return;
-    const params = new URLSearchParams(window.location.search);
-    const certificateId = params.get('c') || params.get('cert') || params.get('certificate');
-    if (!certificateId) return;
-    this._verificationLinkHandled = true;
-    this.switchView('certificate', false);
+    let searchStr = window.location.search;
+    if (!searchStr && window.location.hash.includes('?')) {
+      searchStr = window.location.hash.slice(window.location.hash.indexOf('?'));
+    }
+    const params = new URLSearchParams(searchStr || window.location.search);
+    const rawCertId = params.get('c') || params.get('cert') || params.get('certificate');
+    if (!rawCertId) return;
 
-    const student = students.find(item => String(item.id) === certificateId);
+    this.switchView('certificate', false);
+    if (!window.location.hash.includes('certificate')) {
+      window.history.replaceState(null, '', `#certificate${searchStr ? (searchStr.startsWith('?') ? searchStr : '?' + searchStr) : ''}`);
+    }
+
+    const targetId = decodeURIComponent(rawCertId).trim().toLowerCase();
+    const student = (students || []).find(item => {
+      const id = String(item.id || '').trim().toLowerCase();
+      const reg = String(item.regNo || '').trim().toLowerCase();
+      const serial = String(item.certificateSerial || '').trim().toLowerCase();
+      return id === targetId || reg === targetId || serial === targetId;
+    });
+
     if (!student) {
-      if (this.certSearchForm) this.certSearchForm.style.display = '';
-      if (this.certResultContainer) this.certResultContainer.style.display = 'none';
-      if (this.certNotFoundState) this.certNotFoundState.style.display = 'flex';
+      if (isFinal) {
+        this._verificationLinkHandled = true;
+        if (this.certSearchForm) this.certSearchForm.style.display = '';
+        if (this.certResultContainer) this.certResultContainer.style.display = 'none';
+        if (this.certIncompleteState) this.certIncompleteState.style.display = 'none';
+        if (this.certNotFoundState) {
+          this.certNotFoundState.style.display = 'flex';
+          this.certNotFoundState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
       return;
     }
+    this._verificationLinkHandled = true;
     await this.showCertificateResult(student);
   }
 
   async showCertificateResult(student) {
-    if (student.status !== 'Completed') {
+    const isCompleted = String(student.status || '').toLowerCase() === 'completed' || Boolean(student.certificateIssueDate) || Boolean(student.grade);
+    if (!isCompleted) {
       if (this.certSearchForm) this.certSearchForm.style.display = '';
       if (this.certResultContainer) this.certResultContainer.style.display = 'none';
       if (this.certNotFoundState) this.certNotFoundState.style.display = 'none';
@@ -585,19 +646,92 @@ class PublicAcademyApp {
           this.certIncompleteDesc.textContent = `Hello, ${toTitleCase(student.name)}, your certificate is not available at this moment.`;
         }
         this.certIncompleteState.style.display = 'flex';
+        this.certIncompleteState.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       return;
     }
 
     if (this.certNotFoundState) this.certNotFoundState.style.display = 'none';
     if (this.certIncompleteState) this.certIncompleteState.style.display = 'none';
-    const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || '';
+    const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || student.courseId || '';
     const course = this.courses.find(item => item.id === courseId);
-    await window.CertificateCanvas.render(student, course);
+    if (window.CertificateCanvas) {
+      await window.CertificateCanvas.render(student, course);
+    }
     if (this.certResultContainer) {
       if (this.certSearchForm) this.certSearchForm.style.display = 'none';
       this.certResultContainer.style.display = 'block';
       this.certResultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  async openMarksheetFromVerificationLink(students, isFinal = false) {
+    if (this._marksheetVerificationLinkHandled) return;
+    let searchStr = window.location.search;
+    if (!searchStr && window.location.hash.includes('?')) {
+      searchStr = window.location.hash.slice(window.location.hash.indexOf('?'));
+    }
+    const params = new URLSearchParams(searchStr || window.location.search);
+    const rawMarksheetId = params.get('m') || params.get('mark') || params.get('marksheet');
+    if (!rawMarksheetId) return;
+
+    this.switchView('marksheet', false);
+    if (!window.location.hash.includes('marksheet')) {
+      window.history.replaceState(null, '', `#marksheet${searchStr ? (searchStr.startsWith('?') ? searchStr : '?' + searchStr) : ''}`);
+    }
+
+    const targetId = decodeURIComponent(rawMarksheetId).trim().toLowerCase();
+    const student = (students || []).find(item => {
+      const id = String(item.id || '').trim().toLowerCase();
+      const reg = String(item.regNo || '').trim().toLowerCase();
+      const serial = String(item.certificateSerial || '').trim().toLowerCase();
+      return id === targetId || reg === targetId || serial === targetId;
+    });
+
+    if (!student) {
+      if (isFinal) {
+        this._marksheetVerificationLinkHandled = true;
+        if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = '';
+        if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
+        if (this.marksheetIncompleteState) this.marksheetIncompleteState.style.display = 'none';
+        if (this.marksheetNotFoundState) {
+          this.marksheetNotFoundState.style.display = 'flex';
+          this.marksheetNotFoundState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      return;
+    }
+    this._marksheetVerificationLinkHandled = true;
+    await this.showMarksheetResult(student);
+  }
+
+  async showMarksheetResult(student) {
+    const isCompleted = String(student.status || '').toLowerCase() === 'completed' || Boolean(student.certificateIssueDate) || Boolean(student.grade);
+    if (!isCompleted) {
+      if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = '';
+      if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
+      if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
+      if (this.marksheetIncompleteState) {
+        if (this.marksheetIncompleteDesc) {
+          this.marksheetIncompleteDesc.textContent = `Hello, ${toTitleCase(student.name)}, your marksheet is not available at this moment.`;
+        }
+        this.marksheetIncompleteState.style.display = 'flex';
+        this.marksheetIncompleteState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
+    if (this.marksheetIncompleteState) this.marksheetIncompleteState.style.display = 'none';
+    const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || student.courseId || '';
+    const course = this.courses.find(item => item.id === courseId);
+    if (window.MarksheetCanvas) {
+      await window.MarksheetCanvas.render(student, course);
+    }
+    if (this.marksheetResultContainer) {
+      if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = 'none';
+      this.marksheetResultContainer.style.display = 'block';
+      this.marksheetResultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
@@ -825,14 +959,31 @@ class PublicAcademyApp {
 
     if (this.btnResetMarksheetSearch) {
       this.btnResetMarksheetSearch.addEventListener('click', () => {
+        this._marksheetVerificationLinkHandled = false;
+        try {
+          const cleanUrl = window.location.pathname + (window.location.hash ? window.location.hash.split('?')[0] : '');
+          window.history.replaceState({}, document.title, cleanUrl);
+        } catch {}
         if (this.marksheetSearchForm) {
           this.marksheetSearchForm.style.display = '';
+          this.marksheetSearchForm.classList.remove('cert-search-returning');
+          void this.marksheetSearchForm.offsetWidth;
+          this.marksheetSearchForm.classList.add('cert-search-returning');
+          this.marksheetSearchForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          window.setTimeout(() => this.marksheetSearchForm?.classList.remove('cert-search-returning'), 550);
           this.marksheetSearchForm.reset();
         }
         if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
         if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
         if (this.marksheetIncompleteState) this.marksheetIncompleteState.style.display = 'none';
         if (window.MarksheetCanvas) window.MarksheetCanvas.clear();
+        if (this.marksheetPhone) {
+          this.marksheetPhone.classList.remove('input-error');
+          this.marksheetPhone.focus({ preventScroll: true });
+        }
+        if (this.marksheetPhoneError) this.marksheetPhoneError.style.display = 'none';
+        if (this.marksheetDob) this.marksheetDob.classList.remove('input-error');
+        if (this.marksheetDobError) this.marksheetDobError.style.display = 'none';
       });
     }
 
@@ -852,8 +1003,40 @@ class PublicAcademyApp {
 
     // Hash Change
     window.addEventListener('hashchange', () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash === 'courses') {
+      let searchStr = window.location.search;
+      if (!searchStr && window.location.hash.includes('?')) {
+        searchStr = window.location.hash.slice(window.location.hash.indexOf('?'));
+      }
+      const params = new URLSearchParams(searchStr || window.location.search);
+      const hasCertParam = Boolean(params.get('c') || params.get('cert') || params.get('certificate'));
+      const hasMarksheetParam = Boolean(params.get('m') || params.get('mark') || params.get('marksheet'));
+
+      const hash = window.location.hash.replace('#', '').split('?')[0];
+      if (hasCertParam) {
+        this.switchView('certificate', false);
+        const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+        if (rawStudents) {
+          try {
+            const cachedStudents = JSON.parse(rawStudents);
+            if (Array.isArray(cachedStudents) && cachedStudents.length > 0) {
+              this._verificationLinkHandled = false;
+              this.openCertificateFromVerificationLink(cachedStudents, true);
+            }
+          } catch (e) {}
+        }
+      } else if (hasMarksheetParam) {
+        this.switchView('marksheet', false);
+        const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+        if (rawStudents) {
+          try {
+            const cachedStudents = JSON.parse(rawStudents);
+            if (Array.isArray(cachedStudents) && cachedStudents.length > 0) {
+              this._marksheetVerificationLinkHandled = false;
+              this.openMarksheetFromVerificationLink(cachedStudents, true);
+            }
+          } catch (e) {}
+        }
+      } else if (hash === 'courses') {
         this.switchView('courses', false);
       } else if (hash === 'student' || hash === 'student-registration' || hash === 'registration') {
         this.switchView('student', false);
@@ -906,6 +1089,11 @@ class PublicAcademyApp {
     // Certificate Reset / Print Buttons
     if (this.btnResetCertSearch) {
       this.btnResetCertSearch.addEventListener('click', () => {
+        this._verificationLinkHandled = false;
+        try {
+          const cleanUrl = window.location.pathname + (window.location.hash ? window.location.hash.split('?')[0] : '');
+          window.history.replaceState({}, document.title, cleanUrl);
+        } catch {}
         if (this.certSearchForm) {
           this.certSearchForm.style.display = '';
           this.certSearchForm.classList.remove('cert-search-returning');
@@ -2707,37 +2895,10 @@ class PublicAcademyApp {
         return;
       }
 
-      if (student.status !== 'Completed') {
-        if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = '';
-        if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
-        if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
-        if (this.marksheetIncompleteState) {
-          if (this.marksheetIncompleteDesc) {
-            this.marksheetIncompleteDesc.textContent = `Hello, ${toTitleCase(student.name)}, your marksheet is not available at this moment.`;
-          }
-          this.marksheetIncompleteState.style.display = 'flex';
-          this.marksheetIncompleteState.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        return;
+      await this.showMarksheetResult(student);
+      if (student.status === 'Completed') {
+        this.showToast(`Marksheet verified for ${toTitleCase(student.name)}!`, 'success');
       }
-
-      if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
-      if (this.marksheetIncompleteState) this.marksheetIncompleteState.style.display = 'none';
-
-      const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || '';
-      const course = this.courses.find(item => item.id === courseId);
-
-      if (window.MarksheetCanvas) {
-        await window.MarksheetCanvas.render(student, course);
-      }
-
-      if (this.marksheetResultContainer) {
-        if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = 'none';
-        this.marksheetResultContainer.style.display = 'block';
-        this.marksheetResultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      this.showToast(`Marksheet verified for ${toTitleCase(student.name)}!`, 'success');
     } catch (err) {
       console.error('[PublicApp] handleMarksheetSearch error:', err);
       this.showToast('An error occurred while generating the marksheet.', 'error');

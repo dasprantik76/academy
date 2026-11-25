@@ -496,47 +496,93 @@
     ctx.lineTo(grCol[1], botY + totalGrH);
     ctx.stroke();
 
-    // QR Code Area
-    const qrX = 440;
-    const qrSize = 100;
-    const qrY = botY + 2;
+    // QR Code Area (centered in the middle between Grade table and Stamp section)
+    const qrCenterX = 470;
+    const boxSize = 104;
+    const boxX = qrCenterX - boxSize / 2;
+    const boxY = botY + 4;
+    const targetPadding = 9;
+    const qrDrawSize = boxSize - 2 * targetPadding;
+    const qrDrawX = boxX + targetPadding;
+    const qrDrawY = boxY + targetPadding;
 
     if (window.QRious) {
-      const slug = (student.academySlug || profile?.academySlug || profile?.slug || 'diganta').toLowerCase().trim();
-      const qrUrl = verificationUrl || `https://${slug}.pixelsetu.com/?c=${encodeURIComponent(student.id || student.regNo || '')}`;
+      const rawSlug = (profile?.academySlug || profile?.slug || window.PUBLIC_SITE_CONFIG?.academySlug || student.academySlug || 'diganta').toLowerCase().trim();
+      const slug = (rawSlug && !rawSlug.includes('@') && rawSlug !== 'rcavirup' && rawSlug !== 'prantik') ? rawSlug : 'diganta';
+      const qrUrl = verificationUrl || `https://${slug}.pixelsetu.com/#marksheet?m=${encodeURIComponent(student.id || student.regNo || '')}`;
       const qrCanvas = document.createElement('canvas');
       new window.QRious({
         element: qrCanvas,
         value: qrUrl,
         size: 256,
         level: 'L',
-        padding: 4
+        padding: 0
       });
+
+      // Find exact tight bounding box of QR modules to eliminate any integer-grid asymmetry from QRious
+      let minX = qrCanvas.width;
+      let maxX = 0;
+      let minY = qrCanvas.height;
+      let maxY = 0;
+      let foundDark = false;
+
+      try {
+        const qrCtx = qrCanvas.getContext('2d');
+        const imgData = qrCtx.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
+        const d = imgData.data;
+        for (let y = 0; y < qrCanvas.height; y++) {
+          for (let x = 0; x < qrCanvas.width; x++) {
+            const idx = (y * qrCanvas.width + x) * 4;
+            if (d[idx] < 100 && d[idx + 3] > 100) {
+              foundDark = true;
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+            }
+          }
+        }
+      } catch {
+        foundDark = false;
+      }
 
       ctx.save();
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6);
-      ctx.strokeStyle = '#222222';
+      ctx.strokeStyle = '#1784d6';
       ctx.lineWidth = 2.5;
-      ctx.strokeRect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6);
-      ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(boxX, boxY, boxSize, boxSize, 6);
+      } else {
+        ctx.rect(boxX, boxY, boxSize, boxSize);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      if (foundDark && maxX > minX && maxY > minY) {
+        const srcW = maxX - minX + 1;
+        const srcH = maxY - minY + 1;
+        ctx.drawImage(qrCanvas, minX, minY, srcW, srcH, qrDrawX, qrDrawY, qrDrawSize, qrDrawSize);
+      } else {
+        ctx.drawImage(qrCanvas, qrDrawX, qrDrawY, qrDrawSize, qrDrawSize);
+      }
       ctx.restore();
     }
 
-    // Date line
+    // Date line (aligned with the centered QR code)
     ctx.strokeStyle = '#222222';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(qrX - 15, botY + 128);
-    ctx.lineTo(qrX + qrSize + 15, botY + 128);
+    ctx.moveTo(qrCenterX - 65, botY + 128);
+    ctx.lineTo(qrCenterX + 65, botY + 128);
     ctx.stroke();
 
     ctx.textAlign = 'center';
     ctx.fillStyle = '#222222';
     ctx.font = 'bold 13.5px Arial, sans-serif';
-    ctx.fillText(issueDate, qrX + qrSize / 2, botY + 146);
+    ctx.fillText(issueDate, qrCenterX, botY + 146);
     ctx.font = 'bold 12.5px Arial, sans-serif';
-    ctx.fillText('Date of Issue', qrX + qrSize / 2, botY + 162);
+    ctx.fillText('Date of Issue', qrCenterX, botY + 162);
 
     // Official Stamp Area
     const stampW = 205;

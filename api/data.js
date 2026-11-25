@@ -100,7 +100,7 @@ const DEFAULT_TENANTS = {
     coOwnerEmails: ['digantacomputercentre@gmail.com'],
     academyName: 'Diganta Computer Centre',
     ownerName: 'Diganta',
-    email: 'rcavirup@gmail.com',
+    email: 'digantacomputercentre@gmail.com',
     phone: '9733894742',
     secondaryPhone: '9733894742',
     whatsapp: '9733894742',
@@ -128,7 +128,7 @@ const DEFAULT_TENANTS = {
     coOwnerEmails: ['digantacomputercentre@gmail.com'],
     academyName: 'Diganta Computer Centre',
     ownerName: 'Diganta',
-    email: 'rcavirup@gmail.com',
+    email: 'digantacomputercentre@gmail.com',
     phone: '9733894742',
     secondaryPhone: '9733894742',
     whatsapp: '9733894742',
@@ -1213,7 +1213,7 @@ export default async function handler(req, res) {
         isConfigured: true,
         tenant: {
           ownerEmail,
-          slug: profileDoc?.slug || (ownerEmail.includes('poulami') ? 'poulami' : (ownerEmail === 'rcavirup@gmail.com' ? 'diganta' : '')),
+          slug: profileDoc?.slug || (ownerEmail.includes('poulami') ? 'poulami' : ((ownerEmail === 'rcavirup@gmail.com' || ownerEmail === 'digantacomputercentre@gmail.com') ? 'diganta' : '')),
           status: currentStatus,
           isSuperAdmin
         },

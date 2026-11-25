@@ -145,14 +145,15 @@
             PHOTO_BOX.height - 3
           );
           ctx.restore();
-        } catch {}
+        } catch { }
       }
 
       if (window.QRious && student.id) {
         let verificationUrl = publicVerificationUrl;
         if (!verificationUrl) {
-          const slug = (student.academySlug || window.PUBLIC_SITE_CONFIG?.academySlug || 'diganta').toLowerCase().trim();
-          verificationUrl = `https://${slug}.pixelsetu.com/?c=${encodeURIComponent(student.id || '')}`;
+          const rawSlug = (window.PUBLIC_SITE_CONFIG?.academySlug || student.academySlug || 'diganta').toLowerCase().trim();
+          const slug = (rawSlug && !rawSlug.includes('@') && rawSlug !== 'rcavirup' && rawSlug !== 'prantik') ? rawSlug : 'diganta';
+          verificationUrl = `https://${slug}.pixelsetu.com/#certificate?c=${encodeURIComponent(student.id || student.regNo || '')}`;
         }
         const qrCanvas = document.createElement('canvas');
         new window.QRious({

@@ -870,7 +870,12 @@ class AcademyStore {
 
     if (rawStudents) {
       try {
-        this.students = JSON.parse(rawStudents) || [];
+        this.students = (JSON.parse(rawStudents) || []).map(s => {
+          if (isDiganta && (s.academySlug === 'prantik' || s.academySlug === 'rcavirup' || !s.academySlug)) {
+            return { ...s, academySlug: 'diganta' };
+          }
+          return s;
+        });
       } catch (e) {
         this.students = [];
       }
@@ -945,7 +950,13 @@ class AcademyStore {
           }
 
           if (Array.isArray(students)) {
-            this.students = students;
+            const isDigantaTenant = this.ownerEmail === 'rcavirup@gmail.com' || this.ownerEmail === 'digantacomputercentre@gmail.com' || this.ownerEmail === 'diganta';
+            this.students = students.map(s => {
+              if (isDigantaTenant && (s.academySlug === 'prantik' || s.academySlug === 'rcavirup' || !s.academySlug)) {
+                return { ...s, academySlug: 'diganta' };
+              }
+              return s;
+            });
             localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(this.students));
             localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this.students));
           } else if (this.students.length > 0) {
@@ -1134,7 +1145,7 @@ class AcademyStore {
         return {
           academyName: 'Diganta Computer Centre',
           ownerName: 'Diganta',
-          email: 'rcavirup@gmail.com',
+          email: 'digantacomputercentre@gmail.com',
           coOwnerEmail: 'digantacomputercentre@gmail.com',
           phone: '9733894742',
           secondaryPhone: '9733894742',
@@ -1521,8 +1532,17 @@ class UIController {
   }
 
   getCertificateVerificationUrl(student) {
-    const slug = (student.academySlug || store.getAcademyProfile()?.slug || store.ownerEmail || 'diganta').toLowerCase().trim();
-    return `https://${slug}.pixelsetu.com/?c=${encodeURIComponent(student.id || student.regNo || '')}`;
+    const profile = store.getAcademyProfile();
+    const rawSlug = (profile?.slug || student.academySlug || 'diganta').toLowerCase().trim();
+    const slug = (rawSlug && !rawSlug.includes('@') && rawSlug !== 'rcavirup' && rawSlug !== 'prantik') ? rawSlug : 'diganta';
+    return `https://${slug}.pixelsetu.com/#certificate?c=${encodeURIComponent(student.id || student.regNo || '')}`;
+  }
+
+  getMarksheetVerificationUrl(student) {
+    const profile = store.getAcademyProfile();
+    const rawSlug = (profile?.slug || student.academySlug || 'diganta').toLowerCase().trim();
+    const slug = (rawSlug && !rawSlug.includes('@') && rawSlug !== 'rcavirup' && rawSlug !== 'prantik') ? rawSlug : 'diganta';
+    return `https://${slug}.pixelsetu.com/#marksheet?m=${encodeURIComponent(student.id || student.regNo || '')}`;
   }
 
   updatePublicSiteLink() {
@@ -4461,7 +4481,7 @@ class UIController {
     if (window.MarksheetCanvas?.render) {
       const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
       const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id) || b.id === student.batchId) || {};
-      const verificationUrl = this.getCertificateVerificationUrl(student);
+      const verificationUrl = this.getMarksheetVerificationUrl(student);
       window.MarksheetCanvas.render(student, course, batch, verificationUrl);
     }
   }
@@ -4783,7 +4803,7 @@ class UIController {
 
         const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
         const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id) || b.id === student.batchId) || {};
-        const verificationUrl = this.getCertificateVerificationUrl(student);
+        const verificationUrl = this.getMarksheetVerificationUrl(student);
         const blob = await window.MarksheetCanvas.generateStudentMarksheetPng(student, course, batch, verificationUrl);
         if (!blob) throw new Error('Failed to generate PNG blob');
 
@@ -4812,7 +4832,7 @@ class UIController {
         for (const student of students) {
           const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
           const batch = store.getAllBatches().find(b => (b.studentIds || []).includes(student.id) || b.id === student.batchId) || {};
-          const verificationUrl = this.getCertificateVerificationUrl(student);
+          const verificationUrl = this.getMarksheetVerificationUrl(student);
           const blob = await window.MarksheetCanvas.generateStudentMarksheetPng(student, course, batch, verificationUrl);
           if (blob) {
             successCount++;
@@ -4873,7 +4893,7 @@ class UIController {
         const qrCanvas = document.createElement('canvas');
         new window.QRious({
           element: qrCanvas,
-          value: this.getCertificateVerificationUrl(student),
+          value: this.getMarksheetVerificationUrl(student),
           size: 160,
           level: 'L',
           padding: 4
