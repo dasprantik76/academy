@@ -1,12 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "public",
-  "rewrites": [
-    {
-      "source": "/a/:slug*",
-      "destination": "/public-site/index.html"
-    }
-  ],
   "redirects": [
     {
       "source": "/login.html",
@@ -14,9 +8,19 @@
       "permanent": true
     },
     {
-      "source": "/academy/:slug",
-      "destination": "/a/:slug",
-      "permanent": false
+      "source": "/a",
+      "destination": "https://diganta.pixelsetu.com",
+      "permanent": true
+    },
+    {
+      "source": "/a/:match*",
+      "destination": "https://diganta.pixelsetu.com",
+      "permanent": true
+    },
+    {
+      "source": "/academy/:match*",
+      "destination": "https://diganta.pixelsetu.com",
+      "permanent": true
     }
   ]
 }

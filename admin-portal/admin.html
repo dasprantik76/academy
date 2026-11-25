@@ -15,8 +15,8 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-10.1">
-  <script src="admin-config.js?v=3.4"></script>
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.2">
+  <script src="admin-config.js?v=3.5"></script>
 </head>
 
 <body>
@@ -151,7 +151,7 @@
             <p class="on-hold-desc">
               Thank you for registering with <strong>PixelSetu Academy</strong>! Your academy configuration has been
               safely received. To ensure security and quality, our platform team reviews new tenant accounts before
-              enabling full administration features. Your slug-based public admissions website has been reserved.
+              enabling full administration features.
             </p>
 
             <div class="on-hold-details-box">
@@ -160,8 +160,8 @@
                 <strong class="detail-val" id="holdAcademyName">—</strong>
               </div>
               <div class="on-hold-detail-row">
-                <span class="detail-label"><i class="fa-solid fa-globe"></i> Public Website Link (Slug):</span>
-                <code class="detail-val detail-code" id="holdSubdomainUrl">—</code>
+                <span class="detail-label"><i class="fa-solid fa-globe"></i> Public Website:</span>
+                <code class="detail-val detail-code" id="holdSubdomainUrl">https://diganta.pixelsetu.com</code>
               </div>
               <div class="on-hold-detail-row">
                 <span class="detail-label"><i class="fa-solid fa-user-tie"></i> Owner Name:</span>
@@ -1909,19 +1909,15 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="settingsSubdomainSlug">Public Website Slug <span class="required-star">*</span></label>
+          <div class="form-group" style="display: none;">
+            <label for="settingsSubdomainSlug">Public Website Slug</label>
             <div class="subdomain-input-wrap"
               style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
               <span id="settingsSlugPrefix"
-                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">academy.pixelsetu.com/a/</span>
-              <input type="text" id="settingsSubdomainSlug" placeholder="your-slug"
-                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;"
-                required>
+                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
+              <input type="text" id="settingsSubdomainSlug" value="diganta" placeholder="your-slug"
+                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
             </div>
-            <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
-              Letters, numbers, and hyphens (e.g. <code>dance-academy</code>).
-            </p>
           </div>
         </div>
 
@@ -1970,20 +1966,15 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="onboardingSubdomainSlug">Public Website Slug <span class="required-star">*</span></label>
+          <div class="form-group" style="display: none;">
+            <label for="onboardingSubdomainSlug">Public Website Slug</label>
             <div class="subdomain-input-wrap"
               style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
               <span id="onboardingSlugPrefix"
-                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">academy.pixelsetu.com/a/</span>
-              <input type="text" id="onboardingSubdomainSlug" placeholder="your-slug"
-                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;"
-                required>
+                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
+              <input type="text" id="onboardingSubdomainSlug" value="diganta" placeholder="your-slug"
+                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
             </div>
-            <p style="font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500;">
-              Your public admissions website will firstly be accessible at
-              <code>academy.pixelsetu.com/a/your-slug</code>.
-            </p>
           </div>
         </div>
 

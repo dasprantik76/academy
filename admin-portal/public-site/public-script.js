@@ -160,25 +160,6 @@ class PublicAcademyApp {
   }
 
   resolveTenant() {
-    const params = new URLSearchParams(window.location.search);
-    const querySlug = (params.get('academy') || params.get('owner') || params.get('slug') || '').toLowerCase().trim();
-    if (querySlug) return querySlug;
-
-    // Check pathname: /a/:slug or /academy/:slug or /public-site/:slug
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    if (pathParts.length >= 2 && (pathParts[0] === 'a' || pathParts[0] === 'academy' || pathParts[0] === 'public-site')) {
-      const candidate = pathParts[1].toLowerCase().trim();
-      if (candidate && !candidate.includes('.')) {
-        return candidate;
-      }
-    }
-
-    const host = window.location.hostname.toLowerCase();
-    const parts = host.split('.');
-    if (parts.length >= 3 && parts[0] !== 'www' && parts[0] !== 'academy' && parts[0] !== 'app') {
-      return parts[0];
-    }
-
     return String(PUBLIC_SITE_CONFIG.academySlug || 'diganta').toLowerCase().trim();
   }
 

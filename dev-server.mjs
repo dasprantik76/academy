@@ -160,33 +160,7 @@ const server = http.createServer(async (req, res) => {
     let targetRoot = path.join(root, 'public');
     let targetRelative = relative;
 
-    if (url.pathname === '/a' || url.pathname === '/a/') {
-      res.setHeader('Location', '/');
-      return res.status(302).end();
-    }
-    if (url.pathname.startsWith('/a/')) {
-      const cleanPath = url.pathname.replace(/^\/a\//, '');
-      const possibleExt = path.extname(cleanPath);
-      if (possibleExt && types[possibleExt]) {
-        const targetFilename = cleanPath.split('/').pop();
-        let assetPath = path.join(root, 'public-site', targetFilename);
-        if (cleanPath.includes('assets/')) {
-          const sub = cleanPath.slice(cleanPath.indexOf('assets/'));
-          assetPath = path.join(root, 'public-site', sub);
-        }
-        targetRoot = path.join(root, 'public-site');
-        targetRelative = path.relative(targetRoot, assetPath);
-      } else {
-        targetRoot = path.join(root, 'public-site');
-        targetRelative = 'index.html';
-      }
-    } else if (url.pathname.startsWith('/academy/')) {
-      const slug = url.pathname.replace(/^\/academy\/?/, '').trim();
-      if (slug) {
-        res.setHeader('Location', `/a/${encodeURIComponent(slug)}`);
-        return res.status(302).end();
-      }
-    } else if (relative.startsWith('public-site/') || relative === 'public-site') {
+    if (relative.startsWith('public-site/') || relative === 'public-site') {
       targetRoot = path.join(root, 'public-site');
       targetRelative = relative.replace(/^public-site\/?/, '') || 'index.html';
     }

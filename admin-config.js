@@ -1,10 +1,12 @@
 /**
  * Central Admin Portal configuration.
- * Dynamic origin-based URLs for the academy platform.
+ * Canonical production URLs for the Diganta websites.
  */
 window.ADMIN_PORTAL_CONFIG = Object.freeze({
   adminAcademySlug: 'diganta',
-  defaultPublicSiteUrl: '',
-  publicSites: Object.freeze({})
+  defaultPublicSiteUrl: 'https://diganta.pixelsetu.com',
+  publicSites: Object.freeze({
+    diganta: 'https://diganta.pixelsetu.com',
+    prantik: 'https://diganta.pixelsetu.com'
+  })
 });
-

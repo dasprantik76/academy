@@ -7755,7 +7755,8 @@ body.is-superadmin #nav-tenants {
   overflow: hidden;
 }
 
-.marksheet-preview-stage {
+.marksheet-preview-stage,
+.dashboard-card.marksheet-preview-stage {
   position: relative;
   width: 100%;
   flex: 1;
@@ -7764,10 +7765,11 @@ body.is-superadmin #nav-tenants {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--surface-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: #0f172a;
+  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  border: 1px solid #1e293b;
   border-radius: var(--radius-lg, 16px);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.4), 0 8px 10px -6px rgba(15, 23, 42, 0.3);
   padding: 1rem;
   overflow: hidden;
   box-sizing: border-box;
@@ -7779,7 +7781,7 @@ body.is-superadmin #nav-tenants {
   max-height: 100%;
   aspect-ratio: 210 / 297;
   background: #ffffff;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
   border-radius: 2px;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: high-quality;
@@ -7802,46 +7804,44 @@ body.is-superadmin #nav-tenants {
   justify-content: center;
   text-align: center;
   padding: 2.5rem 1.75rem;
-  background: #ffffff;
-  border: 7px double #173b69;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.14);
+  background: rgba(30, 41, 59, 0.65);
+  border: 2px dashed rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
-  color: #334155;
-  border-radius: 2px;
+  color: #cbd5e1;
+  border-radius: 6px;
 }
 
 .marksheet-preview-stage #marksheetPreviewEmpty::before {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  border: 1px solid #173b69;
-  pointer-events: none;
+  display: none;
 }
 
 .marksheet-preview-stage #marksheetPreviewEmpty .no-selection-icon {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: #e6edf7;
-  border: 2px solid #173b69;
-  color: #173b69;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #38bdf8;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
   margin-bottom: 1.25rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .marksheet-preview-stage #marksheetPreviewEmpty h4 {
-  font-family: Georgia, serif;
+  font-family: inherit;
+  font-weight: 700;
   font-size: 1.35rem;
-  color: #173b69;
+  color: #f8fafc;
   margin: 0 0 0.5rem 0;
 }
 
 .marksheet-preview-stage #marksheetPreviewEmpty p {
   font-size: 0.9rem;
-  color: #64748b;
+  color: #94a3b8;
   margin: 0;
   max-width: 280px;
   line-height: 1.5;

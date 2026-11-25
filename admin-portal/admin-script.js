@@ -1507,20 +1507,10 @@ class UIController {
 
   getPublicUrlForSlug(slug) {
     const cleanSlug = (slug || '').toLowerCase().trim();
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const configuredSites = window.ADMIN_PORTAL_CONFIG?.publicSites || {};
-
-    // Dedicated custom production domain if explicitly mapped in config and not in local dev
-    if (!isLocalhost && cleanSlug && configuredSites[cleanSlug]) {
-      return configuredSites[cleanSlug];
-    }
-
-    // Default: Clean slug-based public website URL: /a/<slug>
-    const baseOrigin = window.location.origin || 'https://academy.pixelsetu.com';
-    if (!cleanSlug) {
-      return `${baseOrigin}/a/`;
-    }
-    return `${baseOrigin}/a/${encodeURIComponent(cleanSlug)}`;
+    return (cleanSlug && configuredSites[cleanSlug])
+      || window.ADMIN_PORTAL_CONFIG?.defaultPublicSiteUrl
+      || 'https://diganta.pixelsetu.com';
   }
 
   getCertificateVerificationUrl(student) {
@@ -7969,8 +7959,7 @@ class UIController {
       this.settingsSubdomainSlug.value = currentSlug;
     }
     if (this.settingsSlugPrefix) {
-      const origin = (window.location.origin || 'https://academy.pixelsetu.com').replace(/^https?:\/\//, '');
-      this.settingsSlugPrefix.textContent = `${origin}/a/`;
+      this.settingsSlugPrefix.textContent = 'diganta.pixelsetu.com';
     }
 
     this.openModal(this.academySettingsModal);
@@ -8223,8 +8212,7 @@ class UIController {
       this.onboardingSubdomainSlug.value = defaultSlug;
     }
     if (this.onboardingSlugPrefix) {
-      const origin = (window.location.origin || 'https://academy.pixelsetu.com').replace(/^https?:\/\//, '');
-      this.onboardingSlugPrefix.textContent = `${origin}/a/`;
+      this.onboardingSlugPrefix.textContent = 'diganta.pixelsetu.com';
     }
 
     this.openModal(this.onboardingModal);

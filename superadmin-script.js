@@ -288,7 +288,12 @@
     tbody.innerHTML = filtered.map(t => {
       const isSuper = t.ownerEmail === SUPER_ADMIN_EMAIL;
       const statusClass = t.status === 'active' ? 'badge-active' : (t.status === 'pending' ? 'badge-pending' : 'badge-suspended');
-      const publicUrl = `/a/${encodeURIComponent(t.slug || '')}`;
+      const publicUrl = (t.slug === 'diganta' || t.ownerEmail === 'rcavirup@gmail.com')
+        ? 'https://diganta.pixelsetu.com'
+        : `https://${encodeURIComponent(t.slug || 'diganta')}.pixelsetu.com`;
+      const siteLabel = (t.slug === 'diganta' || t.ownerEmail === 'rcavirup@gmail.com')
+        ? 'diganta.pixelsetu.com'
+        : `${escapeHtml(t.slug || 'diganta')}.pixelsetu.com`;
       const impersonateUrl = `admin.html?impersonate=${encodeURIComponent(t.ownerEmail)}`;
 
       return `
@@ -303,7 +308,7 @@
             </div>
             <div style="margin-top: 0.4rem;">
               <a href="${publicUrl}" target="_blank" class="subdomain-badge" title="Visit Public Site">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> /a/${escapeHtml(t.slug || 'slug')}
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> ${siteLabel}
               </a>
             </div>
           </td>
