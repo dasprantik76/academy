@@ -267,6 +267,7 @@
         (t.academyName || '').toLowerCase().includes(q) ||
         (t.ownerName || '').toLowerCase().includes(q) ||
         (t.ownerEmail || '').toLowerCase().includes(q) ||
+        (t.coOwnerEmail || '').toLowerCase().includes(q) ||
         (t.slug || '').toLowerCase().includes(q) ||
         (t.phone || '').includes(q)
       );
@@ -288,10 +289,11 @@
     tbody.innerHTML = filtered.map(t => {
       const isSuper = t.ownerEmail === SUPER_ADMIN_EMAIL;
       const statusClass = t.status === 'active' ? 'badge-active' : (t.status === 'pending' ? 'badge-pending' : 'badge-suspended');
-      const publicUrl = (t.slug === 'diganta' || t.ownerEmail === 'rcavirup@gmail.com')
+      const isDiganta = (t.slug === 'diganta' || t.ownerEmail === 'rcavirup@gmail.com' || t.ownerEmail === 'digantacomputercentre@gmail.com');
+      const publicUrl = isDiganta
         ? 'https://diganta.pixelsetu.com'
         : `https://${encodeURIComponent(t.slug || 'diganta')}.pixelsetu.com`;
-      const siteLabel = (t.slug === 'diganta' || t.ownerEmail === 'rcavirup@gmail.com')
+      const siteLabel = isDiganta
         ? 'diganta.pixelsetu.com'
         : `${escapeHtml(t.slug || 'diganta')}.pixelsetu.com`;
       const impersonateUrl = `admin.html?impersonate=${encodeURIComponent(t.ownerEmail)}`;
@@ -315,6 +317,7 @@
           <td>
             <div style="font-weight: 600; color: #fff;">${escapeHtml(t.ownerName || 'Director')}</div>
             <div style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(t.ownerEmail || '')}</div>
+            ${t.coOwnerEmail ? `<div style="font-size: 0.72rem; color: #818cf8; margin-top: 0.15rem;"><i class="fa-solid fa-user-group" style="font-size: 0.65rem;"></i> Co-owner: ${escapeHtml(t.coOwnerEmail)}</div>` : ''}
             ${t.phone ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;"><i class="fa-solid fa-phone" style="font-size: 0.65rem;"></i> ${escapeHtml(t.phone)}</div>` : ''}
           </td>
           <td>

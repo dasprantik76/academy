@@ -832,7 +832,7 @@ class AcademyStore {
 
   init() {
     const isSuperAdminEmail = this.ownerEmail === 'dasprantik76@gmail.com';
-    const isMainDigantaEmail = this.ownerEmail === 'rcavirup@gmail.com' || this.ownerEmail === 'diganta';
+    const isMainDigantaEmail = this.ownerEmail === 'rcavirup@gmail.com' || this.ownerEmail === 'digantacomputercentre@gmail.com' || this.ownerEmail === 'diganta';
     this.tenantStatus = localStorage.getItem(this.getStorageKey('educore_tenant_status')) || (isSuperAdminEmail || isMainDigantaEmail || this.ownerEmail === 'prantik' ? 'active' : 'pending');
     this.isSuperAdmin = isSuperAdminEmail;
     if (!isSuperAdminEmail) {
@@ -1130,11 +1130,12 @@ class AcademyStore {
           slug: 'poulami'
         };
       }
-      if (this.ownerEmail === 'rcavirup@gmail.com' || this.ownerEmail === 'diganta') {
+      if (this.ownerEmail === 'rcavirup@gmail.com' || this.ownerEmail === 'digantacomputercentre@gmail.com' || this.ownerEmail === 'diganta') {
         return {
           academyName: 'Diganta Computer Centre',
           ownerName: 'Diganta',
           email: 'rcavirup@gmail.com',
+          coOwnerEmail: 'digantacomputercentre@gmail.com',
           phone: '9733894742',
           secondaryPhone: '9733894742',
           whatsapp: '9733894742',
@@ -1361,8 +1362,8 @@ class UIController {
     if (isLocalhost && devParam) {
       let email = 'dasprantik76@gmail.com';
       let name = 'Prantik Das (Super Admin)';
-      if (devParam === 'rcavirup' || devParam === 'diganta') {
-        email = 'rcavirup@gmail.com';
+      if (devParam === 'rcavirup' || devParam === 'diganta' || devParam === 'digantacomputercentre' || devParam === 'digantacomputercentre@gmail.com') {
+        email = 'digantacomputercentre@gmail.com';
         name = 'Diganta';
       } else if (devParam === 'new' || devParam === 'pending') {
         email = 'newtenant@academy.com';
@@ -1417,12 +1418,18 @@ class UIController {
     const urlParams = new URLSearchParams(window.location.search);
     const impersonateEmail = urlParams.get('impersonate')?.toLowerCase().trim();
 
+    // Canonical tenant email mapping for co-owners
+    let tenantOwnerEmail = userEmail;
+    if (userEmail === 'digantacomputercentre@gmail.com') {
+      tenantOwnerEmail = 'rcavirup@gmail.com';
+    }
+
     if (isMasterSuperAdmin && impersonateEmail) {
-      store.ownerEmail = impersonateEmail;
+      store.ownerEmail = (impersonateEmail === 'digantacomputercentre@gmail.com') ? 'rcavirup@gmail.com' : impersonateEmail;
       store.isImpersonating = true;
       store.masterSuperAdminEmail = userEmail;
     } else {
-      store.ownerEmail = userEmail || activeAcademySlug;
+      store.ownerEmail = tenantOwnerEmail || activeAcademySlug;
       store.isImpersonating = false;
     }
     store.init();
@@ -8091,7 +8098,7 @@ class UIController {
     this.tenantsTableBody.innerHTML = filtered.map(t => {
       const isApproved = t.status === 'active';
       const isSuperAdminTenant = t.ownerEmail === 'dasprantik76@gmail.com';
-      const isMainDiganta = t.ownerEmail === 'rcavirup@gmail.com';
+      const isMainDiganta = t.ownerEmail === 'rcavirup@gmail.com' || t.ownerEmail === 'digantacomputercentre@gmail.com';
 
       let statusBadgeHtml = '<span class="badge badge-warning"><i class="fa-solid fa-clock"></i> Pending Review</span>';
       if (t.status === 'active') {

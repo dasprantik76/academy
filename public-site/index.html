@@ -20,7 +20,7 @@
     }
   </script>
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="public-style.css?v=28.8">
+  <link rel="stylesheet" href="public-style.css?v=28.20">
   <script src="site-config.js?v=8"></script>
   <script>
     // Fast synchronous pre-hydration to eliminate any flash or delay of text
@@ -193,10 +193,28 @@
               <i class="fa-solid fa-book-open"></i> COURSES
             </a>
           </li>
-          <li>
-            <a href="#student" class="nav-link" data-view="student" id="navStudentLink">
+          <li class="nav-item-dropdown" id="navStudentDropdownItem">
+            <a href="#student" class="nav-link nav-dropdown-toggle" data-view="student" id="navStudentLink" role="button" aria-haspopup="true" aria-expanded="false">
               <i class="fa-solid fa-user-graduate"></i> STUDENT
+              <i class="fa-solid fa-chevron-down nav-dropdown-arrow"></i>
             </a>
+            <ul class="nav-dropdown-menu" id="navStudentDropdownMenu" aria-label="Student Menu">
+              <li>
+                <a href="#student" class="nav-dropdown-link" data-view="student" id="navSubStudentReg">
+                  <i class="fa-solid fa-user-plus"></i> STUDENT REGISTRATION
+                </a>
+              </li>
+              <li>
+                <a href="#student-verification" class="nav-dropdown-link" data-view="student-verification" id="navSubStudentVerify">
+                  <i class="fa-solid fa-user-check"></i> STUDENT VERIFICATION
+                </a>
+              </li>
+              <li>
+                <a href="#marksheet" class="nav-dropdown-link" data-view="marksheet" id="navSubMarksheetDownload">
+                  <i class="fa-solid fa-file-invoice"></i> MARKSHEET DOWNLOAD
+                </a>
+              </li>
+            </ul>
           </li>
           <li>
             <a href="#certificate" class="nav-link" data-view="certificate" id="navCertificateLink">
@@ -885,6 +903,161 @@
   </div>
 
 
+  <!-- ================= VIEW: STUDENT VERIFICATION PAGE ================= -->
+  <div class="view-section" id="view-student-verification">
+    <section class="hero-section compact-page-hero">
+      <div class="hero-container">
+        <h1>Student Verification</h1>
+        <p>Enter your registered mobile number and date of birth to verify student enrollment records and profile details.</p>
+      </div>
+    </section>
+
+    <div class="student-view-container">
+      <div class="registration-card">
+        <form id="studentVerifySearchForm" autocomplete="off" novalidate>
+          <div class="form-grid">
+            <!-- 1. Mobile Number -->
+            <div class="form-group">
+              <label for="verifyPhone">Mobile Number <span class="required-star">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="verifyPhone" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" required>
+              </div>
+              <span class="input-error-msg" id="verifyPhoneError">Please enter a valid 10-digit mobile number.</span>
+            </div>
+
+            <!-- 2. Date of Birth -->
+            <div class="form-group">
+              <label for="verifyDob">Date of Birth <span class="required-star">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="verifyDob" required>
+              </div>
+              <span class="input-error-msg" id="verifyDobError">Please enter your date of birth.</span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-submit-reg" id="btnSearchStudentVerify">
+              <i class="fa-solid fa-user-check"></i> Verify Student Details
+            </button>
+          </div>
+        </form>
+
+        <!-- Static Not Found Message Card -->
+        <div id="studentVerifyNotFoundState" class="cert-not-found-card" style="display: none;">
+          <div class="cert-not-found-icon">
+            <i class="fa-solid fa-circle-exclamation"></i>
+          </div>
+          <div class="cert-not-found-text">
+            <h4>No Record Found</h4>
+            <p>No student record found with the given Mobile Number and Date of Birth.</p>
+          </div>
+        </div>
+
+        <!-- Student Verification Result Card with Photo & Complete Details -->
+        <div id="studentVerifyResultContainer" class="student-verify-result-box" style="display: none;">
+          <div class="certificate-actions-bar" style="margin-bottom: 1.5rem;">
+            <button type="button" class="btn-cert-reset" id="btnResetStudentVerifySearch">
+              <i class="fa-solid fa-arrow-left"></i> Check Another Student
+            </button>
+            <button type="button" class="btn-cert-download" id="btnPrintStudentVerifySlip">
+              <i class="fa-solid fa-print"></i> Print Verification Slip
+            </button>
+          </div>
+
+          <div class="student-profile-verify-card" id="studentProfileVerifyPrintArea">
+            <div class="student-verify-header">
+              <div class="student-verify-header-left">
+                <div class="student-verify-badge">
+                  <i class="fa-solid fa-circle-check"></i>
+                  <span>Official Student Record Verified</span>
+                </div>
+                <h3 class="student-verify-academy-title" id="verifyAcademyName">Diganta Computer Centre</h3>
+                <p class="student-verify-academy-sub" id="verifyAcademySubtitle">Authorized Training Centre • Shyampur, Howrah</p>
+              </div>
+              <div class="student-verify-header-right">
+                <span class="student-status-badge status-active" id="verifyStudentStatus">Active</span>
+              </div>
+            </div>
+
+            <div class="student-verify-body">
+              <div class="student-verify-photo-column">
+                <div class="student-verify-photo-wrapper">
+                  <img id="verifyStudentPhoto" src="" alt="Student Passport Photo" class="student-verify-photo-img" />
+                  <div id="verifyStudentPhotoFallback" class="student-verify-photo-fallback" style="display: none;">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span id="verifyStudentInitials">SP</span>
+                  </div>
+                </div>
+                <div class="student-verify-id-pill">
+                  <span class="id-label">STUDENT ID / REG. NO</span>
+                  <strong id="verifyStudentId">—</strong>
+                </div>
+              </div>
+
+              <div class="student-verify-details-column">
+                <div class="student-verify-field-group full-row">
+                  <span class="verify-field-label">Student Name</span>
+                  <span class="verify-field-value student-name-highlight" id="verifyStudentName">—</span>
+                </div>
+
+                <div class="student-verify-grid">
+                  <div class="student-verify-field-group">
+                    <span class="verify-field-label">Father's Name</span>
+                    <span class="verify-field-value" id="verifyFatherName">—</span>
+                  </div>
+
+                  <div class="student-verify-field-group">
+                    <span class="verify-field-label">Mother's Name</span>
+                    <span class="verify-field-value" id="verifyMotherName">—</span>
+                  </div>
+
+                  <div class="student-verify-field-group">
+                    <span class="verify-field-label">Date of Birth</span>
+                    <span class="verify-field-value" id="verifyStudentDob">—</span>
+                  </div>
+
+                  <div class="student-verify-field-group">
+                    <span class="verify-field-label">Gender</span>
+                    <span class="verify-field-value" id="verifyGender">—</span>
+                  </div>
+
+                  <div class="student-verify-field-group full-col">
+                    <span class="verify-field-label">Enrolled Course</span>
+                    <span class="verify-field-value course-title-highlight" id="verifyCourseName">—</span>
+                  </div>
+
+                  <div class="student-verify-field-group">
+                    <span class="verify-field-label">Course Duration</span>
+                    <span class="verify-field-value" id="verifyCourseDuration">—</span>
+                  </div>
+
+                  <div class="student-verify-field-group">
+                    <span class="verify-field-label">Admission / Reg. Date</span>
+                    <span class="verify-field-value" id="verifyAdmissionDate">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="student-verify-footer">
+              <div class="verify-footer-left">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>This official student profile record is verified against the institutional registry.</span>
+              </div>
+              <div class="verify-footer-timestamp" id="verifyTimestamp">
+                Verified Record
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
   <!-- ================= VIEW 3: CERTIFICATE DOWNLOAD PAGE ================= -->
   <div class="view-section" id="view-certificate">
     <section class="hero-section compact-page-hero">
@@ -965,6 +1138,97 @@
           <div id="certPrintArea">
             <canvas id="certificateCanvas" width="3722" height="2480" role="img"
               aria-label="Student completion certificate">Your browser must support canvas to display this certificate.</canvas>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= VIEW: MARKSHEET DOWNLOAD PAGE ================= -->
+  <div class="view-section" id="view-marksheet">
+    <section class="hero-section compact-page-hero">
+      <div class="hero-container">
+        <h1>Marksheet Download</h1>
+        <p>Enter your registered mobile number and date of birth to verify and download your official marksheet.</p>
+      </div>
+    </section>
+
+    <div class="student-view-container">
+
+      <div class="registration-card">
+        <form id="marksheetSearchForm" autocomplete="off" novalidate>
+          <div class="form-grid">
+            <!-- 1. Mobile Number -->
+            <div class="form-group">
+              <label for="marksheetPhone">Mobile Number <span class="required-star">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="marksheetPhone" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" required>
+              </div>
+              <span class="input-error-msg" id="marksheetPhoneError">Please enter a valid 10-digit mobile number.</span>
+            </div>
+
+            <!-- 2. Date of Birth -->
+            <div class="form-group">
+              <label for="marksheetDob">Date of Birth <span class="required-star">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="marksheetDob" required>
+              </div>
+              <span class="input-error-msg" id="marksheetDobError">Please enter your date of birth.</span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-submit-reg" id="btnSearchMarksheet">
+              <i class="fa-solid fa-magnifying-glass"></i> Verify &amp; View Marksheet
+            </button>
+          </div>
+        </form>
+
+        <!-- Static Not Found Message Card -->
+        <div id="marksheetNotFoundState" class="cert-not-found-card" style="display: none;">
+          <div class="cert-not-found-icon">
+            <i class="fa-solid fa-circle-exclamation"></i>
+          </div>
+          <div class="cert-not-found-text">
+            <h4>No Record Found</h4>
+            <p>No student record found with the given Mobile Number and Date of Birth.</p>
+          </div>
+        </div>
+
+        <!-- Static Marksheet Not Available Message Card -->
+        <div id="marksheetIncompleteState" class="cert-not-found-card cert-pending-card" style="display: none;">
+          <div class="cert-not-found-icon">
+            <i class="fa-solid fa-circle-info"></i>
+          </div>
+          <div class="cert-not-found-text">
+            <h4>Marksheet Notice</h4>
+            <p id="marksheetIncompleteDesc">Hello, Applicant, your marksheet is not available at this moment.</p>
+          </div>
+        </div>
+
+        <!-- Marksheet Verification Result Container -->
+        <div id="marksheetResultContainer" class="certificate-preview-box" style="display: none;">
+          <div class="certificate-actions-bar">
+            <button type="button" class="btn-cert-reset" id="btnResetMarksheetSearch">
+              <i class="fa-solid fa-arrow-left"></i> Check Another Student
+            </button>
+            <button type="button" class="btn-cert-download" id="btnPrintMarksheet">
+              <i class="fa-solid fa-print"></i> Print / Save PDF
+            </button>
+            <button type="button" class="btn-cert-download" id="btnDownloadMarksheet">
+              <i class="fa-solid fa-download"></i> Download PNG
+            </button>
+          </div>
+
+          <p id="marksheetStatus" role="status" aria-live="polite"></p>
+          <div id="marksheetPrintArea" class="marksheet-public-stage">
+            <canvas id="marksheetCanvas" width="2550" height="3606" role="img"
+              aria-label="Student official marksheet">Your browser must support canvas to display this marksheet.</canvas>
           </div>
 
         </div>
@@ -1142,7 +1406,8 @@
   <!-- Public Script -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="certificate-canvas.js?v=25"></script>
-  <script src="public-script.js?v=7.28"></script>
+  <script src="marksheet-canvas.js?v=2"></script>
+  <script src="public-script.js?v=7.32"></script>
 </body>
 
 </html>

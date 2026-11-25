@@ -22,7 +22,7 @@ async function getNextStudentId(db, ownerEmail) {
 
   let prefix = profile?.studentIdPrefix;
   if (!prefix) {
-    if (ownerEmail === 'rcavirup@gmail.com') {
+    if (ownerEmail === 'rcavirup@gmail.com' || ownerEmail === 'digantacomputercentre@gmail.com') {
       prefix = 'DCC/SMP/';
     } else if (profile?.slug) {
       prefix = `${profile.slug.toUpperCase().slice(0, 4)}/`;
@@ -32,7 +32,7 @@ async function getNextStudentId(db, ownerEmail) {
   }
   if (!prefix.endsWith('/')) prefix += '/';
 
-  const defaultStartSeq = (ownerEmail === 'rcavirup@gmail.com') ? 2009 : 1000;
+  const defaultStartSeq = (ownerEmail === 'rcavirup@gmail.com' || ownerEmail === 'digantacomputercentre@gmail.com') ? 2009 : 1000;
   const counter = await db.collection(COLLECTIONS.COUNTERS).findOneAndUpdate(
     { _id: `student-id:${ownerEmail}` },
     [{
@@ -96,6 +96,36 @@ SUPER_ADMIN_EMAILS.add('dasprantik76@gmail.com');
 const DEFAULT_TENANTS = {
   'rcavirup@gmail.com': {
     ownerEmail: 'rcavirup@gmail.com',
+    coOwnerEmail: 'digantacomputercentre@gmail.com',
+    coOwnerEmails: ['digantacomputercentre@gmail.com'],
+    academyName: 'Diganta Computer Centre',
+    ownerName: 'Diganta',
+    email: 'rcavirup@gmail.com',
+    phone: '9733894742',
+    secondaryPhone: '9733894742',
+    whatsapp: '9733894742',
+    address: 'Shyampur, Howrah',
+    pincode: '711314',
+    slug: 'diganta',
+    status: 'active',
+    studentIdPrefix: 'DCC/SMP/',
+    category: 'Computer Science & Information Technology',
+    about: 'Premier professional computer and software training academy offering certified courses.',
+    aboutHeadline: 'West Bengal',
+    aboutStory: 'Premier professional computer and software training academy offering certified courses.',
+    heroDesc: 'Premier professional computer and software training academy offering certified courses.',
+    aboutHighlights: [
+      'Certified Expert & Industry-Experienced Faculty',
+      '100% Practical Hands-on Lab Sessions',
+      'Recognized Government & Industry Certifications',
+      'Comprehensive Career Guidance & Placement Assistance'
+    ],
+    tagline: 'Admissions & Registrations Open 2026'
+  },
+  'digantacomputercentre@gmail.com': {
+    ownerEmail: 'rcavirup@gmail.com',
+    coOwnerEmail: 'digantacomputercentre@gmail.com',
+    coOwnerEmails: ['digantacomputercentre@gmail.com'],
     academyName: 'Diganta Computer Centre',
     ownerName: 'Diganta',
     email: 'rcavirup@gmail.com',
@@ -949,15 +979,19 @@ async function ensureDigantaTenantInDatabase(db) {
     if (!existingProfile) {
       await db.collection(COLLECTIONS.PROFILE).insertOne({
         ...canonicalDiganta,
+        coOwnerEmail: 'digantacomputercentre@gmail.com',
+        coOwnerEmails: ['digantacomputercentre@gmail.com'],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
-    } else if (existingProfile.ownerEmail !== DIGANTA_EMAIL || existingProfile.slug !== 'diganta' || existingProfile.status !== 'active') {
+    } else {
       await db.collection(COLLECTIONS.PROFILE).updateOne(
         { _id: existingProfile._id },
         {
           $set: {
             ownerEmail: DIGANTA_EMAIL,
+            coOwnerEmail: 'digantacomputercentre@gmail.com',
+            coOwnerEmails: ['digantacomputercentre@gmail.com'],
             slug: 'diganta',
             academyName: canonicalDiganta.academyName,
             status: 'active',
@@ -980,9 +1014,10 @@ async function ensureDigantaTenantInDatabase(db) {
     }
 
     // Super Admin dasprantik76@gmail.com is NOT an academy owner.
-    // Clean up any historical tenant data created under dasprantik76@gmail.com.
+    // Clean up any historical tenant data created under dasprantik76@gmail.com or stray co-owner duplicates.
     await Promise.all([
       db.collection(COLLECTIONS.PROFILE).deleteMany({ ownerEmail: 'dasprantik76@gmail.com' }),
+      db.collection(COLLECTIONS.PROFILE).deleteMany({ ownerEmail: 'digantacomputercentre@gmail.com' }),
       db.collection(COLLECTIONS.COURSES).deleteMany({ ownerEmail: 'dasprantik76@gmail.com' }),
       db.collection(COLLECTIONS.STUDENTS).deleteMany({ ownerEmail: 'dasprantik76@gmail.com' }),
       db.collection(COLLECTIONS.BATCHES).deleteMany({ ownerEmail: 'dasprantik76@gmail.com' }),
@@ -1036,10 +1071,18 @@ export default async function handler(req, res) {
     let email = (queryEmail || '').toLowerCase().trim();
     let slug = (querySlug || '').toLowerCase().trim();
 
+    // Map co-owner email to canonical tenant owner email
+    if (email === 'digantacomputercentre@gmail.com') {
+      email = 'rcavirup@gmail.com';
+    }
+
     // If slug parameter actually contains an email, treat it as email directly
     if (!email && slug && slug.includes('@')) {
       email = slug;
       slug = '';
+      if (email === 'digantacomputercentre@gmail.com') {
+        email = 'rcavirup@gmail.com';
+      }
     }
 
     // Resolve legacy tenant-style hostnames when a slug was not supplied.
@@ -1054,7 +1097,7 @@ export default async function handler(req, res) {
     }
 
     if (!email && slug) {
-      if (slug === 'diganta' || slug === 'rcavirup' || slug === 'rcavirup@gmail.com' || slug === 'prantik') {
+      if (slug === 'diganta' || slug === 'rcavirup' || slug === 'rcavirup@gmail.com' || slug === 'digantacomputercentre@gmail.com' || slug === 'digantacomputercentre' || slug === 'prantik') {
         email = 'rcavirup@gmail.com';
       } else if (slug === 'poulami' || slug === 'poulami.13thmay@gmail.com') {
         email = 'poulami.13thmay@gmail.com';

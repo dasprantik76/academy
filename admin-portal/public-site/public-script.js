@@ -118,10 +118,14 @@ class PublicAcademyApp {
     const hash = window.location.hash.replace('#', '');
     if (hash === 'courses') {
       this.switchView('courses');
-    } else if (hash === 'student' || hash === 'registration') {
+    } else if (hash === 'student' || hash === 'student-registration' || hash === 'registration') {
       this.switchView('student');
+    } else if (hash === 'student-verification' || hash === 'verification') {
+      this.switchView('student-verification');
     } else if (hash === 'certificate') {
       this.switchView('certificate');
+    } else if (hash === 'marksheet' || hash === 'marksheet-download') {
+      this.switchView('marksheet');
     } else if (hash === 'about') {
       this.switchView('about');
     } else {
@@ -237,6 +241,10 @@ class PublicAcademyApp {
     this.navCoursesLink = document.getElementById('navCoursesLink');
     this.navAboutLink = document.getElementById('navAboutLink');
     this.navStudentLink = document.getElementById('navStudentLink');
+    this.navStudentDropdownItem = document.getElementById('navStudentDropdownItem');
+    this.navSubStudentReg = document.getElementById('navSubStudentReg');
+    this.navSubStudentVerify = document.getElementById('navSubStudentVerify');
+    this.navSubMarksheetDownload = document.getElementById('navSubMarksheetDownload');
     this.navCertificateLink = document.getElementById('navCertificateLink');
     this.btnHeroGoToRegister = document.getElementById('btnHeroGoToRegister');
     this.btnMobileNav = document.getElementById('btnMobileNav');
@@ -246,7 +254,52 @@ class PublicAcademyApp {
     this.viewCourses = document.getElementById('view-courses');
     this.viewAbout = document.getElementById('view-about');
     this.viewStudent = document.getElementById('view-student');
+    this.viewStudentVerification = document.getElementById('view-student-verification');
     this.viewCertificate = document.getElementById('view-certificate');
+    this.viewMarksheet = document.getElementById('view-marksheet');
+
+    // Student Verification Elements
+    this.studentVerifySearchForm = document.getElementById('studentVerifySearchForm');
+    this.verifyPhone = document.getElementById('verifyPhone');
+    this.verifyPhoneError = document.getElementById('verifyPhoneError');
+    this.verifyDob = document.getElementById('verifyDob');
+    this.verifyDobError = document.getElementById('verifyDobError');
+    this.btnSearchStudentVerify = document.getElementById('btnSearchStudentVerify');
+    this.studentVerifyNotFoundState = document.getElementById('studentVerifyNotFoundState');
+    this.studentVerifyResultContainer = document.getElementById('studentVerifyResultContainer');
+    this.btnResetStudentVerifySearch = document.getElementById('btnResetStudentVerifySearch');
+    this.btnPrintStudentVerifySlip = document.getElementById('btnPrintStudentVerifySlip');
+    this.verifyAcademyName = document.getElementById('verifyAcademyName');
+    this.verifyAcademySubtitle = document.getElementById('verifyAcademySubtitle');
+    this.verifyStudentStatus = document.getElementById('verifyStudentStatus');
+    this.verifyStudentPhoto = document.getElementById('verifyStudentPhoto');
+    this.verifyStudentPhotoFallback = document.getElementById('verifyStudentPhotoFallback');
+    this.verifyStudentInitials = document.getElementById('verifyStudentInitials');
+    this.verifyStudentId = document.getElementById('verifyStudentId');
+    this.verifyStudentName = document.getElementById('verifyStudentName');
+    this.verifyFatherName = document.getElementById('verifyFatherName');
+    this.verifyMotherName = document.getElementById('verifyMotherName');
+    this.verifyStudentDob = document.getElementById('verifyStudentDob');
+    this.verifyGender = document.getElementById('verifyGender');
+    this.verifyCourseName = document.getElementById('verifyCourseName');
+    this.verifyCourseDuration = document.getElementById('verifyCourseDuration');
+    this.verifyAdmissionDate = document.getElementById('verifyAdmissionDate');
+    this.verifyTimestamp = document.getElementById('verifyTimestamp');
+
+    // Marksheet Download Search Elements
+    this.marksheetSearchForm = document.getElementById('marksheetSearchForm');
+    this.marksheetPhone = document.getElementById('marksheetPhone');
+    this.marksheetPhoneError = document.getElementById('marksheetPhoneError');
+    this.marksheetDob = document.getElementById('marksheetDob');
+    this.marksheetDobError = document.getElementById('marksheetDobError');
+    this.btnSearchMarksheet = document.getElementById('btnSearchMarksheet');
+    this.marksheetNotFoundState = document.getElementById('marksheetNotFoundState');
+    this.marksheetIncompleteState = document.getElementById('marksheetIncompleteState');
+    this.marksheetIncompleteDesc = document.getElementById('marksheetIncompleteDesc');
+    this.marksheetResultContainer = document.getElementById('marksheetResultContainer');
+    this.btnResetMarksheetSearch = document.getElementById('btnResetMarksheetSearch');
+    this.btnPrintMarksheet = document.getElementById('btnPrintMarksheet');
+    this.btnDownloadMarksheet = document.getElementById('btnDownloadMarksheet');
     this.viewNotFound = document.getElementById('view-not-found');
     this.notFoundSubdomainDisplay = document.getElementById('notFoundSubdomainDisplay');
     this.btnNotFoundClaim = document.getElementById('btnNotFoundClaim');
@@ -659,10 +712,86 @@ class PublicAcademyApp {
       });
     }
 
+    const collapseStudentDropdown = () => {
+      if (this.navStudentDropdownItem) {
+        this.navStudentDropdownItem.classList.remove('open');
+        this.navStudentDropdownItem.classList.add('collapsed');
+      }
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+    };
+
+    if (this.navStudentDropdownItem) {
+      this.navStudentDropdownItem.addEventListener('mouseleave', () => {
+        this.navStudentDropdownItem.classList.remove('collapsed');
+      });
+    }
+
     if (this.navStudentLink) {
+      this.navStudentLink.addEventListener('mouseenter', () => {
+        this.navStudentDropdownItem?.classList.remove('collapsed');
+      });
       this.navStudentLink.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          this.navStudentDropdownItem?.classList.toggle('open');
+        } else {
+          e.preventDefault();
+          collapseStudentDropdown();
+          this.switchView('student');
+        }
+      });
+    }
+
+    if (this.navSubStudentReg) {
+      this.navSubStudentReg.addEventListener('click', (e) => {
         e.preventDefault();
+        collapseStudentDropdown();
         this.switchView('student');
+      });
+    }
+
+    if (this.navSubStudentVerify) {
+      this.navSubStudentVerify.addEventListener('click', (e) => {
+        e.preventDefault();
+        collapseStudentDropdown();
+        this.switchView('student-verification');
+      });
+    }
+
+    // Student Verification Handlers
+    if (this.studentVerifySearchForm) {
+      this.studentVerifySearchForm.addEventListener('submit', (e) => this.handleStudentVerificationSearch(e));
+      this.studentVerifySearchForm.addEventListener('input', (e) => {
+        e.target?.classList.remove('input-error');
+        if (e.target === this.verifyPhone && this.verifyPhoneError) this.verifyPhoneError.style.display = 'none';
+        if (e.target === this.verifyDob && this.verifyDobError) this.verifyDobError.style.display = 'none';
+      });
+    }
+
+    if (this.btnResetStudentVerifySearch) {
+      this.btnResetStudentVerifySearch.addEventListener('click', () => {
+        if (this.studentVerifySearchForm) {
+          this.studentVerifySearchForm.style.display = '';
+          this.studentVerifySearchForm.reset();
+        }
+        if (this.studentVerifyResultContainer) this.studentVerifyResultContainer.style.display = 'none';
+        if (this.studentVerifyNotFoundState) this.studentVerifyNotFoundState.style.display = 'none';
+      });
+    }
+
+    if (this.btnPrintStudentVerifySlip) {
+      this.btnPrintStudentVerifySlip.addEventListener('click', () => {
+        window.print();
+      });
+    }
+
+    if (this.navSubMarksheetDownload) {
+      this.navSubMarksheetDownload.addEventListener('click', (e) => {
+        e.preventDefault();
+        collapseStudentDropdown();
+        this.switchView('marksheet');
       });
     }
 
@@ -685,15 +814,55 @@ class PublicAcademyApp {
       });
     }
 
+    // Marksheet Search Handlers
+    if (this.marksheetSearchForm) {
+      this.marksheetSearchForm.addEventListener('submit', (e) => this.handleMarksheetSearch(e));
+      this.marksheetSearchForm.addEventListener('input', (e) => {
+        e.target?.classList.remove('input-error');
+        if (e.target === this.marksheetDob && this.marksheetDobError) this.marksheetDobError.style.display = 'none';
+      });
+    }
+
+    if (this.btnResetMarksheetSearch) {
+      this.btnResetMarksheetSearch.addEventListener('click', () => {
+        if (this.marksheetSearchForm) {
+          this.marksheetSearchForm.style.display = '';
+          this.marksheetSearchForm.reset();
+        }
+        if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
+        if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
+        if (this.marksheetIncompleteState) this.marksheetIncompleteState.style.display = 'none';
+        if (window.MarksheetCanvas) window.MarksheetCanvas.clear();
+      });
+    }
+
+    if (this.btnDownloadMarksheet) {
+      this.btnDownloadMarksheet.addEventListener('click', () => {
+        if (window.MarksheetCanvas) {
+          window.MarksheetCanvas.downloadActiveMarksheet();
+        }
+      });
+    }
+
+    if (this.btnPrintMarksheet) {
+      this.btnPrintMarksheet.addEventListener('click', () => {
+        window.print();
+      });
+    }
+
     // Hash Change
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
       if (hash === 'courses') {
         this.switchView('courses', false);
-      } else if (hash === 'student' || hash === 'registration') {
+      } else if (hash === 'student' || hash === 'student-registration' || hash === 'registration') {
         this.switchView('student', false);
+      } else if (hash === 'student-verification' || hash === 'verification') {
+        this.switchView('student-verification', false);
       } else if (hash === 'certificate') {
         this.switchView('certificate', false);
+      } else if (hash === 'marksheet' || hash === 'marksheet-download') {
+        this.switchView('marksheet', false);
       } else if (hash === 'about') {
         this.switchView('about', false);
       } else if (hash === 'home' || hash === '') {
@@ -1157,8 +1326,18 @@ class PublicAcademyApp {
     if (this.navAboutLink) {
       this.navAboutLink.classList.toggle('active', viewName === 'about');
     }
+    const isStudentFamily = (viewName === 'student' || viewName === 'student-verification' || viewName === 'marksheet');
     if (this.navStudentLink) {
-      this.navStudentLink.classList.toggle('active', viewName === 'student');
+      this.navStudentLink.classList.toggle('active', isStudentFamily);
+    }
+    if (this.navSubStudentReg) {
+      this.navSubStudentReg.classList.toggle('active', viewName === 'student');
+    }
+    if (this.navSubStudentVerify) {
+      this.navSubStudentVerify.classList.toggle('active', viewName === 'student-verification');
+    }
+    if (this.navSubMarksheetDownload) {
+      this.navSubMarksheetDownload.classList.toggle('active', viewName === 'marksheet');
     }
     if (this.navCertificateLink) {
       this.navCertificateLink.classList.toggle('active', viewName === 'certificate');
@@ -1181,9 +1360,17 @@ class PublicAcademyApp {
       this.viewStudent.style.display = viewName === 'student' ? 'block' : 'none';
       this.viewStudent.classList.toggle('active', viewName === 'student');
     }
+    if (this.viewStudentVerification) {
+      this.viewStudentVerification.style.display = viewName === 'student-verification' ? 'block' : 'none';
+      this.viewStudentVerification.classList.toggle('active', viewName === 'student-verification');
+    }
     if (this.viewCertificate) {
       this.viewCertificate.style.display = viewName === 'certificate' ? 'block' : 'none';
       this.viewCertificate.classList.toggle('active', viewName === 'certificate');
+    }
+    if (this.viewMarksheet) {
+      this.viewMarksheet.style.display = viewName === 'marksheet' ? 'block' : 'none';
+      this.viewMarksheet.classList.toggle('active', viewName === 'marksheet');
     }
     if (this.viewNotFound) {
       this.viewNotFound.classList.remove('active');
@@ -1193,6 +1380,12 @@ class PublicAcademyApp {
     // Close Mobile Menu if open
     if (this.navMenu) {
       this.navMenu.classList.remove('active');
+    }
+
+    // Collapse Student Dropdown
+    if (this.navStudentDropdownItem) {
+      this.navStudentDropdownItem.classList.remove('open');
+      this.navStudentDropdownItem.classList.add('collapsed');
     }
 
     if (updateHash) {
@@ -2252,6 +2445,310 @@ class PublicAcademyApp {
     }
   }
 
+  // ==========================================================================
+  // Student Profile Verification Handler (Mobile & DOB -> Details + Photo)
+  // ==========================================================================
+  async handleStudentVerificationSearch(e) {
+    e.preventDefault();
+
+    const phone = this.verifyPhone ? this.verifyPhone.value.trim().replace(/\D/g, '') : '';
+    const dob = this.verifyDob ? this.verifyDob.value.trim() : '';
+
+    if (this.verifyPhone) this.verifyPhone.classList.toggle('input-error', !phone);
+    if (this.verifyDob) this.verifyDob.classList.toggle('input-error', !dob);
+
+    if (this.verifyPhoneError) {
+      this.verifyPhoneError.textContent = 'Please enter a valid 10-digit mobile number.';
+      this.verifyPhoneError.style.display = phone ? 'none' : 'block';
+    }
+    if (this.verifyDobError) {
+      this.verifyDobError.style.display = dob ? 'none' : 'block';
+    }
+
+    if (!phone || !dob) {
+      const firstMissing = !phone ? this.verifyPhone : this.verifyDob;
+      firstMissing?.focus();
+      this.showToast('Please enter both Mobile Number and Date of Birth.', 'error');
+      return;
+    }
+
+    if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+      if (this.verifyPhone) this.verifyPhone.classList.add('input-error');
+      if (this.verifyPhoneError) {
+        this.verifyPhoneError.textContent = 'Please enter a valid 10-digit mobile number.';
+        this.verifyPhoneError.style.display = 'block';
+      }
+      this.verifyPhone?.focus();
+      this.showToast('Mobile number must be exactly 10 digits.', 'error');
+      return;
+    }
+
+    if (this.btnSearchStudentVerify) {
+      this.btnSearchStudentVerify.disabled = true;
+      this.btnSearchStudentVerify.innerHTML = '<span class="registration-spinner" aria-hidden="true"></span> Verifying...';
+    }
+
+    try {
+      if (this.studentVerifyResultContainer) this.studentVerifyResultContainer.style.display = 'none';
+
+      let allStudents = [];
+      try {
+        const response = await fetch(getPublicApiUrl(`?academy=${encodeURIComponent(this.currentAcademySlug)}`), { cache: 'no-store' });
+        if (response.ok) {
+          const json = await response.json();
+          if (json?.success && Array.isArray(json.data?.students)) {
+            allStudents = json.data.students;
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(allStudents));
+          }
+        }
+      } catch (err) {}
+
+      if (allStudents.length === 0) {
+        const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+        if (rawStudents) {
+          try {
+            allStudents = JSON.parse(rawStudents) || [];
+          } catch (err) {
+            allStudents = [];
+          }
+        }
+      }
+
+      const student = allStudents.find(s => {
+        const sPhone = String(s.phone || '').replace(/\D/g, '');
+        const sDob = String(s.dob || '').trim();
+        return sPhone === phone && sDob === dob;
+      });
+
+      if (!student) {
+        if (this.studentVerifySearchForm) this.studentVerifySearchForm.style.display = '';
+        if (this.studentVerifyResultContainer) this.studentVerifyResultContainer.style.display = 'none';
+        if (this.studentVerifyNotFoundState) {
+          this.studentVerifyNotFoundState.style.display = 'flex';
+          this.studentVerifyNotFoundState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      if (this.studentVerifyNotFoundState) this.studentVerifyNotFoundState.style.display = 'none';
+      if (this.studentVerifySearchForm) this.studentVerifySearchForm.style.display = 'none';
+
+      // Populate Academy details
+      if (this.verifyAcademyName) {
+        this.verifyAcademyName.textContent = this.academyProfile?.academyName || 'Diganta Computer Centre';
+      }
+      if (this.verifyAcademySubtitle) {
+        this.verifyAcademySubtitle.textContent = this.academyProfile?.address || 'Authorized Training Centre • Shyampur, Howrah';
+      }
+
+      // Populate Student Details
+      const studentId = student.regNo || student.registrationNumber || student.id || student.studentId || '—';
+      const studentName = student.name || student.fullName || '—';
+      const fatherName = student.fatherName || '—';
+      const motherName = student.motherName || '—';
+      const gender = student.gender || '—';
+      const status = student.status || 'Active';
+      const joinDate = student.joinDate || student.admissionDate || student.registrationDate || student.createdAt;
+
+      const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || student.courseId || '';
+      const course = this.courses.find(item => item.id === courseId);
+      const courseTitle = course ? course.title : (student.courseName || student.course || 'Enrolled Program');
+      const courseDuration = course ? course.duration : (student.duration || '1 Year');
+
+      if (this.verifyStudentId) this.verifyStudentId.textContent = studentId;
+      if (this.verifyStudentName) this.verifyStudentName.textContent = toTitleCase(studentName);
+      if (this.verifyFatherName) this.verifyFatherName.textContent = toTitleCase(fatherName);
+      if (this.verifyMotherName) this.verifyMotherName.textContent = toTitleCase(motherName);
+      if (this.verifyStudentDob) this.verifyStudentDob.textContent = student.dob ? formatCertificateDate(student.dob) : '—';
+      if (this.verifyGender) this.verifyGender.textContent = toTitleCase(gender);
+      if (this.verifyCourseName) this.verifyCourseName.textContent = courseTitle;
+      if (this.verifyCourseDuration) this.verifyCourseDuration.textContent = courseDuration;
+      if (this.verifyAdmissionDate) this.verifyAdmissionDate.textContent = joinDate ? formatCertificateDate(joinDate) : '—';
+
+      // Status Badge
+      if (this.verifyStudentStatus) {
+        this.verifyStudentStatus.textContent = status;
+        this.verifyStudentStatus.className = 'student-status-badge';
+        const lower = status.toLowerCase();
+        if (lower === 'completed') {
+          this.verifyStudentStatus.classList.add('status-completed');
+        } else if (lower === 'dropped') {
+          this.verifyStudentStatus.classList.add('status-dropped');
+        } else {
+          this.verifyStudentStatus.classList.add('status-active');
+        }
+      }
+
+      // Passport Photo & Initials Fallback
+      const photoUrl = student.photoUrl || student.photo || '';
+      const initials = getInitials(studentName);
+      if (this.verifyStudentInitials) this.verifyStudentInitials.textContent = initials;
+
+      if (this.verifyStudentPhoto && this.verifyStudentPhotoFallback) {
+        if (photoUrl) {
+          this.verifyStudentPhoto.onload = () => {
+            this.verifyStudentPhoto.style.display = 'block';
+            this.verifyStudentPhotoFallback.style.display = 'none';
+          };
+          this.verifyStudentPhoto.onerror = () => {
+            this.verifyStudentPhoto.style.display = 'none';
+            this.verifyStudentPhotoFallback.style.display = 'flex';
+          };
+          this.verifyStudentPhoto.src = photoUrl;
+        } else {
+          this.verifyStudentPhoto.style.display = 'none';
+          this.verifyStudentPhotoFallback.style.display = 'flex';
+        }
+      }
+
+      // Verification Timestamp
+      if (this.verifyTimestamp) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        this.verifyTimestamp.textContent = `Verified Record • ${dateStr}`;
+      }
+
+      // Show Result Box
+      if (this.studentVerifyResultContainer) {
+        this.studentVerifyResultContainer.style.display = 'block';
+        this.studentVerifyResultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      this.showToast(`Student details verified for ${toTitleCase(studentName)}!`, 'success');
+    } finally {
+      if (this.btnSearchStudentVerify) {
+        this.btnSearchStudentVerify.disabled = false;
+        this.btnSearchStudentVerify.innerHTML = '<i class="fa-solid fa-user-check"></i> Verify Student Details';
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Marksheet Verification & Download Handler (Requires Mobile & DOB)
+  // ==========================================================================
+  async handleMarksheetSearch(e) {
+    e.preventDefault();
+
+    const phone = this.marksheetPhone.value.trim().replace(/\D/g, '');
+    const dob = this.marksheetDob.value.trim();
+
+    this.marksheetPhone.classList.toggle('input-error', !phone);
+    this.marksheetDob.classList.toggle('input-error', !dob);
+    if (this.marksheetPhoneError) {
+      this.marksheetPhoneError.textContent = 'Please enter a valid 10-digit mobile number.';
+      this.marksheetPhoneError.style.display = phone ? 'none' : 'block';
+    }
+    if (this.marksheetDobError) this.marksheetDobError.style.display = dob ? 'none' : 'block';
+
+    if (!phone || !dob) {
+      const firstMissingField = !phone ? this.marksheetPhone : this.marksheetDob;
+      firstMissingField?.focus();
+      this.showToast('Please enter both Mobile Number and Date of Birth.', 'error');
+      return;
+    }
+
+    if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+      this.marksheetPhone.classList.add('input-error');
+      if (this.marksheetPhoneError) {
+        this.marksheetPhoneError.textContent = 'Please enter a valid 10-digit mobile number.';
+        this.marksheetPhoneError.style.display = 'block';
+      }
+      this.marksheetPhone.focus();
+      this.showToast('Mobile number must be exactly 10 digits.', 'error');
+      return;
+    }
+
+    if (this.btnSearchMarksheet) {
+      this.btnSearchMarksheet.disabled = true;
+      this.btnSearchMarksheet.innerHTML = '<span class="registration-spinner" aria-hidden="true"></span> Verifying...';
+    }
+
+    try {
+      if (window.MarksheetCanvas) window.MarksheetCanvas.clear();
+      if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
+
+      let allStudents = [];
+      try {
+        const response = await fetch(getPublicApiUrl(`?academy=${encodeURIComponent(this.currentAcademySlug)}`), { cache: 'no-store' });
+        if (response.ok) {
+          const json = await response.json();
+          if (json?.success && Array.isArray(json.data?.students)) {
+            allStudents = json.data.students;
+            localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(allStudents));
+          }
+        }
+      } catch (err) {}
+
+      if (allStudents.length === 0) {
+        const rawStudents = localStorage.getItem(this.getStorageKey(STORAGE_KEYS.STUDENTS));
+        if (rawStudents) {
+          try {
+            allStudents = JSON.parse(rawStudents) || [];
+          } catch (err) {
+            allStudents = [];
+          }
+        }
+      }
+
+      const student = allStudents.find(s => {
+        const sPhone = String(s.phone || '').replace(/\D/g, '');
+        const sDob = String(s.dob || '').trim();
+        return sPhone === phone && sDob === dob;
+      });
+
+      if (!student) {
+        if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = '';
+        if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
+        if (this.marksheetIncompleteState) this.marksheetIncompleteState.style.display = 'none';
+        if (this.marksheetNotFoundState) {
+          this.marksheetNotFoundState.style.display = 'flex';
+          this.marksheetNotFoundState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      if (student.status !== 'Completed') {
+        if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = '';
+        if (this.marksheetResultContainer) this.marksheetResultContainer.style.display = 'none';
+        if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
+        if (this.marksheetIncompleteState) {
+          if (this.marksheetIncompleteDesc) {
+            this.marksheetIncompleteDesc.textContent = `Hello, ${toTitleCase(student.name)}, your marksheet is not available at this moment.`;
+          }
+          this.marksheetIncompleteState.style.display = 'flex';
+          this.marksheetIncompleteState.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      if (this.marksheetNotFoundState) this.marksheetNotFoundState.style.display = 'none';
+      if (this.marksheetIncompleteState) this.marksheetIncompleteState.style.display = 'none';
+
+      const courseId = (student.enrolledCourseIds && student.enrolledCourseIds[0]) || '';
+      const course = this.courses.find(item => item.id === courseId);
+
+      if (window.MarksheetCanvas) {
+        await window.MarksheetCanvas.render(student, course);
+      }
+
+      if (this.marksheetResultContainer) {
+        if (this.marksheetSearchForm) this.marksheetSearchForm.style.display = 'none';
+        this.marksheetResultContainer.style.display = 'block';
+        this.marksheetResultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      this.showToast(`Marksheet verified for ${toTitleCase(student.name)}!`, 'success');
+    } catch (err) {
+      console.error('[PublicApp] handleMarksheetSearch error:', err);
+      this.showToast('An error occurred while generating the marksheet.', 'error');
+    } finally {
+      if (this.btnSearchMarksheet) {
+        this.btnSearchMarksheet.disabled = false;
+        this.btnSearchMarksheet.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Verify &amp; View Marksheet';
+      }
+    }
+  }
+
   validateAuthenticationCode(inputCode) {
     if (!inputCode) {
       return {
@@ -2374,6 +2871,14 @@ class PublicAcademyApp {
 // ==========================================================================
 // Global Formatters & Helpers
 // ==========================================================================
+function getInitials(name) {
+  if (!name) return 'SP';
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'SP';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 function toTitleCase(str) {
   if (!str) return '';
   return str
