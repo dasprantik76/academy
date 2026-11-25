@@ -3811,7 +3811,7 @@ class UIController {
 
     this.studentsTableBody.innerHTML = filteredStudents.map((student, index) => {
       const isChecked = this.selectedStudentIds.has(student.id);
-      const serialNumber = studentSerialMap.get(student.id) || (totalStudents - index);
+      const serialNumber = filteredStudents.length - index;
 
       const enrolledCoursesBadges = (student.enrolledCourseIds || []).map(cid => {
         const c = allCourses.find(item => item.id === cid);
@@ -4373,14 +4373,12 @@ class UIController {
       if (!visibleIds.has(id)) this.selectedMarksheetIds.delete(id);
     });
 
-    const studentSerialMap = this.getStudentSerialMap();
-
-    list.innerHTML = students.map(s => `
+    list.innerHTML = students.map((s, index) => `
       <div class="idcard-student-item ${this.selectedMarksheetIds.has(s.id) ? 'is-selected' : ''} ${this.marksheetPreviewId === s.id ? 'active' : ''}" data-id="${escapeHtml(s.id)}" tabindex="0" role="button">
         <label class="idcard-checkbox-hit">
           <input type="checkbox" class="custom-table-checkbox" aria-label="Select ${escapeHtml(s.name)}" ${this.selectedMarksheetIds.has(s.id) ? 'checked' : ''}>
         </label>
-        <span class="idcard-student-serial student-serial-text">${studentSerialMap.get(s.id) || ''}</span>
+        <span class="idcard-student-serial student-serial-text">${students.length - index}</span>
         <span class="idcard-student-name">${escapeHtml(s.name)}</span>
         <div class="idcard-student-status-col">
           <span class="badge ${getStatusBadgeClass(s.status)} idcard-student-status">
@@ -4964,8 +4962,7 @@ class UIController {
     const students = completed.filter(s => (!query || `${s.name} ${s.id} ${s.email || ''} ${s.phone || ''}`.toLowerCase().includes(query)) && (courseFilter.value === 'all' || s.courseId === courseFilter.value || (s.enrolledCourseIds || []).includes(courseFilter.value)) && (!batch || (batch.studentIds || []).includes(s.id)));
     const visibleIds = new Set(students.map(s => s.id));
     this.selectedCertificateIds.forEach(id => { if (!visibleIds.has(id)) this.selectedCertificateIds.delete(id); });
-    const studentSerialMap = this.getStudentSerialMap();
-    list.innerHTML = students.map(s => `<div class="idcard-student-item ${this.selectedCertificateIds.has(s.id) ? 'is-selected' : ''}" data-id="${escapeHtml(s.id)}" tabindex="0" role="button"><label class="idcard-checkbox-hit"><input type="checkbox" class="custom-table-checkbox" aria-label="Select ${escapeHtml(s.name)}" ${this.selectedCertificateIds.has(s.id) ? 'checked' : ''}></label><span class="idcard-student-serial student-serial-text">${studentSerialMap.get(s.id) || ''}</span><span class="idcard-student-name">${escapeHtml(s.name)}</span><div class="idcard-student-status-col"><span class="badge ${getStatusBadgeClass(s.status)} idcard-student-status">${getStatusBadgeIcon(s.status)} Completed</span></div></div>`).join('');
+    list.innerHTML = students.map((s, index) => `<div class="idcard-student-item ${this.selectedCertificateIds.has(s.id) ? 'is-selected' : ''}" data-id="${escapeHtml(s.id)}" tabindex="0" role="button"><label class="idcard-checkbox-hit"><input type="checkbox" class="custom-table-checkbox" aria-label="Select ${escapeHtml(s.name)}" ${this.selectedCertificateIds.has(s.id) ? 'checked' : ''}></label><span class="idcard-student-serial student-serial-text">${students.length - index}</span><span class="idcard-student-name">${escapeHtml(s.name)}</span><div class="idcard-student-status-col"><span class="badge ${getStatusBadgeClass(s.status)} idcard-student-status">${getStatusBadgeIcon(s.status)} Completed</span></div></div>`).join('');
     document.getElementById('certificateEmpty').style.display = students.length ? 'none' : '';
     list.closest('.idcards-list-panel').classList.toggle('is-empty', !students.length);
     document.getElementById('certificateSelectionCount').textContent = this.selectedCertificateIds.size;
@@ -5167,13 +5164,11 @@ class UIController {
       this.lastSelectedIdCardStudentId = filteredStudents[0].id;
     }
 
-    const studentSerialMap = this.getStudentSerialMap();
-
-    this.idCardStudentList.innerHTML = filteredStudents.map(student => {
+    this.idCardStudentList.innerHTML = filteredStudents.map((student, index) => {
       const isSelected = this.selectedIdCardStudentIds.has(student.id);
       const isPreviewed = student.id === this.lastSelectedIdCardStudentId;
       const statusText = student.status || 'Active';
-      const serialNumber = studentSerialMap.get(student.id) || '';
+      const serialNumber = filteredStudents.length - index;
 
       return `
         <div class="idcard-student-item ${isSelected ? 'is-selected' : ''} ${isPreviewed ? 'is-previewed' : ''}" data-student-id="${escapeHtml(student.id)}" role="button" tabindex="0">
