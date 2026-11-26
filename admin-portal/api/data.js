@@ -1220,6 +1220,14 @@ export default async function handler(req, res) {
         profileDoc.status = currentStatus;
       }
 
+      const queryEmail = (req.query.ownerEmail || '').toLowerCase().trim();
+      const isCoOwner = Boolean(
+        queryEmail &&
+        queryEmail !== ownerEmail.toLowerCase() &&
+        ((Array.isArray(profileDoc?.coOwnerEmails) && profileDoc.coOwnerEmails.some(e => e.toLowerCase() === queryEmail)) ||
+         (profileDoc?.coOwnerEmail && profileDoc.coOwnerEmail.toLowerCase() === queryEmail))
+      );
+
       return res.status(200).json({
         success: true,
         isConfigured: true,
@@ -1227,7 +1235,8 @@ export default async function handler(req, res) {
           ownerEmail,
           slug: profileDoc?.slug || (ownerEmail.includes('poulami') ? 'poulami' : ((ownerEmail === 'rcavirup@gmail.com' || ownerEmail === 'digantacomputercentre@gmail.com') ? 'diganta' : '')),
           status: currentStatus,
-          isSuperAdmin
+          isSuperAdmin,
+          isCoOwner
         },
         data: {
           profile: profileDoc || null,

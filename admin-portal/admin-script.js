@@ -823,6 +823,8 @@ class AcademyStore {
     this.batches = [];
     this.tenantStatus = 'active';
     this.isSuperAdmin = false;
+    this.isCoOwner = false;
+    this.hasFetchedCloudData = false;
     this.init();
   }
 
@@ -923,16 +925,26 @@ class AcademyStore {
   // Asynchronously synchronize with MongoDB Multi-Tenant Cloud Storage (/api/data)
   async fetchCloudData(onLoadedCallback) {
     try {
-      const queryParam = this.ownerEmail.includes('@')
-        ? `ownerEmail=${encodeURIComponent(this.ownerEmail)}`
-        : `academy=${encodeURIComponent(this.ownerEmail)}`;
+      const currentSession = JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || '{}');
+      const sessionEmail = (currentSession.email || '').toLowerCase().trim();
+      const queryEmail = sessionEmail || this.ownerEmail;
+      const queryParam = queryEmail.includes('@')
+        ? `ownerEmail=${encodeURIComponent(queryEmail)}`
+        : `academy=${encodeURIComponent(queryEmail)}`;
       const response = await fetch(`/api/data?${queryParam}&admin=1`, { cache: 'no-store' });
+      this.hasFetchedCloudData = true;
       if (!response.ok) return false;
       const json = await response.json();
       if (json && json.success) {
         if (json.tenant) {
           this.tenantStatus = json.tenant.status || (this.isSuperAdmin ? 'active' : 'pending');
           this.isSuperAdmin = Boolean(json.tenant.isSuperAdmin) && (this.ownerEmail === 'dasprantik76@gmail.com');
+          if (json.tenant.isCoOwner) {
+            this.isCoOwner = true;
+            if (sessionEmail) {
+              localStorage.setItem(`educore_is_co_owner_${sessionEmail}`, 'true');
+            }
+          }
           localStorage.setItem(this.getStorageKey('educore_tenant_status'), this.tenantStatus);
           if (this.isSuperAdmin) {
             localStorage.setItem(this.getStorageKey('educore_is_super_admin'), 'true');
@@ -943,6 +955,24 @@ class AcademyStore {
         }
         if (json.data) {
           const { profile, courses, students, messages, batches, authToken } = json.data;
+
+          const isCoOwnerUser = Boolean(
+            json.tenant?.isCoOwner ||
+            (profile && sessionEmail && profile.ownerEmail &&
+             sessionEmail !== profile.ownerEmail.toLowerCase() &&
+             ((Array.isArray(profile.coOwnerEmails) && profile.coOwnerEmails.some(e => e.toLowerCase() === sessionEmail)) ||
+              (profile.coOwnerEmail && profile.coOwnerEmail.toLowerCase() === sessionEmail)))
+          );
+
+          if (isCoOwnerUser) {
+            this.isCoOwner = true;
+            if (sessionEmail) {
+              localStorage.setItem(`educore_is_co_owner_${sessionEmail}`, 'true');
+              if (profile?.ownerEmail) {
+                localStorage.setItem(`educore_resolved_owner_${sessionEmail}`, profile.ownerEmail);
+              }
+            }
+          }
 
           if (Array.isArray(courses)) {
             this.courses = courses;
@@ -975,17 +1005,16 @@ class AcademyStore {
           if (profile) {
             if (profile.ownerEmail && profile.ownerEmail !== this.ownerEmail) {
               this.ownerEmail = profile.ownerEmail;
-              try {
-                const currentSession = JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || '{}');
-                const sessionEmail = (currentSession.email || '').toLowerCase().trim();
-                if (sessionEmail && sessionEmail !== profile.ownerEmail) {
-                  localStorage.setItem(`educore_resolved_owner_${sessionEmail}`, profile.ownerEmail);
-                }
-              } catch (_) {}
             }
             this.tenantStatus = profile.status || 'active';
             localStorage.setItem(this.getStorageKey('educore_tenant_status'), this.tenantStatus);
             localStorage.setItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE), JSON.stringify(profile));
+
+            // Also cache under sessionEmail so local lookups find profile immediately
+            if (sessionEmail && sessionEmail !== this.ownerEmail) {
+              localStorage.setItem(`${STORAGE_KEYS.ACADEMY_PROFILE}_${sessionEmail}`, JSON.stringify(profile));
+              localStorage.setItem(`educore_tenant_status_${sessionEmail}`, this.tenantStatus);
+            }
           } else {
             const localProfile = this.getAcademyProfile();
             if (localProfile) this.syncToCloud('save_profile', { profile: localProfile });
@@ -1455,9 +1484,14 @@ class UIController {
 
     // Canonical tenant email mapping for co-owners
     const cachedResolvedOwner = localStorage.getItem(`educore_resolved_owner_${userEmail}`);
+    const cachedIsCoOwner = localStorage.getItem(`educore_is_co_owner_${userEmail}`) === 'true';
+    if (cachedIsCoOwner) {
+      store.isCoOwner = true;
+    }
     let tenantOwnerEmail = cachedResolvedOwner || userEmail;
     if (userEmail === 'digantacomputercentre@gmail.com') {
       tenantOwnerEmail = 'rcavirup@gmail.com';
+      store.isCoOwner = true;
     }
 
     if (isMasterSuperAdmin && impersonateEmail) {
@@ -1515,7 +1549,14 @@ class UIController {
     this.render();
     this.startAuthCountdownTimer();
     this.updatePublicSiteLink();
-    this.checkAccountStatus();
+
+    // Check account status ONLY if profile is already configured and cached locally.
+    // If not, wait for fetchCloudData to complete so co-owners and existing tenants
+    // are not prematurely shown the one-time academy setup dialog.
+    const cachedProfile = store.getAcademyProfile();
+    if (cachedProfile && cachedProfile.academyName && cachedProfile.ownerName) {
+      this.checkAccountStatus();
+    }
 
     // Synchronize with Multi-Tenant MongoDB cloud storage in background
     store.fetchCloudData(() => {
@@ -8439,14 +8480,29 @@ class UIController {
   }
 
   checkAccountStatus() {
+    // Co-owners never see onboarding setup or account-on-hold screen
+    if (store.isCoOwner) {
+      this.closeOnboardingModal();
+      if (this.accountOnHoldScreen) this.accountOnHoldScreen.style.display = 'none';
+      return;
+    }
+
     const profile = store.getAcademyProfile();
     const isConfigured = Boolean(profile && profile.academyName && profile.ownerName);
 
     if (!isConfigured) {
+      // Don't show onboarding modal until cloud data has completed fetching,
+      // to avoid flashing/showing setup modal to existing tenants or co-owners
+      if (!store.hasFetchedCloudData) {
+        return;
+      }
       if (this.accountOnHoldScreen) this.accountOnHoldScreen.style.display = 'none';
       this.openOnboardingModal();
       return;
     }
+
+    // Configured: ensure onboarding modal is closed
+    this.closeOnboardingModal();
 
     const isSuperAdmin = Boolean(store.isSuperAdmin && store.ownerEmail === 'dasprantik76@gmail.com');
     const status = isSuperAdmin ? 'active' : (store.tenantStatus || 'pending');
@@ -8661,6 +8717,7 @@ class UIController {
 
   openOnboardingModal() {
     if (!this.onboardingModal) return;
+    if (store.isCoOwner) return; // Guard: Co-owners must never open onboarding modal
     const userEmail = (this.session?.email || '').toLowerCase().trim();
     const defaultSlug = userEmail.includes('poulami')
       ? 'poulami'
