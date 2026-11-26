@@ -208,31 +208,31 @@ const DEFAULT_COURSES_BY_TENANT = {
       description: 'Build creative design skills through typography, image editing, branding, social media graphics, and print layouts.',
       ownerEmail: 'rcavirup@gmail.com'
     },
-    {"id": "CRS-DEMO-001", "title": "Advanced Excel & MIS Reporting", "duration": "3 Months", "description": "Build spreadsheet models using lookup functions, PivotTables, data validation, Power Query, and interactive dashboards. Complete a monthly sales reporting project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-002", "title": "Python Programming", "duration": "4 Months", "description": "Learn variables, control flow, functions, collections, file handling, exceptions, and object-oriented programming. Build command-line utilities and automate routine tasks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-003", "title": "Data Analysis with Python", "duration": "6 Months", "description": "Clean and explore datasets with pandas and NumPy, visualize results with Matplotlib, and summarize findings using descriptive statistics and reproducible notebooks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-004", "title": "SQL & Database Design", "duration": "3 Months", "description": "Write queries with joins, subqueries, aggregate functions, and window functions. Design relational schemas, apply normalization, and practice transactions and indexing.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-005", "title": "Power BI Dashboard Development", "duration": "3 Months", "description": "Import and transform data with Power Query, build relationships and DAX measures, and create interactive reports with filters, drill-through pages, and business metrics.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-006", "title": "Web Design with HTML & CSS", "duration": "3 Months", "description": "Create responsive websites with semantic HTML, CSS Grid, Flexbox, accessible forms, and media queries. Publish a portfolio website with layouts for mobile and desktop.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-007", "title": "JavaScript Programming", "duration": "4 Months", "description": "Practice functions, arrays, objects, DOM manipulation, events, promises, and asynchronous requests. Build interactive browser applications with validation and error handling.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-008", "title": "React Frontend Development", "duration": "4 Months", "description": "Build reusable components with props, state, hooks, routing, and forms. Connect a frontend to an API and complete an accessible multi-page application.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-009", "title": "Node.js & Express Backend Development", "duration": "4 Months", "description": "Create REST APIs with routing, middleware, validation, authentication, and database integration. Practice automated tests, error handling, and application deployment.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-010", "title": "Django Web Development", "duration": "4 Months", "description": "Develop database-backed websites using models, views, templates, forms, authentication, and the Django admin. Build and deploy a complete student project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-011", "title": "Java Programming", "duration": "6 Months", "description": "Learn Java syntax, classes, inheritance, interfaces, collections, exceptions, and JDBC. Develop a database-connected application using structured object-oriented design.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-012", "title": "C Programming Fundamentals", "duration": "3 Months", "description": "Understand data types, loops, functions, arrays, pointers, structures, and file operations. Practice debugging and implement small programs for common computing problems.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-013", "title": "C++ & Data Structures", "duration": "6 Months", "description": "Study classes, templates, the standard library, linked lists, stacks, queues, trees, and graphs. Compare sorting and searching algorithms using time and space complexity.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-014", "title": "Computer Hardware & Troubleshooting", "duration": "4 Months", "description": "Identify desktop components, assemble systems, install operating systems and drivers, diagnose common faults, and practice backups and preventive maintenance.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-015", "title": "Computer Networking Fundamentals", "duration": "4 Months", "description": "Learn network devices, Ethernet, IP addressing, subnetting, DNS, DHCP, routing, and wireless networks. Configure a small office network and troubleshoot connectivity.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-016", "title": "Linux Administration", "duration": "4 Months", "description": "Use the Linux shell, manage users and permissions, configure services, inspect logs, schedule jobs, and write shell scripts for routine administration tasks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-017", "title": "Cybersecurity Fundamentals", "duration": "4 Months", "description": "Study access control, secure configuration, phishing awareness, network security, backups, and incident response. Practice defensive analysis in isolated training labs.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-018", "title": "Cloud Computing Fundamentals", "duration": "3 Months", "description": "Understand virtual machines, storage, networking, identity management, monitoring, and shared responsibility. Design a small cloud-hosted application and estimate resource usage.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-019", "title": "Git, Docker & CI/CD Fundamentals", "duration": "4 Months", "description": "Manage branches and code reviews with Git, package applications in Docker containers, and build automated pipelines for testing and deployment.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-020", "title": "UI & UX Design with Figma", "duration": "4 Months", "description": "Practice user interviews, information architecture, wireframes, component libraries, responsive layouts, and interactive prototypes. Conduct usability testing on a design project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-021", "title": "Adobe Photoshop & Image Editing", "duration": "3 Months", "description": "Edit photographs using layers, masks, selections, retouching, color correction, and nondestructive adjustments. Prepare images for print, websites, and social media.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-022", "title": "Vector Illustration with Adobe Illustrator", "duration": "3 Months", "description": "Create vector artwork with shapes, paths, the Pen tool, typography, and reusable graphic assets. Design logos, icons, packaging layouts, and print-ready illustrations.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-023", "title": "Video Editing with Adobe Premiere Pro", "duration": "4 Months", "description": "Organize footage, edit sequences, synchronize audio, add titles and transitions, correct color, and export video. Complete a short promotional film from raw footage.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-024", "title": "WordPress Website Development", "duration": "3 Months", "description": "Build websites using themes, blocks, menus, forms, and plugins. Practice backups, security updates, performance optimization, and basic search-friendly site structure.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"},
-    {"id": "CRS-DEMO-025", "title": "AutoCAD 2D Drafting", "duration": "4 Months", "description": "Create technical drawings with precise dimensions, layers, blocks, annotations, layouts, and plotting. Produce a complete set of 2D plans for a drafting project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com"}
+    { "id": "CRS-DEMO-001", "title": "Advanced Excel & MIS Reporting", "duration": "3 Months", "description": "Build spreadsheet models using lookup functions, PivotTables, data validation, Power Query, and interactive dashboards. Complete a monthly sales reporting project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-002", "title": "Python Programming", "duration": "4 Months", "description": "Learn variables, control flow, functions, collections, file handling, exceptions, and object-oriented programming. Build command-line utilities and automate routine tasks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-003", "title": "Data Analysis with Python", "duration": "6 Months", "description": "Clean and explore datasets with pandas and NumPy, visualize results with Matplotlib, and summarize findings using descriptive statistics and reproducible notebooks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-004", "title": "SQL & Database Design", "duration": "3 Months", "description": "Write queries with joins, subqueries, aggregate functions, and window functions. Design relational schemas, apply normalization, and practice transactions and indexing.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-005", "title": "Power BI Dashboard Development", "duration": "3 Months", "description": "Import and transform data with Power Query, build relationships and DAX measures, and create interactive reports with filters, drill-through pages, and business metrics.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-006", "title": "Web Design with HTML & CSS", "duration": "3 Months", "description": "Create responsive websites with semantic HTML, CSS Grid, Flexbox, accessible forms, and media queries. Publish a portfolio website with layouts for mobile and desktop.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-007", "title": "JavaScript Programming", "duration": "4 Months", "description": "Practice functions, arrays, objects, DOM manipulation, events, promises, and asynchronous requests. Build interactive browser applications with validation and error handling.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-008", "title": "React Frontend Development", "duration": "4 Months", "description": "Build reusable components with props, state, hooks, routing, and forms. Connect a frontend to an API and complete an accessible multi-page application.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-009", "title": "Node.js & Express Backend Development", "duration": "4 Months", "description": "Create REST APIs with routing, middleware, validation, authentication, and database integration. Practice automated tests, error handling, and application deployment.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-010", "title": "Django Web Development", "duration": "4 Months", "description": "Develop database-backed websites using models, views, templates, forms, authentication, and the Django admin. Build and deploy a complete student project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-011", "title": "Java Programming", "duration": "6 Months", "description": "Learn Java syntax, classes, inheritance, interfaces, collections, exceptions, and JDBC. Develop a database-connected application using structured object-oriented design.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-012", "title": "C Programming Fundamentals", "duration": "3 Months", "description": "Understand data types, loops, functions, arrays, pointers, structures, and file operations. Practice debugging and implement small programs for common computing problems.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-013", "title": "C++ & Data Structures", "duration": "6 Months", "description": "Study classes, templates, the standard library, linked lists, stacks, queues, trees, and graphs. Compare sorting and searching algorithms using time and space complexity.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-014", "title": "Computer Hardware & Troubleshooting", "duration": "4 Months", "description": "Identify desktop components, assemble systems, install operating systems and drivers, diagnose common faults, and practice backups and preventive maintenance.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-015", "title": "Computer Networking Fundamentals", "duration": "4 Months", "description": "Learn network devices, Ethernet, IP addressing, subnetting, DNS, DHCP, routing, and wireless networks. Configure a small office network and troubleshoot connectivity.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-016", "title": "Linux Administration", "duration": "4 Months", "description": "Use the Linux shell, manage users and permissions, configure services, inspect logs, schedule jobs, and write shell scripts for routine administration tasks.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-017", "title": "Cybersecurity Fundamentals", "duration": "4 Months", "description": "Study access control, secure configuration, phishing awareness, network security, backups, and incident response. Practice defensive analysis in isolated training labs.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-018", "title": "Cloud Computing Fundamentals", "duration": "3 Months", "description": "Understand virtual machines, storage, networking, identity management, monitoring, and shared responsibility. Design a small cloud-hosted application and estimate resource usage.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-019", "title": "Git, Docker & CI/CD Fundamentals", "duration": "4 Months", "description": "Manage branches and code reviews with Git, package applications in Docker containers, and build automated pipelines for testing and deployment.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-020", "title": "UI & UX Design with Figma", "duration": "4 Months", "description": "Practice user interviews, information architecture, wireframes, component libraries, responsive layouts, and interactive prototypes. Conduct usability testing on a design project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-021", "title": "Adobe Photoshop & Image Editing", "duration": "3 Months", "description": "Edit photographs using layers, masks, selections, retouching, color correction, and nondestructive adjustments. Prepare images for print, websites, and social media.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-022", "title": "Vector Illustration with Adobe Illustrator", "duration": "3 Months", "description": "Create vector artwork with shapes, paths, the Pen tool, typography, and reusable graphic assets. Design logos, icons, packaging layouts, and print-ready illustrations.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-023", "title": "Video Editing with Adobe Premiere Pro", "duration": "4 Months", "description": "Organize footage, edit sequences, synchronize audio, add titles and transitions, correct color, and export video. Complete a short promotional film from raw footage.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-024", "title": "WordPress Website Development", "duration": "3 Months", "description": "Build websites using themes, blocks, menus, forms, and plugins. Practice backups, security updates, performance optimization, and basic search-friendly site structure.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" },
+    { "id": "CRS-DEMO-025", "title": "AutoCAD 2D Drafting", "duration": "4 Months", "description": "Create technical drawings with precise dimensions, layers, blocks, annotations, layouts, and plotting. Produce a complete set of 2D plans for a drafting project.", "createdAt": "2026-09-01T09:00:00.000Z", "ownerEmail": "rcavirup@gmail.com" }
   ],
   'poulami.13thmay@gmail.com': [
     {
@@ -401,564 +401,564 @@ const DEFAULT_MESSAGES_BY_TENANT = {
 
 const DEFAULT_BATCHES_BY_TENANT = {
   "rcavirup@gmail.com": [
-  {
-    "id": "6e3812a3-9c16-4c92-810d-91d8c1a34b9c",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-09-13T09:38:36.607Z",
-    "name": "Full Stack Web Development - Batch 2026",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02075",
-      "DCC/SMP/02081",
-      "STU-1444",
-      "DCC/SMP/02058",
-      "DCC/SMP/02020",
-      "DCC/SMP/02037",
-      "DCC/SMP/02100",
-      "DCC/SMP/02028"
-    ],
-    "updatedAt": "2026-09-13T09:38:36.607Z"
-  },
-  {
-    "id": "666b2ca0-cc40-4857-a244-dbd5bd6c8558",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-09-12T11:02:27.287Z",
-    "name": "DCC Course",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02109",
-      "STU-6309",
-      "DCC/SMP/02096",
-      "DCC/SMP/02095",
-      "DCC/SMP/02108"
-    ],
-    "updatedAt": "2026-09-12T17:07:54.605Z",
-    "certificateIssueDate": "2026-09-12",
-    "completedAt": "2026-09-12T15:54:08.926Z",
-    "grade": "A+"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "22ffd44f-bdfb-4ae5-aeee-65fc7d6b883c",
-    "createdAt": "2026-09-11T17:29:02.591Z",
-    "name": "New Batch 2021",
-    "status": "Completed",
-    "studentIds": [
-      "DCC/SMP/02109",
-      "DCC/SMP/02085",
-      "DCC/SMP/02061"
-    ],
-    "updatedAt": "2026-09-11T17:29:32.270Z",
-    "certificateIssueDate": "2026-09-11",
-    "completedAt": "2026-09-11T17:29:31.834Z",
-    "grade": "A+"
-  },
-  {
-    "id": "d751d0a3-6fbf-4dd9-90aa-4872718ccd5a",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-09-11T13:52:29.133Z",
-    "name": "computer science",
-    "status": "Completed",
-    "studentIds": [
-      "DCC/SMP/02106",
-      "DCC/SMP/02096",
-      "DCC/SMP/02095",
-      "DCC/SMP/02094",
-      "DCC/SMP/02093",
-      "DCC/SMP/02092",
-      "DCC/SMP/02091",
-      "DCC/SMP/02090"
-    ],
-    "updatedAt": "2026-09-12T15:46:04.069Z",
-    "certificateIssueDate": "2030-08-12",
-    "completedAt": "2026-09-12T15:46:01.407Z",
-    "grade": "A+"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "360c0a7b-dd41-4988-9e88-16ad6a123f33",
-    "createdAt": "2026-09-10T15:41:50.551Z",
-    "name": "ABC",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02010",
-      "STU-7383",
-      "STU-9970",
-      "STU-1444",
-      "DCC/SMP/02081"
-    ],
-    "updatedAt": "2026-09-12T15:38:31.373Z"
-  },
-  {
-    "id": "ff4eff8d-e437-4476-ba82-9c3d88067f60",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-09-10T15:34:22.539Z",
-    "name": "Python for Data Analytics - Morning Cohort",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02047",
-      "DCC/SMP/02105",
-      "DCC/SMP/02083",
-      "DCC/SMP/02026",
-      "DCC/SMP/02090"
-    ],
-    "updatedAt": "2026-09-10T15:34:22.539Z"
-  },
-  {
-    "id": "46703bae-aba5-468d-9f57-a1ddfcafb62c",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-09-08T10:56:46.934Z",
-    "name": "Tally Prime & GST Filing - Weekend Batch",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02102",
-      "STU-1444",
-      "DCC/SMP/02054",
-      "DCC/SMP/02022",
-      "DCC/SMP/02039",
-      "STU-9970",
-      "DCC/SMP/02028",
-      "DCC/SMP/02013",
-      "DCC/SMP/02042",
-      "DCC/SMP/02053",
-      "DCC/SMP/02044"
-    ],
-    "updatedAt": "2026-09-08T10:56:46.934Z"
-  },
-  {
-    "id": "af86a220-831a-4c25-9287-5b62ad4d00d1",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-09-05T08:15:45.050Z",
-    "name": "Advanced Excel & MIS Reporting - Fast Track",
-    "status": "Completed",
-    "studentIds": [
-      "DCC/SMP/02200",
-      "DCC/SMP/02098",
-      "STU-1444",
-      "DCC/SMP/02035",
-      "DCC/SMP/02100",
-      "DCC/SMP/02091",
-      "DCC/SMP/02068",
-      "DCC/SMP/02077",
-      "DCC/SMP/02093",
-      "DCC/SMP/02052",
-      "DCC/SMP/02094",
-      "DCC/SMP/02040"
-    ],
-    "updatedAt": "2026-09-05T08:15:45.050Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "64b3974f-848b-43a3-a77e-b580959c3b2e",
-    "createdAt": "2026-09-02T18:03:54.477Z",
-    "name": "Graphic Design & UI/UX - Batch Alpha",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02056",
-      "DCC/SMP/02200",
-      "DCC/SMP/02017",
-      "STU-1444",
-      "DCC/SMP/02039",
-      "DCC/SMP/02103",
-      "DCC/SMP/02045",
-      "DCC/SMP/02059",
-      "DCC/SMP/02021",
-      "DCC/SMP/02038",
-      "DCC/SMP/02082",
-      "DCC/SMP/02081",
-      "DCC/SMP/02069",
-      "DCC/SMP/02026",
-      "DCC/SMP/02100"
-    ],
-    "updatedAt": "2026-09-02T18:03:54.477Z"
-  },
-  {
-    "id": "af929672-216c-4f3c-b5fd-db314934ca0c",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-31T14:35:44.976Z",
-    "name": "Cybersecurity & Ethical Hacking - Cohort 1",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02025",
-      "DCC/SMP/02220",
-      "STU-9970",
-      "DCC/SMP/02105",
-      "DCC/SMP/02073",
-      "DCC/SMP/02217",
-      "DCC/SMP/02028",
-      "DCC/SMP/02037",
-      "DCC/SMP/02019",
-      "DCC/SMP/02078",
-      "DCC/SMP/02034",
-      "DCC/SMP/02035",
-      "DCC/SMP/02023",
-      "DCC/SMP/02027",
-      "DCC/SMP/02026",
-      "DCC/SMP/02011"
-    ],
-    "updatedAt": "2026-08-31T14:35:44.976Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "a0357697-9e15-4d7f-9d5f-80719dd77105",
-    "createdAt": "2026-08-28T19:29:32.922Z",
-    "name": "Diploma in Computer Applications (DCA) - Regular",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02028",
-      "DCC/SMP/02053",
-      "DCC/SMP/02052",
-      "DCC/SMP/02205",
-      "DCC/SMP/02207",
-      "DCC/SMP/02068",
-      "DCC/SMP/02105",
-      "DCC/SMP/02200",
-      "DCC/SMP/02041",
-      "DCC/SMP/02102",
-      "DCC/SMP/02218",
-      "DCC/SMP/02045",
-      "DCC/SMP/02215"
-    ],
-    "updatedAt": "2026-08-28T19:29:32.922Z"
-  },
-  {
-    "id": "b12bb9b2-e59d-469e-9830-103282c99e6b",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-26T12:02:13.493Z",
-    "name": "Cloud Computing & AWS - Evening Batch",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02038",
-      "DCC/SMP/02204",
-      "DCC/SMP/02070",
-      "DCC/SMP/02083",
-      "DCC/SMP/02102"
-    ],
-    "updatedAt": "2026-08-26T12:02:13.493Z"
-  },
-  {
-    "id": "25e45c23-c0d9-40bc-9461-9e78cb5fabfe",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-24T14:41:04.297Z",
-    "name": "Digital Marketing & SEO - Batch 2026-A",
-    "status": "Completed",
-    "studentIds": [
-      "DCC/SMP/02078",
-      "DCC/SMP/02055",
-      "DCC/SMP/02044",
-      "DCC/SMP/02067",
-      "DCC/SMP/02053",
-      "DCC/SMP/02211",
-      "DCC/SMP/02021",
-      "DCC/SMP/02051",
-      "DCC/SMP/02066",
-      "DCC/SMP/02052"
-    ],
-    "updatedAt": "2026-08-24T14:41:04.297Z"
-  },
-  {
-    "id": "ae43300f-cefb-4860-b94f-0a174e43b69b",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-21T16:10:35.675Z",
-    "name": "Java Enterprise & Spring Boot - Weekend Intensive",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02109",
-      "DCC/SMP/02033",
-      "DCC/SMP/02022",
-      "DCC/SMP/02096",
-      "DCC/SMP/02085",
-      "DCC/SMP/02083",
-      "DCC/SMP/02038"
-    ],
-    "updatedAt": "2026-08-21T16:10:35.675Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "b7e12059-53bd-4b11-8ede-b8d45c41967e",
-    "createdAt": "2026-08-18T18:01:08.148Z",
-    "name": "AutoCAD 2D/3D & Interior Drafting - Batch 3",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02070",
-      "DCC/SMP/02069",
-      "DCC/SMP/02219",
-      "STU-1444",
-      "DCC/SMP/02106",
-      "DCC/SMP/02012",
-      "DCC/SMP/02038",
-      "DCC/SMP/02039",
-      "DCC/SMP/02104",
-      "DCC/SMP/02029"
-    ],
-    "updatedAt": "2026-08-18T18:01:08.148Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "872ad8c1-fe23-4734-b2e3-289a2a224fac",
-    "createdAt": "2026-08-16T23:22:11.177Z",
-    "name": "Computer Hardware & Networking - Morning 1",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02044",
-      "DCC/SMP/02091",
-      "DCC/SMP/02043",
-      "DCC/SMP/02069",
-      "DCC/SMP/02062",
-      "DCC/SMP/02079",
-      "DCC/SMP/02037",
-      "DCC/SMP/02106"
-    ],
-    "updatedAt": "2026-08-16T23:22:11.177Z"
-  },
-  {
-    "id": "ef5221d4-a9fb-4d36-8054-e6359d7782a9",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-13T23:31:46.243Z",
-    "name": "React & Next.js Masterclass - Cohort B",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02084",
-      "DCC/SMP/02093",
-      "DCC/SMP/02080",
-      "DCC/SMP/02220",
-      "DCC/SMP/02074"
-    ],
-    "updatedAt": "2026-08-13T23:31:46.243Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "68530de7-71f1-4292-b770-50cbb396623a",
-    "createdAt": "2026-08-12T03:05:40.728Z",
-    "name": "Financial Accounting with Tally - Batch Delta",
-    "status": "Completed",
-    "studentIds": [
-      "DCC/SMP/02202",
-      "DCC/SMP/02038",
-      "DCC/SMP/02045",
-      "DCC/SMP/02013",
-      "DCC/SMP/02098",
-      "DCC/SMP/02081",
-      "DCC/SMP/02213",
-      "DCC/SMP/02082",
-      "STU-9970",
-      "DCC/SMP/02084",
-      "DCC/SMP/02072",
-      "DCC/SMP/02102"
-    ],
-    "updatedAt": "2026-08-12T03:05:40.728Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "c697dff2-e7b6-4b55-8edf-bf57de3491a2",
-    "createdAt": "2026-08-09T12:29:44.247Z",
-    "name": "C++ & Algorithms - Winter Cohort",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02043",
-      "DCC/SMP/02059",
-      "DCC/SMP/02017",
-      "DCC/SMP/02038",
-      "DCC/SMP/02047",
-      "DCC/SMP/02023",
-      "DCC/SMP/02027",
-      "DCC/SMP/02099",
-      "DCC/SMP/02021",
-      "DCC/SMP/02108"
-    ],
-    "updatedAt": "2026-08-09T12:29:44.247Z"
-  },
-  {
-    "id": "07c8a65d-da29-4cbc-ab78-95b5018e8fbc",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-06T05:40:42.880Z",
-    "name": "Office Automation & Typing - Regular Batch",
-    "status": "Active",
-    "studentIds": [
-      "STU-9970",
-      "DCC/SMP/02038",
-      "STU-7383",
-      "DCC/SMP/02028"
-    ],
-    "updatedAt": "2026-08-06T05:40:42.880Z"
-  },
-  {
-    "id": "8c2694a8-62d1-4574-a98c-2aa515b09153",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-03T17:56:23.714Z",
-    "name": "Flutter & Mobile App Development - Weekend",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02095",
-      "STU-1444",
-      "DCC/SMP/02037",
-      "DCC/SMP/02040",
-      "DCC/SMP/02056",
-      "DCC/SMP/02036",
-      "DCC/SMP/02058",
-      "DCC/SMP/02034",
-      "DCC/SMP/02027",
-      "DCC/SMP/02015",
-      "STU-9970",
-      "DCC/SMP/02048",
-      "DCC/SMP/02209"
-    ],
-    "updatedAt": "2026-08-03T17:56:23.714Z"
-  },
-  {
-    "id": "89ee35d0-c9f8-4206-93ea-2e93d5c19e68",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-08-01T20:28:22.458Z",
-    "name": "Artificial Intelligence & Prompt Engineering - Cohort 2",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02223",
-      "STU-1444",
-      "DCC/SMP/02070",
-      "DCC/SMP/02088",
-      "DCC/SMP/02203",
-      "DCC/SMP/02051",
-      "DCC/SMP/02017",
-      "DCC/SMP/02025",
-      "DCC/SMP/02073",
-      "DCC/SMP/02206"
-    ],
-    "updatedAt": "2026-08-01T20:28:22.458Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "f54c9bf4-4ea1-4f99-a0f9-06d3f0b25014",
-    "createdAt": "2026-07-30T10:47:11.803Z",
-    "name": "DTP, InDesign & Photoshop - Evening Batch",
-    "status": "Completed",
-    "studentIds": [
-      "DCC/SMP/02016",
-      "DCC/SMP/02206",
-      "DCC/SMP/02075",
-      "DCC/SMP/02042",
-      "DCC/SMP/02207",
-      "DCC/SMP/02101",
-      "STU-1444",
-      "DCC/SMP/02200",
-      "DCC/SMP/02210",
-      "DCC/SMP/02074",
-      "DCC/SMP/02092",
-      "DCC/SMP/02080",
-      "DCC/SMP/02036",
-      "DCC/SMP/02011",
-      "DCC/SMP/02021"
-    ],
-    "updatedAt": "2026-07-30T10:47:11.803Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "1d403882-815e-45b6-bb76-5b54ec3a51ea",
-    "createdAt": "2026-07-28T02:31:56.036Z",
-    "name": "SQL & Database Administration - Fast Track",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02093",
-      "DCC/SMP/02037",
-      "STU-6309",
-      "DCC/SMP/02038",
-      "DCC/SMP/02011",
-      "DCC/SMP/02069"
-    ],
-    "updatedAt": "2026-07-28T02:31:56.036Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "72f3a4af-5b8f-4a12-a6b5-7940f0c06767",
-    "createdAt": "2026-07-25T14:16:02.899Z",
-    "name": "IT Support & System Administration - Batch 4",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02094",
-      "DCC/SMP/02013",
-      "DCC/SMP/02080",
-      "DCC/SMP/02083",
-      "STU-1444",
-      "DCC/SMP/02034",
-      "DCC/SMP/02063",
-      "DCC/SMP/02022",
-      "DCC/SMP/02025",
-      "DCC/SMP/02043"
-    ],
-    "updatedAt": "2026-07-25T14:16:02.899Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "6a5aabdf-f78a-4abb-bb36-683b703e1d0f",
-    "createdAt": "2026-07-22T12:55:11.620Z",
-    "name": "Web Design & Frontend Development - Cohort Gamma",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02208",
-      "DCC/SMP/02081",
-      "DCC/SMP/02064",
-      "DCC/SMP/02066"
-    ],
-    "updatedAt": "2026-07-22T12:55:11.620Z"
-  },
-  {
-    "id": "615a4275-6c74-40ee-9840-2d7b28965654",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-07-20T10:25:42.909Z",
-    "name": "Node.js & Microservices - Weekend Cohort",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02092",
-      "DCC/SMP/02026",
-      "DCC/SMP/02053",
-      "DCC/SMP/02030",
-      "DCC/SMP/02042",
-      "DCC/SMP/02038",
-      "DCC/SMP/02029",
-      "DCC/SMP/02067",
-      "DCC/SMP/02051"
-    ],
-    "updatedAt": "2026-07-20T10:25:42.909Z"
-  },
-  {
-    "id": "8dcf54cd-92cd-4386-b3f7-fc10d2dd1c5a",
-    "ownerEmail": "rcavirup@gmail.com",
-    "createdAt": "2026-07-18T01:51:06.481Z",
-    "name": "Certificate in Financial Management (CFM) - Batch 2",
-    "status": "Completed",
-    "studentIds": [
-      "DCC/SMP/02045",
-      "STU-7383",
-      "DCC/SMP/02072",
-      "STU-1444",
-      "DCC/SMP/02219",
-      "DCC/SMP/02207",
-      "DCC/SMP/02084",
-      "DCC/SMP/02089",
-      "DCC/SMP/02037",
-      "DCC/SMP/02014",
-      "DCC/SMP/02028",
-      "DCC/SMP/02016"
-    ],
-    "updatedAt": "2026-07-18T01:51:06.481Z"
-  },
-  {
-    "ownerEmail": "rcavirup@gmail.com",
-    "id": "a1ab6746-a5f4-4c1e-a4ab-0415e17c5ac3",
-    "createdAt": "2026-07-15T12:11:18.614Z",
-    "name": "Python Django & REST API - Evening Cohort",
-    "status": "Active",
-    "studentIds": [
-      "DCC/SMP/02205",
-      "DCC/SMP/02029",
-      "STU-7383",
-      "DCC/SMP/02020",
-      "DCC/SMP/02034",
-      "DCC/SMP/02033",
-      "DCC/SMP/02015"
-    ],
-    "updatedAt": "2026-07-15T12:11:18.614Z"
-  }
-]
+    {
+      "id": "6e3812a3-9c16-4c92-810d-91d8c1a34b9c",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-09-13T09:38:36.607Z",
+      "name": "Full Stack Web Development - Batch 2026",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02075",
+        "DCC/SMP/02081",
+        "STU-1444",
+        "DCC/SMP/02058",
+        "DCC/SMP/02020",
+        "DCC/SMP/02037",
+        "DCC/SMP/02100",
+        "DCC/SMP/02028"
+      ],
+      "updatedAt": "2026-09-13T09:38:36.607Z"
+    },
+    {
+      "id": "666b2ca0-cc40-4857-a244-dbd5bd6c8558",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-09-12T11:02:27.287Z",
+      "name": "DCC Course",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02109",
+        "STU-6309",
+        "DCC/SMP/02096",
+        "DCC/SMP/02095",
+        "DCC/SMP/02108"
+      ],
+      "updatedAt": "2026-09-12T17:07:54.605Z",
+      "certificateIssueDate": "2026-09-12",
+      "completedAt": "2026-09-12T15:54:08.926Z",
+      "grade": "A+"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "22ffd44f-bdfb-4ae5-aeee-65fc7d6b883c",
+      "createdAt": "2026-09-11T17:29:02.591Z",
+      "name": "New Batch 2021",
+      "status": "Completed",
+      "studentIds": [
+        "DCC/SMP/02109",
+        "DCC/SMP/02085",
+        "DCC/SMP/02061"
+      ],
+      "updatedAt": "2026-09-11T17:29:32.270Z",
+      "certificateIssueDate": "2026-09-11",
+      "completedAt": "2026-09-11T17:29:31.834Z",
+      "grade": "A+"
+    },
+    {
+      "id": "d751d0a3-6fbf-4dd9-90aa-4872718ccd5a",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-09-11T13:52:29.133Z",
+      "name": "computer science",
+      "status": "Completed",
+      "studentIds": [
+        "DCC/SMP/02106",
+        "DCC/SMP/02096",
+        "DCC/SMP/02095",
+        "DCC/SMP/02094",
+        "DCC/SMP/02093",
+        "DCC/SMP/02092",
+        "DCC/SMP/02091",
+        "DCC/SMP/02090"
+      ],
+      "updatedAt": "2026-09-12T15:46:04.069Z",
+      "certificateIssueDate": "2030-08-12",
+      "completedAt": "2026-09-12T15:46:01.407Z",
+      "grade": "A+"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "360c0a7b-dd41-4988-9e88-16ad6a123f33",
+      "createdAt": "2026-09-10T15:41:50.551Z",
+      "name": "ABC",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02010",
+        "STU-7383",
+        "STU-9970",
+        "STU-1444",
+        "DCC/SMP/02081"
+      ],
+      "updatedAt": "2026-09-12T15:38:31.373Z"
+    },
+    {
+      "id": "ff4eff8d-e437-4476-ba82-9c3d88067f60",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-09-10T15:34:22.539Z",
+      "name": "Python for Data Analytics - Morning Cohort",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02047",
+        "DCC/SMP/02105",
+        "DCC/SMP/02083",
+        "DCC/SMP/02026",
+        "DCC/SMP/02090"
+      ],
+      "updatedAt": "2026-09-10T15:34:22.539Z"
+    },
+    {
+      "id": "46703bae-aba5-468d-9f57-a1ddfcafb62c",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-09-08T10:56:46.934Z",
+      "name": "Tally Prime & GST Filing - Weekend Batch",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02102",
+        "STU-1444",
+        "DCC/SMP/02054",
+        "DCC/SMP/02022",
+        "DCC/SMP/02039",
+        "STU-9970",
+        "DCC/SMP/02028",
+        "DCC/SMP/02013",
+        "DCC/SMP/02042",
+        "DCC/SMP/02053",
+        "DCC/SMP/02044"
+      ],
+      "updatedAt": "2026-09-08T10:56:46.934Z"
+    },
+    {
+      "id": "af86a220-831a-4c25-9287-5b62ad4d00d1",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-09-05T08:15:45.050Z",
+      "name": "Advanced Excel & MIS Reporting - Fast Track",
+      "status": "Completed",
+      "studentIds": [
+        "DCC/SMP/02200",
+        "DCC/SMP/02098",
+        "STU-1444",
+        "DCC/SMP/02035",
+        "DCC/SMP/02100",
+        "DCC/SMP/02091",
+        "DCC/SMP/02068",
+        "DCC/SMP/02077",
+        "DCC/SMP/02093",
+        "DCC/SMP/02052",
+        "DCC/SMP/02094",
+        "DCC/SMP/02040"
+      ],
+      "updatedAt": "2026-09-05T08:15:45.050Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "64b3974f-848b-43a3-a77e-b580959c3b2e",
+      "createdAt": "2026-09-02T18:03:54.477Z",
+      "name": "Graphic Design & UI/UX - Batch Alpha",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02056",
+        "DCC/SMP/02200",
+        "DCC/SMP/02017",
+        "STU-1444",
+        "DCC/SMP/02039",
+        "DCC/SMP/02103",
+        "DCC/SMP/02045",
+        "DCC/SMP/02059",
+        "DCC/SMP/02021",
+        "DCC/SMP/02038",
+        "DCC/SMP/02082",
+        "DCC/SMP/02081",
+        "DCC/SMP/02069",
+        "DCC/SMP/02026",
+        "DCC/SMP/02100"
+      ],
+      "updatedAt": "2026-09-02T18:03:54.477Z"
+    },
+    {
+      "id": "af929672-216c-4f3c-b5fd-db314934ca0c",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-31T14:35:44.976Z",
+      "name": "Cybersecurity & Ethical Hacking - Cohort 1",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02025",
+        "DCC/SMP/02220",
+        "STU-9970",
+        "DCC/SMP/02105",
+        "DCC/SMP/02073",
+        "DCC/SMP/02217",
+        "DCC/SMP/02028",
+        "DCC/SMP/02037",
+        "DCC/SMP/02019",
+        "DCC/SMP/02078",
+        "DCC/SMP/02034",
+        "DCC/SMP/02035",
+        "DCC/SMP/02023",
+        "DCC/SMP/02027",
+        "DCC/SMP/02026",
+        "DCC/SMP/02011"
+      ],
+      "updatedAt": "2026-08-31T14:35:44.976Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "a0357697-9e15-4d7f-9d5f-80719dd77105",
+      "createdAt": "2026-08-28T19:29:32.922Z",
+      "name": "Diploma in Computer Applications (DCA) - Regular",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02028",
+        "DCC/SMP/02053",
+        "DCC/SMP/02052",
+        "DCC/SMP/02205",
+        "DCC/SMP/02207",
+        "DCC/SMP/02068",
+        "DCC/SMP/02105",
+        "DCC/SMP/02200",
+        "DCC/SMP/02041",
+        "DCC/SMP/02102",
+        "DCC/SMP/02218",
+        "DCC/SMP/02045",
+        "DCC/SMP/02215"
+      ],
+      "updatedAt": "2026-08-28T19:29:32.922Z"
+    },
+    {
+      "id": "b12bb9b2-e59d-469e-9830-103282c99e6b",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-26T12:02:13.493Z",
+      "name": "Cloud Computing & AWS - Evening Batch",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02038",
+        "DCC/SMP/02204",
+        "DCC/SMP/02070",
+        "DCC/SMP/02083",
+        "DCC/SMP/02102"
+      ],
+      "updatedAt": "2026-08-26T12:02:13.493Z"
+    },
+    {
+      "id": "25e45c23-c0d9-40bc-9461-9e78cb5fabfe",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-24T14:41:04.297Z",
+      "name": "Digital Marketing & SEO - Batch 2026-A",
+      "status": "Completed",
+      "studentIds": [
+        "DCC/SMP/02078",
+        "DCC/SMP/02055",
+        "DCC/SMP/02044",
+        "DCC/SMP/02067",
+        "DCC/SMP/02053",
+        "DCC/SMP/02211",
+        "DCC/SMP/02021",
+        "DCC/SMP/02051",
+        "DCC/SMP/02066",
+        "DCC/SMP/02052"
+      ],
+      "updatedAt": "2026-08-24T14:41:04.297Z"
+    },
+    {
+      "id": "ae43300f-cefb-4860-b94f-0a174e43b69b",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-21T16:10:35.675Z",
+      "name": "Java Enterprise & Spring Boot - Weekend Intensive",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02109",
+        "DCC/SMP/02033",
+        "DCC/SMP/02022",
+        "DCC/SMP/02096",
+        "DCC/SMP/02085",
+        "DCC/SMP/02083",
+        "DCC/SMP/02038"
+      ],
+      "updatedAt": "2026-08-21T16:10:35.675Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "b7e12059-53bd-4b11-8ede-b8d45c41967e",
+      "createdAt": "2026-08-18T18:01:08.148Z",
+      "name": "AutoCAD 2D/3D & Interior Drafting - Batch 3",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02070",
+        "DCC/SMP/02069",
+        "DCC/SMP/02219",
+        "STU-1444",
+        "DCC/SMP/02106",
+        "DCC/SMP/02012",
+        "DCC/SMP/02038",
+        "DCC/SMP/02039",
+        "DCC/SMP/02104",
+        "DCC/SMP/02029"
+      ],
+      "updatedAt": "2026-08-18T18:01:08.148Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "872ad8c1-fe23-4734-b2e3-289a2a224fac",
+      "createdAt": "2026-08-16T23:22:11.177Z",
+      "name": "Computer Hardware & Networking - Morning 1",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02044",
+        "DCC/SMP/02091",
+        "DCC/SMP/02043",
+        "DCC/SMP/02069",
+        "DCC/SMP/02062",
+        "DCC/SMP/02079",
+        "DCC/SMP/02037",
+        "DCC/SMP/02106"
+      ],
+      "updatedAt": "2026-08-16T23:22:11.177Z"
+    },
+    {
+      "id": "ef5221d4-a9fb-4d36-8054-e6359d7782a9",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-13T23:31:46.243Z",
+      "name": "React & Next.js Masterclass - Cohort B",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02084",
+        "DCC/SMP/02093",
+        "DCC/SMP/02080",
+        "DCC/SMP/02220",
+        "DCC/SMP/02074"
+      ],
+      "updatedAt": "2026-08-13T23:31:46.243Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "68530de7-71f1-4292-b770-50cbb396623a",
+      "createdAt": "2026-08-12T03:05:40.728Z",
+      "name": "Financial Accounting with Tally - Batch Delta",
+      "status": "Completed",
+      "studentIds": [
+        "DCC/SMP/02202",
+        "DCC/SMP/02038",
+        "DCC/SMP/02045",
+        "DCC/SMP/02013",
+        "DCC/SMP/02098",
+        "DCC/SMP/02081",
+        "DCC/SMP/02213",
+        "DCC/SMP/02082",
+        "STU-9970",
+        "DCC/SMP/02084",
+        "DCC/SMP/02072",
+        "DCC/SMP/02102"
+      ],
+      "updatedAt": "2026-08-12T03:05:40.728Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "c697dff2-e7b6-4b55-8edf-bf57de3491a2",
+      "createdAt": "2026-08-09T12:29:44.247Z",
+      "name": "C++ & Algorithms - Winter Cohort",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02043",
+        "DCC/SMP/02059",
+        "DCC/SMP/02017",
+        "DCC/SMP/02038",
+        "DCC/SMP/02047",
+        "DCC/SMP/02023",
+        "DCC/SMP/02027",
+        "DCC/SMP/02099",
+        "DCC/SMP/02021",
+        "DCC/SMP/02108"
+      ],
+      "updatedAt": "2026-08-09T12:29:44.247Z"
+    },
+    {
+      "id": "07c8a65d-da29-4cbc-ab78-95b5018e8fbc",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-06T05:40:42.880Z",
+      "name": "Office Automation & Typing - Regular Batch",
+      "status": "Active",
+      "studentIds": [
+        "STU-9970",
+        "DCC/SMP/02038",
+        "STU-7383",
+        "DCC/SMP/02028"
+      ],
+      "updatedAt": "2026-08-06T05:40:42.880Z"
+    },
+    {
+      "id": "8c2694a8-62d1-4574-a98c-2aa515b09153",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-03T17:56:23.714Z",
+      "name": "Flutter & Mobile App Development - Weekend",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02095",
+        "STU-1444",
+        "DCC/SMP/02037",
+        "DCC/SMP/02040",
+        "DCC/SMP/02056",
+        "DCC/SMP/02036",
+        "DCC/SMP/02058",
+        "DCC/SMP/02034",
+        "DCC/SMP/02027",
+        "DCC/SMP/02015",
+        "STU-9970",
+        "DCC/SMP/02048",
+        "DCC/SMP/02209"
+      ],
+      "updatedAt": "2026-08-03T17:56:23.714Z"
+    },
+    {
+      "id": "89ee35d0-c9f8-4206-93ea-2e93d5c19e68",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-08-01T20:28:22.458Z",
+      "name": "Artificial Intelligence & Prompt Engineering - Cohort 2",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02223",
+        "STU-1444",
+        "DCC/SMP/02070",
+        "DCC/SMP/02088",
+        "DCC/SMP/02203",
+        "DCC/SMP/02051",
+        "DCC/SMP/02017",
+        "DCC/SMP/02025",
+        "DCC/SMP/02073",
+        "DCC/SMP/02206"
+      ],
+      "updatedAt": "2026-08-01T20:28:22.458Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "f54c9bf4-4ea1-4f99-a0f9-06d3f0b25014",
+      "createdAt": "2026-07-30T10:47:11.803Z",
+      "name": "DTP, InDesign & Photoshop - Evening Batch",
+      "status": "Completed",
+      "studentIds": [
+        "DCC/SMP/02016",
+        "DCC/SMP/02206",
+        "DCC/SMP/02075",
+        "DCC/SMP/02042",
+        "DCC/SMP/02207",
+        "DCC/SMP/02101",
+        "STU-1444",
+        "DCC/SMP/02200",
+        "DCC/SMP/02210",
+        "DCC/SMP/02074",
+        "DCC/SMP/02092",
+        "DCC/SMP/02080",
+        "DCC/SMP/02036",
+        "DCC/SMP/02011",
+        "DCC/SMP/02021"
+      ],
+      "updatedAt": "2026-07-30T10:47:11.803Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "1d403882-815e-45b6-bb76-5b54ec3a51ea",
+      "createdAt": "2026-07-28T02:31:56.036Z",
+      "name": "SQL & Database Administration - Fast Track",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02093",
+        "DCC/SMP/02037",
+        "STU-6309",
+        "DCC/SMP/02038",
+        "DCC/SMP/02011",
+        "DCC/SMP/02069"
+      ],
+      "updatedAt": "2026-07-28T02:31:56.036Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "72f3a4af-5b8f-4a12-a6b5-7940f0c06767",
+      "createdAt": "2026-07-25T14:16:02.899Z",
+      "name": "IT Support & System Administration - Batch 4",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02094",
+        "DCC/SMP/02013",
+        "DCC/SMP/02080",
+        "DCC/SMP/02083",
+        "STU-1444",
+        "DCC/SMP/02034",
+        "DCC/SMP/02063",
+        "DCC/SMP/02022",
+        "DCC/SMP/02025",
+        "DCC/SMP/02043"
+      ],
+      "updatedAt": "2026-07-25T14:16:02.899Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "6a5aabdf-f78a-4abb-bb36-683b703e1d0f",
+      "createdAt": "2026-07-22T12:55:11.620Z",
+      "name": "Web Design & Frontend Development - Cohort Gamma",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02208",
+        "DCC/SMP/02081",
+        "DCC/SMP/02064",
+        "DCC/SMP/02066"
+      ],
+      "updatedAt": "2026-07-22T12:55:11.620Z"
+    },
+    {
+      "id": "615a4275-6c74-40ee-9840-2d7b28965654",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-07-20T10:25:42.909Z",
+      "name": "Node.js & Microservices - Weekend Cohort",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02092",
+        "DCC/SMP/02026",
+        "DCC/SMP/02053",
+        "DCC/SMP/02030",
+        "DCC/SMP/02042",
+        "DCC/SMP/02038",
+        "DCC/SMP/02029",
+        "DCC/SMP/02067",
+        "DCC/SMP/02051"
+      ],
+      "updatedAt": "2026-07-20T10:25:42.909Z"
+    },
+    {
+      "id": "8dcf54cd-92cd-4386-b3f7-fc10d2dd1c5a",
+      "ownerEmail": "rcavirup@gmail.com",
+      "createdAt": "2026-07-18T01:51:06.481Z",
+      "name": "Certificate in Financial Management (CFM) - Batch 2",
+      "status": "Completed",
+      "studentIds": [
+        "DCC/SMP/02045",
+        "STU-7383",
+        "DCC/SMP/02072",
+        "STU-1444",
+        "DCC/SMP/02219",
+        "DCC/SMP/02207",
+        "DCC/SMP/02084",
+        "DCC/SMP/02089",
+        "DCC/SMP/02037",
+        "DCC/SMP/02014",
+        "DCC/SMP/02028",
+        "DCC/SMP/02016"
+      ],
+      "updatedAt": "2026-07-18T01:51:06.481Z"
+    },
+    {
+      "ownerEmail": "rcavirup@gmail.com",
+      "id": "a1ab6746-a5f4-4c1e-a4ab-0415e17c5ac3",
+      "createdAt": "2026-07-15T12:11:18.614Z",
+      "name": "Python Django & REST API - Evening Cohort",
+      "status": "Active",
+      "studentIds": [
+        "DCC/SMP/02205",
+        "DCC/SMP/02029",
+        "STU-7383",
+        "DCC/SMP/02020",
+        "DCC/SMP/02034",
+        "DCC/SMP/02033",
+        "DCC/SMP/02015"
+      ],
+      "updatedAt": "2026-07-15T12:11:18.614Z"
+    }
+  ]
 };
 
 
@@ -1668,9 +1668,11 @@ export default async function handler(req, res) {
           };
           const savedToken = await db.collection(COLLECTIONS.AUTH_TOKEN).findOneAndUpdate(
             { ownerEmail },
-            [{ $set: Object.fromEntries(Object.entries(token).map(([key, value]) => [
-              key, { $cond: [keepExisting, `$${key}`, { $literal: value }] }
-            ])) }],
+            [{
+              $set: Object.fromEntries(Object.entries(token).map(([key, value]) => [
+                key, { $cond: [keepExisting, `$${key}`, { $literal: value }] }
+              ]))
+            }],
             { upsert: true, returnDocument: 'after', includeResultMetadata: false }
           );
           return res.status(200).json({ success: true, token: savedToken });

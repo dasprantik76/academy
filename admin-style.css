@@ -7978,11 +7978,13 @@ body.is-superadmin #nav-tenants {
     gap: 0.35rem;
     padding: 0.35rem 0.3rem;
   }
+
   .btn-marksheet-zoom {
     width: 34px;
     height: 34px;
     font-size: 0.9rem;
   }
+
   .btn-marksheet-zoom-reset {
     min-width: 36px;
     height: 24px;
