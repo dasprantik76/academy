@@ -498,11 +498,19 @@
       if (provisionModal) {
         form.reset();
         provisionModal.style.display = 'flex';
+        document.documentElement.classList.add('modal-open');
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
       }
     }
 
     function closeModal() {
-      if (provisionModal) provisionModal.style.display = 'none';
+      if (provisionModal) {
+        provisionModal.style.display = 'none';
+        document.documentElement.classList.remove('modal-open');
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+      }
     }
 
     btnOpen?.addEventListener('click', openModal);

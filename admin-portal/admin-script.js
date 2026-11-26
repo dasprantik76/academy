@@ -1317,6 +1317,7 @@ class AcademyStore {
       duration: courseData.duration,
       description: courseData.description,
       subjects: Array.isArray(courseData.subjects) ? courseData.subjects : [],
+      terminalConfig: courseData.terminalConfig || null,
       createdAt: new Date().toISOString()
     };
     this.courses.unshift(newCourse);
@@ -1941,8 +1942,14 @@ class UIController {
     this.durationUnitMenu = document.getElementById('durationUnitMenu');
     this.courseDurationUnitInput = document.getElementById('courseDurationUnit');
     this.courseDescriptionInput = document.getElementById('courseDescription');
-    this.courseSubjectsContainer = document.getElementById('courseSubjectsContainer');
-    this.btnAddSubject = document.getElementById('btnAddSubject');
+    this.courseTerm1Check = document.getElementById('courseTerm1Check');
+    this.courseTerm1Input = document.getElementById('courseTerm1Input');
+    this.courseTerm2Check = document.getElementById('courseTerm2Check');
+    this.courseTerm2Input = document.getElementById('courseTerm2Input');
+    this.courseTerm3Check = document.getElementById('courseTerm3Check');
+    this.courseTerm3Input = document.getElementById('courseTerm3Input');
+    this.courseFinalExamCheck = document.getElementById('courseFinalExamCheck');
+    this.courseFinalExamInput = document.getElementById('courseFinalExamInput');
     this.btnCloseCourseModal = document.getElementById('btnCloseCourseModal');
     this.btnCancelCourseModal = document.getElementById('btnCancelCourseModal');
     this.btnSaveCourse = document.getElementById('btnSaveCourse');
@@ -2536,7 +2543,30 @@ class UIController {
       this.btnAddStudent.addEventListener('click', () => this.openStudentModal());
     }
     this.btnAddCourse.addEventListener('click', () => this.openCourseModal());
-    this.btnAddSubject?.addEventListener('click', () => this.addSubjectInputField('', true));
+    this.courseTerm1Check?.addEventListener('change', () => {
+      if (this.courseTerm1Input) {
+        this.courseTerm1Input.disabled = !this.courseTerm1Check.checked;
+        if (this.courseTerm1Check.checked) this.courseTerm1Input.focus();
+      }
+    });
+    this.courseTerm2Check?.addEventListener('change', () => {
+      if (this.courseTerm2Input) {
+        this.courseTerm2Input.disabled = !this.courseTerm2Check.checked;
+        if (this.courseTerm2Check.checked) this.courseTerm2Input.focus();
+      }
+    });
+    this.courseTerm3Check?.addEventListener('change', () => {
+      if (this.courseTerm3Input) {
+        this.courseTerm3Input.disabled = !this.courseTerm3Check.checked;
+        if (this.courseTerm3Check.checked) this.courseTerm3Input.focus();
+      }
+    });
+    this.courseFinalExamCheck?.addEventListener('change', () => {
+      if (this.courseFinalExamInput) {
+        this.courseFinalExamInput.disabled = !this.courseFinalExamCheck.checked;
+        if (this.courseFinalExamCheck.checked) this.courseFinalExamInput.focus();
+      }
+    });
 
     // Student Filter & Search Handlers
     this.studentSearchInput.addEventListener('input', (e) => {
@@ -7066,53 +7096,143 @@ class UIController {
       this.setDurationUnit(parsed.unit);
 
       this.courseDescriptionInput.value = course.description || '';
-      this.renderCourseSubjectInputs(course.subjects || []);
+      this.setCourseTerminalForm(course);
     } else {
       this.courseModalTitle.textContent = 'Add New Course';
       this.courseIdInput.value = '';
       this.courseDurationValueInput.value = '';
       this.setDurationUnit('Months');
       this.courseDescriptionInput.value = '';
-      this.renderCourseSubjectInputs([]);
+      this.resetCourseTerminalForm();
     }
 
     this.openModal(this.courseModal);
   }
 
-  renderCourseSubjectInputs(subjects = []) {
-    if (!this.courseSubjectsContainer) return;
-    this.courseSubjectsContainer.innerHTML = '';
-    const list = Array.isArray(subjects) && subjects.length > 0 ? subjects : [''];
-    list.forEach(subj => this.addSubjectInputField(subj, false));
+  resetCourseTerminalForm() {
+    if (this.courseTerm1Check) this.courseTerm1Check.checked = true;
+    if (this.courseTerm1Input) {
+      this.courseTerm1Input.disabled = false;
+      this.courseTerm1Input.value = '';
+    }
+
+    if (this.courseTerm2Check) this.courseTerm2Check.checked = false;
+    if (this.courseTerm2Input) {
+      this.courseTerm2Input.disabled = true;
+      this.courseTerm2Input.value = '';
+    }
+
+    if (this.courseTerm3Check) this.courseTerm3Check.checked = false;
+    if (this.courseTerm3Input) {
+      this.courseTerm3Input.disabled = true;
+      this.courseTerm3Input.value = '';
+    }
+
+    if (this.courseFinalExamCheck) this.courseFinalExamCheck.checked = true;
+    if (this.courseFinalExamInput) {
+      this.courseFinalExamInput.disabled = false;
+      this.courseFinalExamInput.value = '';
+    }
   }
 
-  addSubjectInputField(value = '', shouldFocus = true) {
-    if (!this.courseSubjectsContainer) return;
-    const row = document.createElement('div');
-    row.className = 'course-subject-row';
-    row.innerHTML = `
-      <div class="input-icon-wrap flex-1">
-        <i class="fa-solid fa-book-open"></i>
-        <input type="text" class="course-subject-input name-input-capitalized" placeholder="Subject name" value="${escapeHtml(value)}">
-      </div>
-      <button type="button" class="btn-remove-subject" title="Remove Subject" aria-label="Remove Subject">
-        <i class="fa-regular fa-trash-can"></i>
-      </button>
-    `;
-    const removeBtn = row.querySelector('.btn-remove-subject');
-    removeBtn.addEventListener('click', () => {
-      const allRows = this.courseSubjectsContainer.querySelectorAll('.course-subject-row');
-      if (allRows.length <= 1) {
-        const input = row.querySelector('.course-subject-input');
-        if (input) input.value = '';
-      } else {
-        row.remove();
+  setCourseTerminalForm(course) {
+    const config = course?.terminalConfig;
+    if (config) {
+      if (this.courseTerm1Check) this.courseTerm1Check.checked = Boolean(config.term1Enabled);
+      if (this.courseTerm1Input) {
+        this.courseTerm1Input.value = config.term1Name || '';
+        this.courseTerm1Input.disabled = !config.term1Enabled;
+      }
+
+      if (this.courseTerm2Check) this.courseTerm2Check.checked = Boolean(config.term2Enabled);
+      if (this.courseTerm2Input) {
+        this.courseTerm2Input.value = config.term2Name || '';
+        this.courseTerm2Input.disabled = !config.term2Enabled;
+      }
+
+      if (this.courseTerm3Check) this.courseTerm3Check.checked = Boolean(config.term3Enabled);
+      if (this.courseTerm3Input) {
+        this.courseTerm3Input.value = config.term3Name || '';
+        this.courseTerm3Input.disabled = !config.term3Enabled;
+      }
+
+      if (this.courseFinalExamCheck) {
+        const isFinalEnabled = config.finalExamEnabled !== undefined ? Boolean(config.finalExamEnabled) : true;
+        this.courseFinalExamCheck.checked = isFinalEnabled;
+        if (this.courseFinalExamInput) {
+          this.courseFinalExamInput.value = config.finalExamName || '';
+          this.courseFinalExamInput.disabled = !isFinalEnabled;
+        }
+      } else if (this.courseFinalExamInput) {
+        this.courseFinalExamInput.value = config.finalExamName || '';
+      }
+      return;
+    }
+
+    const rawSubjects = Array.isArray(course?.subjects) ? course.subjects : [];
+    let term1 = null, term2 = null, term3 = null, finalExam = null;
+
+    const cleanSubj = (s, prefixRegex) => s.replace(prefixRegex, '').trim();
+
+    rawSubjects.forEach((subj) => {
+      const s = String(subj || '').trim();
+      if (!s) return;
+      if (/^1st\s+Terminal/i.test(s)) {
+        term1 = cleanSubj(s, /^1st\s+Terminal\s*[—:-]\s*/i);
+      } else if (/^2nd\s+Terminal/i.test(s)) {
+        term2 = cleanSubj(s, /^2nd\s+Terminal\s*[—:-]\s*/i);
+      } else if (/^3rd\s+Terminal/i.test(s)) {
+        term3 = cleanSubj(s, /^3rd\s+Terminal\s*[—:-]\s*/i);
+      } else if (/^(?:Course\s+Final|Final\s+Exam)/i.test(s)) {
+        finalExam = cleanSubj(s, /^(?:Course\s+Final|Final\s+Exam)\s*[—:-]\s*/i);
       }
     });
-    this.courseSubjectsContainer.appendChild(row);
-    if (shouldFocus) {
-      const input = row.querySelector('.course-subject-input');
-      input?.focus();
+
+    if (term1 === null && term2 === null && term3 === null && finalExam === null && rawSubjects.length > 0) {
+      if (rawSubjects.length === 1) {
+        finalExam = rawSubjects[0];
+      } else if (rawSubjects.length === 2) {
+        term1 = rawSubjects[0];
+        finalExam = rawSubjects[1];
+      } else if (rawSubjects.length === 3) {
+        term1 = rawSubjects[0];
+        term2 = rawSubjects[1];
+        finalExam = rawSubjects[2];
+      } else {
+        term1 = rawSubjects[0];
+        term2 = rawSubjects[1];
+        term3 = rawSubjects[2];
+        finalExam = rawSubjects[3];
+      }
+    }
+
+    if (this.courseTerm1Check) this.courseTerm1Check.checked = Boolean(term1 !== null && term1 !== undefined);
+    if (this.courseTerm1Input) {
+      this.courseTerm1Input.value = term1 || '';
+      this.courseTerm1Input.disabled = !this.courseTerm1Check.checked;
+    }
+
+    if (this.courseTerm2Check) this.courseTerm2Check.checked = Boolean(term2 !== null && term2 !== undefined);
+    if (this.courseTerm2Input) {
+      this.courseTerm2Input.value = term2 || '';
+      this.courseTerm2Input.disabled = !this.courseTerm2Check.checked;
+    }
+
+    if (this.courseTerm3Check) this.courseTerm3Check.checked = Boolean(term3 !== null && term3 !== undefined);
+    if (this.courseTerm3Input) {
+      this.courseTerm3Input.value = term3 || '';
+      this.courseTerm3Input.disabled = !this.courseTerm3Check.checked;
+    }
+
+    const hasFinal = Boolean(finalExam !== null && finalExam !== undefined && finalExam !== '');
+    if (this.courseFinalExamCheck) {
+      this.courseFinalExamCheck.checked = hasFinal || rawSubjects.length === 0;
+      if (this.courseFinalExamInput) {
+        this.courseFinalExamInput.value = finalExam || '';
+        this.courseFinalExamInput.disabled = !this.courseFinalExamCheck.checked;
+      }
+    } else if (this.courseFinalExamInput) {
+      this.courseFinalExamInput.value = finalExam || '';
     }
   }
 
@@ -7139,12 +7259,53 @@ class UIController {
     }
     const duration = `${durationVal} ${unitText}`;
 
-    const subjectInputs = this.courseSubjectsContainer
-      ? this.courseSubjectsContainer.querySelectorAll('.course-subject-input')
-      : [];
-    const subjects = [...subjectInputs]
-      .map(input => input.value.trim())
-      .filter(name => Boolean(name));
+    const term1Enabled = Boolean(this.courseTerm1Check?.checked);
+    const term1Val = this.courseTerm1Input?.value.trim() || '';
+
+    const term2Enabled = Boolean(this.courseTerm2Check?.checked);
+    const term2Val = this.courseTerm2Input?.value.trim() || '';
+
+    const term3Enabled = Boolean(this.courseTerm3Check?.checked);
+    const term3Val = this.courseTerm3Input?.value.trim() || '';
+
+    const finalExamEnabled = Boolean(this.courseFinalExamCheck ? this.courseFinalExamCheck.checked : true);
+    const finalExamVal = this.courseFinalExamInput?.value.trim() || '';
+
+    const subjects = [];
+    if (term1Enabled && term1Val) {
+      subjects.push(/^1st\s+Terminal/i.test(term1Val) ? term1Val : `1st Terminal — ${term1Val}`);
+    } else if (term1Enabled) {
+      subjects.push('1st Terminal');
+    }
+
+    if (term2Enabled && term2Val) {
+      subjects.push(/^2nd\s+Terminal/i.test(term2Val) ? term2Val : `2nd Terminal — ${term2Val}`);
+    } else if (term2Enabled) {
+      subjects.push('2nd Terminal');
+    }
+
+    if (term3Enabled && term3Val) {
+      subjects.push(/^3rd\s+Terminal/i.test(term3Val) ? term3Val : `3rd Terminal — ${term3Val}`);
+    } else if (term3Enabled) {
+      subjects.push('3rd Terminal');
+    }
+
+    if (finalExamEnabled && finalExamVal) {
+      subjects.push(/^(?:Course\s+Final|Final\s+Exam)/i.test(finalExamVal) ? finalExamVal : `Course Final — ${finalExamVal}`);
+    } else if (finalExamEnabled) {
+      subjects.push('Course Final');
+    }
+
+    const terminalConfig = {
+      term1Enabled,
+      term1Name: term1Val,
+      term2Enabled,
+      term2Name: term2Val,
+      term3Enabled,
+      term3Name: term3Val,
+      finalExamEnabled,
+      finalExamName: finalExamVal
+    };
 
     const saveBtn = this.btnSaveCourse || this.courseForm.querySelector('button[type="submit"]');
     setButtonLoading(saveBtn, true);
@@ -7153,7 +7314,8 @@ class UIController {
       title,
       duration,
       description,
-      subjects
+      subjects,
+      terminalConfig
     };
 
     try {
@@ -7206,7 +7368,24 @@ class UIController {
   openModal(modalElement) {
     this.closeAllAdminDropdowns();
     modalElement.classList.add('open');
+    document.documentElement.classList.add('modal-open');
+    document.body.classList.add('modal-open');
     document.body.style.overflow = 'hidden';
+    if (!modalElement._scrollLockAttached) {
+      modalElement._scrollLockAttached = true;
+      modalElement.addEventListener('wheel', (e) => {
+        const dialog = modalElement.querySelector('.modal-window, [role="dialog"]');
+        if (!dialog || !dialog.contains(e.target)) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+      modalElement.addEventListener('touchmove', (e) => {
+        const dialog = modalElement.querySelector('.modal-window, [role="dialog"]');
+        if (!dialog || !dialog.contains(e.target)) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
     const dialog = modalElement.querySelector('.modal-window') || modalElement;
     dialog.setAttribute('tabindex', '-1');
     dialog.focus({ preventScroll: true });
@@ -7219,6 +7398,8 @@ class UIController {
     }
     modalElement.classList.remove('open');
     if (document.querySelectorAll('.modal-backdrop.open').length === 0) {
+      document.documentElement.classList.remove('modal-open');
+      document.body.classList.remove('modal-open');
       document.body.style.overflow = '';
     }
   }

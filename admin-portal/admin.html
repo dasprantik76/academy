@@ -15,7 +15,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-10.9">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.13">
   <script src="admin-config.js?v=3.5"></script>
 </head>
 
@@ -1507,17 +1507,54 @@
           </div>
 
           <div class="form-group">
-            <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+            <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
               <span>Course Subjects</span>
               <span style="font-size: 0.75rem; font-weight: 500; color: #64748b;">For marksheets & grading</span>
             </label>
-            <div id="courseSubjectsContainer" class="course-subjects-container">
-              <!-- Rendered dynamically -->
-            </div>
-            <div style="display: flex;">
-              <button type="button" class="btn-add-subject" id="btnAddSubject">
-                <i class="fa-solid fa-plus"></i> Add more subject
-              </button>
+            <div class="course-terminal-subjects">
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseTerm1Check">
+                  <input type="checkbox" id="courseTerm1Check" class="terminal-checkbox">
+                  <span class="terminal-text">1<sup>st</sup> Terminal</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseTerm1Input" class="course-subject-input name-input-capitalized" placeholder="Subject name">
+                </div>
+              </div>
+
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseTerm2Check">
+                  <input type="checkbox" id="courseTerm2Check" class="terminal-checkbox">
+                  <span class="terminal-text">2<sup>nd</sup> Terminal</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseTerm2Input" class="course-subject-input name-input-capitalized" placeholder="Subject name">
+                </div>
+              </div>
+
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseTerm3Check">
+                  <input type="checkbox" id="courseTerm3Check" class="terminal-checkbox">
+                  <span class="terminal-text">3<sup>rd</sup> Terminal</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseTerm3Input" class="course-subject-input name-input-capitalized" placeholder="Subject name">
+                </div>
+              </div>
+
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseFinalExamCheck">
+                  <input type="checkbox" id="courseFinalExamCheck" class="terminal-checkbox" checked>
+                  <span class="terminal-text">Final exam name</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseFinalExamInput" class="course-subject-input name-input-capitalized" placeholder="Exam name">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2029,7 +2066,7 @@
   <!-- JavaScript -->
   <script src="certificate-canvas.js?v=12"></script>
   <script src="marksheet-canvas.js?v=17"></script>
-  <script src="admin-script.js?v=idcards-11.3"></script>
+  <script src="admin-script.js?v=idcards-11.7"></script>
 </body>
 
 </html>

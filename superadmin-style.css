@@ -713,6 +713,16 @@ body.superadmin-body {
 }
 
 /* Modals */
+html:has(.sa-modal-backdrop[style*="display: flex"]),
+body:has(.sa-modal-backdrop[style*="display: flex"]),
+html:has(.sa-modal-backdrop:not([style*="display: none"]):not([hidden])),
+body:has(.sa-modal-backdrop:not([style*="display: none"]):not([hidden])),
+html.modal-open,
+body.modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: contain !important;
+}
+
 .sa-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -723,6 +733,8 @@ body.superadmin-body {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sa-modal-card {
