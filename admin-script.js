@@ -1181,6 +1181,17 @@ class AcademyStore {
     return await this.syncToCloud('save_profile', { profile: updated });
   }
 
+  isAuthCodeRequired() {
+    const profile = this.getAcademyProfile();
+    return profile?.authCodeRequired !== false;
+  }
+
+  async setAuthCodeRequired(required) {
+    const profile = this.getAcademyProfile() || {};
+    profile.authCodeRequired = Boolean(required);
+    return await this.saveAcademyProfile(profile);
+  }
+
   // Authentication Token (6-Digit OTP, 5-Hour Expiry)
   getCachedAuthToken() {
     try {
@@ -1620,6 +1631,10 @@ class UIController {
     this.authProgressFill = document.getElementById('authProgressFill');
     this.btnGenerateNewAuthCode = document.getElementById('btnGenerateNewAuthCode');
     this.btnCopyAuthCode = document.getElementById('btnCopyAuthCode');
+    this.toggleAuthCodeRequired = document.getElementById('toggleAuthCodeRequired');
+    this.authSwitchStatusLabel = document.getElementById('authSwitchStatusLabel');
+    this.authCodeDisabledBadge = document.getElementById('authCodeDisabledBadge');
+    this.authCodeCard = document.querySelector('.auth-code-card');
 
     // Student View Elements
     this.studentSearchInput = document.getElementById('studentSearchInput');
@@ -2368,6 +2383,28 @@ class UIController {
     }
 
     // Authentication Code Actions
+    if (this.toggleAuthCodeRequired) {
+      this.toggleAuthCodeRequired.addEventListener('change', async () => {
+        const isRequired = this.toggleAuthCodeRequired.checked;
+        this.updateAuthCodeSwitchUI(isRequired);
+        try {
+          await store.setAuthCodeRequired(isRequired);
+          this.showToast(
+            'Settings Updated',
+            isRequired
+              ? 'Authentication code is now REQUIRED for student registration.'
+              : 'Authentication code is now DISABLED. Students can register directly.',
+            'success'
+          );
+        } catch (e) {
+          console.error('[AdminApp] Failed to update auth code requirement:', e);
+          this.showToast('Error', 'Failed to update authentication code setting.', 'error');
+          this.toggleAuthCodeRequired.checked = !isRequired;
+          this.updateAuthCodeSwitchUI(!isRequired);
+        }
+      });
+    }
+
     if (this.btnGenerateNewAuthCode) {
       this.btnGenerateNewAuthCode.addEventListener('click', async () => {
         setButtonLoading(this.btnGenerateNewAuthCode, true);
@@ -7924,7 +7961,29 @@ class UIController {
   // ==========================================================================
   // Authentication Code (OTP) Timer & Renderer
   // ==========================================================================
+  updateAuthCodeSwitchUI(isRequired) {
+    if (this.toggleAuthCodeRequired && this.toggleAuthCodeRequired.checked !== isRequired) {
+      this.toggleAuthCodeRequired.checked = isRequired;
+    }
+    if (this.authSwitchStatusLabel) {
+      this.authSwitchStatusLabel.textContent = isRequired ? 'Code Required' : 'Code Disabled';
+      this.authSwitchStatusLabel.classList.toggle('is-active', isRequired);
+    }
+    if (this.authCodeCard) {
+      this.authCodeCard.classList.toggle('is-disabled', !isRequired);
+    }
+    if (this.btnGenerateNewAuthCode) {
+      this.btnGenerateNewAuthCode.disabled = !isRequired;
+    }
+    if (this.btnCopyAuthCode) {
+      this.btnCopyAuthCode.disabled = !isRequired;
+    }
+  }
+
   renderAuthCode() {
+    const isRequired = store.isAuthCodeRequired();
+    this.updateAuthCodeSwitchUI(isRequired);
+
     if (!this.authCodeDigits || !this.authCountdownTimer) return;
     const token = store.getCachedAuthToken();
     if (!token) {

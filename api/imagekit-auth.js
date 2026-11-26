@@ -64,9 +64,6 @@ export default async function handler(req, res) {
   if (!academySlug) {
     return res.status(400).json({ success: false, code: 'ACADEMY_REQUIRED', error: 'Academy identifier is required.' });
   }
-  if (!isAdmin && !/^\d{6}$/.test(authCode)) {
-    return res.status(400).json({ success: false, code: 'INVALID_CODE', error: 'Authentication code must be exactly 6 digits.' });
-  }
   if (!ALLOWED_TYPES.has(fileType) || !Number.isFinite(fileSize) || fileSize <= 0 || fileSize > MAX_FILE_BYTES) {
     return res.status(400).json({
       success: false,
@@ -83,18 +80,27 @@ export default async function handler(req, res) {
     }
 
     if (!isAdmin) {
+      const profileDoc = await db.collection('profile').findOne({ ownerEmail }, { projection: { _id: 0, authCodeRequired: 1 } });
+      const isAuthCodeRequired = profileDoc?.authCodeRequired !== false;
+
+      if (isAuthCodeRequired && !/^\d{6}$/.test(authCode)) {
+        return res.status(400).json({ success: false, code: 'INVALID_CODE', error: 'Authentication code must be exactly 6 digits.' });
+      }
+
       const [activeToken, course] = await Promise.all([
-        db.collection('auth_token').findOne({ ownerEmail }, { projection: { _id: 0, code: 1, expiresAt: 1 } }),
+        isAuthCodeRequired ? db.collection('auth_token').findOne({ ownerEmail }, { projection: { _id: 0, code: 1, expiresAt: 1 } }) : null,
         db.collection('courses').findOne({ id: courseId, ownerEmail }, { projection: { _id: 1 } })
       ]);
-      if (!activeToken?.code) {
-        return res.status(403).json({ success: false, code: 'NO_ACTIVE_CODE', error: 'No active authentication code is available.' });
-      }
-      if (!activeToken.expiresAt || Date.now() > Number(activeToken.expiresAt)) {
-        return res.status(403).json({ success: false, code: 'EXPIRED_CODE', error: 'The authentication code has expired.' });
-      }
-      if (!codesMatch(activeToken.code, authCode)) {
-        return res.status(403).json({ success: false, code: 'WRONG_CODE', error: 'The authentication code is incorrect.' });
+      if (isAuthCodeRequired) {
+        if (!activeToken?.code) {
+          return res.status(403).json({ success: false, code: 'NO_ACTIVE_CODE', error: 'No active authentication code is available.' });
+        }
+        if (!activeToken.expiresAt || Date.now() > Number(activeToken.expiresAt)) {
+          return res.status(403).json({ success: false, code: 'EXPIRED_CODE', error: 'The authentication code has expired.' });
+        }
+        if (!codesMatch(activeToken.code, authCode)) {
+          return res.status(403).json({ success: false, code: 'WRONG_CODE', error: 'The authentication code is incorrect.' });
+        }
       }
       if (!course) {
         return res.status(400).json({ success: false, code: 'INVALID_COURSE', error: 'The selected course is unavailable.' });

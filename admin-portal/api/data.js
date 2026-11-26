@@ -1330,7 +1330,13 @@ export default async function handler(req, res) {
             return res.status(404).json({ success: false, code: 'ACADEMY_NOT_FOUND', error: 'Academy not found.' });
           }
 
-          if (!/^\d{6}$/.test(submittedCode)) {
+          const profileDoc = await db.collection(COLLECTIONS.PROFILE).findOne(
+            { ownerEmail: registrationOwnerEmail },
+            { projection: { _id: 0, authCodeRequired: 1 } }
+          );
+          const isAuthCodeRequired = profileDoc?.authCodeRequired !== false;
+
+          if (isAuthCodeRequired && !/^\d{6}$/.test(submittedCode)) {
             return res.status(400).json({ success: false, code: 'INVALID_CODE', error: 'Authentication code must be exactly 6 digits.' });
           }
 
@@ -1338,21 +1344,23 @@ export default async function handler(req, res) {
             return res.status(400).json({ success: false, code: 'INVALID_STUDENT', error: 'Invalid student registration details.' });
           }
 
-          const activeToken = await db.collection(COLLECTIONS.AUTH_TOKEN).findOne(
-            { ownerEmail: registrationOwnerEmail },
-            { projection: { _id: 0 } }
-          );
+          if (isAuthCodeRequired) {
+            const activeToken = await db.collection(COLLECTIONS.AUTH_TOKEN).findOne(
+              { ownerEmail: registrationOwnerEmail },
+              { projection: { _id: 0 } }
+            );
 
-          if (!activeToken?.code) {
-            return res.status(403).json({ success: false, code: 'NO_ACTIVE_CODE', error: 'No active authentication code is available for this academy.' });
-          }
+            if (!activeToken?.code) {
+              return res.status(403).json({ success: false, code: 'NO_ACTIVE_CODE', error: 'No active authentication code is available for this academy.' });
+            }
 
-          if (!activeToken.expiresAt || Date.now() > Number(activeToken.expiresAt)) {
-            return res.status(403).json({ success: false, code: 'EXPIRED_CODE', error: 'The authentication code has expired. Please request a new code.' });
-          }
+            if (!activeToken.expiresAt || Date.now() > Number(activeToken.expiresAt)) {
+              return res.status(403).json({ success: false, code: 'EXPIRED_CODE', error: 'The authentication code has expired. Please request a new code.' });
+            }
 
-          if (String(activeToken.code).trim() !== submittedCode) {
-            return res.status(403).json({ success: false, code: 'WRONG_CODE', error: 'The authentication code is incorrect.' });
+            if (String(activeToken.code).trim() !== submittedCode) {
+              return res.status(403).json({ success: false, code: 'WRONG_CODE', error: 'The authentication code is incorrect.' });
+            }
           }
 
           const requestedCourseId = student?.enrolledCourseIds?.[0];
