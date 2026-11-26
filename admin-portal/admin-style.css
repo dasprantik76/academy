@@ -4729,14 +4729,6 @@ input[type="date"].has-value {
   color: var(--text-main);
 }
 
-.input-icon-wrap input:hover,
-.input-icon-wrap select:hover,
-.form-group textarea:hover,
-.custom-select-trigger:hover {
-  background-color: #ffffff;
-  border-color: #94a3b8;
-}
-
 .form-group textarea {
   padding-left: 0.875rem;
   resize: vertical;
@@ -5325,7 +5317,6 @@ input[data-capitalize="true"] {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.student-photo-upload input[type="file"]:hover,
 .student-photo-upload input[type="file"]:focus {
   border-color: var(--primary, #4f46e5) !important;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
