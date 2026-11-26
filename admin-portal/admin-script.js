@@ -973,6 +973,18 @@ class AcademyStore {
           }
 
           if (profile) {
+            if (profile.ownerEmail && profile.ownerEmail !== this.ownerEmail) {
+              this.ownerEmail = profile.ownerEmail;
+              try {
+                const currentSession = JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION) || '{}');
+                const sessionEmail = (currentSession.email || '').toLowerCase().trim();
+                if (sessionEmail && sessionEmail !== profile.ownerEmail) {
+                  localStorage.setItem(`educore_resolved_owner_${sessionEmail}`, profile.ownerEmail);
+                }
+              } catch (_) {}
+            }
+            this.tenantStatus = profile.status || 'active';
+            localStorage.setItem(this.getStorageKey('educore_tenant_status'), this.tenantStatus);
             localStorage.setItem(this.getStorageKey(STORAGE_KEYS.ACADEMY_PROFILE), JSON.stringify(profile));
           } else {
             const localProfile = this.getAcademyProfile();
@@ -1442,7 +1454,8 @@ class UIController {
     const impersonateEmail = urlParams.get('impersonate')?.toLowerCase().trim();
 
     // Canonical tenant email mapping for co-owners
-    let tenantOwnerEmail = userEmail;
+    const cachedResolvedOwner = localStorage.getItem(`educore_resolved_owner_${userEmail}`);
+    let tenantOwnerEmail = cachedResolvedOwner || userEmail;
     if (userEmail === 'digantacomputercentre@gmail.com') {
       tenantOwnerEmail = 'rcavirup@gmail.com';
     }
@@ -2072,6 +2085,7 @@ class UIController {
     this.btnOpenSubdomainSettings = document.getElementById('btnOpenSubdomainSettings');
 
     // Modals - Academy Settings
+    this.navSettings = document.getElementById('nav-settings');
     this.btnEditAcademySettings = document.getElementById('btnEditAcademySettings');
     this.academySettingsModal = document.getElementById('academySettingsModal');
     this.academySettingsForm = document.getElementById('academySettingsForm');
@@ -2082,6 +2096,12 @@ class UIController {
     this.settingsSlugPrefix = document.getElementById('settingsSlugPrefix');
     this.btnCloseAcademySettingsModal = document.getElementById('btnCloseAcademySettingsModal');
     this.btnCancelAcademySettings = document.getElementById('btnCancelAcademySettings');
+    this.settingsCoOwnerInput = document.getElementById('settingsCoOwnerInput');
+    this.btnAddCoOwner = document.getElementById('btnAddCoOwner');
+    this.settingsCoOwnersContainer = document.getElementById('settingsCoOwnersContainer');
+    this.settingsCoOwnersList = document.getElementById('settingsCoOwnersList');
+    this.settingsCoOwnersEmpty = document.getElementById('settingsCoOwnersEmpty');
+    this.settingsCoOwnerError = document.getElementById('settingsCoOwnerError');
 
     // Modals - Onboarding Setup
     this.onboardingModal = document.getElementById('onboardingModal');
@@ -2242,6 +2262,13 @@ class UIController {
     }
 
     // Academy Settings Handlers
+    if (this.navSettings) {
+      this.navSettings.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.openAcademySettingsModal();
+        this.closeSidebar();
+      });
+    }
     if (this.btnEditAcademySettings) {
       this.btnEditAcademySettings.addEventListener('click', () => this.openAcademySettingsModal());
     }
@@ -2250,6 +2277,27 @@ class UIController {
     }
     if (this.btnCancelAcademySettings) {
       this.btnCancelAcademySettings.addEventListener('click', () => this.closeAcademySettingsModal());
+    }
+    if (this.btnAddCoOwner) {
+      this.btnAddCoOwner.addEventListener('click', () => this.addCoOwnerFromInput());
+    }
+    if (this.settingsCoOwnerInput) {
+      this.settingsCoOwnerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.addCoOwnerFromInput();
+        }
+      });
+      this.settingsCoOwnerInput.addEventListener('input', () => this.hideCoOwnerError());
+    }
+    if (this.settingsCoOwnersList) {
+      this.settingsCoOwnersList.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('.btn-remove-coowner');
+        if (removeBtn) {
+          const email = removeBtn.getAttribute('data-email');
+          if (email) this.removeCoOwner(email);
+        }
+      });
     }
     if (this.academySettingsForm) {
       this.academySettingsForm.addEventListener('submit', async (e) => {
@@ -2271,11 +2319,14 @@ class UIController {
         const submitBtn = this.academySettingsForm.querySelector('button[type="submit"]');
         setButtonLoading(submitBtn, true);
 
+        const coOwnerEmails = Array.isArray(this.currentCoOwnerEmails) ? this.currentCoOwnerEmails : [];
         const updatedProfile = {
           ...currentProfile,
           academyName,
           ownerName,
           slug,
+          coOwnerEmails,
+          coOwnerEmail: coOwnerEmails[0] || '',
           updatedAt: Date.now()
         };
 
@@ -2290,7 +2341,7 @@ class UIController {
           this.closeAcademySettingsModal();
           this.render();
           this.updatePublicSiteLink();
-          this.showToast('Settings Saved', `Academy details & subdomain (${slug}) updated successfully!`, 'success');
+          this.showToast('Settings Saved', 'Academy details & co-owners updated successfully!', 'success');
         } catch (err) {
           this.showToast('Save Failed', err.message || 'Could not update academy settings.', 'error');
         } finally {
@@ -8269,12 +8320,115 @@ class UIController {
       this.settingsSlugPrefix.textContent = 'diganta.pixelsetu.com';
     }
 
+    // Initialize co-owners list
+    let coOwners = [];
+    if (Array.isArray(profile?.coOwnerEmails)) {
+      coOwners = [...profile.coOwnerEmails];
+    } else if (profile?.coOwnerEmail) {
+      coOwners = [profile.coOwnerEmail];
+    }
+    this.currentCoOwnerEmails = Array.from(new Set(coOwners.map(e => String(e || '').toLowerCase().trim()).filter(Boolean)));
+
+    if (this.settingsCoOwnerInput) {
+      this.settingsCoOwnerInput.value = '';
+    }
+    this.hideCoOwnerError();
+    this.renderCoOwnersList();
+
     this.openModal(this.academySettingsModal);
   }
 
   closeAcademySettingsModal() {
     if (!this.academySettingsModal) return;
     this.closeModal(this.academySettingsModal);
+  }
+
+  renderCoOwnersList() {
+    if (!this.settingsCoOwnersList) return;
+    const list = this.currentCoOwnerEmails || [];
+    if (list.length === 0) {
+      if (this.settingsCoOwnersEmpty) this.settingsCoOwnersEmpty.style.display = 'flex';
+      this.settingsCoOwnersList.innerHTML = '';
+      return;
+    }
+
+    if (this.settingsCoOwnersEmpty) this.settingsCoOwnersEmpty.style.display = 'none';
+    this.settingsCoOwnersList.innerHTML = list.map(email => `
+      <li class="coowner-item">
+        <div class="coowner-info">
+          <div class="coowner-avatar">${escapeHtml(email.charAt(0).toUpperCase())}</div>
+          <div class="coowner-details">
+            <span class="coowner-email">${escapeHtml(email)}</span>
+            <span class="coowner-role-badge">Co-Owner</span>
+          </div>
+        </div>
+        <button type="button" class="btn-remove-coowner" data-email="${escapeHtml(email)}" title="Remove ${escapeHtml(email)}">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </li>
+    `).join('');
+  }
+
+  addCoOwnerFromInput() {
+    if (!this.settingsCoOwnerInput) return;
+    const email = this.settingsCoOwnerInput.value.toLowerCase().trim();
+    if (!email) {
+      this.showCoOwnerError('Please enter a Google email address.');
+      this.settingsCoOwnerInput.focus();
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      this.showCoOwnerError('Please enter a valid email address.');
+      this.settingsCoOwnerInput.focus();
+      return;
+    }
+
+    const ownerEmail = (store.ownerEmail || '').toLowerCase();
+    const profile = store.getAcademyProfile();
+    const profileOwnerEmail = (profile?.ownerEmail || '').toLowerCase();
+
+    if (email === ownerEmail || email === profileOwnerEmail) {
+      this.showCoOwnerError('This email is the primary academy owner.');
+      return;
+    }
+
+    if (!Array.isArray(this.currentCoOwnerEmails)) {
+      this.currentCoOwnerEmails = [];
+    }
+
+    if (this.currentCoOwnerEmails.some(e => e.toLowerCase() === email)) {
+      this.showCoOwnerError('This email is already added as a co-owner.');
+      return;
+    }
+
+    this.currentCoOwnerEmails.push(email);
+    this.settingsCoOwnerInput.value = '';
+    this.hideCoOwnerError();
+    this.renderCoOwnersList();
+    this.settingsCoOwnerInput.focus();
+  }
+
+  removeCoOwner(emailToRemove) {
+    if (!Array.isArray(this.currentCoOwnerEmails)) return;
+    const target = (emailToRemove || '').toLowerCase().trim();
+    this.currentCoOwnerEmails = this.currentCoOwnerEmails.filter(e => e.toLowerCase().trim() !== target);
+    this.renderCoOwnersList();
+  }
+
+  showCoOwnerError(msg) {
+    if (this.settingsCoOwnerError) {
+      this.settingsCoOwnerError.textContent = msg;
+      this.settingsCoOwnerError.style.display = 'flex';
+    }
+  }
+
+  hideCoOwnerError() {
+    if (this.settingsCoOwnerError) {
+      this.settingsCoOwnerError.textContent = '';
+      this.settingsCoOwnerError.style.display = 'none';
+    }
   }
 
   // ==========================================================================

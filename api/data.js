@@ -985,13 +985,18 @@ async function ensureDigantaTenantInDatabase(db) {
         updatedAt: new Date().toISOString()
       });
     } else {
+      const existingCoOwners = Array.isArray(existingProfile.coOwnerEmails)
+        ? existingProfile.coOwnerEmails
+        : (existingProfile.coOwnerEmail ? [existingProfile.coOwnerEmail] : []);
+      const coOwnerEmails = Array.from(new Set([...existingCoOwners, 'digantacomputercentre@gmail.com']));
+
       await db.collection(COLLECTIONS.PROFILE).updateOne(
         { _id: existingProfile._id },
         {
           $set: {
             ownerEmail: DIGANTA_EMAIL,
-            coOwnerEmail: 'digantacomputercentre@gmail.com',
-            coOwnerEmails: ['digantacomputercentre@gmail.com'],
+            coOwnerEmail: coOwnerEmails[0] || 'digantacomputercentre@gmail.com',
+            coOwnerEmails,
             slug: 'diganta',
             academyName: canonicalDiganta.academyName,
             status: 'active',
@@ -1071,17 +1076,24 @@ export default async function handler(req, res) {
     let email = (queryEmail || '').toLowerCase().trim();
     let slug = (querySlug || '').toLowerCase().trim();
 
-    // Map co-owner email to canonical tenant owner email
-    if (email === 'digantacomputercentre@gmail.com') {
-      email = 'rcavirup@gmail.com';
-    }
-
     // If slug parameter actually contains an email, treat it as email directly
     if (!email && slug && slug.includes('@')) {
       email = slug;
       slug = '';
+    }
+
+    // Dynamic resolution for co-owner emails to canonical tenant owner email
+    if (email) {
       if (email === 'digantacomputercentre@gmail.com') {
         email = 'rcavirup@gmail.com';
+      } else {
+        const coOwnerProfile = await db.collection(COLLECTIONS.PROFILE).findOne(
+          { $or: [{ coOwnerEmails: email }, { coOwnerEmail: email }] },
+          { projection: { _id: 0, ownerEmail: 1 } }
+        );
+        if (coOwnerProfile && coOwnerProfile.ownerEmail) {
+          email = coOwnerProfile.ownerEmail;
+        }
       }
     }
 
@@ -1409,11 +1421,29 @@ export default async function handler(req, res) {
             status = (isSuperAdmin || DEFAULT_TENANTS[ownerEmail]) ? 'active' : 'pending';
           }
 
+          let coOwnerEmails = [];
+          if (Array.isArray(payload.profile.coOwnerEmails)) {
+            coOwnerEmails = Array.from(
+              new Set(
+                payload.profile.coOwnerEmails
+                  .map(e => String(e || '').toLowerCase().trim())
+                  .filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e !== ownerEmail)
+              )
+            );
+          } else if (Array.isArray(existingProfile?.coOwnerEmails)) {
+            coOwnerEmails = existingProfile.coOwnerEmails;
+          } else if (existingProfile?.coOwnerEmail) {
+            coOwnerEmails = [existingProfile.coOwnerEmail];
+          }
+
           const updatedProfile = {
             ...payload.profile,
             ownerEmail,
+            coOwnerEmails,
+            coOwnerEmail: coOwnerEmails[0] || payload.profile.coOwnerEmail || '',
             status,
-            requestedAt: existingProfile?.requestedAt || new Date().toISOString()
+            requestedAt: existingProfile?.requestedAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           };
           await db.collection(COLLECTIONS.PROFILE).updateOne(
             { ownerEmail },
@@ -1421,6 +1451,31 @@ export default async function handler(req, res) {
             { upsert: true }
           );
           return res.status(200).json({ success: true, profile: updatedProfile });
+        }
+
+        // 1b. Save Co-Owners directly
+        case 'save_co_owners': {
+          let coOwnerEmails = [];
+          if (Array.isArray(payload?.coOwnerEmails)) {
+            coOwnerEmails = Array.from(
+              new Set(
+                payload.coOwnerEmails
+                  .map(e => String(e || '').toLowerCase().trim())
+                  .filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e !== ownerEmail)
+              )
+            );
+          }
+          await db.collection(COLLECTIONS.PROFILE).updateOne(
+            { ownerEmail },
+            {
+              $set: {
+                coOwnerEmails,
+                coOwnerEmail: coOwnerEmails[0] || '',
+                updatedAt: new Date().toISOString()
+              }
+            }
+          );
+          return res.status(200).json({ success: true, coOwnerEmails });
         }
 
         // 2. Save All Courses

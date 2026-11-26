@@ -7797,6 +7797,7 @@ body.is-superadmin #nav-tenants {
     align-items: stretch;
     gap: 0.35rem;
   }
+
   .terminal-label-group {
     width: 100%;
   }
@@ -8526,4 +8527,241 @@ body.is-superadmin #nav-tenants {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+}
+
+
+/* ==========================================================================
+   Academy Settings Modal & Co-Owners Styles
+   ========================================================================== */
+.settings-modal-window {
+  max-width: 580px;
+  width: 100%;
+}
+
+.modal-header .modal-subtitle {
+  font-size: 0.78125rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.15rem;
+  font-weight: 400;
+}
+
+.settings-modal-body {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-section-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.settings-section-title i {
+  color: var(--primary, #4361ee);
+  font-size: 0.95rem;
+}
+
+.settings-helper-text {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #64748b);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.45;
+}
+
+.coowner-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.coowner-input-wrap {
+  flex: 1;
+}
+
+.btn-add-coowner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  padding: 0 1rem;
+  height: 44px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 8px;
+}
+
+.coowner-input-error {
+  font-size: 0.78125rem;
+  color: #ef4444;
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.coowners-list-wrap {
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  background: var(--bg-card-alt, #f8fafc);
+  overflow: hidden;
+}
+
+.coowners-empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: var(--text-muted, #64748b);
+  font-size: 0.8125rem;
+}
+
+.coowners-empty i {
+  font-size: 1.75rem;
+  color: #cbd5e1;
+}
+
+.coowners-empty p {
+  margin: 0;
+  max-width: 340px;
+  line-height: 1.4;
+}
+
+.coowners-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.coowner-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.875rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.coowner-item:last-child {
+  border-bottom: none;
+}
+
+.coowner-item:hover {
+  background: rgba(67, 97, 238, 0.04);
+}
+
+.coowner-info {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.coowner-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4361ee, #3a0ca3);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.coowner-details {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.coowner-email {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main, #0f172a);
+  word-break: break-all;
+}
+
+.coowner-role-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.125rem 0.45rem;
+  border-radius: 4px;
+  background: #e0e7ff;
+  color: #4338ca;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.btn-remove-coowner {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-remove-coowner:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .coowners-list-wrap {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .coowner-item {
+  border-color: #334155;
+}
+
+[data-theme="dark"] .coowner-item:hover {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+[data-theme="dark"] .coowners-empty i {
+  color: #475569;
+}
+
+[data-theme="dark"] .coowner-role-badge {
+  background: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .btn-remove-coowner:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
 }

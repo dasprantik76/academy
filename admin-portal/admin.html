@@ -15,7 +15,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-10.18">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.19">
   <script src="admin-config.js?v=3.5"></script>
 </head>
 
@@ -76,6 +76,10 @@
           <span>Inbox</span>
           <span class="nav-badge" id="inboxUnreadBadge">0</span>
         </a>
+        <a href="#settings" class="nav-item" data-view="settings" id="nav-settings">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -124,6 +128,10 @@
         </div>
 
         <div class="header-right">
+          <button type="button" class="btn btn-secondary btn-sm" id="btnEditAcademySettings" title="Academy Settings">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+          </button>
           <a href="#" class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer"
             title="View Public Academy Website" id="btnViewPublicSite">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
@@ -1527,7 +1535,8 @@
                   <span class="terminal-colon">:</span>
                 </label>
                 <div class="terminal-input-wrap">
-                  <input type="text" id="courseTerm2Input" class="course-subject-input name-input-capitalized" placeholder="Course Modules">
+                  <input type="text" id="courseTerm2Input" class="course-subject-input name-input-capitalized"
+                    placeholder="Course Modules">
                 </div>
               </div>
 
@@ -1538,7 +1547,8 @@
                   <span class="terminal-colon">:</span>
                 </label>
                 <div class="terminal-input-wrap">
-                  <input type="text" id="courseTerm3Input" class="course-subject-input name-input-capitalized" placeholder="Course Modules">
+                  <input type="text" id="courseTerm3Input" class="course-subject-input name-input-capitalized"
+                    placeholder="Course Modules">
                 </div>
               </div>
 
@@ -1940,43 +1950,79 @@
 
   <!-- Academy & Client Profile Settings Modal -->
   <div class="modal-backdrop" id="academySettingsModal">
-    <div class="modal-window modal-sm">
+    <div class="modal-window modal-md settings-modal-window">
       <div class="modal-header">
         <div class="modal-title-box">
           <i class="fa-solid fa-gear modal-icon"></i>
-          <h3>Academy Settings</h3>
+          <div>
+            <h3>Academy Settings</h3>
+            <p class="modal-subtitle">Manage academy profile and authorized co-owners</p>
+          </div>
         </div>
         <button class="btn-close-modal" id="btnCloseAcademySettingsModal" aria-label="Close modal">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <form id="academySettingsForm" autocomplete="off">
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="settingsAcademyName">Academy Name <span class="required-star">*</span></label>
-            <div class="input-icon-wrap">
-              <i class="fa-solid fa-school"></i>
-              <input type="text" id="settingsAcademyName" class="name-input-capitalized" data-capitalize="true"
-                required>
+        <div class="modal-body settings-modal-body">
+          <div class="settings-section">
+            <h4 class="settings-section-title"><i class="fa-solid fa-school"></i> Academy Details</h4>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="settingsAcademyName">Academy Name <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-school"></i>
+                  <input type="text" id="settingsAcademyName" class="name-input-capitalized" data-capitalize="true"
+                    required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="settingsOwnerName">Owner Name <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-user-tie"></i>
+                  <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="display: none;">
+              <label for="settingsSubdomainSlug">Public Website Slug</label>
+              <div class="subdomain-input-wrap"
+                style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+                <span id="settingsSlugPrefix"
+                  style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
+                <input type="text" id="settingsSubdomainSlug" value="diganta" placeholder="your-slug"
+                  style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="settingsOwnerName">Owner Name <span class="required-star">*</span></label>
-            <div class="input-icon-wrap">
-              <i class="fa-solid fa-user-tie"></i>
-              <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true" required>
+          <div class="settings-section settings-coowners-section">
+            <div class="settings-section-header">
+              <div>
+                <h4 class="settings-section-title"><i class="fa-solid fa-user-group"></i> Academy Co-Owners</h4>
+                <p class="settings-helper-text">Add Google account email addresses. Co-owners have full access to manage courses, students, and marksheets for this academy.</p>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group" style="display: none;">
-            <label for="settingsSubdomainSlug">Public Website Slug</label>
-            <div class="subdomain-input-wrap"
-              style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
-              <span id="settingsSlugPrefix"
-                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
-              <input type="text" id="settingsSubdomainSlug" value="diganta" placeholder="your-slug"
-                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
+            <div class="coowner-input-row">
+              <div class="input-icon-wrap coowner-input-wrap">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="settingsCoOwnerInput" placeholder="Enter Google email (e.g. coowner@gmail.com)" autocomplete="off">
+              </div>
+              <button type="button" class="btn btn-secondary btn-add-coowner" id="btnAddCoOwner">
+                <i class="fa-solid fa-plus"></i> <span>Add Co-Owner</span>
+              </button>
+            </div>
+            <div class="coowner-input-error" id="settingsCoOwnerError" style="display: none;"></div>
+
+            <div class="coowners-list-wrap">
+              <div class="coowners-empty" id="settingsCoOwnersEmpty">
+                <i class="fa-solid fa-user-shield"></i>
+                <p>No co-owners added yet. Enter an email above to add a co-owner.</p>
+              </div>
+              <ul class="coowners-list" id="settingsCoOwnersList"></ul>
             </div>
           </div>
         </div>
@@ -2063,7 +2109,7 @@
   <!-- JavaScript -->
   <script src="certificate-canvas.js?v=12"></script>
   <script src="marksheet-canvas.js?v=17"></script>
-  <script src="admin-script.js?v=idcards-11.8"></script>
+  <script src="admin-script.js?v=idcards-11.9"></script>
 </body>
 
 </html>
