@@ -1632,8 +1632,6 @@ class UIController {
     this.btnGenerateNewAuthCode = document.getElementById('btnGenerateNewAuthCode');
     this.btnCopyAuthCode = document.getElementById('btnCopyAuthCode');
     this.toggleAuthCodeRequired = document.getElementById('toggleAuthCodeRequired');
-    this.authSwitchStatusLabel = document.getElementById('authSwitchStatusLabel');
-    this.authCodeDisabledBadge = document.getElementById('authCodeDisabledBadge');
     this.authCodeCard = document.querySelector('.auth-code-card');
 
     // Student View Elements
@@ -7964,10 +7962,6 @@ class UIController {
   updateAuthCodeSwitchUI(isRequired) {
     if (this.toggleAuthCodeRequired && this.toggleAuthCodeRequired.checked !== isRequired) {
       this.toggleAuthCodeRequired.checked = isRequired;
-    }
-    if (this.authSwitchStatusLabel) {
-      this.authSwitchStatusLabel.textContent = isRequired ? 'Code Required' : 'Code Disabled';
-      this.authSwitchStatusLabel.classList.toggle('is-active', isRequired);
     }
     if (this.authCodeCard) {
       this.authCodeCard.classList.toggle('is-disabled', !isRequired);

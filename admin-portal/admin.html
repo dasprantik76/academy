@@ -15,7 +15,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-10.8">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.9">
   <script src="admin-config.js?v=3.5"></script>
 </head>
 
@@ -267,25 +267,19 @@
                   </div>
                 </div>
                 <div class="auth-header-controls">
-                  <div class="auth-switch-item" title="Toggle whether authentication code is required for student registration">
-                    <span class="auth-switch-status-label" id="authSwitchStatusLabel">Code Required</span>
-                    <label class="apple-switch" for="toggleAuthCodeRequired">
-                      <input type="checkbox" id="toggleAuthCodeRequired" checked
-                        aria-label="Require Authentication Code for Student Registration">
-                      <span class="apple-switch-slider"></span>
-                    </label>
-                  </div>
                   <button class="btn btn-sm btn-outline" id="btnGenerateNewAuthCode"
                     title="Generate a fresh authentication code">
                     <i class="fa-solid fa-rotate"></i> Generate New
                   </button>
+                  <label class="apple-switch" for="toggleAuthCodeRequired"
+                    title="Toggle authentication code requirement for student registration">
+                    <input type="checkbox" id="toggleAuthCodeRequired" checked
+                      aria-label="Require Authentication Code for Student Registration">
+                    <span class="apple-switch-slider"></span>
+                  </label>
                 </div>
               </div>
               <div class="card-body auth-code-body">
-                <div class="auth-code-disabled-badge" id="authCodeDisabledBadge" aria-live="polite">
-                  <i class="fa-solid fa-circle-info"></i>
-                  <span>Authentication code is disabled. Students can register directly on the public site without an authentication code.</span>
-                </div>
                 <div class="auth-code-box">
                   <div class="auth-digits" id="authCodeDigits">
                     <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
@@ -2031,7 +2025,7 @@
   <!-- JavaScript -->
   <script src="certificate-canvas.js?v=12"></script>
   <script src="marksheet-canvas.js?v=17"></script>
-  <script src="admin-script.js?v=idcards-11.2"></script>
+  <script src="admin-script.js?v=idcards-11.3"></script>
 </body>
 
 </html>
