@@ -7685,6 +7685,12 @@ body.is-superadmin #nav-tenants {
   display: flex !important;
 }
 
+/* Course Modal Window Sizing */
+#courseModal .modal-window,
+.course-modal-window {
+  max-width: 680px;
+}
+
 /* Course Terminal Subjects in Add/Edit Course Modal */
 .course-terminal-subjects {
   display: flex;

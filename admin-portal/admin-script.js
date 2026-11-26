@@ -2546,24 +2546,28 @@ class UIController {
     this.courseTerm1Check?.addEventListener('change', () => {
       if (this.courseTerm1Input) {
         this.courseTerm1Input.disabled = !this.courseTerm1Check.checked;
+        this.courseTerm1Input.required = this.courseTerm1Check.checked;
         if (this.courseTerm1Check.checked) this.courseTerm1Input.focus();
       }
     });
     this.courseTerm2Check?.addEventListener('change', () => {
       if (this.courseTerm2Input) {
         this.courseTerm2Input.disabled = !this.courseTerm2Check.checked;
+        this.courseTerm2Input.required = this.courseTerm2Check.checked;
         if (this.courseTerm2Check.checked) this.courseTerm2Input.focus();
       }
     });
     this.courseTerm3Check?.addEventListener('change', () => {
       if (this.courseTerm3Input) {
         this.courseTerm3Input.disabled = !this.courseTerm3Check.checked;
+        this.courseTerm3Input.required = this.courseTerm3Check.checked;
         if (this.courseTerm3Check.checked) this.courseTerm3Input.focus();
       }
     });
     this.courseFinalExamCheck?.addEventListener('change', () => {
       if (this.courseFinalExamInput) {
         this.courseFinalExamInput.disabled = !this.courseFinalExamCheck.checked;
+        this.courseFinalExamInput.required = this.courseFinalExamCheck.checked;
         if (this.courseFinalExamCheck.checked) this.courseFinalExamInput.focus();
       }
     });
@@ -7113,24 +7117,28 @@ class UIController {
     if (this.courseTerm1Check) this.courseTerm1Check.checked = true;
     if (this.courseTerm1Input) {
       this.courseTerm1Input.disabled = false;
+      this.courseTerm1Input.required = true;
       this.courseTerm1Input.value = '';
     }
 
     if (this.courseTerm2Check) this.courseTerm2Check.checked = false;
     if (this.courseTerm2Input) {
       this.courseTerm2Input.disabled = true;
+      this.courseTerm2Input.required = false;
       this.courseTerm2Input.value = '';
     }
 
     if (this.courseTerm3Check) this.courseTerm3Check.checked = false;
     if (this.courseTerm3Input) {
       this.courseTerm3Input.disabled = true;
+      this.courseTerm3Input.required = false;
       this.courseTerm3Input.value = '';
     }
 
     if (this.courseFinalExamCheck) this.courseFinalExamCheck.checked = true;
     if (this.courseFinalExamInput) {
       this.courseFinalExamInput.disabled = false;
+      this.courseFinalExamInput.required = true;
       this.courseFinalExamInput.value = '';
     }
   }
@@ -7142,18 +7150,21 @@ class UIController {
       if (this.courseTerm1Input) {
         this.courseTerm1Input.value = config.term1Name || '';
         this.courseTerm1Input.disabled = !config.term1Enabled;
+        this.courseTerm1Input.required = Boolean(config.term1Enabled);
       }
 
       if (this.courseTerm2Check) this.courseTerm2Check.checked = Boolean(config.term2Enabled);
       if (this.courseTerm2Input) {
         this.courseTerm2Input.value = config.term2Name || '';
         this.courseTerm2Input.disabled = !config.term2Enabled;
+        this.courseTerm2Input.required = Boolean(config.term2Enabled);
       }
 
       if (this.courseTerm3Check) this.courseTerm3Check.checked = Boolean(config.term3Enabled);
       if (this.courseTerm3Input) {
         this.courseTerm3Input.value = config.term3Name || '';
         this.courseTerm3Input.disabled = !config.term3Enabled;
+        this.courseTerm3Input.required = Boolean(config.term3Enabled);
       }
 
       if (this.courseFinalExamCheck) {
@@ -7162,9 +7173,11 @@ class UIController {
         if (this.courseFinalExamInput) {
           this.courseFinalExamInput.value = config.finalExamName || '';
           this.courseFinalExamInput.disabled = !isFinalEnabled;
+          this.courseFinalExamInput.required = isFinalEnabled;
         }
       } else if (this.courseFinalExamInput) {
         this.courseFinalExamInput.value = config.finalExamName || '';
+        this.courseFinalExamInput.required = true;
       }
       return;
     }
@@ -7210,18 +7223,21 @@ class UIController {
     if (this.courseTerm1Input) {
       this.courseTerm1Input.value = term1 || '';
       this.courseTerm1Input.disabled = !this.courseTerm1Check.checked;
+      this.courseTerm1Input.required = this.courseTerm1Check.checked;
     }
 
     if (this.courseTerm2Check) this.courseTerm2Check.checked = Boolean(term2 !== null && term2 !== undefined);
     if (this.courseTerm2Input) {
       this.courseTerm2Input.value = term2 || '';
       this.courseTerm2Input.disabled = !this.courseTerm2Check.checked;
+      this.courseTerm2Input.required = this.courseTerm2Check.checked;
     }
 
     if (this.courseTerm3Check) this.courseTerm3Check.checked = Boolean(term3 !== null && term3 !== undefined);
     if (this.courseTerm3Input) {
       this.courseTerm3Input.value = term3 || '';
       this.courseTerm3Input.disabled = !this.courseTerm3Check.checked;
+      this.courseTerm3Input.required = this.courseTerm3Check.checked;
     }
 
     const hasFinal = Boolean(finalExam !== null && finalExam !== undefined && finalExam !== '');
@@ -7230,9 +7246,11 @@ class UIController {
       if (this.courseFinalExamInput) {
         this.courseFinalExamInput.value = finalExam || '';
         this.courseFinalExamInput.disabled = !this.courseFinalExamCheck.checked;
+        this.courseFinalExamInput.required = this.courseFinalExamCheck.checked;
       }
     } else if (this.courseFinalExamInput) {
       this.courseFinalExamInput.value = finalExam || '';
+      this.courseFinalExamInput.required = true;
     }
   }
 
@@ -7270,6 +7288,24 @@ class UIController {
 
     const finalExamEnabled = Boolean(this.courseFinalExamCheck ? this.courseFinalExamCheck.checked : true);
     const finalExamVal = this.courseFinalExamInput?.value.trim() || '';
+
+    const activeEnabled = [];
+    if (term1Enabled) activeEnabled.push({ name: '1st Terminal', val: term1Val, input: this.courseTerm1Input });
+    if (term2Enabled) activeEnabled.push({ name: '2nd Terminal', val: term2Val, input: this.courseTerm2Input });
+    if (term3Enabled) activeEnabled.push({ name: '3rd Terminal', val: term3Val, input: this.courseTerm3Input });
+    if (finalExamEnabled) activeEnabled.push({ name: 'Final Exam', val: finalExamVal, input: this.courseFinalExamInput });
+
+    if (activeEnabled.length === 0) {
+      this.showToast('Validation Error', 'Please enable and fill at least one module or exam for Marksheets & Grading.', 'error');
+      return;
+    }
+
+    const emptyEnabled = activeEnabled.find(item => !item.val);
+    if (emptyEnabled) {
+      this.showToast('Validation Error', `Please enter the course module or exam name for ${emptyEnabled.name}.`, 'error');
+      emptyEnabled.input?.focus();
+      return;
+    }
 
     const subjects = [];
     if (term1Enabled && term1Val) {

@@ -4485,8 +4485,6 @@ button:hover,
    ========================================================================== */
 html:has(.modal-backdrop.open),
 body:has(.modal-backdrop.open),
-html:has([role="dialog"]:not([hidden])),
-body:has([role="dialog"]:not([hidden])),
 html.modal-open,
 body.modal-open {
   overflow: hidden !important;
@@ -7685,6 +7683,12 @@ body:not(.is-superadmin) #view-tenants {
 
 body.is-superadmin #nav-tenants {
   display: flex !important;
+}
+
+/* Course Modal Window Sizing */
+#courseModal .modal-window,
+.course-modal-window {
+  max-width: 680px;
 }
 
 /* Course Terminal Subjects in Add/Edit Course Modal */
