@@ -4485,8 +4485,6 @@ button:hover,
    ========================================================================== */
 html:has(.modal-backdrop.open),
 body:has(.modal-backdrop.open),
-html:has([role="dialog"]:not([hidden])),
-body:has([role="dialog"]:not([hidden])),
 html.modal-open,
 body.modal-open {
   overflow: hidden !important;
