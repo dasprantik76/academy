@@ -2014,7 +2014,6 @@ class UIController {
     this.btnCloseDetailsModal = document.getElementById('btnCloseDetailsModal');
     this.btnEditFromDetails = document.getElementById('btnEditFromDetails');
     this.btnDeleteStudentFromDetails = document.getElementById('btnDeleteStudentFromDetails');
-    this.btnDownloadApplicationForm = document.getElementById('btnDownloadApplicationForm');
     this.currentViewingStudentId = null;
     this.completingBatchId = null;
 
@@ -3484,11 +3483,6 @@ class UIController {
       this.closeModal(this.studentDetailsModal);
       this.confirmDeleteStudent(studentId);
     });
-    this.btnDownloadApplicationForm?.addEventListener('click', () => {
-      const studentId = this.currentViewingStudentId;
-      if (!studentId) return;
-      this.downloadStudentApplicationForm(studentId);
-    });
 
     ['input', 'change'].forEach(event => this.completionIssueDate.addEventListener(event, () => this.validateCompletionDates()));
     this.completionForm.addEventListener('submit', (e) => this.handleCompletionSubmit(e));
@@ -4063,15 +4057,6 @@ class UIController {
             <span class="course-duration-badge">
               <i class="fa-regular fa-clock"></i> ${escapeHtml(course.duration)}
             </span>
-          </div>
-          <div class="course-card-body">
-            <p class="course-desc" title="${escapeHtml(course.description || '')}">${escapeHtml(course.description || 'No description provided.')}</p>
-            ${Array.isArray(course.subjects) && course.subjects.length > 0 ? `
-              <div class="course-subjects-chips" style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.65rem;">
-                ${course.subjects.slice(0, 3).map(s => `<span class="badge-course-tag" style="font-size: 0.75rem;" title="${escapeHtml(s)}">${escapeHtml(s)}</span>`).join('')}
-                ${course.subjects.length > 3 ? `<span class="badge-course-tag" style="font-size: 0.75rem; background: #f1f5f9; color: #64748b;">+${course.subjects.length - 3} more</span>` : ''}
-              </div>
-            ` : ''}
           </div>
           <div class="course-card-footer">
             <div class="enrolled-stat">
@@ -4776,12 +4761,43 @@ class UIController {
       totalMax += maxMarks;
       totalObtained += obtained;
 
-      let subjectFormatted = escapeHtml(subj);
-      if (subj.includes('—') || subj.includes('-')) {
-        const parts = subj.split(/[—-]/);
-        subjectFormatted = `<b>${escapeHtml(parts[0].trim())}</b><br><span style="font-size: 0.9em; color: #475569;">Modules: ${escapeHtml(parts.slice(1).join(' - ').trim())}</span>`;
+      let title = String(subj || '').trim();
+      let modules = '';
+
+      const isFinalExam = /^(?:Course\s+Final|Final\s+Exam|Final)/i.test(title) || (idx === courseSubjects.length - 1 && (idx >= 2 || /Final/i.test(subj)));
+
+      if (isFinalExam) {
+        let examName = title;
+        if (title.includes('—') || title.includes('-')) {
+          const parts = title.split(/[—-]/);
+          examName = parts.slice(1).join(' - ').trim() || parts[0].trim();
+        } else if (/^(?:Course\s+Final|Final\s+Exam)\s*[:]/i.test(title)) {
+          examName = title.replace(/^(?:Course\s+Final|Final\s+Exam)\s*[:]\s*/i, '').trim();
+        }
+        examName = examName.replace(/^(?:Course\s+Final|Final\s+Exam|Modules?)\s*[:—\-]?\s*/i, '').trim() || title;
+        title = examName;
+        modules = '';
       } else {
-        subjectFormatted = `<b>${escapeHtml(subj)}</b>`;
+        if (title.includes('—') || title.includes('-')) {
+          const parts = title.split(/[—-]/);
+          title = parts[0].replace(/\s+Modules?$/i, '').trim();
+          let rawModules = parts.slice(1).join(' - ').trim();
+          let cleanModules = rawModules.replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
+          modules = cleanModules ? 'Modules: ' + cleanModules : '';
+        } else if (/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i.test(title)) {
+          const match = title.match(/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i);
+          title = match[1].replace(/\s+Modules?$/i, '').trim();
+          let cleanModules = match[2].trim().replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
+          modules = cleanModules ? 'Modules: ' + cleanModules : '';
+        } else {
+          title = title.replace(/\s+Modules?$/i, '').trim();
+          modules = '';
+        }
+      }
+
+      let subjectFormatted = `<b>${escapeHtml(title)}</b>`;
+      if (modules) {
+        subjectFormatted += `<br><span style="font-size: 0.9em; color: #475569;">${escapeHtml(modules)}</span>`;
       }
 
       return `
@@ -7208,8 +7224,8 @@ class UIController {
             ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status === 'Active' ? 'On going' : student.status)}
           </span>
         </div>
-        <button type="button" class="btn btn-secondary btn-sm" id="btnQuickDownloadAppForm" style="margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:0.45rem;" title="Download Application Form (PDF)">
-          <i class="fa-solid fa-file-pdf"></i> Download PDF
+        <button type="button" class="btn" id="btnQuickDownloadAppForm" title="Print Details">
+          <i class="fa-solid fa-print"></i> Print Details
         </button>
       </div>
 
@@ -7325,10 +7341,8 @@ class UIController {
       return;
     }
 
-    const downloadBtn = this.btnDownloadApplicationForm;
     const quickBtn = document.getElementById('btnQuickDownloadAppForm');
-    if (downloadBtn) setButtonLoading(downloadBtn, true);
-    if (quickBtn) quickBtn.disabled = true;
+    if (quickBtn) setButtonLoading(quickBtn, true);
 
     try {
       this.showToast('Generating Form', `Generating application form for ${student.name}...`, 'info');
@@ -7342,8 +7356,7 @@ class UIController {
       console.error('Error generating application form:', error);
       this.showToast('Generation Failed', error.message || 'Could not create application form.', 'error');
     } finally {
-      if (downloadBtn) setButtonLoading(downloadBtn, false);
-      if (quickBtn) quickBtn.disabled = false;
+      if (quickBtn) setButtonLoading(quickBtn, false);
     }
   }
 
@@ -7471,17 +7484,17 @@ class UIController {
     const rawSubjects = Array.isArray(course?.subjects) ? course.subjects : [];
     let term1 = null, term2 = null, term3 = null, finalExam = null;
 
-    const cleanSubj = (s, prefixRegex) => s.replace(prefixRegex, '').trim();
+    const cleanSubj = (s, prefixRegex) => s.replace(prefixRegex, '').replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
 
     rawSubjects.forEach((subj) => {
       const s = String(subj || '').trim();
       if (!s) return;
-      if (/^1st\s+Terminal/i.test(s)) {
-        term1 = cleanSubj(s, /^1st\s+Terminal\s*[—:-]\s*/i);
-      } else if (/^2nd\s+Terminal/i.test(s)) {
-        term2 = cleanSubj(s, /^2nd\s+Terminal\s*[—:-]\s*/i);
-      } else if (/^3rd\s+Terminal/i.test(s)) {
-        term3 = cleanSubj(s, /^3rd\s+Terminal\s*[—:-]\s*/i);
+      if (/^1st\s+Terminal(?:\s+Modules)?/i.test(s)) {
+        term1 = cleanSubj(s, /^1st\s+Terminal(?:\s+Modules)?\s*[—:-]\s*/i);
+      } else if (/^2nd\s+Terminal(?:\s+Modules)?/i.test(s)) {
+        term2 = cleanSubj(s, /^2nd\s+Terminal(?:\s+Modules)?\s*[—:-]\s*/i);
+      } else if (/^3rd\s+Terminal(?:\s+Modules)?/i.test(s)) {
+        term3 = cleanSubj(s, /^3rd\s+Terminal(?:\s+Modules)?\s*[—:-]\s*/i);
       } else if (/^(?:Course\s+Final|Final\s+Exam)/i.test(s)) {
         finalExam = cleanSubj(s, /^(?:Course\s+Final|Final\s+Exam)\s*[—:-]\s*/i);
       }
@@ -7576,9 +7589,9 @@ class UIController {
     const finalExamVal = this.courseFinalExamInput?.value.trim() || '';
 
     const activeEnabled = [];
-    if (term1Enabled) activeEnabled.push({ name: '1st Terminal', val: term1Val, input: this.courseTerm1Input });
-    if (term2Enabled) activeEnabled.push({ name: '2nd Terminal', val: term2Val, input: this.courseTerm2Input });
-    if (term3Enabled) activeEnabled.push({ name: '3rd Terminal', val: term3Val, input: this.courseTerm3Input });
+    if (term1Enabled) activeEnabled.push({ name: '1st Terminal Modules', val: term1Val, input: this.courseTerm1Input });
+    if (term2Enabled) activeEnabled.push({ name: '2nd Terminal Modules', val: term2Val, input: this.courseTerm2Input });
+    if (term3Enabled) activeEnabled.push({ name: '3rd Terminal Modules', val: term3Val, input: this.courseTerm3Input });
     if (finalExamEnabled) activeEnabled.push({ name: 'Final Exam', val: finalExamVal, input: this.courseFinalExamInput });
 
     if (activeEnabled.length === 0) {
@@ -7595,25 +7608,29 @@ class UIController {
 
     const subjects = [];
     if (term1Enabled && term1Val) {
-      subjects.push(/^1st\s+Terminal/i.test(term1Val) ? term1Val : `1st Terminal — ${term1Val}`);
+      const cleanVal = term1Val.replace(/^(?:1st\s+Terminal(?:\s+Modules?)?|Modules?)\s*[:—\-]?\s*/i, '').trim() || term1Val;
+      subjects.push(`1st Terminal Modules — ${cleanVal}`);
     } else if (term1Enabled) {
-      subjects.push('1st Terminal');
+      subjects.push('1st Terminal Modules');
     }
 
     if (term2Enabled && term2Val) {
-      subjects.push(/^2nd\s+Terminal/i.test(term2Val) ? term2Val : `2nd Terminal — ${term2Val}`);
+      const cleanVal = term2Val.replace(/^(?:2nd\s+Terminal(?:\s+Modules?)?|Modules?)\s*[:—\-]?\s*/i, '').trim() || term2Val;
+      subjects.push(`2nd Terminal Modules — ${cleanVal}`);
     } else if (term2Enabled) {
-      subjects.push('2nd Terminal');
+      subjects.push('2nd Terminal Modules');
     }
 
     if (term3Enabled && term3Val) {
-      subjects.push(/^3rd\s+Terminal/i.test(term3Val) ? term3Val : `3rd Terminal — ${term3Val}`);
+      const cleanVal = term3Val.replace(/^(?:3rd\s+Terminal(?:\s+Modules?)?|Modules?)\s*[:—\-]?\s*/i, '').trim() || term3Val;
+      subjects.push(`3rd Terminal Modules — ${cleanVal}`);
     } else if (term3Enabled) {
-      subjects.push('3rd Terminal');
+      subjects.push('3rd Terminal Modules');
     }
 
     if (finalExamEnabled && finalExamVal) {
-      subjects.push(/^(?:Course\s+Final|Final\s+Exam)/i.test(finalExamVal) ? finalExamVal : `Course Final — ${finalExamVal}`);
+      const cleanVal = finalExamVal.replace(/^(?:Course\s+Final|Final\s+Exam|Modules?)\s*[:—\-]?\s*/i, '').trim() || finalExamVal;
+      subjects.push(`Course Final — ${cleanVal}`);
     } else if (finalExamEnabled) {
       subjects.push('Course Final');
     }

@@ -2825,8 +2825,7 @@ button:hover,
 }
 
 .course-card {
-  aspect-ratio: 1 / 0.88;
-  min-height: 250px;
+  min-height: 120px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2844,13 +2843,12 @@ button:hover,
 }
 
 .course-card-header {
-  padding: 1.05rem 1.2rem 0.65rem;
+  padding: 1.25rem 1.25rem 1.15rem;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
-  border-bottom: 1px solid var(--border-subtle);
-  flex-shrink: 0;
+  gap: 0.85rem;
+  flex-grow: 1;
 }
 
 .course-duration-badge {
@@ -5452,25 +5450,25 @@ input[data-capitalize="true"] {
 .profile-detail-header {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  padding-bottom: 1.25rem;
+  gap: 1.6rem;
+  padding-bottom: 1.4rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 .profile-avatar-large {
-  width: 72px;
-  height: 88px;
-  border-radius: 10px;
+  width: 144px;
+  height: 180px;
+  border-radius: 14px;
   border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
+  font-size: 2.8rem;
   font-weight: 700;
   color: #ffffff;
   flex-shrink: 0;
   overflow: hidden;
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
 }
 
 .profile-avatar-large.has-photo {
@@ -5485,16 +5483,78 @@ input[data-capitalize="true"] {
   object-position: center top;
 }
 
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .profile-info h3 {
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 800;
   color: var(--text-main);
+  line-height: 1.2;
+  margin: 0 0 0.45rem 0;
+  letter-spacing: -0.02em;
 }
 
 .profile-info p {
-  font-size: 0.8125rem;
+  font-size: 1.05rem;
   color: var(--text-muted);
-  margin-bottom: 0.4rem;
+  margin: 0 0 0.75rem 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.profile-info p strong {
+  color: var(--text-main);
+  font-weight: 700;
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.profile-info .badge {
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.42rem 0.95rem;
+  border-radius: 9999px;
+  gap: 0.5rem;
+  align-self: flex-start;
+}
+
+.profile-info .badge i,
+.profile-info .badge svg {
+  font-size: 0.85rem;
+}
+
+#btnQuickDownloadAppForm {
+  margin-left: auto;
+  align-self: flex-start;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 1px solid #059669;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.28);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+#btnQuickDownloadAppForm:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-color: #047857;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.38);
+  color: #ffffff;
+}
+
+#btnQuickDownloadAppForm i {
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+#btnQuickDownloadAppForm:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .profile-section-heading {
@@ -7761,7 +7821,7 @@ body.is-superadmin #nav-tenants {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  width: 172px;
+  width: 220px;
   flex-shrink: 0;
   cursor: pointer;
   user-select: none;
