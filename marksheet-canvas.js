@@ -66,6 +66,63 @@
     return `${day}/${month}/${year}`;
   }
 
+  function drawModuleTextWithOrdinals(ctx, text, startX, startY, maxWidth) {
+    if (!text) return;
+    const baseFont = '13px Arial, sans-serif';
+    const supFont = '9.5px Arial, sans-serif';
+    const fillStyle = '#444444';
+
+    const normalized = String(text)
+      .replace(/1[ˢᵗ]+/g, '1st')
+      .replace(/2[ⁿᵈ]+/g, '2nd')
+      .replace(/3[ʳᵈ]+/g, '3rd')
+      .replace(/4[ᵗʰ]+/g, '4th');
+
+    const ordinalRegex = /(\d+)(st|nd|rd|th)/gi;
+    if (!ordinalRegex.test(normalized)) {
+      ctx.font = baseFont;
+      ctx.fillStyle = fillStyle;
+      ctx.textAlign = 'left';
+      ctx.fillText(text, startX, startY, maxWidth);
+      return;
+    }
+
+    ordinalRegex.lastIndex = 0;
+    let curX = startX;
+    let lastIdx = 0;
+    let match;
+
+    ctx.fillStyle = fillStyle;
+    ctx.textAlign = 'left';
+
+    while ((match = ordinalRegex.exec(normalized)) !== null) {
+      if (match.index > lastIdx) {
+        const prefix = normalized.slice(lastIdx, match.index);
+        ctx.font = baseFont;
+        ctx.fillText(prefix, curX, startY);
+        curX += ctx.measureText(prefix).width;
+      }
+
+      const numStr = match[1];
+      ctx.font = baseFont;
+      ctx.fillText(numStr, curX, startY);
+      curX += ctx.measureText(numStr).width;
+
+      const supStr = match[2];
+      ctx.font = supFont;
+      ctx.fillText(supStr, curX, startY - 4.5);
+      curX += ctx.measureText(supStr).width;
+
+      lastIdx = match.index + match[0].length;
+    }
+
+    if (lastIdx < normalized.length) {
+      const rest = normalized.slice(lastIdx);
+      ctx.font = baseFont;
+      ctx.fillText(rest, curX, startY);
+    }
+  }
+
   function calculateMarksData(student, course, batch) {
     let courseSubjects = Array.isArray(course?.subjects) && course.subjects.length > 0
       ? course.subjects
@@ -116,16 +173,61 @@
 
       if (isFinalExam) {
         // For the 4th data, it should directly be the final exam name of the course
-        let examName = title;
-        if (title.includes('—') || title.includes('-')) {
-          const parts = title.split(/[—-]/);
-          examName = parts.slice(1).join(' - ').trim() || parts[0].trim();
-        } else if (/^(?:Course\s+Final|Final\s+Exam)\s*[:]/i.test(title)) {
-          examName = title.replace(/^(?:Course\s+Final|Final\s+Exam)\s*[:]\s*/i, '').trim();
+        let examName = course?.terminalConfig?.finalExamName || '';
+        if (!examName) {
+          if (title.includes('—') || title.includes('-')) {
+            const parts = title.split(/[—-]/);
+            examName = parts.slice(1).join(' - ').trim() || parts[0].trim();
+          } else if (/^(?:Course\s+Final|Final\s+Exam)\s*[:]/i.test(title)) {
+            examName = title.replace(/^(?:Course\s+Final|Final\s+Exam)\s*[:]\s*/i, '').trim();
+          }
+          examName = examName.replace(/^(?:Course\s+Final|Final\s+Exam|Modules?)\s*[:—\-]?\s*/i, '').trim();
         }
-        examName = examName.replace(/^(?:Course\s+Final|Final\s+Exam|Modules?)\s*[:—\-]?\s*/i, '').trim() || title;
+        if (!examName || examName.toLowerCase() === 'course final' || examName.toLowerCase() === 'final exam') {
+          const acronymMatch = (course?.title || '').match(/\(([^)]+)\)/);
+          if (acronymMatch) {
+            examName = `${acronymMatch[1].trim()} Final`;
+          } else if (course?.title) {
+            examName = `${course.title.trim()} Final`;
+          } else {
+            examName = 'Course Final';
+          }
+        }
         title = examName;
-        modules = '';
+
+        // Modules: list checked terminals of that course (e.g. "Modules : 1ˢᵗ Term, 2ⁿᵈ Term & 3ʳᵈ Term")
+        const checkedTerms = [];
+        const cfg = course?.terminalConfig;
+        if (cfg) {
+          if (cfg.term1Enabled) checkedTerms.push('1ˢᵗ Term');
+          if (cfg.term2Enabled) checkedTerms.push('2ⁿᵈ Term');
+          if (cfg.term3Enabled) checkedTerms.push('3ʳᵈ Term');
+          if (cfg.term4Enabled) checkedTerms.push('4ᵗʰ Term');
+        }
+
+        if (checkedTerms.length === 0) {
+          courseSubjects.forEach((sItem, sIdx) => {
+            if (sIdx < idx) {
+              const str = String(sItem || '').trim();
+              if (/1st\s+Term/i.test(str) || sIdx === 0) checkedTerms.push('1ˢᵗ Term');
+              else if (/2nd\s+Term/i.test(str) || sIdx === 1) checkedTerms.push('2ⁿᵈ Term');
+              else if (/3rd\s+Term/i.test(str) || sIdx === 2) checkedTerms.push('3ʳᵈ Term');
+              else if (/4th\s+Term/i.test(str) || sIdx === 3) checkedTerms.push('4ᵗʰ Term');
+            }
+          });
+        }
+
+        const uniqueTerms = Array.from(new Set(checkedTerms));
+        let termsListStr = '';
+        if (uniqueTerms.length === 1) {
+          termsListStr = uniqueTerms[0];
+        } else if (uniqueTerms.length === 2) {
+          termsListStr = `${uniqueTerms[0]} & ${uniqueTerms[1]}`;
+        } else if (uniqueTerms.length > 2) {
+          termsListStr = `${uniqueTerms.slice(0, -1).join(', ')} & ${uniqueTerms[uniqueTerms.length - 1]}`;
+        }
+
+        modules = termsListStr ? `Modules : ${termsListStr}` : '';
       } else {
         // Terminal subjects (1st, 2nd, 3rd)
         if (title.includes('—') || title.includes('-')) {
@@ -133,19 +235,19 @@
           title = parts[0].replace(/\s+Modules?$/i, '').trim();
           let rawModules = parts.slice(1).join(' - ').trim();
           let cleanModules = rawModules.replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
-          modules = cleanModules ? 'Modules: ' + cleanModules : '';
+          modules = cleanModules ? 'Modules : ' + cleanModules : '';
         } else if (/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i.test(title)) {
           const match = title.match(/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i);
           title = match[1].replace(/\s+Modules?$/i, '').trim();
           let cleanModules = match[2].trim().replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
-          modules = cleanModules ? 'Modules: ' + cleanModules : '';
+          modules = cleanModules ? 'Modules : ' + cleanModules : '';
         } else {
           title = title.replace(/\s+Modules?$/i, '').trim();
           modules = '';
         }
       }
 
-      return { slNo: idx + 1, title, modules, maxMarks, obtained };
+      return { slNo: idx + 1, title, modules, isFinalExam, maxMarks, obtained };
     });
 
     const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(1) : '85.0';
@@ -376,9 +478,7 @@
       ctx.fillStyle = '#111111';
       ctx.fillText(r.title, colX[1] + 18, rowY + (r.modules ? 23 : 32));
       if (r.modules) {
-        ctx.font = '13px Arial, sans-serif';
-        ctx.fillStyle = '#444444';
-        ctx.fillText(r.modules, colX[1] + 18, rowY + 44, colW[1] - 28);
+        drawModuleTextWithOrdinals(ctx, r.modules, colX[1] + 18, rowY + 44, colW[1] - 28);
       }
 
       ctx.fillStyle = '#222222';

@@ -1,184 +1,2119 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Academy | Admin Sign In</title>
-  <meta name="description" content="Sign in to Academy Administration Portal">
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <title>Academy by PixelSetu | Admin Panel</title>
+  <meta name="description" content="Comprehensive Academy Management Portal by PixelSetu">
+  <!-- Google Fonts: Plus Jakarta Sans & SF Pro -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Identity Services SDK -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=2.5">
-  <script src="admin-config.js?v=3.4"></script>
-  <style>
-    .btn-google-action {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      width: 100%;
-      max-width: 320px;
-      height: 48px;
-      background-color: #ffffff;
-      color: #1e293b;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      user-select: none;
-    }
-    .btn-google-action:hover {
-      background-color: #f8fafc;
-      border-color: #94a3b8;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-    .btn-google-action:active {
-      background-color: #f1f5f9;
-    }
-  </style>
+  <!-- Admin Stylesheet -->
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.26">
+  <script src="admin-config.js?v=3.5"></script>
 </head>
-<body class="login-body">
-  <div class="login-container">
-    <div class="login-card">
-      <!-- Brand Header -->
-      <div class="login-brand">
-        <div class="brand-logo-large">
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
           <i class="fa-solid fa-graduation-cap"></i>
         </div>
-        <h2>Academy</h2>
-        <p class="login-subtitle">by <strong>PixelSetu</strong></p>
+        <div class="brand-text">
+          <h2 id="sidebarAcademyName">Academy</h2>
+        </div>
+        <button class="btn-close-sidebar" id="btnCloseSidebar" aria-label="Close sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
 
-      <!-- Alert Box -->
-      <div class="login-alert" id="loginAlert" style="display: none;">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span id="loginAlertText">Authentication message</span>
-      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">MAIN MENU</div>
+        <a href="#dashboard" class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#students" class="nav-item" data-view="students" id="nav-students">
+          <i class="fa-solid fa-user-graduate"></i>
+          <span>Students</span>
+          <span class="nav-badge" id="studentCountBadge">0</span>
+        </a>
+        <a href="#courses" class="nav-item" data-view="courses" id="nav-courses">
+          <i class="fa-solid fa-desktop"></i>
+          <span>Courses</span>
+          <span class="nav-badge" id="courseCountBadge">0</span>
+        </a>
+        <a href="#batches" class="nav-item" data-view="batches" id="nav-batches">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Batches</span>
+          <span class="nav-badge" id="batchCountBadge">0</span>
+        </a>
+        <a href="#marksheets" class="nav-item" data-view="marksheets" id="nav-marksheets">
+          <i class="fa-solid fa-file-lines"></i>
+          <span>Marksheets</span>
+        </a>
+        <a href="#certificates" class="nav-item" data-view="certificates" id="nav-certificates">
+          <i class="fa-solid fa-certificate"></i><span>Certificates</span>
+        </a>
+        <a href="#idcards" class="nav-item" data-view="idcards" id="nav-idcards">
+          <i class="fa-solid fa-id-card"></i>
+          <span>ID Cards</span>
+        </a>
+        <a href="#inbox" class="nav-item" data-view="inbox" id="nav-inbox">
+          <i class="nav-custom-icon" aria-hidden="true"><svg viewBox="0 0 512 512" fill="currentColor"
+              fill-rule="evenodd" aria-hidden="true">
+              <path
+                d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z" />
+            </svg></i>
+          <span>Inbox</span>
+          <span class="nav-badge" id="inboxUnreadBadge">0</span>
+        </a>
+        <a href="#settings" class="nav-item" data-view="settings" id="nav-settings">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
 
-      <!-- Google Sign In Section -->
-      <div class="login-actions" style="margin: 1.75rem 0 1rem 0; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
-        <div id="googleSignInBtn" aria-label="Sign in with Google"></div>
-        <div id="localDevSection" style="display: none; margin-top: 1.25rem; width: 100%; max-width: 320px; flex-direction: column; gap: 0.6rem;">
-          <div style="display: flex; align-items: center; gap: 0.5rem; color: #94a3b8; font-size: 0.75rem; justify-content: center; margin-bottom: 0.25rem;">
-            <span style="flex: 1; height: 1px; background: #e2e8f0;"></span>
-            <span>LOCAL DEV QUICK ACCESS</span>
-            <span style="flex: 1; height: 1px; background: #e2e8f0;"></span>
+      <div class="sidebar-footer">
+        <div class="system-status-card">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span>
+            <span>Live Data Sync</span>
           </div>
-          <a href="admin.html?dev=rcavirup" class="btn-google-action" style="text-decoration: none; font-size: 0.85rem; height: 42px; background: #f1f5f9; color: #0f172a; justify-content: center;">
-            <i class="fa-solid fa-user-shield"></i> Continue as Admin (Diganta)
-          </a>
-          <a href="superadmin.html?dev=superadmin" class="btn-google-action" style="text-decoration: none; font-size: 0.85rem; height: 42px; background: #f8fafc; color: #475569; justify-content: center;">
-            <i class="fa-solid fa-crown"></i> Continue as Super Admin
-          </a>
+          <button class="btn-reset-demo" id="btnClearAllData" title="Clear all student and course records">
+            <i class="fa-regular fa-trash-can"></i> Clear All Data
+          </button>
+        </div>
+        <div class="user-profile-compact">
+          <div class="avatar-circle" id="sidebarUserAvatar">AD</div>
+          <div class="user-info">
+            <strong id="sidebarUserName">Admin Portal</strong>
+            <span id="sidebarUserEmail">admin@educore.edu</span>
+          </div>
+          <button class="btn-logout" id="btnLogout" title="Sign Out">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
         </div>
       </div>
+    </aside>
 
-      <!-- Footer Security Notice -->
-      <div class="login-footer" style="margin-top: 1.5rem;">
-        <div class="security-tag">
-          <i class="fa-solid fa-lock"></i>
-          <span>Authorized Access Only</span>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <!-- Top Navigation Bar -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="btn-sidebar-toggle" id="btnSidebarToggle" aria-label="Toggle sidebar">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-box">
+            <div class="page-title-icon theme-dashboard" id="pageTitleIcon" aria-hidden="true">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div class="page-title-text-wrap">
+              <h1 id="pageTitle">Dashboard Overview</h1>
+              <p id="pageSubtitle">Monitor key metrics, student enrollments, and recent activity</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button type="button" class="btn btn-secondary btn-sm" id="btnEditAcademySettings" title="Academy Settings">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+          </button>
+          <a href="#" class="btn btn-secondary btn-sm" target="_blank" rel="noopener noreferrer"
+            title="View Public Academy Website" id="btnViewPublicSite">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>View Public Site</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Views Container -->
+      <main class="content-container">
+
+        <!-- ================= ACCOUNT ON HOLD SCREEN ================= -->
+        <div class="account-on-hold-screen" id="accountOnHoldScreen" style="display: none;">
+          <div class="on-hold-card card">
+            <div class="on-hold-badge">
+              <span class="pulse-dot-amber"></span>
+              <span>Registration Received — Pending Review</span>
+            </div>
+
+            <div class="on-hold-icon-wrap">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+
+            <h2 class="on-hold-title">Your Academy Portal is on Hold</h2>
+            <p class="on-hold-desc">
+              Thank you for registering with <strong>PixelSetu Academy</strong>! Your academy configuration has been
+              safely received. To ensure security and quality, our platform team reviews new tenant accounts before
+              enabling full administration features.
+            </p>
+
+            <div class="on-hold-details-box">
+              <div class="on-hold-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-school"></i> Academy Name:</span>
+                <strong class="detail-val" id="holdAcademyName">—</strong>
+              </div>
+              <div class="on-hold-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-globe"></i> Public Website:</span>
+                <code class="detail-val detail-code" id="holdSubdomainUrl">https://diganta.pixelsetu.com</code>
+              </div>
+              <div class="on-hold-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-user-tie"></i> Owner Name:</span>
+                <span class="detail-val" id="holdOwnerName">—</span>
+              </div>
+              <div class="on-hold-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-envelope"></i> Google Email:</span>
+                <span class="detail-val" id="holdOwnerEmail">—</span>
+              </div>
+              <div class="on-hold-detail-row">
+                <span class="detail-label"><i class="fa-solid fa-clock"></i> Status:</span>
+                <span class="badge badge-warning" id="holdStatusBadge">Pending Approval</span>
+              </div>
+            </div>
+
+            <div class="on-hold-notice">
+              <i class="fa-solid fa-circle-info"></i>
+              <span>Need your subdomain activated urgently? Contact platform support on WhatsApp with your requested
+                subdomain to expedite setup.</span>
+            </div>
+
+            <div class="on-hold-actions">
+              <button type="button" class="btn btn-primary" id="btnRefreshHoldStatus">
+                <i class="fa-solid fa-rotate"></i> Refresh Status
+              </button>
+              <a href="https://wa.me/919733894742?text=Hello%20Prantik,%20I%20have%20registered%20my%20academy%20on%20PixelSetu%20Academy%20and%20request%20subdomain%20approval."
+                target="_blank" rel="noopener" class="btn btn-whatsapp" id="btnHoldWhatsApp">
+                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+              </a>
+              <button type="button" class="btn btn-outline" id="btnHoldLogout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <section class="view-section active" id="view-dashboard">
+          <div class="view-header-bar dashboard-greeting-toolbar">
+            <p class="dashboard-greeting" id="dashboardGreeting" aria-live="polite"></p>
+          </div>
+          <!-- Stats Summary Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="card-header-title-wrap">
+                <div class="stat-icon card-header-stat-icon icon-primary">
+                  <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div>
+                  <h3 class="card-title">Total Students</h3>
+                </div>
+              </div>
+              <div class="stat-value" id="statTotalStudents">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="card-header-title-wrap">
+                <div class="stat-icon card-header-stat-icon icon-primary">
+                  <i class="fa-solid fa-desktop"></i>
+                </div>
+                <div>
+                  <h3 class="card-title">Total Courses</h3>
+                </div>
+              </div>
+              <div class="stat-value" id="statTotalCourses">0</div>
+            </div>
+          </div>
+
+          <!-- Dashboard Highlights Section -->
+          <div class="dashboard-grid">
+            <!-- Recent Messages -->
+            <div class="dashboard-card span-2">
+              <div class="card-header">
+                <div class="card-header-title-wrap">
+                  <div class="stat-icon card-header-stat-icon icon-primary">
+                    <svg viewBox="0 0 512 512" fill="currentColor" fill-rule="evenodd" aria-hidden="true">
+                      <path
+                        d="M 237.5 43.0 L 238.0 42.5 L 273.0 42.5 L 274.0 43.5 L 283.0 43.5 L 284.0 44.5 L 290.0 44.5 L 291.0 45.5 L 295.0 45.5 L 296.0 46.5 L 300.0 46.5 L 301.0 47.5 L 305.0 47.5 L 306.0 48.5 L 309.0 48.5 L 310.0 49.5 L 312.0 49.5 L 313.0 50.5 L 316.0 50.5 L 317.0 51.5 L 319.0 51.5 L 320.0 52.5 L 322.0 52.5 L 323.0 53.5 L 325.0 53.5 L 326.0 54.5 L 331.0 55.5 L 334.0 57.5 L 336.0 57.5 L 341.0 60.5 L 343.0 60.5 L 359.0 68.5 L 361.0 70.5 L 366.0 72.5 L 368.0 74.5 L 369.0 74.5 L 371.0 76.5 L 372.0 76.5 L 374.0 78.5 L 378.0 80.5 L 381.0 83.5 L 385.0 85.5 L 396.0 95.5 L 397.0 95.5 L 415.5 114.0 L 415.5 115.0 L 421.5 121.0 L 421.5 122.0 L 430.5 133.0 L 430.5 134.0 L 438.5 145.0 L 440.5 150.0 L 442.5 152.0 L 450.5 168.0 L 450.5 170.0 L 453.5 175.0 L 453.5 177.0 L 455.5 180.0 L 455.5 182.0 L 456.5 183.0 L 456.5 185.0 L 457.5 186.0 L 457.5 188.0 L 458.5 189.0 L 458.5 191.0 L 460.5 195.0 L 460.5 198.0 L 462.5 202.0 L 462.5 206.0 L 463.5 207.0 L 463.5 210.0 L 464.5 211.0 L 465.5 220.0 L 466.5 221.0 L 466.5 228.0 L 467.5 229.0 L 467.5 237.0 L 468.5 238.0 L 468.5 273.0 L 467.5 274.0 L 467.5 282.0 L 466.5 283.0 L 466.5 290.0 L 465.5 291.0 L 464.5 300.0 L 463.5 301.0 L 463.5 304.0 L 462.5 305.0 L 462.5 309.0 L 460.5 313.0 L 460.5 316.0 L 459.5 317.0 L 459.5 319.0 L 458.5 320.0 L 458.5 322.0 L 457.5 323.0 L 457.5 325.0 L 456.5 326.0 L 455.5 331.0 L 450.5 341.0 L 450.5 343.0 L 442.5 359.0 L 440.5 361.0 L 436.5 369.0 L 434.5 371.0 L 434.5 372.0 L 432.5 374.0 L 430.5 378.0 L 427.5 381.0 L 427.5 382.0 L 424.5 385.0 L 424.5 386.0 L 421.5 389.0 L 421.5 390.0 L 415.5 396.0 L 415.5 397.0 L 397.0 415.5 L 396.0 415.5 L 390.0 421.5 L 389.0 421.5 L 378.0 430.5 L 377.0 430.5 L 369.0 436.5 L 366.0 437.5 L 364.0 439.5 L 361.0 440.5 L 359.0 442.5 L 343.0 450.5 L 341.0 450.5 L 336.0 453.5 L 334.0 453.5 L 331.0 455.5 L 329.0 455.5 L 328.0 456.5 L 326.0 456.5 L 325.0 457.5 L 323.0 457.5 L 322.0 458.5 L 320.0 458.5 L 316.0 460.5 L 313.0 460.5 L 309.0 462.5 L 306.0 462.5 L 305.0 463.5 L 301.0 463.5 L 300.0 464.5 L 296.0 464.5 L 295.0 465.5 L 291.0 465.5 L 290.0 466.5 L 284.0 466.5 L 283.0 467.5 L 274.0 467.5 L 273.0 468.5 L 75.0 468.5 L 74.0 467.5 L 69.0 466.5 L 65.0 463.5 L 64.0 463.5 L 61.0 460.5 L 60.0 460.5 L 54.5 454.0 L 51.5 448.0 L 51.5 446.0 L 50.5 445.0 L 50.5 440.0 L 49.5 439.0 L 49.5 434.0 L 50.5 433.0 L 50.5 429.0 L 51.5 428.0 L 51.5 426.0 L 53.5 423.0 L 53.5 421.0 L 60.5 408.0 L 60.5 406.0 L 67.5 393.0 L 67.5 391.0 L 73.5 379.0 L 73.5 368.0 L 72.5 367.0 L 72.5 365.0 L 70.5 361.0 L 68.5 359.0 L 60.5 343.0 L 60.5 341.0 L 57.5 336.0 L 57.5 334.0 L 55.5 331.0 L 55.5 329.0 L 54.5 328.0 L 54.5 326.0 L 53.5 325.0 L 53.5 323.0 L 52.5 322.0 L 52.5 320.0 L 50.5 316.0 L 50.5 313.0 L 49.5 312.0 L 49.5 310.0 L 48.5 309.0 L 48.5 306.0 L 47.5 305.0 L 47.5 301.0 L 46.5 300.0 L 45.5 291.0 L 44.5 290.0 L 44.5 284.0 L 43.5 283.0 L 43.5 275.0 L 42.5 274.0 L 42.5 238.0 L 43.5 237.0 L 43.5 228.0 L 44.5 227.0 L 44.5 221.0 L 45.5 220.0 L 45.5 216.0 L 46.5 215.0 L 47.5 206.0 L 48.5 205.0 L 48.5 202.0 L 50.5 198.0 L 50.5 195.0 L 51.5 194.0 L 51.5 192.0 L 52.5 191.0 L 52.5 189.0 L 53.5 188.0 L 53.5 186.0 L 54.5 185.0 L 55.5 180.0 L 57.5 177.0 L 57.5 175.0 L 60.5 170.0 L 60.5 168.0 L 68.5 152.0 L 70.5 150.0 L 72.5 145.0 L 74.5 143.0 L 74.5 142.0 L 76.5 140.0 L 76.5 139.0 L 78.5 137.0 L 80.5 133.0 L 83.5 130.0 L 85.5 126.0 L 95.5 115.0 L 95.5 114.0 L 114.0 95.5 L 115.0 95.5 L 121.0 89.5 L 122.0 89.5 L 133.0 80.5 L 134.0 80.5 L 145.0 72.5 L 150.0 70.5 L 152.0 68.5 L 168.0 60.5 L 170.0 60.5 L 180.0 55.5 L 182.0 55.5 L 183.0 54.5 L 185.0 54.5 L 186.0 53.5 L 188.0 53.5 L 189.0 52.5 L 191.0 52.5 L 195.0 50.5 L 198.0 50.5 L 202.0 48.5 L 206.0 48.5 L 207.0 47.5 L 210.0 47.5 L 211.0 46.5 L 215.0 46.5 L 216.0 45.5 L 220.0 45.5 L 221.0 44.5 L 228.0 44.5 L 229.0 43.5 L 237.0 43.5 L 237.5 43.0 Z M 191.5 192 h 43 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -43 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z M 191.5 278 h 128 a 20.5 20.5 0 0 1 20.5 20.5 a 20.5 20.5 0 0 1 -20.5 20.5 h -128 a 20.5 20.5 0 0 1 -20.5 -20.5 a 20.5 20.5 0 0 1 20.5 -20.5 Z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="card-title">Recent Messages</h3>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-outline" id="btnViewInbox">
+                  View Inbox <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="dashboard-inbox-list" id="dashboardInboxList"></div>
+              </div>
+            </div>
+
+            <!-- Authentication Code Card (OTP Generator & 5-Hour Countdown) -->
+            <div class="dashboard-card auth-code-card">
+              <div class="card-header">
+                <div class="card-header-title-wrap">
+                  <div class="stat-icon card-header-stat-icon icon-primary">
+                    <i class="fa-solid fa-shield-halved"></i>
+                  </div>
+                  <div>
+                    <h3 class="card-title">Authentication Code</h3>
+                  </div>
+                </div>
+                <div class="auth-header-controls">
+                  <button class="btn btn-sm btn-outline" id="btnGenerateNewAuthCode"
+                    title="Generate a fresh authentication code">
+                    <i class="fa-solid fa-rotate"></i> Generate New
+                  </button>
+                  <label class="apple-switch" for="toggleAuthCodeRequired"
+                    title="Toggle authentication code requirement for student registration">
+                    <input type="checkbox" id="toggleAuthCodeRequired" checked
+                      aria-label="Require Authentication Code for Student Registration">
+                    <span class="apple-switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="card-body auth-code-body">
+                <div class="auth-code-box">
+                  <div class="auth-digits" id="authCodeDigits">
+                    <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                  </div>
+                  <button class="btn-copy-code" id="btnCopyAuthCode" title="Copy authentication code">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+
+                <div class="auth-countdown-container">
+                  <div class="auth-countdown-meta">
+                    <span class="countdown-label">
+                      <i class="fa-regular fa-clock"></i> Expires in:
+                    </span>
+                    <strong class="countdown-timer" id="authCountdownTimer">05:00:00</strong>
+                  </div>
+                  <div class="auth-progress-bar" role="progressbar" aria-label="Authentication code validity remaining"
+                    aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+                    <div class="auth-progress-fill" id="authProgressFill" style="width: 100%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= STUDENTS MANAGEMENT VIEW ================= -->
+        <section class="view-section" id="view-students">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="studentSearchInput" placeholder="Search students...">
+                <button class="btn-clear-search" id="btnClearStudentSearch" title="Clear search">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- Course Filter (Custom Dropdown opens right below) -->
+              <div class="custom-select-container toolbar-filter-dropdown" id="adminStudentCourseFilterDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentCourseFilterTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-filter select-icon"></i>
+                  <span id="adminStudentCourseFilterDisplay">All Courses</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentCourseFilterMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="all" role="option">All Courses</li>
+                </ul>
+                <input type="hidden" id="studentCourseFilter" value="all">
+              </div>
+
+              <!-- Batch Filter (Custom Dropdown opens right below) -->
+              <div class="custom-select-container toolbar-filter-dropdown" id="adminStudentBatchFilterDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentBatchFilterTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-filter select-icon"></i>
+                  <span id="adminStudentBatchFilterDisplay">All Batches</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentBatchFilterMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="all" role="option">All Batches</li>
+                </ul>
+                <input type="hidden" id="studentBatchFilter" value="all">
+              </div>
+            </div>
+
+            <div class="view-actions">
+              <div class="batch-action-menu" id="batchActionMenu">
+                <button class="btn btn-primary" type="button" id="btnCreateBatch" aria-haspopup="menu"
+                  aria-expanded="false" disabled>
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>Create Batch</span>
+                  <i class="fa-solid fa-chevron-down batch-action-chevron"></i>
+                </button>
+                <div class="batch-action-dropdown" id="batchActionDropdown" role="menu">
+                  <button type="button" class="batch-action-option" id="btnCreateNewBatch" role="menuitem">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Create New</span>
+                  </button>
+                  <button type="button" class="batch-action-option" id="btnAddToExistingBatch" role="menuitem">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Add to Existing</span>
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-success" id="btnBulkMarkCompleted" disabled
+                title="Mark selected students as Course Completed">
+                <i class="fa-solid fa-check"></i>
+                <span id="bulkMarkCompletedLabel">Mark as Completed</span>
+              </button>
+              <div class="student-more-actions-menu" id="studentMoreActionsMenu">
+                <button class="btn btn-secondary btn-more-actions" type="button" id="btnStudentMoreActions"
+                  aria-haspopup="menu" aria-expanded="false" disabled title="More Options">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="student-more-dropdown" id="studentMoreDropdown" role="menu">
+                  <button type="button" class="student-more-option" id="btnMoreDownloadCert" role="menuitem">
+                    <i class="fa-solid fa-download"></i>
+                    <span id="labelMoreDownloadCert">Download Certificate</span>
+                  </button>
+                  <button type="button" class="student-more-option" id="btnMoreChangeStatus" role="menuitem">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span id="labelMoreChangeStatus">Change Status</span>
+                  </button>
+                  <button type="button" class="student-more-option danger" id="btnMoreDeleteStudent" role="menuitem">
+                    <i class="fa-regular fa-trash-can"></i>
+                    <span id="labelMoreDeleteStudent">Delete Student</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Students List Table Card -->
+          <div class="dashboard-card student-table-card">
+            <div class="card-body">
+              <div class="student-table-labels" id="studentTableLabels">
+                <table class="data-table" id="studentsTable">
+                  <thead>
+                    <tr>
+                      <th class="th-checkbox-col">
+                        <input type="checkbox" id="selectAllStudentsCheckbox" aria-label="Select All Students"
+                          class="custom-table-checkbox">
+                      </th>
+                      <th class="th-serial-col text-center" title="Serial Number">
+                        <span>#</span>
+                      </th>
+                      <th>
+                        <span class="th-student-label-wrap">
+                          <span>Student Name</span>
+                          <span class="student-selection-count" id="studentSelectionCount" aria-live="polite"
+                            hidden>0</span>
+                        </span>
+                      </th>
+                      <th class="text-center">Student ID</th>
+                      <th class="text-center">Enrolled Courses</th>
+                      <th class="text-center">Registration Date</th>
+                      <th class="text-center">
+                        <div class="custom-select-container th-status-header-wrap th-minimal-dropdown"
+                          id="adminStudentStatusFilterDropdown">
+                          <button type="button" class="btn-th-filter btn-th-status-filter"
+                            id="adminStudentStatusFilterTrigger" title="Filter by Status" aria-label="Filter by Status"
+                            aria-haspopup="listbox" aria-expanded="false">
+                            <span>Course Status</span>
+                            <svg width="7" height="12" viewBox="0 0 217 383" fill="currentColor" aria-hidden="true"
+                              style="display: block;">
+                              <path
+                                d="M 98 10 C 103 2 114 2 119 10 L 213 148 C 219 157 213 169 202 169 L 15 169 C 4 169 -2 157 4 148 Z" />
+                              <path
+                                d="M 98 373 C 103 381 114 381 119 373 L 213 235 C 219 226 213 214 202 214 L 15 214 C 4 214 -2 226 4 235 Z" />
+                            </svg>
+                          </button>
+                          <span id="adminStudentStatusFilterDisplay" style="display: none;">All Statuses</span>
+                          <ul class="custom-select-menu th-filter-menu" id="adminStudentStatusFilterMenu"
+                            role="listbox">
+                            <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
+                            <li class="custom-select-option" data-value="Active" role="option">On going</li>
+                            <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                            <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                          </ul>
+                          <input type="hidden" id="studentStatusFilter" value="all">
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table" id="studentsRowsTable">
+                  <colgroup>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                    <col>
+                  </colgroup>
+                  <tbody id="studentsTableBody">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Empty State -->
+              <div class="empty-state" id="studentsEmptyState" style="display: none;">
+                <div class="empty-icon">
+                  <i class="fa-solid fa-user-slash"></i>
+                </div>
+                <h4>No Students Found</h4>
+                <p>No student records match your current search or filter criteria.</p>
+                <button class="btn btn-secondary btn-sm" id="btnResetStudentFilters">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= BATCHES VIEW ================= -->
+        <section class="view-section" id="view-batches">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="batchSearchInput" placeholder="Search batches...">
+                <button class="btn-clear-search" id="btnClearBatchSearch" title="Clear search">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <div class="custom-select-container toolbar-filter-dropdown" id="batchStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="batchStatusTrigger"
+                  aria-label="Filter batches by status" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-filter select-icon"></i>
+                  <span id="batchStatusDisplay">All Statuses</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="batchStatusMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
+                  <li class="custom-select-option" data-value="Active" role="option">On going</li>
+                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                </ul>
+                <input type="hidden" id="batchStatusFilter" value="all">
+              </div>
+              <div class="custom-select-container toolbar-filter-dropdown card-sort-dropdown" id="batchSortDropdown">
+                <button type="button" class="custom-select-trigger" id="batchSortTrigger" aria-label="Sort batches by"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-arrow-down-wide-short select-icon"></i>
+                  <span id="batchSortDisplay">Sort by :&nbsp;Name (A → Z)</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="batchSortMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="name-asc" role="option">Name (A → Z)</li>
+                  <li class="custom-select-option" data-value="name-desc" role="option">Name (Z → A)</li>
+                  <li class="custom-select-option" data-value="newest" role="option">New → Old</li>
+                  <li class="custom-select-option" data-value="oldest" role="option">Old → New</li>
+                </ul>
+                <input type="hidden" id="batchSortValue" value="name-asc">
+              </div>
+            </div>
+
+            <div class="view-actions">
+              <button class="btn btn-primary" id="btnAddBatch">
+                <i class="fa-solid fa-plus"></i>
+                <span>Create Batch</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Batches Grid -->
+          <div class="batches-grid" id="batchesGrid"></div>
+
+          <!-- Batches Empty State -->
+          <div class="empty-state" id="batchesEmptyState" style="display:none">
+            <div class="empty-icon"><i class="fa-solid fa-layer-group"></i></div>
+            <h4 id="batchesEmptyTitle">No Batches Yet</h4>
+            <p id="batchesEmptyDesc">Create your first batch to organize students and issue certificates.</p>
+            <button class="btn btn-primary btn-sm" id="btnEmptyCreateBatch" style="margin-bottom: 0.5rem;">
+              <i class="fa-solid fa-plus"></i> Create Batch
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnResetBatchFilters" style="display: none;">
+              <i class="fa-solid fa-rotate-left"></i> Reset Filters
+            </button>
+          </div>
+        </section>
+
+        <section class="view-section" id="view-marksheets">
+          <div class="idcards-split-container marksheet-split-container">
+            <!-- Left Side: Search Bar & Student List Panel -->
+            <div class="marksheet-left-column">
+              <div class="marksheet-search-bar">
+                <div class="search-box">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" id="marksheetSearch" placeholder="Search students...">
+                  <button type="button" class="btn-clear-search" id="btnClearMarksheetSearch" title="Clear search"
+                    style="display:none;">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="dashboard-card idcards-list-panel marksheet-list-panel">
+                <div class="idcards-panel-header">
+                  <div class="idcards-filter-row">
+                    <div class="custom-select-container idcards-filter-dropdown" id="marksheetCourseFilterDropdown">
+                      <button type="button" class="custom-select-trigger" id="marksheetCourseFilterTrigger"
+                        aria-haspopup="listbox" aria-expanded="false">
+                        <i class="fa-solid fa-filter select-icon"></i>
+                        <span id="marksheetCourseFilterDisplay">All Courses</span>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                      </button>
+                      <ul class="custom-select-menu" id="marksheetCourseFilterMenu" role="listbox">
+                        <li class="custom-select-option selected" data-value="all" role="option">All Courses</li>
+                      </ul>
+                      <input type="hidden" id="marksheetCourse" value="all">
+                    </div>
+                    <div class="custom-select-container idcards-filter-dropdown" id="marksheetBatchFilterDropdown">
+                      <button type="button" class="custom-select-trigger" id="marksheetBatchFilterTrigger"
+                        aria-haspopup="listbox" aria-expanded="false">
+                        <i class="fa-solid fa-filter select-icon"></i>
+                        <span id="marksheetBatchFilterDisplay">All Batches</span>
+                        <i class="fa-solid fa-chevron-down select-chevron"></i>
+                      </button>
+                      <ul class="custom-select-menu" id="marksheetBatchFilterMenu" role="listbox">
+                        <li class="custom-select-option selected" data-value="all" role="option">All Batches</li>
+                      </ul>
+                      <input type="hidden" id="marksheetBatch" value="all">
+                    </div>
+                    <button type="button" class="idcards-btn-clear-filter" id="btnClearMarksheetFilter"
+                      title="Clear filters" disabled>Clear</button>
+                  </div>
+                </div>
+
+                <!-- Column Header Row / Select All -->
+                <div class="idcards-select-all-row">
+                  <div class="idcards-header-col-main">
+                    <label class="idcards-select-all-label" for="marksheetSelectAll" title="Select All Students">
+                      <input type="checkbox" id="marksheetSelectAll" class="custom-table-checkbox"
+                        aria-label="Select All Students">
+                      <span class="idcards-serial-col" title="Serial Number">#</span>
+                      <span class="idcards-name-wrap">
+                        <span class="idcards-select-all-text">Student Name</span>
+                        <span class="student-selection-count idcards-selection-count-badge" id="marksheetSelectionCount"
+                          aria-live="polite" hidden>0</span>
+                      </span>
+                    </label>
+                  </div>
+                  <div class="idcards-header-col-status">
+                    <span class="idcards-select-all-text">Course Status</span>
+                  </div>
+                </div>
+
+                <!-- Scrollable Student List -->
+                <div class="idcards-student-list" id="marksheetStudents" role="listbox"
+                  aria-label="Student Selection List">
+                  <!-- Rendered dynamically -->
+                </div>
+
+                <div class="empty-state idcards-empty-list" id="marksheetEmpty" style="display:none;">
+                  <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+                  <h4>No Students Found</h4>
+                  <p>No student records match your search or filter.</p>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnResetMarksheetFilters"
+                    style="margin-top: 0.5rem;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Marksheet Preview Panel -->
+            <div class="idcards-preview-panel marksheet-preview-panel">
+              <div class="dashboard-card marksheet-preview-stage" id="marksheetPreviewStage">
+                <div class="marksheet-zoom-controls" id="marksheetZoomControls" aria-label="Marksheet Zoom Controls"
+                  hidden>
+                  <button type="button" class="btn-marksheet-zoom" id="btnMarksheetZoomIn" title="Zoom In (+)"
+                    aria-label="Zoom In">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                  </button>
+                  <button type="button" class="btn-marksheet-zoom btn-marksheet-zoom-reset" id="btnMarksheetZoomReset"
+                    title="Reset Zoom (100%)" aria-label="Reset Zoom">
+                    <span id="marksheetZoomLevel">100%</span>
+                  </button>
+                  <button type="button" class="btn-marksheet-zoom" id="btnMarksheetZoomOut" title="Zoom Out (-)"
+                    aria-label="Zoom Out">
+                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                  </button>
+                </div>
+                <canvas id="marksheetCanvas" width="2550" height="3606" aria-label="Marksheet Preview Canvas"
+                  hidden></canvas>
+                <div class="idcard-no-selection" id="marksheetPreviewEmpty">
+                  <div class="no-selection-icon"><i class="fa-solid fa-file-lines"></i></div>
+                  <h4>No Student Selected</h4>
+                  <p>Select any student from the left list to preview their marksheet.</p>
+                </div>
+              </div>
+              <p id="marksheetStatus" role="status"></p>
+              <div class="idcards-preview-actions">
+                <button type="button" class="btn btn-secondary idcard-download-btn" id="marksheetDownloadSelected"
+                  title="Download Marksheet" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                    <polyline points="6 10 12 16 18 10"></polyline>
+                    <line x1="4" y1="21" x2="20" y2="21"></line>
+                  </svg> Download Marksheet
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view-section" id="view-certificates">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="certificateSearch" placeholder="Search students...">
+                <button type="button" class="btn-clear-search" id="btnClearCertCardSearch" title="Clear search"
+                  style="display:none;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+
+          </div>
+
+          <div class="idcards-split-container">
+            <!-- Left Side: Student List & Filtering -->
+            <div class="dashboard-card idcards-list-panel">
+              <div class="idcards-panel-header">
+                <div class="idcards-filter-row">
+                  <div class="custom-select-container idcards-filter-dropdown" id="certCardCourseFilterDropdown">
+                    <button type="button" class="custom-select-trigger" id="certCardCourseFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <i class="fa-solid fa-filter select-icon"></i>
+                      <span id="certCardCourseFilterDisplay">All Courses</span>
+                      <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="certCardCourseFilterMenu" role="listbox">
+                      <li class="custom-select-option selected" data-value="all" role="option">All Courses</li>
+                    </ul>
+                    <input type="hidden" id="certificateCourse" value="all">
+                  </div>
+                  <div class="custom-select-container idcards-filter-dropdown" id="certCardBatchFilterDropdown">
+                    <button type="button" class="custom-select-trigger" id="certCardBatchFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <i class="fa-solid fa-filter select-icon"></i>
+                      <span id="certCardBatchFilterDisplay">All Batches</span>
+                      <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="certCardBatchFilterMenu" role="listbox">
+                      <li class="custom-select-option selected" data-value="all" role="option">All Batches</li>
+                    </ul>
+                    <input type="hidden" id="certificateBatch" value="all">
+                  </div>
+                  <button type="button" class="idcards-btn-clear-filter" id="btnClearCertCardFilter"
+                    title="Clear filters" disabled>Clear</button>
+                </div>
+              </div>
+
+              <!-- Column Header Row / Select All -->
+              <div class="idcards-select-all-row">
+                <div class="idcards-header-col-main">
+                  <label class="idcards-select-all-label" for="certificateSelectAll" title="Select All Students">
+                    <input type="checkbox" id="certificateSelectAll" class="custom-table-checkbox"
+                      aria-label="Select All Students">
+                    <span class="idcards-serial-col" title="Serial Number">#</span>
+                    <span class="idcards-name-wrap">
+                      <span class="idcards-select-all-text">Student Name</span>
+                      <span class="student-selection-count idcards-selection-count-badge" id="certificateSelectionCount"
+                        aria-live="polite" hidden>0</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="idcards-header-col-status">
+                  <span class="idcards-select-all-text">Course Status</span>
+                </div>
+              </div>
+
+              <!-- Scrollable Student List -->
+              <div class="idcards-student-list" id="certificateStudents" role="listbox"
+                aria-label="Student Selection List">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <div class="empty-state idcards-empty-list" id="certificateEmpty" style="display:none;">
+                <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+                <h4>No Students Found</h4>
+                <p>No student records match your search or filter.</p>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnResetCertCardFilters"
+                  style="margin-top: 0.5rem;">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+
+            <div class="idcards-preview-panel certificate-preview-panel">
+              <div class="certificate-preview-stage">
+                <canvas id="certificateCanvas" width="3722" height="2480" hidden
+                  aria-label="Certificate preview"></canvas>
+                <div class="idcard-no-selection" id="certificatePreviewEmpty">
+                  <div class="no-selection-icon"><i class="fa-solid fa-certificate"></i></div>
+                  <h4>No Student Selected</h4>
+                  <p>Select any student from the left list to preview their certificate.</p>
+                </div>
+              </div>
+              <p id="certCanvasStatus" role="status"></p>
+              <div class="idcards-preview-actions"><button type="button" class="btn btn-secondary idcard-download-btn"
+                  id="certificateDownloadSelected" disabled><i class="fa-solid fa-download"></i> Download
+                  Certificate</button></div>
+              <button id="btnDownloadCertificate" hidden disabled>Download</button><button id="btnPrintCertificate"
+                hidden disabled>Print</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= ID CARDS VIEW ================= -->
+        <section class="view-section" id="view-idcards">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="idCardStudentSearchInput" placeholder="Search students...">
+                <button type="button" class="btn-clear-search" id="btnClearIdCardSearch" title="Clear search"
+                  style="display:none;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+
+          </div>
+
+          <div class="idcards-split-container">
+            <!-- Left Side: Student List & Filtering -->
+            <div class="dashboard-card idcards-list-panel">
+              <div class="idcards-panel-header">
+                <div class="idcards-filter-row">
+                  <div class="custom-select-container idcards-filter-dropdown" id="idCardCourseFilterDropdown">
+                    <button type="button" class="custom-select-trigger" id="idCardCourseFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <i class="fa-solid fa-filter select-icon"></i>
+                      <span id="idCardCourseFilterDisplay">All Courses</span>
+                      <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="idCardCourseFilterMenu" role="listbox">
+                      <li class="custom-select-option selected" data-value="all" role="option">All Courses</li>
+                    </ul>
+                    <input type="hidden" id="idCardCourseFilterVal" value="all">
+                  </div>
+                  <div class="custom-select-container idcards-filter-dropdown" id="idCardBatchFilterDropdown">
+                    <button type="button" class="custom-select-trigger" id="idCardBatchFilterTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <i class="fa-solid fa-filter select-icon"></i>
+                      <span id="idCardBatchFilterDisplay">All Batches</span>
+                      <i class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="idCardBatchFilterMenu" role="listbox">
+                      <li class="custom-select-option selected" data-value="all" role="option">All Batches</li>
+                    </ul>
+                    <input type="hidden" id="idCardBatchFilterVal" value="all">
+                  </div>
+                  <button type="button" class="idcards-btn-clear-filter" id="btnClearIdCardFilter" title="Clear filters"
+                    disabled>Clear</button>
+                </div>
+              </div>
+
+              <!-- Column Header Row / Select All -->
+              <div class="idcards-select-all-row">
+                <div class="idcards-header-col-main">
+                  <label class="idcards-select-all-label" for="idCardSelectAllCheckbox" title="Select All Students">
+                    <input type="checkbox" id="idCardSelectAllCheckbox" class="custom-table-checkbox"
+                      aria-label="Select All Students">
+                    <span class="idcards-serial-col" title="Serial Number">#</span>
+                    <span class="idcards-name-wrap">
+                      <span class="idcards-select-all-text">Student Name</span>
+                      <span class="student-selection-count idcards-selection-count-badge" id="idCardSelectionCountBadge"
+                        aria-live="polite" hidden>0</span>
+                    </span>
+                  </label>
+                </div>
+                <div class="idcards-header-col-status">
+                  <div class="custom-select-container th-status-header-wrap th-minimal-dropdown"
+                    id="idCardStatusFilterDropdown">
+                    <button type="button" class="btn-th-filter btn-th-status-filter" id="idCardStatusFilterTrigger"
+                      title="Filter by Status" aria-label="Filter by Status" aria-haspopup="listbox"
+                      aria-expanded="false">
+                      <span>Course Status</span>
+                      <svg width="7" height="12" viewBox="0 0 217 383" fill="currentColor" aria-hidden="true"
+                        style="display: block;">
+                        <path
+                          d="M 98 10 C 103 2 114 2 119 10 L 213 148 C 219 157 213 169 202 169 L 15 169 C 4 169 -2 157 4 148 Z" />
+                        <path
+                          d="M 98 373 C 103 381 114 381 119 373 L 213 235 C 219 226 213 214 202 214 L 15 214 C 4 214 -2 226 4 235 Z" />
+                      </svg>
+                    </button>
+                    <span id="idCardStatusFilterDisplay" style="display: none;">All Statuses</span>
+                    <ul class="custom-select-menu th-filter-menu" id="idCardStatusFilterMenu" role="listbox">
+                      <li class="custom-select-option selected" data-value="all" role="option">All Statuses</li>
+                      <li class="custom-select-option" data-value="Active" role="option">On going</li>
+                      <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                      <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                    </ul>
+                    <input type="hidden" id="idCardStatusFilterVal" value="all">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Scrollable Student List -->
+              <div class="idcards-student-list" id="idCardStudentList" role="listbox"
+                aria-label="Student Selection List">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <div class="empty-state idcards-empty-list" id="idCardListEmptyState" style="display:none;">
+                <div class="empty-icon"><i class="fa-solid fa-user-slash"></i></div>
+                <h4>No Students Found</h4>
+                <p>No student records match your search or filter.</p>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnResetIdCardFilters"
+                  style="margin-top: 0.5rem;">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Side: Selected Student ID Card Preview -->
+            <div class="idcards-preview-panel">
+              <!-- Card Canvas Display Area -->
+              <div class="idcards-card-stage">
+                <div class="idcard-mockup-wrapper" id="idCardMockupWrapper">
+                  <div class="idcard-frame-holder">
+                    <!-- V-shaped Blue Lanyard Ribbon with Woven Ribbon Texture -->
+                    <svg class="idcard-lanyard-ribbon" viewBox="-750 -1400 1500 1400" aria-hidden="true">
+                      <defs>
+                        <!-- Overlap drop shadow -->
+                        <filter id="lanyardStrapShadow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.32" />
+                        </filter>
+
+                        <!-- Cylindrical satin fabric gradients -->
+                        <linearGradient id="frontStrapGrad" x1="0%" y1="0%" x2="100%" y2="0%"
+                          gradientTransform="rotate(64)">
+                          <stop offset="0%" stop-color="#005ea6" />
+                          <stop offset="12%" stop-color="#006ec7" />
+                          <stop offset="42%" stop-color="#007fe8" />
+                          <stop offset="65%" stop-color="#148bf0" />
+                          <stop offset="88%" stop-color="#0072ce" />
+                          <stop offset="100%" stop-color="#005ea6" />
+                        </linearGradient>
+
+                        <linearGradient id="backStrapGrad" x1="0%" y1="0%" x2="100%" y2="0%"
+                          gradientTransform="rotate(-64)">
+                          <stop offset="0%" stop-color="#04325a" />
+                          <stop offset="15%" stop-color="#064478" />
+                          <stop offset="50%" stop-color="#095596" />
+                          <stop offset="70%" stop-color="#0d61a8" />
+                          <stop offset="85%" stop-color="#084d8a" />
+                          <stop offset="100%" stop-color="#04325a" />
+                        </linearGradient>
+
+                        <!-- Transverse woven polyester ribbing texture patterns -->
+                        <pattern id="ribbonTextureLeft" width="20" height="3.5" patternUnits="userSpaceOnUse"
+                          patternTransform="rotate(-26)">
+                          <line x1="0" y1="0.8" x2="20" y2="0.8" stroke="rgba(255,255,255,0.13)" stroke-width="1.1" />
+                          <line x1="0" y1="2.4" x2="20" y2="2.4" stroke="rgba(0,0,0,0.12)" stroke-width="1.1" />
+                        </pattern>
+
+                        <pattern id="ribbonTextureRight" width="20" height="3.5" patternUnits="userSpaceOnUse"
+                          patternTransform="rotate(26)">
+                          <line x1="0" y1="0.8" x2="20" y2="0.8" stroke="rgba(255,255,255,0.13)" stroke-width="1.1" />
+                          <line x1="0" y1="2.4" x2="20" y2="2.4" stroke="rgba(0,0,0,0.12)" stroke-width="1.1" />
+                        </pattern>
+                      </defs>
+
+                      <!-- Back strap base gradient -->
+                      <polygon class="lanyard-strap-back" points="-18,0 17.6,0 700.4,-1400 664.8,-1400"
+                        fill="url(#backStrapGrad)" stroke="rgba(0,0,0,0.15)" stroke-width="0.8" />
+                      <!-- Back strap woven ribbing texture overlay -->
+                      <polygon points="-18,0 17.6,0 700.4,-1400 664.8,-1400" fill="url(#ribbonTextureRight)" />
+
+                      <!-- Front strap base gradient with crossover drop shadow -->
+                      <polygon class="lanyard-strap-front" points="-17.6,0 18,0 -664.8,-1400 -700.4,-1400"
+                        fill="url(#frontStrapGrad)" filter="url(#lanyardStrapShadow)" stroke="rgba(0,0,0,0.12)"
+                        stroke-width="0.8" />
+                      <!-- Front strap woven ribbing texture overlay -->
+                      <polygon points="-17.6,0 18,0 -664.8,-1400 -700.4,-1400" fill="url(#ribbonTextureLeft)" />
+                    </svg>
+                    <div class="idcard-clip-tab" aria-hidden="true"></div>
+                    <div class="idcard-hole left-hole" aria-hidden="true"></div>
+                    <div class="idcard-lanyard-slot" aria-hidden="true"></div>
+                    <div class="idcard-hole right-hole" aria-hidden="true"></div>
+                    <div class="idcard-canvas-wrap">
+                      <canvas id="idCardPreviewCanvas" width="1250" height="2000"></canvas>
+                      <div class="idcard-loading-overlay" id="idCardLoadingOverlay" style="display: none;">
+                        <span class="btn-spinner" style="width: 38px; height: 38px; border-width: 3.5px;"></span>
+                        <span>Generating ID Card...</span>
+                      </div>
+                      <div class="idcard-no-selection" id="idCardNoSelection">
+                        <div class="no-selection-icon">
+                          <i class="fa-solid fa-id-badge"></i>
+                        </div>
+                        <h4>No Student Selected</h4>
+                        <p>Select any student from the left list to instantly generate and preview their dynamic ID
+                          card.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="idcards-preview-actions" id="idCardPreviewActions">
+                <button type="button" class="btn btn-secondary idcard-download-btn" id="btnDownloadIdCard"
+                  title="Download ID Card" disabled>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                    <polyline points="6 10 12 16 18 10"></polyline>
+                    <line x1="4" y1="21" x2="20" y2="21"></line>
+                  </svg> Download ID Card
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= COURSES MANAGEMENT VIEW ================= -->
+        <section class="view-section" id="view-courses">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="courseSearchInput" placeholder="Search courses...">
+                <button class="btn-clear-search" id="btnClearCourseSearch" title="Clear search">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <div class="custom-select-container toolbar-filter-dropdown card-sort-dropdown" id="courseSortDropdown">
+                <button type="button" class="custom-select-trigger" id="courseSortTrigger" aria-label="Sort courses by"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-arrow-down-wide-short select-icon"></i>
+                  <span id="courseSortDisplay">Sort by :&nbsp;Name (A → Z)</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="courseSortMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="name-asc" role="option">Name (A → Z)</li>
+                  <li class="custom-select-option" data-value="name-desc" role="option">Name (Z → A)</li>
+                  <li class="custom-select-option" data-value="newest" role="option">New → Old</li>
+                  <li class="custom-select-option" data-value="oldest" role="option">Old → New</li>
+                </ul>
+                <input type="hidden" id="courseSortValue" value="name-asc">
+              </div>
+            </div>
+
+            <div class="view-actions">
+              <button class="btn btn-primary" id="btnAddCourse">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Course</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Courses Grid -->
+          <div class="courses-grid" id="coursesGrid">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Courses Empty State -->
+          <div class="empty-state" id="coursesEmptyState" style="display: none;">
+            <div class="empty-icon">
+              <i class="fa-solid fa-desktop"></i>
+            </div>
+            <h4>No Courses Found</h4>
+            <p>No courses match your search keywords.</p>
+            <button class="btn btn-secondary btn-sm" id="btnResetCourseFilters">
+              <i class="fa-solid fa-rotate-left"></i> Reset Filters
+            </button>
+          </div>
+        </section>
+
+        <!-- ================= INBOX VIEW ================= -->
+        <section class="view-section" id="view-inbox">
+          <div class="view-header-bar">
+            <div class="search-filter-group">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inboxSearchInput" placeholder="Search messages...">
+                <button class="btn-clear-search" id="btnClearInboxSearch" title="Clear search" style="display: none;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="view-actions">
+              <button type="button" class="btn btn-primary" id="btnMarkAllInboxRead" disabled>
+                <i class="fa-regular fa-envelope-open"></i>
+                <span>Mark All as Read</span>
+              </button>
+              <button type="button" class="btn btn-danger" id="btnBulkDeleteInbox" title="Delete selected messages"
+                disabled>
+                <i class="fa-regular fa-trash-can"></i> <span>Delete</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Inbox Container Card (like student management page) -->
+          <div class="dashboard-card inbox-table-card">
+            <div class="card-body">
+              <div class="inbox-table-header">
+                <label class="inbox-header-checkbox-col" for="selectAllInboxCheckbox" title="Select All Messages">
+                  <input type="checkbox" id="selectAllInboxCheckbox" aria-label="Select All Messages"
+                    class="custom-table-checkbox">
+                </label>
+                <div class="inbox-header-info-col">
+                  <span class="inbox-header-label">All Messages</span>
+                  <span class="inbox-selection-count" id="inboxSelectionCount" aria-live="polite" hidden>0</span>
+                </div>
+              </div>
+              <div class="inbox-scroll-container">
+                <!-- Inbox List (Single Column Rows) -->
+                <div class="inbox-list" id="inboxList"></div>
+
+                <!-- Inbox Empty State -->
+                <div class="empty-state" id="inboxEmptyState" style="display: none;">
+                  <div class="empty-icon">
+                    <i class="fa-regular fa-envelope-open"></i>
+                  </div>
+                  <h4 id="inboxEmptyTitle">No Messages Yet</h4>
+                  <p id="inboxEmptyDesc">Messages sent through the public website will appear here.</p>
+                  <button class="btn btn-secondary btn-sm" id="btnResetInboxSearch" style="display: none;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Student Form Modal (Add / Edit) -->
+  <div class="modal-backdrop" id="studentModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-user-graduate modal-icon"></i>
+          <h3 id="studentModalTitle">Add New Student</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseStudentModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="studentForm">
+        <input type="hidden" id="studentId">
+        <input type="hidden" id="studentPhotoUrl">
+        <input type="hidden" id="studentImageKitFileId">
+        <input type="hidden" id="studentImageKitFilePath">
+        <div class="modal-body">
+          <!-- Student Passport Photo Upload -->
+          <div class="student-photo-edit-section">
+            <div class="student-photo-edit-preview-wrap">
+              <div class="student-photo-edit-preview" id="studentPhotoPreview">
+                <img id="studentPhotoPreviewImg" src="" alt="Student Photo" hidden>
+                <span id="studentPhotoPreviewInitials">SP</span>
+              </div>
+            </div>
+            <div class="student-photo-edit-controls">
+              <label for="studentPhotoInput" class="student-photo-edit-label">Student Passport Photo</label>
+              <span class="student-photo-format">JPG, JPEG, PNG or WebP; maximum 2 MB.</span>
+              <div class="student-photo-upload" id="studentPhotoUploadWrapper">
+                <input type="file" id="studentPhotoInput" name="studentPhoto"
+                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                  aria-describedby="studentPhotoHelp studentPhotoError">
+                <button type="button" class="student-photo-clear" id="btnClearStudentPhoto" aria-label="Remove photo"
+                  title="Remove photo" hidden>
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+              </div>
+              <span class="student-photo-help" id="studentPhotoHelp"><i class="fa-solid fa-circle-info"></i><span>This
+                  photo will be printed on the student's ID card and certificate.</span></span>
+              <span class="input-error-msg" id="studentPhotoError" role="alert" style="display: none;"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 1. Full Name (Auto Capitalize Initials) -->
+            <div class="form-group flex-1">
+              <label for="studentName">Full Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="studentName" class="name-input-capitalized" data-capitalize="true"
+                  placeholder="Full name" required>
+              </div>
+            </div>
+
+            <!-- 2. Date of Birth (Beside Full Name) -->
+            <div class="form-group flex-1">
+              <label for="studentDob">Date of Birth <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="studentDob" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 3. Father's Name (Auto Capitalize Initials) -->
+            <div class="form-group flex-1">
+              <label for="studentFatherName">Father's Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user-tie"></i>
+                <input type="text" id="studentFatherName" class="name-input-capitalized" data-capitalize="true"
+                  placeholder="Father's name" required>
+              </div>
+            </div>
+
+            <!-- 4. Mother's Name (Auto Capitalize Initials) -->
+            <div class="form-group flex-1">
+              <label for="studentMotherName">Mother's Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="studentMotherName" class="name-input-capitalized" data-capitalize="true"
+                  placeholder="Mother's name" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 5. Aadhar Number (12 Digits normal slot) -->
+            <div class="form-group flex-1">
+              <label for="studentAadhar">Aadhar Number <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-id-card"></i>
+                <input type="text" id="studentAadhar" maxlength="12" pattern="[0-9]{12}" inputmode="numeric"
+                  placeholder="12-digit Aadhar" required>
+              </div>
+              <span class="input-error-msg" id="studentAadharError">Please enter a valid 12-digit Aadhar number.</span>
+            </div>
+
+            <!-- 6. Gender (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Gender <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentGenderDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentGenderTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-venus-mars select-icon"></i>
+                  <span id="adminStudentGenderDisplay">Select Gender</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentGenderMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Male" role="option">Male</li>
+                  <li class="custom-select-option" data-value="Female" role="option">Female</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentGender" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 7. Marital Status (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Marital Status <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentMaritalStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentMaritalStatusTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-ring select-icon"></i>
+                  <span id="adminStudentMaritalStatusDisplay">Select Marital Status</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentMaritalStatusMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Single / Unmarried" role="option">Single / Unmarried</li>
+                  <li class="custom-select-option" data-value="Married" role="option">Married</li>
+                  <li class="custom-select-option" data-value="Divorced" role="option">Divorced</li>
+                  <li class="custom-select-option" data-value="Widowed" role="option">Widowed</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentMaritalStatus" required>
+              </div>
+            </div>
+
+            <!-- 8. Category (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Category <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentCategoryDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentCategoryTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-layer-group select-icon"></i>
+                  <span id="adminStudentCategoryDisplay">Select Category</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentCategoryMenu" role="listbox">
+                  <li class="custom-select-option" data-value="General" role="option">General</li>
+                  <li class="custom-select-option" data-value="SC" role="option">SC</li>
+                  <li class="custom-select-option" data-value="ST" role="option">ST</li>
+                  <li class="custom-select-option" data-value="OBC" role="option">OBC</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentCategory" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 9. Religion (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Religion <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentReligionDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentReligionTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-hands-praying select-icon"></i>
+                  <span id="adminStudentReligionDisplay">Select Religion</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentReligionMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Hinduism" role="option">Hinduism</li>
+                  <li class="custom-select-option" data-value="Islam" role="option">Islam</li>
+                  <li class="custom-select-option" data-value="Christianity" role="option">Christianity</li>
+                  <li class="custom-select-option" data-value="Sikhism" role="option">Sikhism</li>
+                  <li class="custom-select-option" data-value="Buddhism" role="option">Buddhism</li>
+                  <li class="custom-select-option" data-value="Jainism" role="option">Jainism</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentReligion" required>
+              </div>
+            </div>
+
+            <!-- 10. Mobile Number (10 Digits strictly) -->
+            <div class="form-group flex-1">
+              <label for="studentPhone">Mobile Number <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="studentPhone" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                  placeholder="10-digit mobile" required>
+              </div>
+              <span class="input-error-msg" id="studentPhoneError">Please enter a valid 10-digit mobile number.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 11. Email Address -->
+            <div class="form-group flex-1">
+              <label for="studentEmail">Email Address <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="studentEmail" placeholder="student@example.com" required>
+              </div>
+            </div>
+
+            <!-- 12. State (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>State <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentStateDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentStateTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-map-location-dot select-icon"></i>
+                  <span id="adminStudentStateDisplay">Select State</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentStateMenu" role="listbox">
+                  <!-- Populated dynamically with Indian States & UTs -->
+                </ul>
+                <input type="hidden" id="studentState" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 13. District (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>District <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentDistrictDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentDistrictTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-city select-icon"></i>
+                  <span id="adminStudentDistrictDisplay">Select District</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentDistrictMenu" role="listbox">
+                  <!-- Populated dynamically based on selected state -->
+                </ul>
+                <input type="hidden" id="studentDistrict" required>
+              </div>
+            </div>
+
+            <!-- 14. Pin Code (6 Digits) -->
+            <div class="form-group flex-1">
+              <label for="studentPinCode">Pin Code <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-location-dot"></i>
+                <input type="text" id="studentPinCode" maxlength="6" pattern="[0-9]{6}" inputmode="numeric"
+                  placeholder="6-digit pin code" required>
+              </div>
+              <span class="input-error-msg" id="studentPinCodeError">Please enter a valid 6-digit pin code.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 15. Highest Qualification (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Highest Qualification <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentQualificationDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentQualificationTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-award select-icon"></i>
+                  <span id="adminStudentQualificationDisplay">Select Qualification</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentQualificationMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Below Madhyamik" role="option">Below Madhyamik</li>
+                  <li class="custom-select-option" data-value="Madhyamik / 10th" role="option">Madhyamik / 10th</li>
+                  <li class="custom-select-option" data-value="Higher Secondary / 12th" role="option">Higher Secondary /
+                    12th</li>
+                  <li class="custom-select-option" data-value="Diploma" role="option">Diploma</li>
+                  <li class="custom-select-option" data-value="Bachelor's Degree" role="option">Bachelor's Degree</li>
+                  <li class="custom-select-option" data-value="Master's Degree" role="option">Master's Degree</li>
+                  <li class="custom-select-option" data-value="Doctorate / PhD" role="option">Doctorate / PhD</li>
+                  <li class="custom-select-option" data-value="Other" role="option">Other</li>
+                </ul>
+                <input type="hidden" id="studentQualification" required>
+              </div>
+            </div>
+
+            <!-- 16. Course (Custom Dropdown) -->
+            <div class="form-group flex-1">
+              <label>Enrolled Course <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentCourseDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentCourseTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-desktop select-icon"></i>
+                  <span id="adminStudentCourseDisplay">Select Course</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentCourseMenu" role="listbox">
+                  <!-- Dynamically populated from active courses -->
+                </ul>
+                <input type="hidden" id="studentCourse" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- 17. Course Status (Custom Dropdown - Small 50% width like others) -->
+            <div class="form-group flex-1" style="max-width: calc(50% - 0.5rem);">
+              <label for="studentStatus">Course Status <span class="required">*</span></label>
+              <div class="custom-select-container" id="adminStudentStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="adminStudentStatusTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-circle-check select-icon"></i>
+                  <span id="adminStudentStatusDisplay">On going</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="adminStudentStatusMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="Active" role="option">On going</li>
+                  <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                </ul>
+                <input type="hidden" id="studentStatus" value="Active" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- 18. Full Address -->
+          <div class="form-group">
+            <label for="studentAddress">Full Address <span class="required">*</span></label>
+            <textarea id="studentAddress" rows="2" placeholder="House/Flat No., Street, Landmark, Area..."
+              required></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer" id="studentModalFooter" style="justify-content:space-between;">
+          <button type="button" class="btn btn-danger" id="btnDeleteStudentModal" style="display: none;">Delete
+            Student</button>
+          <div style="display:flex;gap:0.75rem;margin-left:auto;">
+            <button type="button" class="btn btn-secondary" id="btnCancelStudentModal">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveStudent">
+              <i class="fa-solid fa-check"></i> Save Student
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Course Form Modal (Add / Edit) - Only Course Name, Duration, and Description -->
+  <div class="modal-backdrop" id="courseModal">
+    <div class="modal-window course-modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-desktop modal-icon"></i>
+          <h3 id="courseModalTitle">Add New Course</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseCourseModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="courseForm">
+        <input type="hidden" id="courseId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="courseTitle">Course Name <span class="required">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-desktop"></i>
+              <input type="text" id="courseTitle" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="courseDurationValue">Duration <span class="required">*</span></label>
+            <div class="duration-input-group">
+              <div class="input-icon-wrap flex-1">
+                <i class="fa-regular fa-clock"></i>
+                <input type="number" id="courseDurationValue" min="1" step="1" required>
+              </div>
+              <div class="custom-select-container has-value" id="durationUnitDropdown">
+                <button type="button" class="custom-select-trigger has-value" id="durationUnitTrigger"
+                  aria-haspopup="listbox" aria-expanded="false">
+                  <span id="durationUnitDisplay">Months</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="durationUnitMenu" role="listbox">
+                  <li class="custom-select-option selected" data-value="Months" role="option" aria-selected="true">
+                    Months</li>
+                  <li class="custom-select-option" data-value="Years" role="option" aria-selected="false">Years</li>
+                </ul>
+                <input type="hidden" id="courseDurationUnit" value="Months" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="courseDescription">Description <span class="required">*</span></label>
+            <textarea id="courseDescription" rows="4" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>For Marksheets & Grading <span class="required">*</span></label>
+            <div class="course-terminal-subjects">
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseTerm1Check">
+                  <input type="checkbox" id="courseTerm1Check" class="terminal-checkbox">
+                  <span class="terminal-text">1<sup>st</sup> Terminal Modules</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseTerm1Input" class="course-subject-input name-input-capitalized"
+                    placeholder="Course Modules" required>
+                </div>
+              </div>
+
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseTerm2Check">
+                  <input type="checkbox" id="courseTerm2Check" class="terminal-checkbox">
+                  <span class="terminal-text">2<sup>nd</sup> Terminal Modules</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseTerm2Input" class="course-subject-input name-input-capitalized"
+                    placeholder="Course Modules">
+                </div>
+              </div>
+
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseTerm3Check">
+                  <input type="checkbox" id="courseTerm3Check" class="terminal-checkbox">
+                  <span class="terminal-text">3<sup>rd</sup> Terminal Modules</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseTerm3Input" class="course-subject-input name-input-capitalized"
+                    placeholder="Course Modules">
+                </div>
+              </div>
+
+              <div class="course-terminal-row">
+                <label class="terminal-label-group" for="courseFinalExamCheck">
+                  <input type="checkbox" id="courseFinalExamCheck" class="terminal-checkbox" checked>
+                  <span class="terminal-text">Final Exam Name</span>
+                  <span class="terminal-colon">:</span>
+                </label>
+                <div class="terminal-input-wrap">
+                  <input type="text" id="courseFinalExamInput" class="course-subject-input name-input-capitalized"
+                    placeholder="Exam name" required>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelCourseModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveCourse">
+            <i class="fa-solid fa-check"></i> Save Course
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Student Details & Profile Modal -->
+  <div class="modal-backdrop" id="studentDetailsModal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-id-card modal-icon"></i>
+          <h3>Student Profile & Enrollments</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseDetailsModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="studentDetailsContent">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <button type="button" class="btn btn-danger" id="btnDeleteStudentFromDetails">Delete Student</button>
+        <button type="button" class="btn btn-primary" id="btnEditFromDetails">
+          <i class="fa-regular fa-pen-to-square"></i> Edit Student
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Complete Course Dialog -->
+  <div class="modal-backdrop" id="batchModal">
+    <div class="modal-window batch-modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-plus modal-icon"></i>
+          <h3 id="batchModalTitle">Create New Batch</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseBatchModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="batchForm">
+        <div class="modal-body">
+          <p class="field-hint" id="batchStudentCount" hidden></p>
+          <div class="form-group" id="batchNameGroup">
+            <label for="batchNameInput">Batch Name <span class="required">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-layer-group"></i>
+              <input type="text" id="batchNameInput" maxlength="100" placeholder="For example: DCA October 2026">
+            </div>
+          </div>
+          <div class="form-group" id="existingBatchGroup" hidden>
+            <label for="existingBatchTrigger">Select Batch <span class="required">*</span></label>
+            <div class="custom-select-container batch-select-dropdown" id="existingBatchDropdown">
+              <button type="button" class="custom-select-trigger" id="existingBatchTrigger" aria-haspopup="listbox"
+                aria-expanded="false">
+                <i class="fa-solid fa-list select-icon"></i>
+                <span class="select-label" id="existingBatchDisplay">Choose an active batch</span>
+                <i class="fa-solid fa-chevron-down select-chevron"></i>
+              </button>
+              <ul class="custom-select-menu" id="existingBatchMenu" role="listbox"></ul>
+              <input type="hidden" id="existingBatchSelect">
+            </div>
+          </div>
+          <div class="form-group" id="batchStudentSelectionGroup">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+              <label style="margin-bottom: 0;">Select Students <span
+                  style="color: var(--text-muted); font-weight: normal; font-size: 0.8125rem;">(Optional)</span></label>
+              <span id="createBatchSelectionCount" class="batch-edit-selection-count">0 selected</span>
+            </div>
+            <div class="batch-edit-toolbar">
+              <div class="search-box batch-edit-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="createBatchStudentSearch" placeholder="Search students by name or ID"
+                  autocomplete="off">
+              </div>
+            </div>
+            <div class="batch-edit-student-list" id="createBatchStudentList" style="max-height: 240px;"></div>
+            <p class="empty-inline-state" id="createBatchEmptyState" hidden>No students found.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelBatchModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveBatch">
+            <i class="fa-solid fa-check"></i> <span id="saveBatchLabel">Create Batch</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Batch Students Dialog -->
+  <div class="modal-backdrop" id="editBatchModal">
+    <div class="modal-window batch-edit-modal-window">
+      <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="modal-title-box" style="flex:1;">
+          <i class="fa-solid fa-users-gear modal-icon"></i>
+          <div>
+            <h3>Edit Batch</h3>
+            <p class="modal-title-caption" id="editBatchName"></p>
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;justify-content:flex-end;">
+          <button type="button" class="btn-close-modal" id="btnCloseEditBatchModal" aria-label="Close modal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+      <form id="editBatchForm">
+        <div class="modal-body">
+          <div class="batch-edit-details-row">
+            <div class="form-group">
+              <label for="editBatchNameInput">Batch Name <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-layer-group"></i>
+                <input type="text" id="editBatchNameInput" maxlength="100" required placeholder="Enter batch name">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="editBatchStatusTrigger">Batch Status</label>
+              <div class="custom-select-container" id="editBatchStatusDropdown">
+                <button type="button" class="custom-select-trigger" id="editBatchStatusTrigger"
+                  aria-label="Batch status" aria-haspopup="listbox" aria-expanded="false">
+                  <i class="fa-solid fa-circle-half-stroke select-icon"></i>
+                  <span class="select-label" id="editBatchStatusDisplay">On going</span>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </button>
+                <ul class="custom-select-menu" id="editBatchStatusMenu" role="listbox">
+                  <li class="custom-select-option" data-value="Active" role="option">On going</li>
+                  <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+                </ul>
+                <input type="hidden" id="editBatchStatus" value="Active">
+              </div>
+            </div>
+          </div>
+          <div class="batch-edit-toolbar">
+            <div class="search-box batch-edit-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" id="editBatchStudentSearch" placeholder="Search students by name or ID"
+                autocomplete="off">
+            </div>
+            <span id="editBatchSelectionCount" class="batch-edit-selection-count">0 selected</span>
+          </div>
+          <div class="batch-edit-student-list" id="editBatchStudentList"></div>
+          <p class="empty-inline-state" id="editBatchEmptyState" hidden>No students match your search.</p>
+        </div>
+        <div class="modal-footer" style="justify-content:space-between;">
+          <button type="button" class="btn btn-danger" id="btnDeleteBatch">Delete Batch</button>
+          <div style="display:flex;gap:0.75rem;">
+            <button type="button" class="btn btn-secondary" id="btnCancelEditBatch">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveEditBatch">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Complete Course Dialog -->
+  <div class="modal-backdrop" id="completionModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-certificate modal-icon"></i>
+          <h3 id="completionModalTitle">Complete Course</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseCompletionModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="completionForm" novalidate>
+        <div class="modal-body">
+          <p class="field-hint" id="completionStudentCount"></p>
+          <div class="form-group">
+            <label>Course Duration <span class="required">*</span></label>
+            <div class="completion-period-fields">
+              <div class="completion-period-field">
+                <label for="completionStartMonth">Start month</label>
+                <div class="completion-date-selects">
+                  <div class="custom-select-container completion-select-dropdown" id="completionStartMonthDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionStartMonthTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionStartMonthDisplay">Month</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionStartMonthMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionStartMonth">
+                  </div>
+                  <div class="custom-select-container completion-select-dropdown completion-year-select"
+                    id="completionStartYearDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionStartYearTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionStartYearDisplay">Year</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionStartYearMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionStartYear">
+                  </div>
+                </div>
+              </div>
+              <span class="completion-period-separator" aria-hidden="true">to</span>
+              <div class="completion-period-field">
+                <label for="completionEndMonth">End month</label>
+                <div class="completion-date-selects">
+                  <div class="custom-select-container completion-select-dropdown" id="completionEndMonthDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionEndMonthTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionEndMonthDisplay">Month</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionEndMonthMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionEndMonth">
+                  </div>
+                  <div class="custom-select-container completion-select-dropdown completion-year-select"
+                    id="completionEndYearDropdown">
+                    <button type="button" class="custom-select-trigger" id="completionEndYearTrigger"
+                      aria-haspopup="listbox" aria-expanded="false">
+                      <span class="select-label" id="completionEndYearDisplay">Year</span><i
+                        class="fa-solid fa-chevron-down select-chevron"></i>
+                    </button>
+                    <ul class="custom-select-menu" id="completionEndYearMenu" role="listbox"></ul>
+                    <input type="hidden" id="completionEndYear">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p id="completionDurationError" class="completion-field-error" role="alert" hidden></p>
+          <div class="completion-issue-grade-row">
+            <div class="form-group">
+              <label for="completionIssueDate">Certificate Issue Date <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" id="completionIssueDate" min="0001-01-01" max="9999-12-31"
+                  aria-describedby="completionIssueDateError" required>
+              </div>
+              <p id="completionIssueDateError" class="completion-field-error" role="alert" hidden></p>
+            </div>
+            <div class="form-group">
+              <label for="completionGrade">Grade <span class="required">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-award"></i>
+                <input type="text" id="completionGrade" autocapitalize="characters" maxlength="30" placeholder="e.g. A+"
+                  required>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelCompletion">Cancel</button>
+          <button type="submit" class="btn btn-success" id="btnConfirmCompletion">
+            <i class="fa-solid fa-check"></i> Mark as Completed
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Bulk Change Status Modal -->
+  <div class="modal-backdrop" id="bulkStatusModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-arrows-rotate modal-icon text-primary"></i>
+          <div>
+            <h3 id="bulkStatusModalTitle">Change Status</h3>
+            <p class="modal-subtitle" id="bulkStatusModalSubtitle">Select a new status for the selected students.</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="btnCloseBulkStatusModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="bulkStatusForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>New Status <span class="required">*</span></label>
+            <div class="custom-select-container" id="bulkStatusDropdown">
+              <button type="button" class="custom-select-trigger" id="bulkStatusTrigger" aria-haspopup="listbox"
+                aria-expanded="false">
+                <i class="fa-solid fa-circle-check select-icon"></i>
+                <span id="bulkStatusDisplay">On going</span>
+                <i class="fa-solid fa-chevron-down select-chevron"></i>
+              </button>
+              <ul class="custom-select-menu" id="bulkStatusMenu" role="listbox">
+                <li class="custom-select-option selected" data-value="Active" role="option">On going</li>
+                <li class="custom-select-option" data-value="Inactive" role="option">Inactive</li>
+                <li class="custom-select-option" data-value="Completed" role="option">Completed</li>
+              </ul>
+              <input type="hidden" id="bulkStatusSelect" value="Active" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelBulkStatus">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnConfirmBulkStatus">
+            <i class="fa-solid fa-check"></i> Apply Status
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Confirmation Dialog Modal -->
+  <div class="modal-backdrop" id="confirmModal">
+    <div class="modal-window modal-sm">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-triangle-exclamation modal-icon text-danger" id="confirmIcon"></i>
+          <h3 id="confirmTitle">Confirm Action</h3>
+        </div>
+        <button class="btn-close-modal" id="btnCloseConfirmModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage">Are you sure you want to proceed with this action?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelConfirm">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btnExecuteConfirm">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Inbox Message View Dialog Modal -->
+  <div class="modal-backdrop" id="inboxMessageModal">
+    <div class="modal-window inbox-message-modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-regular fa-envelope-open modal-icon inbox-modal-header-icon" aria-hidden="true"></i>
+          <div>
+            <h3>Message</h3>
+            <p class="modal-title-caption" id="inboxModalReceivedTime"></p>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="btnCloseInboxMessageModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="inboxMessageModalBody">
+        <div class="inbox-modal-sender-card">
+          <div class="inbox-modal-sender-info">
+            <div class="inbox-modal-name-row">
+              <h4 id="inboxModalSenderName"></h4>
+            </div>
+            <div class="inbox-modal-contact-row">
+              <span class="inbox-modal-phone-link" id="inboxModalPhone">
+                <i class="fa-solid fa-phone"></i>
+                <span id="inboxModalPhoneText"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="inbox-modal-section" id="inboxModalCourseSection">
+          <span class="inbox-modal-label">Interested in</span>
+          <div class="inbox-modal-course-pill">
+            <span id="inboxModalCourseName"></span>
+          </div>
+        </div>
+
+        <div class="inbox-modal-section">
+          <span class="inbox-modal-label">Message body</span>
+          <div class="inbox-modal-message-box" id="inboxModalMessageText"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Login Logic Script -->
-  <script>
-    const GOOGLE_CLIENT_ID = '330236506368-38k618t0l8ick1rosohr9g3ui1teljhg.apps.googleusercontent.com';
-    const SESSION_KEY = 'educore_admin_session';
+  <!-- Academy & Client Profile Settings Modal -->
+  <div class="modal-backdrop" id="academySettingsModal">
+    <div class="modal-window modal-md settings-modal-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-gear modal-icon"></i>
+          <div>
+            <h3>Academy Settings</h3>
+            <p class="modal-subtitle">Manage academy profile and authorized co-owners</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" id="btnCloseAcademySettingsModal" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="academySettingsForm" autocomplete="off">
+        <div class="modal-body settings-modal-body">
+          <div class="settings-section">
+            <h4 class="settings-section-title"><i class="fa-solid fa-school"></i> Academy Details</h4>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="settingsAcademyName">Academy Name <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-school"></i>
+                  <input type="text" id="settingsAcademyName" class="name-input-capitalized" data-capitalize="true"
+                    required>
+                </div>
+              </div>
 
-    // Clean up any legacy keys
-    localStorage.removeItem('educore_google_client_id');
+              <div class="form-group">
+                <label for="settingsOwnerName">Owner Name <span class="required-star">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-user-tie"></i>
+                  <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true"
+                    required>
+                </div>
+              </div>
+            </div>
 
-    // Check if already logged in -> redirect to superadmin or admin dashboard
-    const existingSession = localStorage.getItem(SESSION_KEY);
-    if (existingSession) {
-      try {
-        const session = JSON.parse(existingSession);
-        const userEmail = (session?.email || '').toLowerCase().trim();
-        if (session && session.provider === 'google' && userEmail) {
-          if (userEmail === 'dasprantik76@gmail.com' || session.isSuperAdmin) {
-            window.location.href = 'superadmin.html';
-          } else {
-            window.location.href = 'admin.html' + (window.location.hash || '');
-          }
-        } else {
-          localStorage.removeItem(SESSION_KEY);
-        }
-      } catch (e) {
-        localStorage.removeItem(SESSION_KEY);
-      }
-    }
+            <div class="form-group" style="display: none;">
+              <label for="settingsSubdomainSlug">Public Website Slug</label>
+              <div class="subdomain-input-wrap"
+                style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+                <span id="settingsSlugPrefix"
+                  style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
+                <input type="text" id="settingsSubdomainSlug" value="diganta" placeholder="your-slug"
+                  style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
+              </div>
+            </div>
+          </div>
 
-    let googleAuthInitialized = false;
+          <div class="settings-section settings-coowners-section">
+            <div class="settings-section-header">
+              <div>
+                <h4 class="settings-section-title"><i class="fa-solid fa-user-group"></i> Academy Co-Owners</h4>
+                <p class="settings-helper-text">Add Google account email addresses. Co-owners have full access to manage
+                  courses, students, and marksheets for this academy.</p>
+              </div>
+            </div>
 
-    const loginError = new URLSearchParams(window.location.search).get('loginError');
-    if (loginError) {
-      showLoginAlert('Google Sign-In could not be verified. Please try again.', 'error');
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+            <div class="coowner-input-row">
+              <div class="input-icon-wrap coowner-input-wrap">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="settingsCoOwnerInput" placeholder="Enter Google email (e.g. coowner@gmail.com)"
+                  autocomplete="off">
+              </div>
+              <button type="button" class="btn btn-secondary btn-add-coowner" id="btnAddCoOwner">
+                <i class="fa-solid fa-plus"></i> <span>Add Co-Owner</span>
+              </button>
+            </div>
+            <div class="coowner-input-error" id="settingsCoOwnerError" style="display: none;"></div>
 
-    // Keep the Google account chooser in this browser tab. The server verifies
-    // the credential returned by Google's full-page redirect flow.
-    function initGoogleAuth() {
-      if (googleAuthInitialized) return;
-      if (window.google && window.google.accounts && window.google.accounts.id) {
-        try {
-          google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            ux_mode: 'redirect',
-            login_uri: `${window.location.origin}/api/google-login`,
-            auto_select: false,
-            cancel_on_tap_outside: false
-          });
-          google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), {
-            type: 'standard',
-            theme: 'outline',
-            size: 'large',
-            text: 'signin_with',
-            shape: 'rectangular',
-            logo_alignment: 'left',
-            width: 320
-          });
-          googleAuthInitialized = true;
-        } catch (e) {
-          console.error('[Google OAuth2 Init Error]:', e);
-          showLoginAlert('Google Sign-In could not load. Please refresh and try again.', 'error');
-        }
-      }
-    }
+            <div class="coowners-list-wrap">
+              <div class="coowners-empty" id="settingsCoOwnersEmpty">
+                <i class="fa-solid fa-user-shield"></i>
+                <p>No co-owners added yet. Enter an email above to add a co-owner.</p>
+              </div>
+              <ul class="coowners-list" id="settingsCoOwnersList"></ul>
+            </div>
+          </div>
+        </div>
 
-    function showLoginAlert(message, type = 'error') {
-      const alertBox = document.getElementById('loginAlert');
-      const alertText = document.getElementById('loginAlertText');
-      if (alertBox && alertText) {
-        alertText.textContent = message;
-        alertBox.className = `login-alert ${type}`;
-        alertBox.style.display = 'flex';
-      }
-    }
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelAcademySettings">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveAcademySettings">
+            <i class="fa-solid fa-check"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      if (isLocalhost) {
-        const devSec = document.getElementById('localDevSection');
-        if (devSec) devSec.style.display = 'flex';
-      }
-      initGoogleAuth();
-    });
 
-    window.addEventListener('load', initGoogleAuth);
-  </script>
+  <!-- One-Time Academy & Owner Setup Modal -->
+  <div class="modal-backdrop" id="onboardingModal">
+    <div class="modal-window modal-sm onboarding-window">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-graduation-cap modal-icon"></i>
+          <h3>Welcome to Academy by PixelSetu</h3>
+        </div>
+      </div>
+      <form id="onboardingForm" autocomplete="off">
+        <div class="modal-body">
+          <p class="onboarding-intro"
+            style="margin-bottom: 1.25rem; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+            Please complete your one-time academy setup to personalize your administration workspace.
+          </p>
+
+          <div class="form-group">
+            <label for="onboardingAcademyName">Academy Name <span class="required-star">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-school"></i>
+              <input type="text" id="onboardingAcademyName" class="name-input-capitalized" data-capitalize="true"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="onboardingOwnerName">Owner Name <span class="required-star">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-user-tie"></i>
+              <input type="text" id="onboardingOwnerName" class="name-input-capitalized" data-capitalize="true"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group" style="display: none;">
+            <label for="onboardingSubdomainSlug">Public Website Slug</label>
+            <div class="subdomain-input-wrap"
+              style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+              <span id="onboardingSlugPrefix"
+                style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
+              <input type="text" id="onboardingSubdomainSlug" value="diganta" placeholder="your-slug"
+                style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="justify-content: flex-end;">
+          <button type="submit" class="btn btn-primary" id="btnSaveOnboarding"
+            style="width: 100%; justify-content: center; height: 44px; font-weight: 600;">
+            <i class="fa-solid fa-check"></i> Complete Setup & Launch Portal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- QR Code & Zip Utilities -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Print Container for Marksheets -->
+  <div id="marksheetPrintContainer" class="marksheet-print-container" aria-hidden="true"></div>
+
+  <!-- JavaScript -->
+  <script src="certificate-canvas.js?v=12"></script>
+  <script src="marksheet-canvas.js?v=20"></script>
+  <script src="application-canvas.js?v=17"></script>
+  <script src="admin-script.js?v=idcards-11.40"></script>
 </body>
+
 </html>

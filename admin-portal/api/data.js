@@ -1142,6 +1142,42 @@ export default async function handler(req, res) {
     return email;
   }
 
+  // Helper to resolve full tenant context (canonical owner, aliases, and slugs)
+  async function getTenantContext(targetOwnerEmail, querySlug) {
+    const slug = (querySlug || '').toLowerCase().trim();
+    const profile = await db.collection(COLLECTIONS.PROFILE).findOne({
+      $or: [
+        { ownerEmail: targetOwnerEmail },
+        { coOwnerEmail: targetOwnerEmail },
+        { coOwnerEmails: targetOwnerEmail },
+        ...(slug ? [{ slug }] : [])
+      ]
+    });
+    const canonicalOwner = profile?.ownerEmail || targetOwnerEmail;
+    const tenantEmails = new Set([canonicalOwner, targetOwnerEmail]);
+    if (profile?.coOwnerEmail) tenantEmails.add(profile.coOwnerEmail);
+    if (Array.isArray(profile?.coOwnerEmails)) {
+      profile.coOwnerEmails.forEach(e => tenantEmails.add(e));
+    }
+    if (canonicalOwner === 'rcavirup@gmail.com' || targetOwnerEmail === 'rcavirup@gmail.com' || slug === 'diganta' || slug === 'prantik') {
+      tenantEmails.add('rcavirup@gmail.com');
+      tenantEmails.add('digantacomputercentre@gmail.com');
+      tenantEmails.add('atreyeeart20@gmail.com');
+    }
+    const tenantSlugs = new Set([profile?.slug, slug].filter(Boolean));
+    if (canonicalOwner === 'rcavirup@gmail.com' || targetOwnerEmail === 'rcavirup@gmail.com') {
+      tenantSlugs.add('diganta');
+      tenantSlugs.add('prantik');
+      tenantSlugs.add('rcavirup');
+    }
+    return {
+      canonicalOwner,
+      allowedEmails: Array.from(tenantEmails),
+      allowedSlugs: Array.from(tenantSlugs),
+      profile
+    };
+  }
+
   // --------------------------------------------------------------------------
   // GET: Fetch Academy Data for Specific Tenant
   // --------------------------------------------------------------------------
@@ -1285,9 +1321,11 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Missing action parameter' });
       }
 
-      let ownerEmail = await resolveOwnerEmail(payload?.ownerEmail, payload?.academySlug);
-      if (SUPER_ADMIN_EMAILS.has(ownerEmail) && payload?.academySlug) {
-        const targetTenantEmail = await resolveOwnerEmail('', payload.academySlug);
+      const requestOwnerEmail = payload?.ownerEmail || req.body?.ownerEmail;
+      const requestAcademySlug = payload?.academySlug || req.body?.academySlug;
+      let ownerEmail = await resolveOwnerEmail(requestOwnerEmail, requestAcademySlug);
+      if (SUPER_ADMIN_EMAILS.has(ownerEmail) && requestAcademySlug) {
+        const targetTenantEmail = await resolveOwnerEmail('', requestAcademySlug);
         if (targetTenantEmail) {
           ownerEmail = targetTenantEmail;
         }
@@ -1296,7 +1334,7 @@ export default async function handler(req, res) {
       // Check tenant approval status for restricted actions
       const RESTRICTED_ACTIONS = new Set([
         'add_student', 'save_students', 'update_student', 'bulk_update_students', 'delete_student', 'bulk_delete_students',
-        'add_course', 'save_courses', 'delete_course',
+        'add_course', 'update_course', 'save_courses', 'delete_course',
         'save_batch', 'delete_batch',
         'save_auth_token'
       ]);
@@ -1507,52 +1545,143 @@ export default async function handler(req, res) {
         // 2. Save All Courses
         case 'save_courses': {
           const courses = Array.isArray(payload?.courses) ? payload.courses : [];
+          const { canonicalOwner, allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
           const now = Date.now();
-          const taggedCourses = courses.map((c, idx) => ({
-            ...c,
-            ownerEmail,
-            createdAt: c.createdAt || new Date(now - idx * 1000).toISOString()
-          }));
-          await db.collection(COLLECTIONS.COURSES).deleteMany({ ownerEmail });
+          const taggedCourses = courses.map((c, idx) => {
+            const clean = { ...c };
+            delete clean._id;
+            return {
+              ...clean,
+              ownerEmail: canonicalOwner,
+              createdAt: clean.createdAt || new Date(now - idx * 1000).toISOString()
+            };
+          });
+          await db.collection(COLLECTIONS.COURSES).deleteMany({ ownerEmail: { $in: allowedEmails } });
           if (taggedCourses.length > 0) {
             await db.collection(COLLECTIONS.COURSES).insertMany(taggedCourses);
           }
-          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
+          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail: { $in: allowedEmails } }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
           return res.status(200).json({ success: true, courses: updatedCourses });
         }
 
-        // 3. Add or Update a Single Course
+        // 3. Add a Single Course
         case 'add_course': {
           const course = payload?.course;
           if (!course || !course.id) {
             return res.status(400).json({ success: false, error: 'Invalid course payload' });
           }
-          const taggedCourse = { ...course, ownerEmail, createdAt: course.createdAt || new Date().toISOString() };
+          const { canonicalOwner, allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const cleanCourse = { ...course };
+          delete cleanCourse._id;
+          const taggedCourse = {
+            ...cleanCourse,
+            ownerEmail: canonicalOwner,
+            createdAt: course.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
           await db.collection(COLLECTIONS.COURSES).updateOne(
-            { id: course.id, ownerEmail },
+            { id: course.id, ownerEmail: { $in: allowedEmails } },
             { $set: taggedCourse },
             { upsert: true }
           );
-          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
+          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail: { $in: allowedEmails } }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
           return res.status(200).json({ success: true, courses: updatedCourses });
+        }
+
+        // 3b. Update Single Course
+        case 'update_course': {
+          const courseId = String(payload?.courseId || payload?.course?.id || payload?.id || '').trim();
+          const updatedData = payload?.updatedData || payload?.course;
+          if (!courseId || !updatedData) {
+            return res.status(400).json({ success: false, error: 'Missing courseId or updatedData' });
+          }
+          const { canonicalOwner, allowedEmails, allowedSlugs } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const cleanUpdate = { ...updatedData };
+          delete cleanUpdate._id;
+          delete cleanUpdate.ownerEmail;
+          cleanUpdate.updatedAt = new Date().toISOString();
+
+          const idRegex = new RegExp(`^${escapeRegex(courseId)}$`, 'i');
+          const courseDoc = await db.collection(COLLECTIONS.COURSES).findOne({
+            $and: [
+              {
+                $or: [
+                  { ownerEmail: { $in: allowedEmails } },
+                  { academySlug: { $in: allowedSlugs } }
+                ]
+              },
+              {
+                $or: [
+                  { id: courseId },
+                  { id: idRegex }
+                ]
+              }
+            ]
+          });
+
+          if (courseDoc) {
+            await db.collection(COLLECTIONS.COURSES).updateOne(
+              { _id: courseDoc._id },
+              { $set: cleanUpdate }
+            );
+          } else {
+            // Upsert under canonical owner if not found
+            const newDoc = {
+              ...cleanUpdate,
+              id: courseId,
+              ownerEmail: canonicalOwner,
+              createdAt: cleanUpdate.createdAt || new Date().toISOString()
+            };
+            await db.collection(COLLECTIONS.COURSES).updateOne(
+              { id: courseId, ownerEmail: canonicalOwner },
+              { $set: newDoc },
+              { upsert: true }
+            );
+          }
+
+          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail: { $in: allowedEmails } }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
+          const savedCourse = updatedCourses.find(c => String(c.id).trim().toLowerCase() === courseId.toLowerCase()) || null;
+          return res.status(200).json({ success: true, course: savedCourse, courses: updatedCourses });
         }
 
         // 4. Delete Course
         case 'delete_course': {
-          const courseId = payload?.courseId;
+          const courseId = String(payload?.courseId || '').trim();
           if (!courseId) {
             return res.status(400).json({ success: false, error: 'Missing courseId' });
           }
-          await db.collection(COLLECTIONS.COURSES).deleteOne({ id: courseId, ownerEmail });
-          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
+          const { allowedEmails, allowedSlugs } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const idRegex = new RegExp(`^${escapeRegex(courseId)}$`, 'i');
+          await db.collection(COLLECTIONS.COURSES).deleteMany({
+            $and: [
+              {
+                $or: [
+                  { ownerEmail: { $in: allowedEmails } },
+                  { academySlug: { $in: allowedSlugs } }
+                ]
+              },
+              {
+                $or: [
+                  { id: courseId },
+                  { id: idRegex }
+                ]
+              }
+            ]
+          });
+          const updatedCourses = await db.collection(COLLECTIONS.COURSES).find({ ownerEmail: { $in: allowedEmails } }, { projection: { _id: 0 } }).sort({ createdAt: -1, _id: -1 }).toArray();
           return res.status(200).json({ success: true, courses: updatedCourses });
         }
 
         // 5. Save All Students
         case 'save_students': {
           const students = Array.isArray(payload?.students) ? payload.students : [];
-          const taggedStudents = students.map(s => ({ ...s, ownerEmail }));
-          await db.collection(COLLECTIONS.STUDENTS).deleteMany({ ownerEmail });
+          const { canonicalOwner, allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const taggedStudents = students.map(s => {
+            const clean = { ...s };
+            delete clean._id;
+            return { ...clean, ownerEmail: canonicalOwner };
+          });
+          await db.collection(COLLECTIONS.STUDENTS).deleteMany({ ownerEmail: { $in: allowedEmails } });
           if (taggedStudents.length > 0) {
             await db.collection(COLLECTIONS.STUDENTS).insertMany(taggedStudents);
           }
@@ -1566,15 +1695,17 @@ export default async function handler(req, res) {
           if (!student || !studentName || !student?.phone) {
             return res.status(400).json({ success: false, error: 'Invalid student registration payload' });
           }
-          const studentId = await getNextStudentId(db, ownerEmail);
+          const { canonicalOwner } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const studentId = await getNextStudentId(db, canonicalOwner);
           const normalizedStudent = {
             ...student,
             id: studentId,
             certificateSerial: studentId,
             name: studentName,
             fullName: studentName,
-            ownerEmail
+            ownerEmail: canonicalOwner
           };
+          delete normalizedStudent._id;
           await db.collection(COLLECTIONS.STUDENTS).insertOne(normalizedStudent);
           return res.status(200).json({ success: true, student: normalizedStudent });
         }
@@ -1585,13 +1716,45 @@ export default async function handler(req, res) {
           if (!studentId || !updatedData) {
             return res.status(400).json({ success: false, error: 'Missing studentId or updatedData' });
           }
+          const { allowedEmails, allowedSlugs } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const targetId = String(studentId).trim();
+          const idRegex = new RegExp(`^${escapeRegex(targetId)}$`, 'i');
+
+          const studentQuery = {
+            $and: [
+              {
+                $or: [
+                  { ownerEmail: { $in: allowedEmails } },
+                  { academySlug: { $in: allowedSlugs } }
+                ]
+              },
+              {
+                $or: [
+                  { id: targetId },
+                  { id: idRegex },
+                  { certificateSerial: idRegex }
+                ]
+              }
+            ]
+          };
+
+          const currentStudent = await db.collection(COLLECTIONS.STUDENTS).findOne(studentQuery);
+          if (!currentStudent) {
+            return res.status(404).json({ success: false, error: 'Student not found' });
+          }
+
+          const cleanUpdate = { ...updatedData };
+          delete cleanUpdate._id;
+          delete cleanUpdate.ownerEmail;
+          cleanUpdate.updatedAt = new Date().toISOString();
 
           // If changing or removing student photo, delete the old photo from ImageKit
-          if ('imageKitFileId' in updatedData || 'photoUrl' in updatedData) {
-            const currentStudent = await db.collection(COLLECTIONS.STUDENTS).findOne(
-              { id: studentId, ownerEmail },
-              { projection: { _id: 0, imageKitFileId: 1 } }
-            );
+          const isExplicitRemove = Boolean(payload?.removePhoto);
+          if (cleanUpdate.photoUrl === '' && !isExplicitRemove && currentStudent?.photoUrl) {
+            delete cleanUpdate.photoUrl;
+            delete cleanUpdate.imageKitFileId;
+            delete cleanUpdate.imageKitFilePath;
+          } else if ('imageKitFileId' in updatedData || 'photoUrl' in updatedData) {
             const oldFileId = currentStudent?.imageKitFileId;
             const newFileId = updatedData.imageKitFileId;
             if (oldFileId && oldFileId !== newFileId) {
@@ -1599,15 +1762,15 @@ export default async function handler(req, res) {
             }
           }
 
-          const result = await db.collection(COLLECTIONS.STUDENTS).updateOne(
-            { id: studentId, ownerEmail },
-            { $set: updatedData }
+          await db.collection(COLLECTIONS.STUDENTS).updateOne(
+            { _id: currentStudent._id },
+            { $set: cleanUpdate }
           );
-          if (result.matchedCount > 0) {
-            const updatedStudent = await db.collection(COLLECTIONS.STUDENTS).findOne({ id: studentId, ownerEmail }, { projection: { _id: 0 } });
-            return res.status(200).json({ success: true, student: updatedStudent });
-          }
-          return res.status(404).json({ success: false, error: 'Student not found' });
+          const updatedStudent = await db.collection(COLLECTIONS.STUDENTS).findOne(
+            { _id: currentStudent._id },
+            { projection: { _id: 0 } }
+          );
+          return res.status(200).json({ success: true, student: updatedStudent });
         }
 
         // 8. Bulk Update Students (e.g. Mark as Completed)
@@ -1616,9 +1779,34 @@ export default async function handler(req, res) {
           if (!Array.isArray(studentIds) || !updateFields) {
             return res.status(400).json({ success: false, error: 'Invalid bulk update payload' });
           }
+          const { allowedEmails, allowedSlugs } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const idSet = studentIds.map(id => String(id).trim());
+          const idRegexes = idSet.map(id => new RegExp(`^${escapeRegex(id)}$`, 'i'));
+
+          const cleanFields = { ...updateFields };
+          delete cleanFields._id;
+          delete cleanFields.ownerEmail;
+          cleanFields.updatedAt = new Date().toISOString();
+
           const result = await db.collection(COLLECTIONS.STUDENTS).updateMany(
-            { id: { $in: studentIds }, ownerEmail },
-            { $set: updateFields }
+            {
+              $and: [
+                {
+                  $or: [
+                    { ownerEmail: { $in: allowedEmails } },
+                    { academySlug: { $in: allowedSlugs } }
+                  ]
+                },
+                {
+                  $or: [
+                    { id: { $in: idSet } },
+                    { id: { $in: idRegexes } },
+                    { certificateSerial: { $in: idSet } }
+                  ]
+                }
+              ]
+            },
+            { $set: cleanFields }
           );
           return res.status(200).json({ success: true, modifiedCount: result.modifiedCount });
         }
@@ -1628,30 +1816,53 @@ export default async function handler(req, res) {
           const name = String(batch.name || '').trim().slice(0, 100);
           const studentIds = [...new Set(Array.isArray(batch.studentIds) ? batch.studentIds.map(String) : [])];
           if (!name) return res.status(400).json({ success: false, error: 'A batch name is required.' });
-          const savedBatch = { ...batch, id: String(batch.id || randomUUID()), name, studentIds, ownerEmail, status: batch.status === 'Completed' ? 'Completed' : 'Active', createdAt: batch.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
-          await db.collection(COLLECTIONS.BATCHES).updateOne({ id: savedBatch.id, ownerEmail }, { $set: savedBatch }, { upsert: true });
+          const { canonicalOwner, allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const cleanBatch = { ...batch };
+          delete cleanBatch._id;
+          const batchId = String(cleanBatch.id || randomUUID());
+          const savedBatch = {
+            ...cleanBatch,
+            id: batchId,
+            name,
+            studentIds,
+            ownerEmail: canonicalOwner,
+            status: cleanBatch.status === 'Completed' ? 'Completed' : 'Active',
+            createdAt: cleanBatch.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          await db.collection(COLLECTIONS.BATCHES).updateOne(
+            { id: batchId, ownerEmail: { $in: allowedEmails } },
+            { $set: savedBatch },
+            { upsert: true }
+          );
           return res.status(200).json({ success: true, batch: savedBatch });
         }
 
         case 'delete_batch': {
           const batchId = String(payload?.batchId || '').trim();
           if (!batchId) return res.status(400).json({ success: false, error: 'Missing batch ID.' });
-          await db.collection(COLLECTIONS.BATCHES).deleteOne({ id: batchId, ownerEmail });
+          const { allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          await db.collection(COLLECTIONS.BATCHES).deleteMany({
+            id: batchId,
+            ownerEmail: { $in: allowedEmails }
+          });
           return res.status(200).json({ success: true, batchId });
         }
 
         case 'mark_all_messages_read': {
-          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail });
-          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[ownerEmail]) {
-            const seed = DEFAULT_MESSAGES_BY_TENANT[ownerEmail].map(m => ({
+          const { canonicalOwner, allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail: { $in: allowedEmails } });
+          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[canonicalOwner]) {
+            const seed = DEFAULT_MESSAGES_BY_TENANT[canonicalOwner].map(m => ({
               ...m,
+              ownerEmail: canonicalOwner,
               isRead: true,
               readAt: new Date().toISOString()
             }));
             await db.collection(COLLECTIONS.MESSAGES).insertMany(seed);
           } else {
             await db.collection(COLLECTIONS.MESSAGES).updateMany(
-              { ownerEmail, isRead: false },
+              { ownerEmail: { $in: allowedEmails }, isRead: false },
               { $set: { isRead: true, readAt: new Date().toISOString() } }
             );
           }
@@ -1661,17 +1872,19 @@ export default async function handler(req, res) {
         case 'mark_message_read': {
           const messageId = String(payload?.messageId || '').trim();
           if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
-          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail });
-          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[ownerEmail]) {
-            const seed = DEFAULT_MESSAGES_BY_TENANT[ownerEmail].map(m => ({
+          const { canonicalOwner, allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail: { $in: allowedEmails } });
+          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[canonicalOwner]) {
+            const seed = DEFAULT_MESSAGES_BY_TENANT[canonicalOwner].map(m => ({
               ...m,
+              ownerEmail: canonicalOwner,
               isRead: m.id === messageId ? true : m.isRead,
               readAt: m.id === messageId ? new Date().toISOString() : m.readAt
             }));
             await db.collection(COLLECTIONS.MESSAGES).insertMany(seed);
           } else {
             await db.collection(COLLECTIONS.MESSAGES).updateOne(
-              { id: messageId, ownerEmail },
+              { id: messageId, ownerEmail: { $in: allowedEmails } },
               { $set: { isRead: true, readAt: new Date().toISOString() } }
             );
           }
@@ -1681,16 +1894,18 @@ export default async function handler(req, res) {
         case 'mark_message_unread': {
           const messageId = String(payload?.messageId || '').trim();
           if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
-          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail });
-          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[ownerEmail]) {
-            const seed = DEFAULT_MESSAGES_BY_TENANT[ownerEmail].map(m => ({
+          const { canonicalOwner, allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const count = await db.collection(COLLECTIONS.MESSAGES).countDocuments({ ownerEmail: { $in: allowedEmails } });
+          if (count === 0 && DEFAULT_MESSAGES_BY_TENANT[canonicalOwner]) {
+            const seed = DEFAULT_MESSAGES_BY_TENANT[canonicalOwner].map(m => ({
               ...m,
+              ownerEmail: canonicalOwner,
               isRead: m.id === messageId ? false : m.isRead
             }));
             await db.collection(COLLECTIONS.MESSAGES).insertMany(seed);
           } else {
             await db.collection(COLLECTIONS.MESSAGES).updateOne(
-              { id: messageId, ownerEmail },
+              { id: messageId, ownerEmail: { $in: allowedEmails } },
               { $set: { isRead: false }, $unset: { readAt: '' } }
             );
           }
@@ -1700,7 +1915,8 @@ export default async function handler(req, res) {
         case 'delete_message': {
           const messageId = String(payload?.messageId || '').trim();
           if (!messageId) return res.status(400).json({ success: false, error: 'Missing message ID.' });
-          await db.collection(COLLECTIONS.MESSAGES).deleteOne({ id: messageId, ownerEmail });
+          const { allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          await db.collection(COLLECTIONS.MESSAGES).deleteMany({ id: messageId, ownerEmail: { $in: allowedEmails } });
           return res.status(200).json({ success: true });
         }
 

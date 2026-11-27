@@ -980,7 +980,7 @@ class AcademyStore {
           }
 
           if (Array.isArray(students)) {
-            const isDigantaTenant = this.ownerEmail === 'rcavirup@gmail.com' || this.ownerEmail === 'digantacomputercentre@gmail.com' || this.ownerEmail === 'diganta';
+            const isDigantaTenant = this.ownerEmail === 'rcavirup@gmail.com' || this.ownerEmail === 'digantacomputercentre@gmail.com' || this.ownerEmail === 'diganta' || this.ownerEmail === 'prantik';
             this.students = students.map(s => {
               if (isDigantaTenant && (s.academySlug === 'prantik' || s.academySlug === 'rcavirup' || !s.academySlug)) {
                 return { ...s, academySlug: 'diganta' };
@@ -989,6 +989,12 @@ class AcademyStore {
             });
             localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(this.students));
             localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this.students));
+            if (isDigantaTenant) {
+              localStorage.setItem(`${STORAGE_KEYS.STUDENTS}_diganta`, JSON.stringify(this.students));
+              localStorage.setItem(`${STORAGE_KEYS.STUDENTS}_prantik`, JSON.stringify(this.students));
+              localStorage.setItem(`${STORAGE_KEYS.STUDENTS}_rcavirup@gmail.com`, JSON.stringify(this.students));
+              localStorage.setItem(`${STORAGE_KEYS.STUDENTS}_digantacomputercentre@gmail.com`, JSON.stringify(this.students));
+            }
           } else if (this.students.length > 0) {
             this.syncToCloud('save_students', { students: this.students });
           }
@@ -1039,15 +1045,18 @@ class AcademyStore {
 
   async syncToCloud(action, payload) {
     try {
+      const slug = this.getAcademyProfile()?.slug || this.ownerEmail;
       const response = await fetch('/api/data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action,
+          ownerEmail: this.ownerEmail,
+          academySlug: slug,
           payload: {
             ...payload,
             ownerEmail: this.ownerEmail,
-            academySlug: this.getAcademyProfile()?.slug || this.ownerEmail
+            academySlug: slug
           }
         })
       });
@@ -1365,7 +1374,15 @@ class AcademyStore {
     };
     this.courses.unshift(newCourse);
     this.save();
-    await this.syncToCloud('add_course', { course: newCourse });
+    try {
+      const result = await this.syncToCloud('add_course', { course: newCourse });
+      if (result && result.success && Array.isArray(result.courses)) {
+        this.courses = result.courses;
+        this.save();
+      }
+    } catch (e) {
+      console.warn('[AcademyStore] Cloud sync failed (add_course):', e);
+    }
     return newCourse;
   }
 
@@ -1377,7 +1394,15 @@ class AcademyStore {
         ...updatedData
       };
       this.save();
-      await this.syncToCloud('save_courses', { courses: this.courses });
+      try {
+        const result = await this.syncToCloud('update_course', { courseId: id, updatedData });
+        if (result && result.success && Array.isArray(result.courses)) {
+          this.courses = result.courses;
+          this.save();
+        }
+      } catch (e) {
+        console.warn('[AcademyStore] Cloud sync failed (update_course):', e);
+      }
       return this.courses[index];
     }
     return null;
@@ -1392,7 +1417,17 @@ class AcademyStore {
       }
     });
     this.save();
-    return await this.syncToCloud('delete_course', { courseId: id });
+    try {
+      const result = await this.syncToCloud('delete_course', { courseId: id });
+      if (result && result.success && Array.isArray(result.courses)) {
+        this.courses = result.courses;
+        this.save();
+      }
+      return result;
+    } catch (e) {
+      console.warn('[AcademyStore] Cloud sync failed (delete_course):', e);
+      return false;
+    }
   }
 
   getCourseEnrollmentCount(courseId) {
@@ -4774,28 +4809,72 @@ class UIController {
       const isFinalExam = /^(?:Course\s+Final|Final\s+Exam|Final)/i.test(title) || (idx === courseSubjects.length - 1 && (idx >= 2 || /Final/i.test(subj)));
 
       if (isFinalExam) {
-        let examName = title;
-        if (title.includes('—') || title.includes('-')) {
-          const parts = title.split(/[—-]/);
-          examName = parts.slice(1).join(' - ').trim() || parts[0].trim();
-        } else if (/^(?:Course\s+Final|Final\s+Exam)\s*[:]/i.test(title)) {
-          examName = title.replace(/^(?:Course\s+Final|Final\s+Exam)\s*[:]\s*/i, '').trim();
+        let examName = course?.terminalConfig?.finalExamName || '';
+        if (!examName) {
+          if (title.includes('—') || title.includes('-')) {
+            const parts = title.split(/[—-]/);
+            examName = parts.slice(1).join(' - ').trim() || parts[0].trim();
+          } else if (/^(?:Course\s+Final|Final\s+Exam)\s*[:]/i.test(title)) {
+            examName = title.replace(/^(?:Course\s+Final|Final\s+Exam)\s*[:]\s*/i, '').trim();
+          }
+          examName = examName.replace(/^(?:Course\s+Final|Final\s+Exam|Modules?)\s*[:—\-]?\s*/i, '').trim();
         }
-        examName = examName.replace(/^(?:Course\s+Final|Final\s+Exam|Modules?)\s*[:—\-]?\s*/i, '').trim() || title;
+        if (!examName || examName.toLowerCase() === 'course final' || examName.toLowerCase() === 'final exam') {
+          const acronymMatch = (course?.title || '').match(/\(([^)]+)\)/);
+          if (acronymMatch) {
+            examName = `${acronymMatch[1].trim()} Final`;
+          } else if (course?.title) {
+            examName = `${course.title.trim()} Final`;
+          } else {
+            examName = 'Course Final';
+          }
+        }
         title = examName;
-        modules = '';
+
+        const checkedTerms = [];
+        const cfg = course?.terminalConfig;
+        if (cfg) {
+          if (cfg.term1Enabled) checkedTerms.push('1ˢᵗ Term');
+          if (cfg.term2Enabled) checkedTerms.push('2ⁿᵈ Term');
+          if (cfg.term3Enabled) checkedTerms.push('3ʳᵈ Term');
+          if (cfg.term4Enabled) checkedTerms.push('4ᵗʰ Term');
+        }
+
+        if (checkedTerms.length === 0) {
+          courseSubjects.forEach((sItem, sIdx) => {
+            if (sIdx < idx) {
+              const str = String(sItem || '').trim();
+              if (/1st\s+Term/i.test(str) || sIdx === 0) checkedTerms.push('1ˢᵗ Term');
+              else if (/2nd\s+Term/i.test(str) || sIdx === 1) checkedTerms.push('2ⁿᵈ Term');
+              else if (/3rd\s+Term/i.test(str) || sIdx === 2) checkedTerms.push('3ʳᵈ Term');
+              else if (/4th\s+Term/i.test(str) || sIdx === 3) checkedTerms.push('4ᵗʰ Term');
+            }
+          });
+        }
+
+        const uniqueTerms = Array.from(new Set(checkedTerms));
+        let termsListStr = '';
+        if (uniqueTerms.length === 1) {
+          termsListStr = uniqueTerms[0];
+        } else if (uniqueTerms.length === 2) {
+          termsListStr = `${uniqueTerms[0]} & ${uniqueTerms[1]}`;
+        } else if (uniqueTerms.length > 2) {
+          termsListStr = `${uniqueTerms.slice(0, -1).join(', ')} & ${uniqueTerms[uniqueTerms.length - 1]}`;
+        }
+
+        modules = termsListStr ? `Modules : ${termsListStr}` : '';
       } else {
         if (title.includes('—') || title.includes('-')) {
           const parts = title.split(/[—-]/);
           title = parts[0].replace(/\s+Modules?$/i, '').trim();
           let rawModules = parts.slice(1).join(' - ').trim();
           let cleanModules = rawModules.replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
-          modules = cleanModules ? 'Modules: ' + cleanModules : '';
+          modules = cleanModules ? 'Modules : ' + cleanModules : '';
         } else if (/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i.test(title)) {
           const match = title.match(/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i);
           title = match[1].replace(/\s+Modules?$/i, '').trim();
           let cleanModules = match[2].trim().replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
-          modules = cleanModules ? 'Modules: ' + cleanModules : '';
+          modules = cleanModules ? 'Modules : ' + cleanModules : '';
         } else {
           title = title.replace(/\s+Modules?$/i, '').trim();
           modules = '';
@@ -4804,7 +4883,12 @@ class UIController {
 
       let subjectFormatted = `<b>${escapeHtml(title)}</b>`;
       if (modules) {
-        subjectFormatted += `<br><span style="font-size: 0.9em; color: #475569;">${escapeHtml(modules)}</span>`;
+        let cleanModulesHtml = escapeHtml(modules);
+        cleanModulesHtml = cleanModulesHtml.replace(/(\d+)(?:st|ˢᵗ)/gi, '$1<sup>st</sup>')
+                                           .replace(/(\d+)(?:nd|ⁿᵈ)/gi, '$1<sup>nd</sup>')
+                                           .replace(/(\d+)(?:rd|ʳᵈ)/gi, '$1<sup>rd</sup>')
+                                           .replace(/(\d+)(?:th|ᵗʰ)/gi, '$1<sup>th</sup>');
+        subjectFormatted += `<br><span style="font-size: 0.9em; font-weight: normal; color: #475569;">${cleanModulesHtml}</span>`;
       }
 
       return `
@@ -6851,7 +6935,7 @@ class UIController {
         body: JSON.stringify({
           isAdmin: true,
           ownerEmail: store.ownerEmail,
-          academySlug: store.ownerEmail,
+          academySlug: store.getAcademyProfile()?.slug || (store.ownerEmail === 'rcavirup@gmail.com' ? 'diganta' : store.ownerEmail),
           fileType: uploadFile.type,
           fileSize: uploadFile.size
         })
@@ -7150,6 +7234,13 @@ class UIController {
       photoUrl = '';
       imageKitFileId = '';
       imageKitFilePath = '';
+    } else if (!photoUrl && isEditing) {
+      const existingStudent = store.getStudentById(id);
+      if (existingStudent?.photoUrl) {
+        photoUrl = existingStudent.photoUrl;
+        imageKitFileId = existingStudent.imageKitFileId || '';
+        imageKitFilePath = existingStudent.imageKitFilePath || '';
+      }
     }
 
     const payload = {
@@ -7498,6 +7589,23 @@ class UIController {
         this.courseFinalExamInput.value = config.finalExamName || '';
         this.courseFinalExamInput.required = true;
       }
+
+      if (this.courseTerm1Input && !this.courseTerm1Input.value) {
+        const s1 = (course?.subjects || []).find(s => /^1st\s+Terminal(?:\s+Modules)?/i.test(s));
+        if (s1) this.courseTerm1Input.value = s1.replace(/^1st\s+Terminal(?:\s+Modules)?\s*[—:-]\s*/i, '').replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
+      }
+      if (this.courseTerm2Input && !this.courseTerm2Input.value) {
+        const s2 = (course?.subjects || []).find(s => /^2nd\s+Terminal(?:\s+Modules)?/i.test(s));
+        if (s2) this.courseTerm2Input.value = s2.replace(/^2nd\s+Terminal(?:\s+Modules)?\s*[—:-]\s*/i, '').replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
+      }
+      if (this.courseTerm3Input && !this.courseTerm3Input.value) {
+        const s3 = (course?.subjects || []).find(s => /^3rd\s+Terminal(?:\s+Modules)?/i.test(s));
+        if (s3) this.courseTerm3Input.value = s3.replace(/^3rd\s+Terminal(?:\s+Modules)?\s*[—:-]\s*/i, '').replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
+      }
+      if (this.courseFinalExamInput && !this.courseFinalExamInput.value) {
+        const sf = (course?.subjects || []).find(s => /^(?:Course\s+Final|Final\s+Exam)/i.test(s));
+        if (sf) this.courseFinalExamInput.value = sf.replace(/^(?:Course\s+Final|Final\s+Exam)\s*[—:-]\s*/i, '').replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
+      }
       return;
     }
 
@@ -7706,8 +7814,8 @@ class UIController {
     this.promptConfirmation({
       title: 'Delete Course?',
       message: `Are you sure you want to delete "${course.title}"?${extraMsg}`,
-      action: () => {
-        store.deleteCourse(courseId);
+      action: async () => {
+        await store.deleteCourse(courseId);
         this.render();
         this.showToast('Course Deleted', `"${course.title}" was removed.`, 'info');
       }

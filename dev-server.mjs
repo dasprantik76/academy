@@ -141,8 +141,36 @@ const server = http.createServer(async (req, res) => {
         req.body = req.headers['content-type']?.includes('application/json')
           ? (body ? JSON.parse(body) : {}) : Object.fromEntries(new URLSearchParams(body));
       } catch { return res.status(400).end('Invalid request body'); }
-      const { default: handler } = await import(`./api/${route}.js?t=${Date.now()}`);
-      return await handler(req, res);
+
+      // Forward API calls to production Vercel to guarantee instant, reliable cloud sync
+      // and prevent local ISP shard connectivity timeouts from blocking the UI.
+      try {
+        const prodUrl = `https://academy.pixelsetu.com${url.pathname}${url.search}`;
+        const fetchOptions = {
+          method: req.method,
+          headers: {
+            'content-type': req.headers['content-type'] || 'application/json',
+            'accept': req.headers['accept'] || 'application/json, text/plain, */*'
+          }
+        };
+        if (req.method !== 'GET' && req.method !== 'HEAD' && body) {
+          fetchOptions.body = body;
+        }
+        const prodRes = await fetch(prodUrl, fetchOptions);
+        res.statusCode = prodRes.status;
+        for (const [k, v] of prodRes.headers.entries()) {
+          if (!['content-encoding', 'transfer-encoding', 'content-length'].includes(k.toLowerCase())) {
+            res.setHeader(k, v);
+          }
+        }
+        const dataBuffer = Buffer.from(await prodRes.arrayBuffer());
+        res.setHeader('content-length', dataBuffer.length);
+        return res.end(dataBuffer);
+      } catch (proxyError) {
+        console.warn('[Proxy Fallback to Local]:', proxyError.message);
+        const { default: handler } = await import(`./api/${route}.js?t=${Date.now()}`);
+        return await handler(req, res);
+      }
     }
     if (!['GET', 'HEAD'].includes(req.method)) {
       res.setHeader('Allow', 'GET, HEAD');

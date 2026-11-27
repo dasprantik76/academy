@@ -23,14 +23,41 @@ function codesMatch(activeCode, submittedCode) {
   return expected.length === supplied.length && timingSafeEqual(expected, supplied);
 }
 
-async function resolveOwnerEmail(db, academySlug) {
-  if (academySlug === 'prantik') return 'dasprantik76@gmail.com';
-  if (academySlug === 'poulami') return 'poulami.13thmay@gmail.com';
+async function resolveOwnerEmail(db, queryEmail, querySlug) {
+  let email = (queryEmail || '').toLowerCase().trim();
+  let slug = (querySlug || '').toLowerCase().trim();
+
+  if (!email && slug && slug.includes('@')) {
+    email = slug;
+    slug = '';
+  }
+  if (email && !email.includes('@')) {
+    if (!slug) slug = email;
+    email = '';
+  }
+
+  if (email) {
+    if (email === 'digantacomputercentre@gmail.com') return 'rcavirup@gmail.com';
+    const profile = await db.collection('profile').findOne(
+      { $or: [{ ownerEmail: email }, { coOwnerEmails: email }, { coOwnerEmail: email }] },
+      { projection: { _id: 0, ownerEmail: 1 } }
+    );
+    if (profile && profile.ownerEmail) return profile.ownerEmail;
+    return email;
+  }
+
+  if (slug === 'prantik' || slug === 'diganta' || slug === 'rcavirup' || slug === 'digantacomputercentre') {
+    return 'rcavirup@gmail.com';
+  }
+  if (slug === 'poulami') {
+    return 'poulami.13thmay@gmail.com';
+  }
+
   const profile = await db.collection('profile').findOne(
-    { slug: academySlug },
+    { slug },
     { projection: { _id: 0, ownerEmail: 1 } }
   );
-  return profile?.ownerEmail || null;
+  return profile?.ownerEmail || 'rcavirup@gmail.com';
 }
 
 export default async function handler(req, res) {
@@ -74,7 +101,7 @@ export default async function handler(req, res) {
 
   try {
     const db = await getDatabase();
-    const ownerEmail = await resolveOwnerEmail(db, academySlug);
+    const ownerEmail = await resolveOwnerEmail(db, req.body?.ownerEmail, req.body?.academySlug || academySlug);
     if (!ownerEmail) {
       return res.status(404).json({ success: false, code: 'ACADEMY_NOT_FOUND', error: 'Academy not found.' });
     }
