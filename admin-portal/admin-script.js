@@ -1069,6 +1069,7 @@ class AcademyStore {
   save() {
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.COURSES), JSON.stringify(this.courses));
     localStorage.setItem(this.getStorageKey(STORAGE_KEYS.STUDENTS), JSON.stringify(this.students));
+    localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(this.students));
   }
 
   getAllMessages() {
@@ -1324,14 +1325,15 @@ class AcademyStore {
   }
 
   async deleteStudent(id) {
-    this.students = this.students.filter(s => s.id !== id);
+    const targetIdStr = String(id).trim().toLowerCase();
+    this.students = this.students.filter(s => String(s.id).trim().toLowerCase() !== targetIdStr);
     this.save();
     return await this.syncToCloud('delete_student', { studentId: id });
   }
 
   async bulkDeleteStudents(ids) {
-    const idSet = new Set(ids);
-    this.students = this.students.filter(s => !idSet.has(s.id));
+    const idSet = new Set((ids || []).map(id => String(id).trim().toLowerCase()));
+    this.students = this.students.filter(s => !idSet.has(String(s.id).trim().toLowerCase()));
     this.save();
     return await this.syncToCloud('bulk_delete_students', { studentIds: Array.from(ids) });
   }
@@ -1496,6 +1498,11 @@ class UIController {
 
     if (isMasterSuperAdmin && impersonateEmail) {
       store.ownerEmail = (impersonateEmail === 'digantacomputercentre@gmail.com') ? 'rcavirup@gmail.com' : impersonateEmail;
+      store.isImpersonating = true;
+      store.masterSuperAdminEmail = userEmail;
+    } else if (isMasterSuperAdmin && activeAcademySlug) {
+      const mappedOwner = (activeAcademySlug === 'diganta' || activeAcademySlug === 'prantik') ? 'rcavirup@gmail.com' : activeAcademySlug;
+      store.ownerEmail = mappedOwner;
       store.isImpersonating = true;
       store.masterSuperAdminEmail = userEmail;
     } else {
@@ -7367,11 +7374,24 @@ class UIController {
     this.promptConfirmation({
       title: 'Delete Student Record?',
       message: `Are you sure you want to delete "${student.name}" (ID: ${student.id})? This action cannot be undone.`,
-      action: () => {
-        this.selectedStudentIds.delete(studentId);
-        store.deleteStudent(studentId);
-        this.render();
-        this.showToast('Student Deleted', `${student.name} was removed from the registry.`, 'info');
+      action: async () => {
+        try {
+          this.selectedStudentIds.delete(studentId);
+          const result = await store.deleteStudent(studentId);
+          if (result === false || (result && result.success === false)) {
+            const errDetail = result?.error || 'Could not delete student from cloud.';
+            this.showToast('Delete Failed', errDetail, 'error');
+            await store.fetchCloudData();
+            this.render();
+            return;
+          }
+          this.render();
+          this.showToast('Student Deleted', `${student.name} was removed from the registry.`, 'info');
+        } catch (err) {
+          this.showToast('Delete Failed', err.message || 'An error occurred during deletion.', 'error');
+          await store.fetchCloudData();
+          this.render();
+        }
       }
     });
   }
@@ -8231,22 +8251,46 @@ class UIController {
       this.promptConfirmation({
         title: 'Delete Student Record?',
         message: `Are you sure you want to delete "${student.name}" (ID: ${student.id})? This action cannot be undone.`,
-        action: () => {
-          this.selectedStudentIds.delete(student.id);
-          store.deleteStudent(student.id);
-          this.render();
-          this.showToast('Student Deleted', `${student.name} was removed from the registry.`, 'info');
+        action: async () => {
+          try {
+            this.selectedStudentIds.delete(student.id);
+            const result = await store.deleteStudent(student.id);
+            if (result === false || (result && result.success === false)) {
+              this.showToast('Delete Failed', result?.error || 'Cloud deletion failed.', 'error');
+              await store.fetchCloudData();
+              this.render();
+              return;
+            }
+            this.render();
+            this.showToast('Student Deleted', `${student.name} was removed from the registry.`, 'info');
+          } catch (err) {
+            this.showToast('Delete Failed', err.message || 'An error occurred.', 'error');
+            await store.fetchCloudData();
+            this.render();
+          }
         }
       });
     } else {
       this.promptConfirmation({
         title: `Delete ${count} Students?`,
         message: `Are you sure you want to delete ${count} selected student records? This action cannot be undone.`,
-        action: () => {
-          store.bulkDeleteStudents(selectedIds);
-          this.selectedStudentIds.clear();
-          this.render();
-          this.showToast('Students Deleted', `${count} students were removed from the registry.`, 'info');
+        action: async () => {
+          try {
+            const result = await store.bulkDeleteStudents(selectedIds);
+            if (result === false || (result && result.success === false)) {
+              this.showToast('Delete Failed', result?.error || 'Cloud deletion failed.', 'error');
+              await store.fetchCloudData();
+              this.render();
+              return;
+            }
+            this.selectedStudentIds.clear();
+            this.render();
+            this.showToast('Students Deleted', `${count} students were removed from the registry.`, 'info');
+          } catch (err) {
+            this.showToast('Delete Failed', err.message || 'An error occurred.', 'error');
+            await store.fetchCloudData();
+            this.render();
+          }
         }
       });
     }

@@ -48,6 +48,11 @@ async function getNextStudentId(db, ownerEmail) {
 }
 
 const COURSE_SEED_VERSION = 2;
+
+function escapeRegex(string) {
+  return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function verifyImageKitStudentPhoto(student) {
   const urlEndpoint = String(process.env.IMAGEKIT_URL_ENDPOINT || '').replace(/\/$/, '');
   const photoUrl = String(student?.photoUrl || '').trim();
@@ -1082,6 +1087,12 @@ export default async function handler(req, res) {
       slug = '';
     }
 
+    // If email parameter does not contain '@' (e.g. slug passed as email: "diganta", "prantik"), treat it as slug
+    if (email && !email.includes('@')) {
+      if (!slug) slug = email;
+      email = '';
+    }
+
     // Dynamic resolution for co-owner emails to canonical tenant owner email
     if (email) {
       if (email === 'digantacomputercentre@gmail.com') {
@@ -1274,11 +1285,17 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: 'Missing action parameter' });
       }
 
-      const ownerEmail = await resolveOwnerEmail(payload?.ownerEmail, payload?.academySlug);
+      let ownerEmail = await resolveOwnerEmail(payload?.ownerEmail, payload?.academySlug);
+      if (SUPER_ADMIN_EMAILS.has(ownerEmail) && payload?.academySlug) {
+        const targetTenantEmail = await resolveOwnerEmail('', payload.academySlug);
+        if (targetTenantEmail) {
+          ownerEmail = targetTenantEmail;
+        }
+      }
 
       // Check tenant approval status for restricted actions
       const RESTRICTED_ACTIONS = new Set([
-        'add_student', 'save_students', 'update_student', 'bulk_update_students', 'delete_student',
+        'add_student', 'save_students', 'update_student', 'bulk_update_students', 'delete_student', 'bulk_delete_students',
         'add_course', 'save_courses', 'delete_course',
         'save_batch', 'delete_batch',
         'save_auth_token'
@@ -1689,19 +1706,138 @@ export default async function handler(req, res) {
 
         // 9. Delete Student
         case 'delete_student': {
-          const studentId = payload?.studentId;
-          if (!studentId) {
+          const rawId = payload?.studentId ? String(payload.studentId).trim() : '';
+          if (!rawId) {
             return res.status(400).json({ success: false, error: 'Missing studentId' });
           }
-          const studentToDelete = await db.collection(COLLECTIONS.STUDENTS).findOne(
-            { id: studentId, ownerEmail },
-            { projection: { _id: 0, imageKitFileId: 1 } }
-          );
-          if (studentToDelete?.imageKitFileId) {
-            await deleteImageKitFile(studentToDelete.imageKitFileId);
+
+          // Resolve tenant profile to match students by canonical owner, co-owners, or slug
+          const tenantProfile = await db.collection(COLLECTIONS.PROFILE).findOne({
+            $or: [
+              { ownerEmail },
+              { coOwnerEmail: ownerEmail },
+              { coOwnerEmails: ownerEmail },
+              { slug: payload?.academySlug || '' }
+            ]
+          });
+          const canonicalOwner = tenantProfile?.ownerEmail || ownerEmail;
+          const tenantEmails = new Set([canonicalOwner, ownerEmail]);
+          if (tenantProfile?.coOwnerEmail) tenantEmails.add(tenantProfile.coOwnerEmail);
+          if (Array.isArray(tenantProfile?.coOwnerEmails)) tenantProfile.coOwnerEmails.forEach(e => tenantEmails.add(e));
+          if (canonicalOwner === 'rcavirup@gmail.com' || ownerEmail === 'rcavirup@gmail.com') {
+            tenantEmails.add('digantacomputercentre@gmail.com');
+            tenantEmails.add('atreyeeart20@gmail.com');
           }
-          await db.collection(COLLECTIONS.STUDENTS).deleteOne({ id: studentId, ownerEmail });
-          return res.status(200).json({ success: true, studentId });
+          const allowedEmails = Array.from(tenantEmails);
+
+          const idRegex = new RegExp(`^${escapeRegex(rawId)}$`, 'i');
+          const isSuper = SUPER_ADMIN_EMAILS.has(ownerEmail);
+
+          const studentQuery = isSuper
+            ? { $or: [{ id: idRegex }, { id: rawId }, { certificateSerial: idRegex }] }
+            : {
+                $and: [
+                  { $or: [{ id: idRegex }, { id: rawId }, { certificateSerial: idRegex }] },
+                  {
+                    $or: [
+                      { ownerEmail: { $in: allowedEmails } },
+                      { academySlug: tenantProfile?.slug || payload?.academySlug || '' }
+                    ]
+                  }
+                ]
+              };
+
+          const studentToDelete = await db.collection(COLLECTIONS.STUDENTS).findOne(
+            studentQuery,
+            { projection: { _id: 1, id: 1, imageKitFileId: 1, name: 1 } }
+          );
+
+          if (!studentToDelete) {
+            return res.status(404).json({ success: false, error: `Student "${rawId}" not found in database.` });
+          }
+
+          if (studentToDelete.imageKitFileId) {
+            try {
+              await deleteImageKitFile(studentToDelete.imageKitFileId);
+            } catch (imgErr) {
+              console.warn('[ImageKit Delete Warning]:', imgErr.message);
+            }
+          }
+
+          const deleteResult = await db.collection(COLLECTIONS.STUDENTS).deleteOne({ _id: studentToDelete._id });
+          if (deleteResult.deletedCount === 0) {
+            return res.status(500).json({ success: false, error: 'Database delete operation failed.' });
+          }
+
+          return res.status(200).json({ success: true, studentId: rawId, deletedCount: deleteResult.deletedCount });
+        }
+
+        // 9a. Bulk Delete Students
+        case 'bulk_delete_students': {
+          const rawIds = Array.isArray(payload?.studentIds) ? payload.studentIds : [];
+          const studentIds = rawIds.map(id => String(id).trim()).filter(Boolean);
+          if (studentIds.length === 0) {
+            return res.status(400).json({ success: false, error: 'No student IDs provided for deletion.' });
+          }
+
+          const tenantProfile = await db.collection(COLLECTIONS.PROFILE).findOne({
+            $or: [
+              { ownerEmail },
+              { coOwnerEmail: ownerEmail },
+              { coOwnerEmails: ownerEmail },
+              { slug: payload?.academySlug || '' }
+            ]
+          });
+          const canonicalOwner = tenantProfile?.ownerEmail || ownerEmail;
+          const tenantEmails = new Set([canonicalOwner, ownerEmail]);
+          if (tenantProfile?.coOwnerEmail) tenantEmails.add(tenantProfile.coOwnerEmail);
+          if (Array.isArray(tenantProfile?.coOwnerEmails)) tenantProfile.coOwnerEmails.forEach(e => tenantEmails.add(e));
+          if (canonicalOwner === 'rcavirup@gmail.com' || ownerEmail === 'rcavirup@gmail.com') {
+            tenantEmails.add('digantacomputercentre@gmail.com');
+            tenantEmails.add('atreyeeart20@gmail.com');
+          }
+          const allowedEmails = Array.from(tenantEmails);
+
+          const regexList = studentIds.map(id => new RegExp(`^${escapeRegex(id)}$`, 'i'));
+          const isSuper = SUPER_ADMIN_EMAILS.has(ownerEmail);
+
+          const studentQuery = isSuper
+            ? { $or: [{ id: { $in: regexList } }, { id: { $in: studentIds } }] }
+            : {
+                $and: [
+                  { $or: [{ id: { $in: regexList } }, { id: { $in: studentIds } }] },
+                  {
+                    $or: [
+                      { ownerEmail: { $in: allowedEmails } },
+                      { academySlug: tenantProfile?.slug || payload?.academySlug || '' }
+                    ]
+                  }
+                ]
+              };
+
+          const studentsToDelete = await db.collection(COLLECTIONS.STUDENTS).find(
+            studentQuery,
+            { projection: { _id: 1, imageKitFileId: 1 } }
+          ).toArray();
+
+          for (const s of studentsToDelete) {
+            if (s.imageKitFileId) {
+              try {
+                await deleteImageKitFile(s.imageKitFileId);
+              } catch (imgErr) {
+                console.warn('[ImageKit Delete Warning]:', imgErr.message);
+              }
+            }
+          }
+
+          const deleteIds = studentsToDelete.map(s => s._id);
+          let deletedCount = 0;
+          if (deleteIds.length > 0) {
+            const delRes = await db.collection(COLLECTIONS.STUDENTS).deleteMany({ _id: { $in: deleteIds } });
+            deletedCount = delRes.deletedCount;
+          }
+
+          return res.status(200).json({ success: true, deletedCount, studentIds });
         }
 
         // 9b. Explicit Delete Student Photo Action
