@@ -2014,6 +2014,7 @@ class UIController {
     this.btnCloseDetailsModal = document.getElementById('btnCloseDetailsModal');
     this.btnEditFromDetails = document.getElementById('btnEditFromDetails');
     this.btnDeleteStudentFromDetails = document.getElementById('btnDeleteStudentFromDetails');
+    this.btnDownloadApplicationForm = document.getElementById('btnDownloadApplicationForm');
     this.currentViewingStudentId = null;
     this.completingBatchId = null;
 
@@ -3409,6 +3410,23 @@ class UIController {
       this.closeAllAdminDropdowns();
     });
 
+    // Alphabet typeahead & keyboard navigation for active open dropdown
+    document.addEventListener('keydown', (e) => {
+      const openDropdown = document.querySelector('.custom-select-container.open') ||
+                           document.querySelector('.portal-select-menu');
+      if (!openDropdown || typeof openDropdown._customDropdownKeyHandler !== 'function') return;
+
+      if (document.activeElement &&
+          (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') &&
+          !openDropdown.contains(document.activeElement)) {
+        return;
+      }
+
+      if (!openDropdown.contains(document.activeElement)) {
+        openDropdown._customDropdownKeyHandler(e);
+      }
+    });
+
     window.addEventListener('resize', () => {
       if (this.portaledMenu) this.closeAllAdminDropdowns();
       if (this.currentView === 'marksheets') this.scaleMarksheetPreview();
@@ -3465,6 +3483,11 @@ class UIController {
       if (!studentId) return;
       this.closeModal(this.studentDetailsModal);
       this.confirmDeleteStudent(studentId);
+    });
+    this.btnDownloadApplicationForm?.addEventListener('click', () => {
+      const studentId = this.currentViewingStudentId;
+      if (!studentId) return;
+      this.downloadStudentApplicationForm(studentId);
     });
 
     ['input', 'change'].forEach(event => this.completionIssueDate.addEventListener(event, () => this.validateCompletionDates()));
@@ -6305,6 +6328,144 @@ class UIController {
   setupAdminDropdown(container, trigger, menu, display, hiddenInput, onChangeCallback) {
     if (!container || !trigger || !menu || !hiddenInput) return;
 
+    const commitOption = (option) => {
+      if (!option) return;
+
+      const value = option.getAttribute('data-value');
+      const label = option.textContent.trim();
+
+      hiddenInput.value = value;
+      if (display) display.textContent = label;
+      container.classList.toggle('has-value', Boolean(value));
+
+      const isFilter = container.classList.contains('toolbar-filter-dropdown') ||
+        container.classList.contains('idcards-filter-dropdown') ||
+        container.classList.contains('th-minimal-dropdown') ||
+        Boolean(container.id && container.id.toLowerCase().includes('filter'));
+      if (isFilter) {
+        container.classList.toggle('is-filtered', Boolean(value && value !== 'all'));
+      }
+
+      menu.querySelectorAll('.custom-select-option').forEach(opt => {
+        opt.classList.remove('selected', 'soft-selected');
+      });
+      option.classList.add('selected');
+
+      container.classList.remove('open', 'drop-up');
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.blur();
+      this.closeAllAdminDropdowns();
+
+      if (typeof onChangeCallback === 'function') {
+        onChangeCallback(value);
+      }
+    };
+
+    const softSelectOption = (option) => {
+      if (!option) return;
+      menu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('soft-selected'));
+      option.classList.add('soft-selected');
+      option.scrollIntoView({ block: 'nearest' });
+    };
+
+    let typeaheadBuffer = '';
+    let typeaheadTimeout = null;
+
+    const handleKeydown = (e) => {
+      if (!container.classList.contains('open') && !menu.classList.contains('portal-select-menu')) return;
+
+      const options = Array.from(menu.querySelectorAll('.custom-select-option')).filter(opt => {
+        return opt.offsetParent !== null && !opt.disabled && opt.getAttribute('data-value') !== '';
+      });
+      if (!options.length) return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        this.closeAllAdminDropdowns();
+        trigger.focus();
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        const softSelected = menu.querySelector('.custom-select-option.soft-selected') ||
+                             menu.querySelector('.custom-select-option.selected');
+        if (softSelected) {
+          e.preventDefault();
+          e.stopPropagation();
+          commitOption(softSelected);
+        }
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const softSelected = menu.querySelector('.custom-select-option.soft-selected');
+        if (softSelected) {
+          commitOption(softSelected);
+        } else {
+          this.closeAllAdminDropdowns();
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentIdx = options.findIndex(opt => opt.classList.contains('soft-selected') || opt.classList.contains('selected'));
+        let nextIdx;
+        if (e.key === 'ArrowDown') {
+          nextIdx = currentIdx >= 0 && currentIdx < options.length - 1 ? currentIdx + 1 : 0;
+        } else {
+          nextIdx = currentIdx > 0 ? currentIdx - 1 : options.length - 1;
+        }
+        softSelectOption(options[nextIdx]);
+        return;
+      }
+
+      // Single printable character (alphabet search)
+      if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        if (e.key === ' ') e.preventDefault();
+        e.stopPropagation();
+
+        const char = e.key.toLowerCase();
+        clearTimeout(typeaheadTimeout);
+        typeaheadTimeout = setTimeout(() => {
+          typeaheadBuffer = '';
+        }, 800);
+
+        const isRepeatedChar = typeaheadBuffer.length > 0 && typeaheadBuffer.split('').every(c => c === char);
+
+        if (isRepeatedChar) {
+          const matching = options.filter(opt => opt.textContent.trim().toLowerCase().startsWith(char));
+          if (matching.length > 0) {
+            const currentSoft = menu.querySelector('.custom-select-option.soft-selected');
+            const currentIndexInMatching = matching.indexOf(currentSoft);
+            const nextInMatching = (currentIndexInMatching + 1) % matching.length;
+            softSelectOption(matching[nextInMatching]);
+            typeaheadBuffer += char;
+            return;
+          }
+        }
+
+        typeaheadBuffer += char;
+
+        let matched = options.find(opt => opt.textContent.trim().toLowerCase().startsWith(typeaheadBuffer));
+        if (!matched && typeaheadBuffer.length > 1) {
+          typeaheadBuffer = char;
+          matched = options.find(opt => opt.textContent.trim().toLowerCase().startsWith(typeaheadBuffer));
+        }
+
+        if (matched) {
+          softSelectOption(matched);
+        }
+      }
+    };
+
+    container._customDropdownKeyHandler = handleKeydown;
+    menu._customDropdownKeyHandler = handleKeydown;
+    container.addEventListener('keydown', handleKeydown);
+    menu.addEventListener('keydown', handleKeydown);
+
     trigger.addEventListener('click', (e) => {
       e.stopPropagation();
       const wasOpen = container.classList.contains('open');
@@ -6354,6 +6515,7 @@ class UIController {
         container.classList.remove('drop-up');
         container.classList.add('open');
         trigger.setAttribute('aria-expanded', 'true');
+        trigger.focus();
       } else {
         // Measure trigger position and scroll parent boundaries to decide drop-down vs drop-up
         const triggerRect = trigger.getBoundingClientRect();
@@ -6371,39 +6533,22 @@ class UIController {
         container.classList.toggle('drop-up', shouldDropUp);
         container.classList.add('open');
         trigger.setAttribute('aria-expanded', 'true');
+        trigger.focus();
+      }
+
+      // Soft-select currently selected option and scroll into view
+      const selected = menu.querySelector('.custom-select-option.selected');
+      if (selected) {
+        menu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('soft-selected'));
+        selected.classList.add('soft-selected');
+        selected.scrollIntoView({ block: 'nearest' });
       }
     });
 
     menu.addEventListener('click', (e) => {
       const option = e.target.closest('.custom-select-option');
       if (!option) return;
-
-      const value = option.getAttribute('data-value');
-      const label = option.textContent.trim();
-
-      hiddenInput.value = value;
-      if (display) display.textContent = label;
-      container.classList.toggle('has-value', Boolean(value));
-
-      const isFilter = container.classList.contains('toolbar-filter-dropdown') ||
-        container.classList.contains('idcards-filter-dropdown') ||
-        container.classList.contains('th-minimal-dropdown') ||
-        Boolean(container.id && container.id.toLowerCase().includes('filter'));
-      if (isFilter) {
-        container.classList.toggle('is-filtered', Boolean(value && value !== 'all'));
-      }
-
-      menu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('selected'));
-      option.classList.add('selected');
-
-      container.classList.remove('open', 'drop-up');
-      trigger.setAttribute('aria-expanded', 'false');
-      trigger.blur();
-      this.closeAllAdminDropdowns();
-
-      if (typeof onChangeCallback === 'function') {
-        onChangeCallback(value);
-      }
+      commitOption(option);
     });
   }
 
@@ -6418,6 +6563,7 @@ class UIController {
       this.portaledMenu.style.width = '';
       this.portaledMenu.style.minWidth = '';
       this.portaledMenu.style.maxHeight = '';
+      this.portaledMenu.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('soft-selected'));
       this.portaledMenu = null;
       this.portaledOriginalParent = null;
       this.portaledNextSibling = null;
@@ -6429,6 +6575,7 @@ class UIController {
         dropdown.classList.remove('open', 'drop-up');
         const trigger = dropdown.querySelector('.custom-select-trigger, [aria-haspopup="listbox"], [aria-haspopup="true"]');
         if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        dropdown.querySelectorAll('.custom-select-option').forEach(opt => opt.classList.remove('soft-selected'));
       }
     });
 
@@ -7061,14 +7208,20 @@ class UIController {
             ${getStatusBadgeIcon(student.status)} ${escapeHtml(student.status === 'Active' ? 'On going' : student.status)}
           </span>
         </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnQuickDownloadAppForm" style="margin-left:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:0.45rem;" title="Download Application Form (PDF)">
+          <i class="fa-solid fa-file-pdf"></i> Download PDF
+        </button>
       </div>
 
-      <div class="profile-meta-card">
-        <span class="label"><i class="fa-solid fa-book-open"></i> ENROLLED COURSE</span>
-        ${enrolledCourses || '<span class="value">No courses currently enrolled.</span>'}
+      <div class="profile-section-heading">
+        <span class="profile-section-number">1</span>
+        <h4>Basic Details</h4>
       </div>
-
       <div class="profile-meta-grid">
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-regular fa-calendar"></i> Date of Birth</span>
+          <span class="value">${student.dob ? formatDate(student.dob) : '—'}</span>
+        </div>
         <div class="profile-meta-card">
           <span class="label"><i class="fa-solid fa-user-tie"></i> Father's Name</span>
           <span class="value">${escapeHtml(student.fatherName || '—')}</span>
@@ -7082,75 +7235,116 @@ class UIController {
           <span class="value">${escapeHtml(formatAadhar(student.aadhar))}</span>
         </div>
         <div class="profile-meta-card">
-          <span class="label"><i class="fa-regular fa-envelope"></i> Email Address</span>
-          <span class="value">${escapeHtml(student.email)}</span>
+          <span class="label"><i class="fa-solid fa-venus-mars"></i> Gender</span>
+          <span class="value">${escapeHtml(student.gender || '—')}</span>
         </div>
         <div class="profile-meta-card">
-          <span class="label"><i class="fa-solid fa-phone"></i> Mobile Number</span>
-          <span class="value">${escapeHtml(student.phone)}</span>
-        </div>
-        ${student.dob ? `
-          <div class="profile-meta-card">
-            <span class="label"><i class="fa-regular fa-calendar"></i> Date of Birth</span>
-            <span class="value">${formatDate(student.dob)}</span>
-          </div>
-        ` : ''}
-        ${student.gender ? `
-          <div class="profile-meta-card">
-            <span class="label"><i class="fa-solid fa-venus-mars"></i> Gender</span>
-            <span class="value">${escapeHtml(student.gender)}</span>
-          </div>
-        ` : ''}
-        ${student.maritalStatus ? `
-          <div class="profile-meta-card">
-            <span class="label"><i class="fa-solid fa-ring"></i> Marital Status</span>
-            <span class="value">${escapeHtml(student.maritalStatus)}</span>
-          </div>
-        ` : ''}
-        ${student.category ? `
-          <div class="profile-meta-card">
-            <span class="label"><i class="fa-solid fa-layer-group"></i> Category</span>
-            <span class="value">${escapeHtml(student.category)}</span>
-          </div>
-        ` : ''}
-        ${student.religion ? `
-          <div class="profile-meta-card">
-            <span class="label"><i class="fa-solid fa-hands-praying"></i> Religion</span>
-            <span class="value">${escapeHtml(student.religion)}</span>
-          </div>
-        ` : ''}
-        <div class="profile-meta-card">
-          <span class="label"><i class="fa-solid fa-map-location-dot"></i> State & District</span>
-          <span class="value">${escapeHtml(student.district ? `${student.district}, ${student.state}` : (student.state || '—'))}</span>
+          <span class="label"><i class="fa-solid fa-ring"></i> Marital Status</span>
+          <span class="value">${escapeHtml(student.maritalStatus || '—')}</span>
         </div>
         <div class="profile-meta-card">
-          <span class="label"><i class="fa-solid fa-map-pin"></i> Pin Code</span>
-          <span class="value">${escapeHtml(student.pinCode || '—')}</span>
+          <span class="label"><i class="fa-solid fa-layer-group"></i> Category</span>
+          <span class="value">${escapeHtml(student.category || '—')}</span>
         </div>
-        ${student.qualification ? `
-          <div class="profile-meta-card">
-            <span class="label"><i class="fa-solid fa-award"></i> Highest Qualification</span>
-            <span class="value">${escapeHtml(student.qualification)}</span>
-          </div>
-        ` : ''}
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-solid fa-hands-praying"></i> Religion</span>
+          <span class="value">${escapeHtml(student.religion || '—')}</span>
+        </div>
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-solid fa-award"></i> Highest Qualification</span>
+          <span class="value">${escapeHtml(student.qualification || '—')}</span>
+        </div>
         <div class="profile-meta-card">
           <span class="label"><i class="fa-regular fa-calendar-check"></i> Registration Date</span>
           <span class="value">${formatDate(student.joinDate)}</span>
         </div>
       </div>
 
-      ${student.address ? `
-        <div style="margin-top: 1rem; padding: 0.875rem 1rem; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 0.35rem;">
-            <i class="fa-solid fa-location-dot"></i> Full Address
-          </span>
-          <p style="font-size: 0.875rem; color: var(--text-main); margin-top: 0.25rem;">${escapeHtml(student.address)}</p>
+      <div class="profile-section-heading">
+        <span class="profile-section-number">2</span>
+        <h4>Contact Details</h4>
+      </div>
+      <div class="profile-meta-grid">
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-solid fa-phone"></i> Mobile Number</span>
+          <span class="value">${escapeHtml(student.phone || '—')}</span>
         </div>
-      ` : ''}
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-regular fa-envelope"></i> Email Address</span>
+          <span class="value">${escapeHtml(student.email || '—')}</span>
+        </div>
+      </div>
 
+      <div class="profile-section-heading">
+        <span class="profile-section-number">3</span>
+        <h4>Address Details</h4>
+      </div>
+      <div class="profile-meta-grid">
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-solid fa-map-location-dot"></i> State</span>
+          <span class="value">${escapeHtml(student.state || '—')}</span>
+        </div>
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-solid fa-city"></i> District</span>
+          <span class="value">${escapeHtml(student.district || '—')}</span>
+        </div>
+        <div class="profile-meta-card">
+          <span class="label"><i class="fa-solid fa-location-dot"></i> Pin Code</span>
+          <span class="value">${escapeHtml(student.pinCode || '—')}</span>
+        </div>
+        <div class="profile-meta-card profile-meta-card-full">
+          <span class="label"><i class="fa-solid fa-house"></i> Full Address</span>
+          <span class="value" style="font-weight: 500; line-height: 1.45; word-break: break-word;">${escapeHtml(student.address || '—')}</span>
+        </div>
+      </div>
+
+      <div class="profile-section-heading">
+        <span class="profile-section-number">4</span>
+        <h4>Course Selection</h4>
+      </div>
+      <div class="profile-meta-card profile-meta-card-full" style="margin-top: 0.65rem;">
+        <span class="label"><i class="fa-solid fa-book-open"></i> Enrolled Course</span>
+        ${enrolledCourses || '<span class="value">No courses currently enrolled.</span>'}
+      </div>
     `;
 
+    const quickDownloadBtn = this.studentDetailsContent.querySelector('#btnQuickDownloadAppForm');
+    if (quickDownloadBtn) {
+      quickDownloadBtn.addEventListener('click', () => {
+        this.downloadStudentApplicationForm(student.id);
+      });
+    }
+
     this.openModal(this.studentDetailsModal);
+  }
+
+  async downloadStudentApplicationForm(studentId) {
+    const student = store.getStudentById(studentId);
+    if (!student) {
+      this.showToast('Student Not Found', 'Could not locate student details for application download.', 'error');
+      return;
+    }
+
+    const downloadBtn = this.btnDownloadApplicationForm;
+    const quickBtn = document.getElementById('btnQuickDownloadAppForm');
+    if (downloadBtn) setButtonLoading(downloadBtn, true);
+    if (quickBtn) quickBtn.disabled = true;
+
+    try {
+      this.showToast('Generating Form', `Generating application form for ${student.name}...`, 'info');
+      if (!window.ApplicationFormCanvas?.downloadApplicationForm) {
+        throw new Error('Application form canvas generator is not loaded.');
+      }
+      const course = store.getCourseById(student.courseId || student.enrolledCourseIds?.[0]);
+      const filename = await window.ApplicationFormCanvas.downloadApplicationForm(student, course);
+      this.showToast('Download Complete', `Application form downloaded (${filename}).`, 'success');
+    } catch (error) {
+      console.error('Error generating application form:', error);
+      this.showToast('Generation Failed', error.message || 'Could not create application form.', 'error');
+    } finally {
+      if (downloadBtn) setButtonLoading(downloadBtn, false);
+      if (quickBtn) quickBtn.disabled = false;
+    }
   }
 
   confirmDeleteStudent(studentId) {

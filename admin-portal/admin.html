@@ -15,7 +15,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-10.19">
+  <link rel="stylesheet" href="admin-style.css?v=idcards-10.21">
   <script src="admin-config.js?v=3.5"></script>
 </head>
 
@@ -1597,6 +1597,9 @@
       <div class="modal-footer" style="justify-content:space-between;">
         <button type="button" class="btn btn-danger" id="btnDeleteStudentFromDetails">Delete Student</button>
         <div style="display:flex;gap:0.75rem;">
+          <button type="button" class="btn btn-secondary" id="btnDownloadApplicationForm">
+            <i class="fa-solid fa-file-pdf"></i> Download Application Form (PDF)
+          </button>
           <button type="button" class="btn btn-primary" id="btnEditFromDetails">
             <i class="fa-regular fa-pen-to-square"></i> Edit Student
           </button>
@@ -1983,7 +1986,8 @@
                 <label for="settingsOwnerName">Owner Name <span class="required-star">*</span></label>
                 <div class="input-icon-wrap">
                   <i class="fa-solid fa-user-tie"></i>
-                  <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true" required>
+                  <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true"
+                    required>
                 </div>
               </div>
             </div>
@@ -2004,14 +2008,16 @@
             <div class="settings-section-header">
               <div>
                 <h4 class="settings-section-title"><i class="fa-solid fa-user-group"></i> Academy Co-Owners</h4>
-                <p class="settings-helper-text">Add Google account email addresses. Co-owners have full access to manage courses, students, and marksheets for this academy.</p>
+                <p class="settings-helper-text">Add Google account email addresses. Co-owners have full access to manage
+                  courses, students, and marksheets for this academy.</p>
               </div>
             </div>
 
             <div class="coowner-input-row">
               <div class="input-icon-wrap coowner-input-wrap">
                 <i class="fa-solid fa-envelope"></i>
-                <input type="email" id="settingsCoOwnerInput" placeholder="Enter Google email (e.g. coowner@gmail.com)" autocomplete="off">
+                <input type="email" id="settingsCoOwnerInput" placeholder="Enter Google email (e.g. coowner@gmail.com)"
+                  autocomplete="off">
               </div>
               <button type="button" class="btn btn-secondary btn-add-coowner" id="btnAddCoOwner">
                 <i class="fa-solid fa-plus"></i> <span>Add Co-Owner</span>
@@ -2111,7 +2117,8 @@
   <!-- JavaScript -->
   <script src="certificate-canvas.js?v=12"></script>
   <script src="marksheet-canvas.js?v=17"></script>
-  <script src="admin-script.js?v=idcards-11.10"></script>
+  <script src="application-canvas.js?v=17"></script>
+  <script src="admin-script.js?v=idcards-11.29"></script>
 </body>
 
 </html>

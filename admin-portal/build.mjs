@@ -9,6 +9,7 @@ const publicFiles = [
   'superadmin-script.js',
   'admin-config.js',
   'admin-script.js',
+  'application-canvas.js',
   'certificate-canvas.js',
   'marksheet-canvas.js',
   'admin-style.css',

@@ -5200,6 +5200,14 @@ input[data-capitalize="true"] {
   font-weight: 600;
 }
 
+.custom-select-option.soft-selected {
+  background-color: #e0e7ff;
+  color: var(--primary);
+  outline: 1.5px solid var(--primary);
+  outline-offset: -1.5px;
+  font-weight: 600;
+}
+
 /* Course Checkbox Picker inside Student Modal */
 .checkbox-courses-list {
   display: grid;
@@ -5489,21 +5497,61 @@ input[data-capitalize="true"] {
   margin-bottom: 0.4rem;
 }
 
-.profile-meta-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+.profile-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.35rem;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1.5px solid var(--border-color);
+}
+
+.profile-detail-header + .profile-section-heading {
   margin-top: 1rem;
 }
 
+.profile-section-number {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: var(--primary, #4f46e5);
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.profile-section-heading h4 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.profile-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.65rem;
+}
+
 .profile-meta-card {
-  padding: 0.875rem;
+  padding: 0.85rem 1rem;
   background-color: #fafbfc;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
+}
+
+.profile-meta-card-full {
+  grid-column: 1 / -1;
 }
 
 .profile-meta-card span.label {
@@ -5511,6 +5559,9 @@ input[data-capitalize="true"] {
   color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .profile-meta-card span.value {
@@ -7797,6 +7848,7 @@ body.is-superadmin #nav-tenants {
     align-items: stretch;
     gap: 0.35rem;
   }
+
   .terminal-label-group {
     width: 100%;
   }
