@@ -7735,9 +7735,9 @@ class UIController {
     const finalExamVal = this.courseFinalExamInput?.value.trim() || '';
 
     const activeEnabled = [];
-    if (term1Enabled) activeEnabled.push({ name: '1st Terminal Modules', val: term1Val, input: this.courseTerm1Input });
-    if (term2Enabled) activeEnabled.push({ name: '2nd Terminal Modules', val: term2Val, input: this.courseTerm2Input });
-    if (term3Enabled) activeEnabled.push({ name: '3rd Terminal Modules', val: term3Val, input: this.courseTerm3Input });
+    if (term1Enabled) activeEnabled.push({ name: '1st Terminal', val: term1Val, input: this.courseTerm1Input });
+    if (term2Enabled) activeEnabled.push({ name: '2nd Terminal', val: term2Val, input: this.courseTerm2Input });
+    if (term3Enabled) activeEnabled.push({ name: '3rd Terminal', val: term3Val, input: this.courseTerm3Input });
     if (finalExamEnabled) activeEnabled.push({ name: 'Final Exam', val: finalExamVal, input: this.courseFinalExamInput });
 
     if (activeEnabled.length === 0) {
@@ -7755,23 +7755,23 @@ class UIController {
     const subjects = [];
     if (term1Enabled && term1Val) {
       const cleanVal = term1Val.replace(/^(?:1st\s+Terminal(?:\s+Modules?)?|Modules?)\s*[:—\-]?\s*/i, '').trim() || term1Val;
-      subjects.push(`1st Terminal Modules — ${cleanVal}`);
+      subjects.push(`1st Terminal — ${cleanVal}`);
     } else if (term1Enabled) {
-      subjects.push('1st Terminal Modules');
+      subjects.push('1st Terminal');
     }
 
     if (term2Enabled && term2Val) {
       const cleanVal = term2Val.replace(/^(?:2nd\s+Terminal(?:\s+Modules?)?|Modules?)\s*[:—\-]?\s*/i, '').trim() || term2Val;
-      subjects.push(`2nd Terminal Modules — ${cleanVal}`);
+      subjects.push(`2nd Terminal — ${cleanVal}`);
     } else if (term2Enabled) {
-      subjects.push('2nd Terminal Modules');
+      subjects.push('2nd Terminal');
     }
 
     if (term3Enabled && term3Val) {
       const cleanVal = term3Val.replace(/^(?:3rd\s+Terminal(?:\s+Modules?)?|Modules?)\s*[:—\-]?\s*/i, '').trim() || term3Val;
-      subjects.push(`3rd Terminal Modules — ${cleanVal}`);
+      subjects.push(`3rd Terminal — ${cleanVal}`);
     } else if (term3Enabled) {
-      subjects.push('3rd Terminal Modules');
+      subjects.push('3rd Terminal');
     }
 
     if (finalExamEnabled && finalExamVal) {

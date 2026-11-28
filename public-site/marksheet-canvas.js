@@ -66,25 +66,66 @@
     return `${day}/${month}/${year}`;
   }
 
-  function drawModuleTextWithOrdinals(ctx, text, startX, startY, maxWidth) {
+  function drawTextWithOrdinals(ctx, text, startX, startY, options = {}) {
     if (!text) return;
-    const baseFont = '13px Arial, sans-serif';
-    const supFont = '9.5px Arial, sans-serif';
-    const fillStyle = '#444444';
+    const baseFont = options.baseFont || '13px Arial, sans-serif';
+    const supFont = options.supFont || '9.5px Arial, sans-serif';
+    const fillStyle = options.fillStyle || '#444444';
+    const supOffset = options.supOffset !== undefined ? options.supOffset : -4.5;
+    const maxWidth = options.maxWidth;
 
     const normalized = String(text)
-      .replace(/1[ˢᵗ]+/g, '1st')
-      .replace(/2[ⁿᵈ]+/g, '2nd')
-      .replace(/3[ʳᵈ]+/g, '3rd')
-      .replace(/4[ᵗʰ]+/g, '4th');
+      .replace(/ˢ/g, 's')
+      .replace(/ᵗ/g, 't')
+      .replace(/ⁿ/g, 'n')
+      .replace(/ᵈ/g, 'd')
+      .replace(/ʳ/g, 'r')
+      .replace(/ʰ/g, 'h');
 
-    const ordinalRegex = /(\d+)(st|nd|rd|th)/gi;
+    const ordinalRegex = /(\d+)(st|nd|rd|th)\b/gi;
     if (!ordinalRegex.test(normalized)) {
       ctx.font = baseFont;
       ctx.fillStyle = fillStyle;
       ctx.textAlign = 'left';
-      ctx.fillText(text, startX, startY, maxWidth);
+      if (maxWidth) {
+        ctx.fillText(text, startX, startY, maxWidth);
+      } else {
+        ctx.fillText(text, startX, startY);
+      }
       return;
+    }
+
+    // Auto-scale if text exceeds maxWidth
+    if (maxWidth && maxWidth > 0) {
+      ctx.font = baseFont;
+      let totalW = 0;
+      ordinalRegex.lastIndex = 0;
+      let checkIdx = 0;
+      let chkMatch;
+      while ((chkMatch = ordinalRegex.exec(normalized)) !== null) {
+        if (chkMatch.index > checkIdx) {
+          ctx.font = baseFont;
+          totalW += ctx.measureText(normalized.slice(checkIdx, chkMatch.index)).width;
+        }
+        ctx.font = baseFont;
+        totalW += ctx.measureText(chkMatch[1]).width;
+        ctx.font = supFont;
+        totalW += ctx.measureText(chkMatch[2]).width;
+        checkIdx = chkMatch.index + chkMatch[0].length;
+      }
+      if (checkIdx < normalized.length) {
+        ctx.font = baseFont;
+        totalW += ctx.measureText(normalized.slice(checkIdx)).width;
+      }
+
+      if (totalW > maxWidth) {
+        ctx.save();
+        ctx.translate(startX, startY);
+        ctx.scale(maxWidth / totalW, 1);
+        drawTextWithOrdinals(ctx, text, 0, 0, { ...options, maxWidth: undefined });
+        ctx.restore();
+        return;
+      }
     }
 
     ordinalRegex.lastIndex = 0;
@@ -110,7 +151,7 @@
 
       const supStr = match[2];
       ctx.font = supFont;
-      ctx.fillText(supStr, curX, startY - 4.5);
+      ctx.fillText(supStr, curX, startY + supOffset);
       curX += ctx.measureText(supStr).width;
 
       lastIdx = match.index + match[0].length;
@@ -121,6 +162,26 @@
       ctx.font = baseFont;
       ctx.fillText(rest, curX, startY);
     }
+  }
+
+  function drawTitleTextWithOrdinals(ctx, text, startX, startY, maxWidth) {
+    drawTextWithOrdinals(ctx, text, startX, startY, {
+      baseFont: 'bold 15px Arial, sans-serif',
+      supFont: 'bold 10.5px Arial, sans-serif',
+      fillStyle: '#111111',
+      supOffset: -5,
+      maxWidth
+    });
+  }
+
+  function drawModuleTextWithOrdinals(ctx, text, startX, startY, maxWidth) {
+    drawTextWithOrdinals(ctx, text, startX, startY, {
+      baseFont: '13px Arial, sans-serif',
+      supFont: '9.5px Arial, sans-serif',
+      fillStyle: '#444444',
+      supOffset: -4.5,
+      maxWidth
+    });
   }
 
   function calculateMarksData(student, course, batch) {
@@ -230,21 +291,25 @@
         modules = termsListStr ? `Modules : ${termsListStr}` : '';
       } else {
         // Terminal subjects (1st, 2nd, 3rd)
-        if (title.includes('—') || title.includes('-')) {
-          const parts = title.split(/[—-]/);
-          title = parts[0].replace(/\s+Modules?$/i, '').trim();
-          let rawModules = parts.slice(1).join(' - ').trim();
+        const delimMatch = title.match(/[—]|(?:\s+-\s+)/);
+        if (delimMatch) {
+          const idx = delimMatch.index;
+          const len = delimMatch[0].length;
+          const rawTitle = title.slice(0, idx);
+          const rawModules = title.slice(idx + len).trim();
+          title = rawTitle.replace(/\s+Modules?\b/gi, '').trim();
           let cleanModules = rawModules.replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
           modules = cleanModules ? 'Modules : ' + cleanModules : '';
         } else if (/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i.test(title)) {
           const match = title.match(/^(\d+(?:st|nd|rd|th)\s+Terminal(?:\s+Modules)?)\s*[:](.*)$/i);
-          title = match[1].replace(/\s+Modules?$/i, '').trim();
+          title = match[1].replace(/\s+Modules?\b/gi, '').trim();
           let cleanModules = match[2].trim().replace(/^(?:Modules?|Module)\s*[:—\-]?\s*/i, '').trim();
           modules = cleanModules ? 'Modules : ' + cleanModules : '';
         } else {
-          title = title.replace(/\s+Modules?$/i, '').trim();
+          title = title.replace(/\s+Modules?\b/gi, '').trim();
           modules = '';
         }
+        title = title.replace(/\s+Modules?\b/gi, '').trim();
       }
 
       return { slNo: idx + 1, title, modules, isFinalExam, maxMarks, obtained };
@@ -476,7 +541,7 @@
       ctx.textAlign = 'left';
       ctx.font = 'bold 15px Arial, sans-serif';
       ctx.fillStyle = '#111111';
-      ctx.fillText(r.title, colX[1] + 18, rowY + (r.modules ? 23 : 32));
+      drawTitleTextWithOrdinals(ctx, r.title, colX[1] + 18, rowY + (r.modules ? 23 : 32), colW[1] - 28);
       if (r.modules) {
         drawModuleTextWithOrdinals(ctx, r.modules, colX[1] + 18, rowY + 44, colW[1] - 28);
       }
