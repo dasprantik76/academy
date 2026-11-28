@@ -15,7 +15,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Admin Stylesheet -->
-  <link rel="stylesheet" href="admin-style.css?v=idcards-10.26">
+  <link rel="stylesheet" href="admin-style.css?v=settings-1.0">
   <script src="admin-config.js?v=3.5"></script>
 </head>
 
@@ -1110,6 +1110,111 @@
           </div>
         </section>
 
+        <!-- ================= ACADEMY SETTINGS VIEW ================= -->
+        <section class="view-section" id="view-settings">
+          <div class="settings-page-wrapper">
+            <form id="academySettingsForm" class="settings-form" autocomplete="off">
+              <div class="settings-cards-grid">
+                <!-- Card 1: Academy Details -->
+                <div class="dashboard-card settings-card">
+                  <div class="card-header">
+                    <div class="card-header-title-wrap">
+                      <div class="stat-icon card-header-stat-icon icon-primary">
+                        <i class="fa-solid fa-school"></i>
+                      </div>
+                      <div>
+                        <h3 class="card-title">Academy Details</h3>
+                        <p class="card-subtitle">Manage public academy identity and ownership name</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body settings-card-body">
+                    <div class="form-grid-2">
+                      <div class="form-group">
+                        <label for="settingsAcademyName">Academy Name <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                          <i class="fa-solid fa-school"></i>
+                          <input type="text" id="settingsAcademyName" class="name-input-capitalized"
+                            data-capitalize="true" required placeholder="e.g. Diganta Computer Centre">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="settingsOwnerName">Owner Name <span class="required-star">*</span></label>
+                        <div class="input-icon-wrap">
+                          <i class="fa-solid fa-user-tie"></i>
+                          <input type="text" id="settingsOwnerName" class="name-input-capitalized"
+                            data-capitalize="true" required placeholder="e.g. Swarup Khan">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group" style="display: none;">
+                      <label for="settingsSubdomainSlug">Public Website Slug</label>
+                      <div class="subdomain-input-wrap"
+                        style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
+                        <span id="settingsSlugPrefix"
+                          style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
+                        <input type="text" id="settingsSubdomainSlug" value="diganta" placeholder="your-slug"
+                          style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card 2: Academy Co-Owners -->
+                <div class="dashboard-card settings-card">
+                  <div class="card-header">
+                    <div class="card-header-title-wrap">
+                      <div class="stat-icon card-header-stat-icon icon-primary">
+                        <i class="fa-solid fa-user-group"></i>
+                      </div>
+                      <div>
+                        <h3 class="card-title">Academy Co-Owners</h3>
+                        <p class="card-subtitle">Authorize additional Google accounts with management access</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body settings-card-body">
+                    <p class="settings-helper-text">Add Google account email addresses. Co-owners have full access to manage
+                      courses, students, and marksheets for this academy.</p>
+
+                    <div class="coowner-input-row">
+                      <div class="input-icon-wrap coowner-input-wrap">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="settingsCoOwnerInput"
+                          placeholder="Enter Google email (e.g. coowner@gmail.com)" autocomplete="off">
+                      </div>
+                      <button type="button" class="btn btn-secondary btn-add-coowner" id="btnAddCoOwner">
+                        <i class="fa-solid fa-plus"></i> <span>Add Co-Owner</span>
+                      </button>
+                    </div>
+                    <div class="coowner-input-error" id="settingsCoOwnerError" style="display: none;"></div>
+
+                    <div class="coowners-list-wrap">
+                      <div class="coowners-empty" id="settingsCoOwnersEmpty">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <p>No co-owners added yet. Enter an email above to add a co-owner.</p>
+                      </div>
+                      <ul class="coowners-list" id="settingsCoOwnersList"></ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Settings Action Bar -->
+              <div class="settings-actions-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelAcademySettings">
+                  <i class="fa-solid fa-rotate-left"></i> <span>Reset</span>
+                </button>
+                <button type="submit" class="btn btn-primary btn-save-settings" id="btnSaveAcademySettings">
+                  <i class="fa-solid fa-check"></i> <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
 
 
       </main>
@@ -1948,98 +2053,6 @@
     </div>
   </div>
 
-  <!-- Academy & Client Profile Settings Modal -->
-  <div class="modal-backdrop" id="academySettingsModal">
-    <div class="modal-window modal-md settings-modal-window">
-      <div class="modal-header">
-        <div class="modal-title-box">
-          <i class="fa-solid fa-gear modal-icon"></i>
-          <div>
-            <h3>Academy Settings</h3>
-            <p class="modal-subtitle">Manage academy profile and authorized co-owners</p>
-          </div>
-        </div>
-        <button class="btn-close-modal" id="btnCloseAcademySettingsModal" aria-label="Close modal">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <form id="academySettingsForm" autocomplete="off">
-        <div class="modal-body settings-modal-body">
-          <div class="settings-section">
-            <h4 class="settings-section-title"><i class="fa-solid fa-school"></i> Academy Details</h4>
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label for="settingsAcademyName">Academy Name <span class="required-star">*</span></label>
-                <div class="input-icon-wrap">
-                  <i class="fa-solid fa-school"></i>
-                  <input type="text" id="settingsAcademyName" class="name-input-capitalized" data-capitalize="true"
-                    required>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="settingsOwnerName">Owner Name <span class="required-star">*</span></label>
-                <div class="input-icon-wrap">
-                  <i class="fa-solid fa-user-tie"></i>
-                  <input type="text" id="settingsOwnerName" class="name-input-capitalized" data-capitalize="true"
-                    required>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-group" style="display: none;">
-              <label for="settingsSubdomainSlug">Public Website Slug</label>
-              <div class="subdomain-input-wrap"
-                style="display: flex; align-items: center; background: #f8fafc; border: 1.5px solid #d1d5db; border-radius: 8px; overflow: hidden; height: 46px;">
-                <span id="settingsSlugPrefix"
-                  style="padding: 0 0.75rem; color: #64748b; font-weight: 600; font-size: 0.8125rem; background: #f1f5f9; height: 100%; display: flex; align-items: center; border-right: 1px solid #cbd5e1; white-space: nowrap;">diganta.pixelsetu.com</span>
-                <input type="text" id="settingsSubdomainSlug" value="diganta" placeholder="your-slug"
-                  style="flex: 1; border: none; background: transparent; padding: 0 0.75rem; font-weight: 700; color: #0f172a; outline: none; font-size: 0.9375rem;">
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-section settings-coowners-section">
-            <div class="settings-section-header">
-              <div>
-                <h4 class="settings-section-title"><i class="fa-solid fa-user-group"></i> Academy Co-Owners</h4>
-                <p class="settings-helper-text">Add Google account email addresses. Co-owners have full access to manage
-                  courses, students, and marksheets for this academy.</p>
-              </div>
-            </div>
-
-            <div class="coowner-input-row">
-              <div class="input-icon-wrap coowner-input-wrap">
-                <i class="fa-solid fa-envelope"></i>
-                <input type="email" id="settingsCoOwnerInput" placeholder="Enter Google email (e.g. coowner@gmail.com)"
-                  autocomplete="off">
-              </div>
-              <button type="button" class="btn btn-secondary btn-add-coowner" id="btnAddCoOwner">
-                <i class="fa-solid fa-plus"></i> <span>Add Co-Owner</span>
-              </button>
-            </div>
-            <div class="coowner-input-error" id="settingsCoOwnerError" style="display: none;"></div>
-
-            <div class="coowners-list-wrap">
-              <div class="coowners-empty" id="settingsCoOwnersEmpty">
-                <i class="fa-solid fa-user-shield"></i>
-                <p>No co-owners added yet. Enter an email above to add a co-owner.</p>
-              </div>
-              <ul class="coowners-list" id="settingsCoOwnersList"></ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btnCancelAcademySettings">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="btnSaveAcademySettings">
-            <i class="fa-solid fa-check"></i> Save Changes
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
 
   <!-- One-Time Academy & Owner Setup Modal -->
   <div class="modal-backdrop" id="onboardingModal">
@@ -2110,10 +2123,10 @@
   <div id="marksheetPrintContainer" class="marksheet-print-container" aria-hidden="true"></div>
 
   <!-- JavaScript -->
-  <script src="certificate-canvas.js?v=12"></script>
-  <script src="marksheet-canvas.js?v=20"></script>
-  <script src="application-canvas.js?v=17"></script>
-  <script src="admin-script.js?v=idcards-11.40"></script>
+  <script src="certificate-canvas.js?v=idcards-11.42"></script>
+  <script src="marksheet-canvas.js?v=idcards-11.42"></script>
+  <script src="application-canvas.js?v=idcards-11.42"></script>
+  <script src="admin-script.js?v=settings-1.0"></script>
 </body>
 
 </html>

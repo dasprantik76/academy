@@ -1558,7 +1558,7 @@ class UIController {
       window.location.replace('superadmin.html');
       return;
     }
-    const validViews = ['dashboard', 'students', 'courses', 'batches', 'marksheets', 'certificates', 'idcards', 'inbox'];
+    const validViews = ['dashboard', 'students', 'courses', 'batches', 'marksheets', 'certificates', 'idcards', 'inbox', 'settings'];
     let targetView = validViews.includes(initialHash) ? initialHash : 'dashboard';
     this.currentView = targetView;
     this.confirmCallback = null;
@@ -2329,7 +2329,7 @@ class UIController {
 
 
     if (this.btnOpenSubdomainSettings) {
-      this.btnOpenSubdomainSettings.addEventListener('click', () => this.openAcademySettingsModal());
+      this.btnOpenSubdomainSettings.addEventListener('click', () => this.switchView('settings'));
     }
 
     // Subdomain Slug Cleaners (lowercase, alphanumeric, hyphens only)
@@ -2348,18 +2348,21 @@ class UIController {
     if (this.navSettings) {
       this.navSettings.addEventListener('click', (e) => {
         e.preventDefault();
-        this.openAcademySettingsModal();
+        this.switchView('settings');
         this.closeSidebar();
       });
     }
     if (this.btnEditAcademySettings) {
-      this.btnEditAcademySettings.addEventListener('click', () => this.openAcademySettingsModal());
+      this.btnEditAcademySettings.addEventListener('click', () => this.switchView('settings'));
     }
     if (this.btnCloseAcademySettingsModal) {
       this.btnCloseAcademySettingsModal.addEventListener('click', () => this.closeAcademySettingsModal());
     }
     if (this.btnCancelAcademySettings) {
-      this.btnCancelAcademySettings.addEventListener('click', () => this.closeAcademySettingsModal());
+      this.btnCancelAcademySettings.addEventListener('click', () => {
+        this.loadSettingsPageData();
+        this.showToast('Reset', 'Settings form reset to saved values.', 'info');
+      });
     }
     if (this.btnAddCoOwner) {
       this.btnAddCoOwner.addEventListener('click', () => this.addCoOwnerFromInput());
@@ -2497,7 +2500,7 @@ class UIController {
     // Hash change handler for browser back/forward
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
-      if (['dashboard', 'students', 'courses', 'batches', 'marksheets', 'certificates', 'idcards', 'inbox', 'tenants'].includes(hash)) {
+      if (['dashboard', 'students', 'courses', 'batches', 'marksheets', 'certificates', 'idcards', 'inbox', 'settings', 'tenants'].includes(hash)) {
         if (hash === 'tenants' && (!store.isSuperAdmin || store.ownerEmail !== 'dasprantik76@gmail.com')) {
           this.switchView('dashboard', true);
           return;
@@ -3765,6 +3768,12 @@ class UIController {
         subtitle: 'Manage and issue academic marksheets and grading records'
       },
       certificates: { icon: '<i class="fa-solid fa-certificate"></i>', theme: 'theme-dashboard', title: 'Student Certificates', subtitle: 'Preview and download certificates for completed students' },
+      settings: {
+        icon: '<i class="fa-solid fa-gear"></i>',
+        theme: 'theme-dashboard',
+        title: 'Academy Settings',
+        subtitle: 'Manage academy profile and authorized co-owners'
+      },
       tenants: {
         icon: '<i class="fa-solid fa-shield-halved"></i>',
         theme: 'theme-dashboard',
@@ -3804,6 +3813,9 @@ class UIController {
     if (viewName === 'marksheets') {
       setTimeout(() => this.scaleMarksheetPreview(), 50);
     }
+    if (viewName === 'settings') {
+      this.loadSettingsPageData();
+    }
     if (viewName === 'tenants' && store.isSuperAdmin && store.ownerEmail === 'dasprantik76@gmail.com') {
       this.loadPlatformTenants();
     }
@@ -3829,6 +3841,7 @@ class UIController {
     this.renderMarksheetsView();
     this.renderCertificatesView();
     this.renderInboxView();
+    this.renderSettingsView();
   }
 
   renderUserProfile() {
@@ -8709,17 +8722,26 @@ class UIController {
   }
 
   // ==========================================================================
-  // Academy Settings Modal Methods
+  // Academy Settings Page Methods
   // ==========================================================================
   openAcademySettingsModal() {
-    if (!this.academySettingsModal) return;
+    this.switchView('settings');
+  }
+
+  closeAcademySettingsModal() {
+    if (this.academySettingsModal) {
+      this.closeModal(this.academySettingsModal);
+    }
+  }
+
+  loadSettingsPageData() {
     const profile = store.getAcademyProfile();
     const currentSlug = profile?.slug || (this.session?.email?.includes('poulami') ? 'poulami' : (this.session?.email?.includes('diganta') ? 'diganta' : (this.session?.email ? this.session.email.split('@')[0].replace(/[^a-z0-9]/g, '') : '')));
 
-    if (this.settingsAcademyName) {
+    if (this.settingsAcademyName && (!this.settingsAcademyName.value || document.activeElement !== this.settingsAcademyName)) {
       this.settingsAcademyName.value = profile?.academyName || '';
     }
-    if (this.settingsOwnerName) {
+    if (this.settingsOwnerName && (!this.settingsOwnerName.value || document.activeElement !== this.settingsOwnerName)) {
       this.settingsOwnerName.value = profile?.ownerName || this.session?.name || '';
     }
     if (this.settingsSubdomainSlug) {
@@ -8729,27 +8751,22 @@ class UIController {
       this.settingsSlugPrefix.textContent = 'diganta.pixelsetu.com';
     }
 
-    // Initialize co-owners list
-    let coOwners = [];
-    if (Array.isArray(profile?.coOwnerEmails)) {
-      coOwners = [...profile.coOwnerEmails];
-    } else if (profile?.coOwnerEmail) {
-      coOwners = [profile.coOwnerEmail];
+    // Initialize co-owners list if not actively typing
+    if (!this.currentCoOwnerEmails || document.activeElement !== this.settingsCoOwnerInput) {
+      let coOwners = [];
+      if (Array.isArray(profile?.coOwnerEmails)) {
+        coOwners = [...profile.coOwnerEmails];
+      } else if (profile?.coOwnerEmail) {
+        coOwners = [profile.coOwnerEmail];
+      }
+      this.currentCoOwnerEmails = Array.from(new Set(coOwners.map(e => String(e || '').toLowerCase().trim()).filter(Boolean)));
+      this.renderCoOwnersList();
     }
-    this.currentCoOwnerEmails = Array.from(new Set(coOwners.map(e => String(e || '').toLowerCase().trim()).filter(Boolean)));
-
-    if (this.settingsCoOwnerInput) {
-      this.settingsCoOwnerInput.value = '';
-    }
-    this.hideCoOwnerError();
-    this.renderCoOwnersList();
-
-    this.openModal(this.academySettingsModal);
   }
 
-  closeAcademySettingsModal() {
-    if (!this.academySettingsModal) return;
-    this.closeModal(this.academySettingsModal);
+  renderSettingsView() {
+    if (this.currentView !== 'settings') return;
+    this.loadSettingsPageData();
   }
 
   renderCoOwnersList() {

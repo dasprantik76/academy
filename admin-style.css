@@ -8876,3 +8876,113 @@ body.is-superadmin #nav-tenants {
   background: rgba(239, 68, 68, 0.2);
   color: #f87171;
 }
+
+/* ==========================================================================
+   Academy Settings Page View
+   ========================================================================== */
+.settings-page-wrapper {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.5rem 0 3.5rem 0;
+}
+
+.settings-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-card {
+  height: auto;
+  overflow: visible;
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--border-color, #e2e8f0);
+  background-color: var(--surface-card, #ffffff);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.05));
+}
+
+.settings-card .card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-card .card-header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.settings-card .card-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.15rem;
+  font-weight: 400;
+}
+
+.settings-card-body {
+  padding: 1.5rem;
+}
+
+.settings-card .form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.settings-actions-footer {
+  margin-top: 1.75rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.btn-save-settings {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+  height: 44px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-save-settings:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(67, 97, 238, 0.35);
+}
+
+@media (max-width: 640px) {
+  .settings-page-wrapper {
+    padding: 1rem 0 2rem 0;
+  }
+  .settings-card .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .settings-card-body {
+    padding: 1.25rem 1rem;
+  }
+  .coowner-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-add-coowner {
+    width: 100%;
+    justify-content: center;
+  }
+  .settings-actions-footer {
+    flex-direction: column-reverse;
+  }
+  .settings-actions-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
