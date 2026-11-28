@@ -1049,26 +1049,17 @@ async function ensureDigantaTenantInDatabase(db) {
         updatedAt: new Date().toISOString()
       });
     } else {
-      const existingCoOwners = Array.isArray(existingProfile.coOwnerEmails)
-        ? existingProfile.coOwnerEmails
-        : (existingProfile.coOwnerEmail ? [existingProfile.coOwnerEmail] : []);
-      const coOwnerEmails = Array.from(new Set([...existingCoOwners, 'digantacomputercentre@gmail.com']));
-
-      await db.collection(COLLECTIONS.PROFILE).updateOne(
-        { _id: existingProfile._id },
-        {
-          $set: {
-            ownerEmail: DIGANTA_EMAIL,
-            coOwnerEmail: coOwnerEmails[0] || 'digantacomputercentre@gmail.com',
-            coOwnerEmails,
-            slug: 'diganta',
-            academyName: canonicalDiganta.academyName,
-            status: 'active',
-            studentIdPrefix: 'DCC/SMP/',
-            updatedAt: new Date().toISOString()
-          }
-        }
-      );
+      const updates = {};
+      if (!existingProfile.status) updates.status = 'active';
+      if (!existingProfile.slug) updates.slug = 'diganta';
+      if (!existingProfile.ownerEmail) updates.ownerEmail = DIGANTA_EMAIL;
+      if (Object.keys(updates).length > 0) {
+        updates.updatedAt = new Date().toISOString();
+        await db.collection(COLLECTIONS.PROFILE).updateOne(
+          { _id: existingProfile._id },
+          { $set: updates }
+        );
+      }
     }
 
     // Ensure counter exists for rcavirup@gmail.com
@@ -1221,7 +1212,6 @@ export default async function handler(req, res) {
     if (canonicalOwner === 'rcavirup@gmail.com' || targetOwnerEmail === 'rcavirup@gmail.com' || slug === 'diganta' || slug === 'prantik') {
       tenantEmails.add('rcavirup@gmail.com');
       tenantEmails.add('digantacomputercentre@gmail.com');
-      tenantEmails.add('atreyeeart20@gmail.com');
     }
     const tenantSlugs = new Set([profile?.slug, slug].filter(Boolean));
     if (canonicalOwner === 'rcavirup@gmail.com' || targetOwnerEmail === 'rcavirup@gmail.com') {
@@ -1577,7 +1567,7 @@ export default async function handler(req, res) {
             ...payload.profile,
             ownerEmail,
             coOwnerEmails,
-            coOwnerEmail: coOwnerEmails[0] || payload.profile.coOwnerEmail || '',
+            coOwnerEmail: coOwnerEmails[0] || '',
             status,
             requestedAt: existingProfile?.requestedAt || new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -2081,7 +2071,6 @@ export default async function handler(req, res) {
           if (Array.isArray(tenantProfile?.coOwnerEmails)) tenantProfile.coOwnerEmails.forEach(e => tenantEmails.add(e));
           if (canonicalOwner === 'rcavirup@gmail.com' || ownerEmail === 'rcavirup@gmail.com') {
             tenantEmails.add('digantacomputercentre@gmail.com');
-            tenantEmails.add('atreyeeart20@gmail.com');
           }
           const allowedEmails = Array.from(tenantEmails);
 
@@ -2149,7 +2138,6 @@ export default async function handler(req, res) {
           if (Array.isArray(tenantProfile?.coOwnerEmails)) tenantProfile.coOwnerEmails.forEach(e => tenantEmails.add(e));
           if (canonicalOwner === 'rcavirup@gmail.com' || ownerEmail === 'rcavirup@gmail.com') {
             tenantEmails.add('digantacomputercentre@gmail.com');
-            tenantEmails.add('atreyeeart20@gmail.com');
           }
           const allowedEmails = Array.from(tenantEmails);
 

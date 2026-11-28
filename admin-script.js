@@ -8751,17 +8751,20 @@ class UIController {
       this.settingsSlugPrefix.textContent = 'diganta.pixelsetu.com';
     }
 
-    // Initialize co-owners list if not actively typing
-    if (!this.currentCoOwnerEmails || document.activeElement !== this.settingsCoOwnerInput) {
-      let coOwners = [];
-      if (Array.isArray(profile?.coOwnerEmails)) {
-        coOwners = [...profile.coOwnerEmails];
-      } else if (profile?.coOwnerEmail) {
-        coOwners = [profile.coOwnerEmail];
-      }
-      this.currentCoOwnerEmails = Array.from(new Set(coOwners.map(e => String(e || '').toLowerCase().trim()).filter(Boolean)));
-      this.renderCoOwnersList();
+    // Initialize co-owners list from store profile
+    let coOwners = [];
+    if (Array.isArray(profile?.coOwnerEmails)) {
+      coOwners = [...profile.coOwnerEmails];
+    } else if (profile?.coOwnerEmail) {
+      coOwners = [profile.coOwnerEmail];
     }
+    this.currentCoOwnerEmails = Array.from(new Set(coOwners.map(e => String(e || '').toLowerCase().trim()).filter(Boolean)));
+
+    if (this.settingsCoOwnerInput && document.activeElement !== this.settingsCoOwnerInput) {
+      this.settingsCoOwnerInput.value = '';
+    }
+    this.hideCoOwnerError();
+    this.renderCoOwnersList();
   }
 
   renderSettingsView() {
@@ -8795,7 +8798,7 @@ class UIController {
     `).join('');
   }
 
-  addCoOwnerFromInput() {
+  async addCoOwnerFromInput() {
     if (!this.settingsCoOwnerInput) return;
     const email = this.settingsCoOwnerInput.value.toLowerCase().trim();
     if (!email) {
@@ -8833,14 +8836,35 @@ class UIController {
     this.settingsCoOwnerInput.value = '';
     this.hideCoOwnerError();
     this.renderCoOwnersList();
+    await this.persistCoOwners(this.currentCoOwnerEmails, `Co-owner ${email} added.`);
     this.settingsCoOwnerInput.focus();
   }
 
-  removeCoOwner(emailToRemove) {
+  async removeCoOwner(emailToRemove) {
     if (!Array.isArray(this.currentCoOwnerEmails)) return;
     const target = (emailToRemove || '').toLowerCase().trim();
     this.currentCoOwnerEmails = this.currentCoOwnerEmails.filter(e => e.toLowerCase().trim() !== target);
     this.renderCoOwnersList();
+    await this.persistCoOwners(this.currentCoOwnerEmails, `Co-owner ${target} removed.`);
+  }
+
+  async persistCoOwners(coOwnerEmails, successMessage) {
+    const profile = store.getAcademyProfile() || {};
+    const updatedEmails = Array.from(new Set((coOwnerEmails || []).map(e => String(e || '').toLowerCase().trim()).filter(Boolean)));
+    const updatedProfile = {
+      ...profile,
+      coOwnerEmails: updatedEmails,
+      coOwnerEmail: updatedEmails[0] || '',
+      updatedAt: Date.now()
+    };
+    try {
+      await store.saveAcademyProfile(updatedProfile);
+      if (successMessage) {
+        this.showToast('Co-Owners Updated', successMessage, 'success');
+      }
+    } catch (err) {
+      this.showToast('Update Failed', err.message || 'Could not update co-owners in database.', 'error');
+    }
   }
 
   showCoOwnerError(msg) {
