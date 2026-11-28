@@ -7735,9 +7735,9 @@ class UIController {
     const finalExamVal = this.courseFinalExamInput?.value.trim() || '';
 
     const activeEnabled = [];
-    if (term1Enabled) activeEnabled.push({ name: '1st Terminal', val: term1Val, input: this.courseTerm1Input });
-    if (term2Enabled) activeEnabled.push({ name: '2nd Terminal', val: term2Val, input: this.courseTerm2Input });
-    if (term3Enabled) activeEnabled.push({ name: '3rd Terminal', val: term3Val, input: this.courseTerm3Input });
+    if (term1Enabled) activeEnabled.push({ name: '1st Terminal Modules', val: term1Val, input: this.courseTerm1Input });
+    if (term2Enabled) activeEnabled.push({ name: '2nd Terminal Modules', val: term2Val, input: this.courseTerm2Input });
+    if (term3Enabled) activeEnabled.push({ name: '3rd Terminal Modules', val: term3Val, input: this.courseTerm3Input });
     if (finalExamEnabled) activeEnabled.push({ name: 'Final Exam', val: finalExamVal, input: this.courseFinalExamInput });
 
     if (activeEnabled.length === 0) {
