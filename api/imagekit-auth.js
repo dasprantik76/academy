@@ -60,6 +60,44 @@ async function resolveOwnerEmail(db, queryEmail, querySlug) {
   return profile?.ownerEmail || 'rcavirup@gmail.com';
 }
 
+async function peekNextStudentId(db, ownerEmail) {
+  const profile = await db.collection('profile').findOne(
+    { ownerEmail },
+    { projection: { studentIdPrefix: 1, slug: 1, academyName: 1 } }
+  );
+
+  let prefix = profile?.studentIdPrefix;
+  if (!prefix) {
+    if (ownerEmail === 'rcavirup@gmail.com' || ownerEmail === 'digantacomputercentre@gmail.com') {
+      prefix = 'DCC/SMP/';
+    } else if (profile?.slug) {
+      prefix = `${profile.slug.toUpperCase().slice(0, 4)}/`;
+    } else {
+      prefix = 'STU/';
+    }
+  }
+  if (!prefix.endsWith('/')) prefix += '/';
+
+  const defaultStartSeq = (ownerEmail === 'rcavirup@gmail.com' || ownerEmail === 'digantacomputercentre@gmail.com') ? 2009 : 1000;
+  const counter = await db.collection('counters').findOne({ _id: `student-id:${ownerEmail}` });
+  const currentSeq = counter?.sequence ? Math.max(counter.sequence, defaultStartSeq) : defaultStartSeq;
+  const nextSeq = currentSeq + 1;
+  return `${prefix}${String(nextSeq).padStart(5, '0')}`;
+}
+
+function formatStudentPhotoFileName(studentId, date = new Date()) {
+  const safeId = String(studentId || 'STUDENT').replace(/[^a-zA-Z0-9_-]+/g, '_');
+  const d = date instanceof Date && !isNaN(date) ? date : new Date(date || Date.now());
+  const pad = (n) => String(n).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const min = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  return `${safeId}_${yyyy}${mm}${dd}_${hh}${min}${ss}.jpg`;
+}
+
 export default async function handler(req, res) {
   setCorsHeaders(req, res);
   if (req.method === 'OPTIONS') return res.status(204).end();
@@ -134,10 +172,22 @@ export default async function handler(req, res) {
       }
     }
 
+    const studentIdToUse = String(req.body?.studentId || '').trim() || await peekNextStudentId(db, ownerEmail);
+    const suggestedFileName = formatStudentPhotoFileName(studentIdToUse, new Date());
+
     const token = randomUUID();
     const expire = Math.floor(Date.now() / 1000) + 5 * 60;
     const signature = createHmac('sha1', privateKey).update(`${token}${expire}`).digest('hex');
-    return res.status(200).json({ success: true, token, expire, signature, publicKey, urlEndpoint });
+    return res.status(200).json({
+      success: true,
+      token,
+      expire,
+      signature,
+      publicKey,
+      urlEndpoint,
+      studentId: studentIdToUse,
+      suggestedFileName
+    });
   } catch (error) {
     console.error('[ImageKit Auth Error]:', error);
     return res.status(500).json({ success: false, error: 'Could not authorize the photo upload.' });

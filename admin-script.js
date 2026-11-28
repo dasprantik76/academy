@@ -6936,6 +6936,7 @@ class UIController {
           isAdmin: true,
           ownerEmail: store.ownerEmail,
           academySlug: store.getAcademyProfile()?.slug || (store.ownerEmail === 'rcavirup@gmail.com' ? 'diganta' : store.ownerEmail),
+          studentId,
           fileType: uploadFile.type,
           fileSize: uploadFile.size
         })
@@ -6949,8 +6950,11 @@ class UIController {
       throw new Error(auth?.error || 'Could not authorize photo upload.');
     }
 
-    const safeStudentId = String(studentId || 'student').replace(/[^a-zA-Z0-9_-]+/g, '_');
-    const fileName = `${safeStudentId}.jpg`;
+    const safeStudentId = String(studentId || store.generateStudentId() || 'student').replace(/[^a-zA-Z0-9_-]+/g, '_');
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const fileName = auth?.suggestedFileName || `${safeStudentId}_${timestamp}.jpg`;
 
     const uploadBody = new FormData();
     uploadBody.append('file', uploadFile);
@@ -7220,7 +7224,8 @@ class UIController {
     // Handle photo upload if a new file was chosen
     if (this.selectedStudentPhotoFile) {
       try {
-        const uploadResult = await this.uploadStudentPhoto(this.selectedStudentPhotoFile, id || 'temp');
+        const studentIdForPhoto = id || store.generateStudentId();
+        const uploadResult = await this.uploadStudentPhoto(this.selectedStudentPhotoFile, studentIdForPhoto);
         photoUrl = uploadResult.photoUrl;
         imageKitFileId = uploadResult.imageKitFileId;
         imageKitFilePath = uploadResult.imageKitFilePath;

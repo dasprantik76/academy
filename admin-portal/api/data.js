@@ -90,6 +90,65 @@ async function deleteImageKitFile(fileId) {
   }
 }
 
+function formatStudentPhotoFileName(studentId, date = new Date()) {
+  const safeId = String(studentId || 'STUDENT').replace(/[^a-zA-Z0-9_-]+/g, '_');
+  const d = date instanceof Date && !isNaN(date) ? date : new Date(date || Date.now());
+  const pad = (n) => String(n).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const min = pad(d.getMinutes());
+  const ss = pad(d.getSeconds());
+  return `${safeId}_${yyyy}${mm}${dd}_${hh}${min}${ss}.jpg`;
+}
+
+async function renameImageKitFile(currentFilePath, newFileName) {
+  if (!currentFilePath || !newFileName) return null;
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
+  const urlEndpoint = String(process.env.IMAGEKIT_URL_ENDPOINT || 'https://ik.imagekit.io/d3ycnoiwd').replace(/\/$/, '');
+  if (!privateKey) {
+    console.warn('[ImageKit Rename] Skipped: IMAGEKIT_PRIVATE_KEY is not defined.');
+    return null;
+  }
+
+  try {
+    const authHeader = `Basic ${Buffer.from(privateKey + ':').toString('base64')}`;
+    const cleanFilePath = currentFilePath.startsWith('/') ? currentFilePath : `/${currentFilePath}`;
+    const cleanNewName = newFileName.replace(/^.*[\\\/]/, '');
+
+    const response = await fetch('https://api.imagekit.io/v1/files/rename', {
+      method: 'PUT',
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        filePath: cleanFilePath,
+        newFileName: cleanNewName,
+        purgeCache: true
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.warn('[ImageKit Rename Error]:', response.status, errText);
+      return null;
+    }
+
+    const dirPath = cleanFilePath.substring(0, cleanFilePath.lastIndexOf('/'));
+    const newFilePath = `${dirPath}/${cleanNewName}`;
+    const newPhotoUrl = `${urlEndpoint}${newFilePath}`;
+    return {
+      filePath: newFilePath,
+      photoUrl: newPhotoUrl
+    };
+  } catch (err) {
+    console.warn('[ImageKit Rename Exception]:', err);
+    return null;
+  }
+}
+
 // Super Administrator Accounts with Platform Tenant Approval Rights
 const configuredSuperAdmin = process.env.SUPER_ADMIN_EMAIL || process.env.SUPER_ADMIN_EMAILS || 'dasprantik76@gmail.com';
 const SUPER_ADMIN_EMAILS = new Set(
@@ -1468,6 +1527,20 @@ export default async function handler(req, res) {
           };
           delete normalizedStudent.authCode;
 
+          // Automatically rename student passport photo in ImageKit to match the assigned Student ID with timestamp
+          if (student.imageKitFilePath) {
+            const safeStudentId = String(studentId).replace(/[^a-zA-Z0-9_-]+/g, '_');
+            const currentFileName = student.imageKitFilePath.replace(/^.*[\\\/]/, '');
+            if (!currentFileName.startsWith(safeStudentId)) {
+              const targetFileName = formatStudentPhotoFileName(studentId, new Date());
+              const renameResult = await renameImageKitFile(student.imageKitFilePath, targetFileName);
+              if (renameResult) {
+                normalizedStudent.imageKitFilePath = renameResult.filePath;
+                normalizedStudent.photoUrl = renameResult.photoUrl;
+              }
+            }
+          }
+
           await db.collection(COLLECTIONS.STUDENTS).insertOne(normalizedStudent);
           delete normalizedStudent._id;
           return res.status(201).json({ success: true, student: normalizedStudent });
@@ -1706,6 +1779,21 @@ export default async function handler(req, res) {
             ownerEmail: canonicalOwner
           };
           delete normalizedStudent._id;
+
+          // Automatically rename student passport photo in ImageKit to match the assigned Student ID with timestamp
+          if (student.imageKitFilePath) {
+            const safeStudentId = String(studentId).replace(/[^a-zA-Z0-9_-]+/g, '_');
+            const currentFileName = student.imageKitFilePath.replace(/^.*[\\\/]/, '');
+            if (!currentFileName.startsWith(safeStudentId)) {
+              const targetFileName = formatStudentPhotoFileName(studentId, new Date());
+              const renameResult = await renameImageKitFile(student.imageKitFilePath, targetFileName);
+              if (renameResult) {
+                normalizedStudent.imageKitFilePath = renameResult.filePath;
+                normalizedStudent.photoUrl = renameResult.photoUrl;
+              }
+            }
+          }
+
           await db.collection(COLLECTIONS.STUDENTS).insertOne(normalizedStudent);
           return res.status(200).json({ success: true, student: normalizedStudent });
         }
@@ -1760,6 +1848,20 @@ export default async function handler(req, res) {
             if (oldFileId && oldFileId !== newFileId) {
               await deleteImageKitFile(oldFileId);
             }
+
+            // If a new photo is uploaded, ensure it is renamed to match student ID with timestamp
+            if (cleanUpdate.imageKitFilePath) {
+              const safeStudentId = String(targetId).replace(/[^a-zA-Z0-9_-]+/g, '_');
+              const currentFileName = cleanUpdate.imageKitFilePath.replace(/^.*[\\\/]/, '');
+              if (!currentFileName.startsWith(safeStudentId)) {
+                const targetFileName = formatStudentPhotoFileName(targetId, new Date());
+                const renameResult = await renameImageKitFile(cleanUpdate.imageKitFilePath, targetFileName);
+                if (renameResult) {
+                  cleanUpdate.imageKitFilePath = renameResult.filePath;
+                  cleanUpdate.photoUrl = renameResult.photoUrl;
+                }
+              }
+            }
           }
 
           await db.collection(COLLECTIONS.STUDENTS).updateOne(
@@ -1771,6 +1873,43 @@ export default async function handler(req, res) {
             { projection: { _id: 0 } }
           );
           return res.status(200).json({ success: true, student: updatedStudent });
+        }
+
+        // 7b. Rename Student Photos in ImageKit to match Student IDs with date/time
+        case 'rename_student_photos': {
+          const { allowedEmails } = await getTenantContext(ownerEmail, requestAcademySlug);
+          const students = await db.collection(COLLECTIONS.STUDENTS).find({
+            ownerEmail: { $in: allowedEmails },
+            imageKitFilePath: { $exists: true, $ne: '' }
+          }).toArray();
+
+          const results = [];
+          for (const s of students) {
+            if (!s.imageKitFilePath || !s.imageKitFilePath.includes('/academy/student-photos/')) continue;
+            const safeStudentId = String(s.id || '').replace(/[^a-zA-Z0-9_-]+/g, '_');
+            const currentFileName = s.imageKitFilePath.replace(/^.*[\\\/]/, '');
+
+            if (!currentFileName.startsWith(safeStudentId)) {
+              const regDate = s.createdAt ? new Date(s.createdAt) : (s.joinDate ? new Date(s.joinDate) : new Date());
+              const targetFileName = formatStudentPhotoFileName(s.id, regDate);
+              const renameResult = await renameImageKitFile(s.imageKitFilePath, targetFileName);
+              if (renameResult) {
+                await db.collection(COLLECTIONS.STUDENTS).updateOne(
+                  { _id: s._id },
+                  {
+                    $set: {
+                      imageKitFilePath: renameResult.filePath,
+                      photoUrl: renameResult.photoUrl
+                    }
+                  }
+                );
+                results.push({ id: s.id, oldPath: s.imageKitFilePath, newPath: renameResult.filePath, success: true });
+              } else {
+                results.push({ id: s.id, oldPath: s.imageKitFilePath, success: false });
+              }
+            }
+          }
+          return res.status(200).json({ success: true, count: results.length, results });
         }
 
         // 8. Bulk Update Students (e.g. Mark as Completed)

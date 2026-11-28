@@ -2737,6 +2737,7 @@ class PublicAcademyApp {
           academySlug: this.currentAcademySlug,
           authCode,
           courseId,
+          studentId,
           fileName: uploadFile.name,
           fileType: uploadFile.type,
           fileSize: uploadFile.size
@@ -2752,17 +2753,18 @@ class PublicAcademyApp {
       throw error;
     }
 
-    const safeOriginalName = uploadFile.name
-      .normalize('NFKD')
-      .replace(/[^a-zA-Z0-9.-]+/g, '_')
-      .replace(/^\.+/, '')
-      .slice(-100) || 'passport-photo.jpg';
-    const uniqueFileName = `${studentId}_${Date.now()}_${safeOriginalName}`;
+    const activeStudentId = auth.studentId || studentId || 'STU';
+    const safeStudentId = String(activeStudentId).replace(/[^a-zA-Z0-9_-]+/g, '_');
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const targetFileName = auth.suggestedFileName || `${safeStudentId}_${timestamp}.jpg`;
+
     const uploadBody = new FormData();
     uploadBody.append('file', uploadFile);
-    uploadBody.append('fileName', uniqueFileName);
+    uploadBody.append('fileName', targetFileName);
     uploadBody.append('folder', '/academy/student-photos/');
-    uploadBody.append('useUniqueFileName', 'true');
+    uploadBody.append('useUniqueFileName', 'false');
     uploadBody.append('publicKey', auth.publicKey);
     uploadBody.append('token', auth.token);
     uploadBody.append('signature', auth.signature);
@@ -2790,9 +2792,10 @@ class PublicAcademyApp {
     const metadata = {
       photoUrl: uploaded.url,
       imageKitFileId: uploaded.fileId,
-      imageKitFilePath: uploaded.filePath
+      imageKitFilePath: uploaded.filePath,
+      studentId: activeStudentId
     };
-    this.pendingPhotoUpload = { file, studentId, metadata };
+    this.pendingPhotoUpload = { file, studentId: activeStudentId, metadata };
     return metadata;
   }
 
@@ -3003,7 +3006,14 @@ class PublicAcademyApp {
     try {
       this.setRegistrationBusy(true);
       const photoMetadata = await this.uploadStudentPhoto(photoFile, studentId, authCode, courseId);
-      Object.assign(newStudent, photoMetadata);
+      if (photoMetadata.studentId) {
+        newStudent.id = photoMetadata.studentId;
+      }
+      Object.assign(newStudent, {
+        photoUrl: photoMetadata.photoUrl,
+        imageKitFileId: photoMetadata.imageKitFileId,
+        imageKitFilePath: photoMetadata.imageKitFilePath
+      });
 
       submissionStage = 'registration';
       this.setRegistrationBusy(true);
